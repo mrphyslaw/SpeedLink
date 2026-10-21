@@ -27,7 +27,7 @@ public partial class MainWindow
         CaptureWorkbench(System.IO.Path.Combine(folder, "DetailsWorkbench.png"));
         EditorPane.DetailsButton.IsChecked = false; UpdateLayout();
         CaptureWorkbench(System.IO.Path.Combine(folder, "Workbench.png"));
-        EditorPane.FocusButton.IsChecked = true; EditorPane.ViewBox.SelectedIndex = 1; UpdateLayout();
+        EditorPane.FocusButton.IsChecked = true; EditorPane.SetViewMode(1); UpdateLayout();
         CaptureWorkbench(System.IO.Path.Combine(folder, "FocusedWorkbench.png"));
         Width = MinWidth; Height = MinHeight; UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);

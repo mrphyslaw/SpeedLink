@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.5.2-alpha.1 — compact editor (unreleased)
+
+- Collapse app navigation to icons and reduce the editor's top and bottom bars.
+- Add Fit map, a resizable/hideable/floating map browser, floating graph and
+  separate map-information window. Remember panel sizes, views and positions.
+- Fit a full 16×16 table and both axes without scrolling at 1024×700 and
+  1280×720 logical window sizes using Fit map with compact navigation.
+- Display long MAF curves as breakpoint/value rows beside a curve with zoom,
+  pan and linked point selection. Keep static breakpoints read-only.
+- Keep full precision during cell editing and clipboard operations; support
+  long-curve value-column paste and validated breakpoint/value paste.
+- Fit the 3D surface to wide and tall panes. Preserve mandatory checksum saves.
+
 ## v0.5.1-alpha.1 — definition import
 
 - Import editor XML and logger JSON updates through the Definitions window.

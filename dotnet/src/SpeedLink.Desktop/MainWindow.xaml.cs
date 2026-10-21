@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.5.1-alpha.1";
+    public const string Version = "0.5.2-alpha.1";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -42,6 +42,7 @@ public partial class MainWindow : Window
             EditorPane = new(editorInspector, editorGuard); ((TabItem)Pages.Items[1]).Content = EditorPane;
         }
         EditorPane.Definitions = definitionSnapshot.Editors;
+        ConfigureWorkspaceLayout();
         Width = Math.Min(Width, Math.Max(MinWidth, SystemParameters.WorkArea.Width));
         Height = Math.Min(Height, Math.Max(MinHeight, SystemParameters.WorkArea.Height));
         Navigate(0);
@@ -344,6 +345,7 @@ public partial class MainWindow : Window
     {
         if (!closeApproved && !EditorPane.MayClose()) { e.Cancel = true; return; }
         closeApproved = true;
+        EditorPane.PrepareHostClose();
         if (transport is null && !busy)
             return;
         e.Cancel = true;
