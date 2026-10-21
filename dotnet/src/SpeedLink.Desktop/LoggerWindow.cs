@@ -78,7 +78,7 @@ public partial class MainWindow
 
     private void InitializeLogger()
     {
-        ConfigureLoggerProfile(LoggerDefinition.Speed6);
+        ConfigureLoggerProfile(definitionSnapshot.LoggerFor("L38KEH000")!);
         LoggerGrid.ItemsSource = loggerRows;
         LoggerRateBox.ItemsSource = new[] { 1, 2, 5, 10, 20 }; LoggerRateBox.SelectedItem = 5;
         var view = CollectionViewSource.GetDefaultView(loggerRows);
@@ -116,7 +116,7 @@ public partial class MainWindow
     }
     private void LoggerIdentityChanged()
     {
-        var match = LoggerDefinition.ForCalibration(identity?.Calibration);
+        var match = definitionSnapshot.LoggerFor(identity?.Calibration);
         if (match is not null && match.Id != loggerDefinition.Id) ConfigureLoggerProfile(match);
         if (match is null)
         {
@@ -130,7 +130,7 @@ public partial class MainWindow
     {
         if (LoggerStartButton is null || loggerDefinition is null) return;
         LoggerStartButton.IsEnabled = idle && transport is not null && !transport.ReadAttempted && loggerCalibration is not null &&
-            LoggerDefinition.ForCalibration(identity?.Calibration) is not null && loggerDefinition.MatchesCalibrationId(identity?.Calibration) && loggerRows.Any(row => row.Selected);
+            definitionSnapshot.LoggerFor(identity?.Calibration) is not null && loggerDefinition.MatchesCalibrationId(identity?.Calibration) && loggerRows.Any(row => row.Selected);
         LoggerStopButton.IsEnabled = loggingActive && !closing;
         LoggerRomButton.IsEnabled = idle; LoggerRateBox.IsEnabled = idle; StoichBox.IsEnabled = idle; RecordCsvBox.IsEnabled = idle;
         LoggerEssentialsButton.IsEnabled = idle; LoggerAllButton.IsEnabled = idle; LoggerNoneButton.IsEnabled = idle;
@@ -139,8 +139,8 @@ public partial class MainWindow
     private void BindLoggerRom(string path)
     {
         if (new FileInfo(path).Length != RomInspector.RomSize) throw new InvalidDataException("Load a full 1 MiB ECU image.");
-        var binding = LoggerDefinition.BindKnownRom(File.ReadAllBytes(path));
-        if (identity is not null && (LoggerDefinition.ForCalibration(identity.Calibration) is null || !binding.Definition.MatchesCalibrationId(identity.Calibration)))
+        var binding = definitionSnapshot.BindLoggerRom(File.ReadAllBytes(path));
+        if (identity is not null && (definitionSnapshot.LoggerFor(identity.Calibration) is null || !binding.Definition.MatchesCalibrationId(identity.Calibration)))
             throw new InvalidDataException("The selected ROM does not match the connected ECU calibration.");
         ConfigureLoggerProfile(binding.Definition); loggerCalibration = binding.Calibration;
         LoggerRomText.Text = $"{string.Join(", ", binding.Definition.SoftwareIds)} · {System.IO.Path.GetFileName(path)} · MAP calibration loaded";

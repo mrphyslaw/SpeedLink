@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.5.0-alpha.1";
+    public const string Version = "0.5.1-alpha.1";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -35,11 +35,13 @@ public partial class MainWindow : Window
     internal MainWindow(string? testVault, RomInspector? editorInspector = null, TuningCodeGuard? editorGuard = null)
     {
         vault = testVault ?? Path.Combine(AppContext.BaseDirectory, "data");
+        definitionLibrary = new(Path.Combine(vault, "definitions")); definitionSnapshot = definitionLibrary.Load();
         UiTheme.Ensure(); InitializeComponent();
         if (editorInspector is not null && editorGuard is not null)
         {
             EditorPane = new(editorInspector, editorGuard); ((TabItem)Pages.Items[1]).Content = EditorPane;
         }
+        EditorPane.Definitions = definitionSnapshot.Editors;
         Width = Math.Min(Width, Math.Max(MinWidth, SystemParameters.WorkArea.Width));
         Height = Math.Min(Height, Math.Max(MinHeight, SystemParameters.WorkArea.Height));
         Navigate(0);
@@ -54,6 +56,7 @@ public partial class MainWindow : Window
         RefreshPorts();
         RefreshHistory();
         Controls();
+        if (definitionSnapshot.Entries.Any(e => e.Problem is not null)) StatusText.Text = "Some imported definitions were rejected · open Definitions for details";
     }
     private void Log(string message)
     {
@@ -63,6 +66,7 @@ public partial class MainWindow : Window
     private void Controls()
     {
         bool idle = !busy && !closing;
+        DefinitionsButton.IsEnabled = idle && transport is null;
         SessionText.Text = transport is null ? "Offline" : identity?.Calibration ?? "Adapter connected";
         ConnectButton.IsEnabled = idle && transport is null;
         DisconnectButton.IsEnabled = idle && transport is not null;
@@ -425,6 +429,9 @@ public partial class MainWindow : Window
                 pages = 6,
                 loggerChannels = loggerRows.Count,
                 loggerProfiles = LoggerDefinition.Known.Count,
+                editorDefinitions = definitionSnapshot.Editors.Count,
+                definitionImportAvailable = DefinitionsButton.IsEnabled,
+                importedDefinitions = definitionSnapshot.Entries.Count(entry => entry.Imported),
                 loggerCalibration = loggerDefinition.SoftwareIds.Single(),
                 stockRomLogger = true,
                 realEcuLoggerValidated = false,

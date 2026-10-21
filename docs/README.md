@@ -14,6 +14,7 @@ Start with the workflow you need. ECU programming remains disabled.
 | [Logger](LOGGER.md) | Adapter setup, ROM binding, parameters, units, charts, CSV recording and log viewing |
 | [General usage](USAGE.md) | Reading, backups, transport settings and file inspection |
 | [Supported ROMs](SUPPORTED_ROMS.md) | Known inspection layouts and compatibility limits |
+| [Definition import](DEFINITIONS.md) | Import editor/logger updates, persistence and bundled fallback |
 | [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all seven profiles |
 
 ## Development and validation

@@ -53,11 +53,11 @@ public sealed class LoggerDefinition
         var matches = Known.Where(p => p.MatchesCalibrationId(calibration)).ToArray();
         return matches.Length == 1 ? matches[0] : null;
     }
-    public static (LoggerDefinition Definition, LoggerCalibration Calibration) BindKnownRom(ReadOnlySpan<byte> image)
+    public static (LoggerDefinition Definition, LoggerCalibration Calibration) BindKnownRom(ReadOnlySpan<byte> image, IReadOnlyList<LoggerDefinition>? definitions = null)
     {
         if (image.Length != 1_048_576) throw new InvalidDataException("Load a complete 1 MiB ECU image.");
         LoggerDefinition? match = null;
-        foreach (var profile in Known)
+        foreach (var profile in definitions ?? Known)
         {
             if (!profile.HasSoftwareMarker(image)) continue;
             if (match is not null) throw new InvalidDataException("The image contains multiple logger software identities.");

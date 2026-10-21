@@ -40,6 +40,7 @@ a vehicle test or measured ECU logging rates.
 | Logger setup, rates, units and troubleshooting | [Logger guide](docs/LOGGER.md) |
 | Check ROM/profile compatibility | [Supported ROMs](docs/SUPPORTED_ROMS.md) |
 | Build from source or review validation | [Documentation index](docs/README.md) |
+| Install editor or logger definition updates | [Definition import](docs/DEFINITIONS.md) |
 
 ## Edit a ROM
 
@@ -61,6 +62,10 @@ Editing needs no adapter. Supported tuning profiles are **L33XEH000, L35HEH000,
 L38KEH000, L39SED000, L39SEE000, L39SEF000 and L3M7EF000**. A matching calibration,
 boot and program area are required. Patched/extended ROM layouts are unsupported.
 Static axes are read-only. See the [editor guide](docs/EDITOR.md) for details.
+
+Select **Definitions** to import editor XML or logger JSON updates for supported
+ROM layouts. Updates are kept in `data/definitions` beside the EXE; the bundled
+copies remain available. See [definition import](docs/DEFINITIONS.md).
 
 ## Read and back up a ROM
 

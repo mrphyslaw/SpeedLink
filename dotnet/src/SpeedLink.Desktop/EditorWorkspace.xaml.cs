@@ -64,7 +64,10 @@ public partial class EditorWorkspace : UserControl
     }
     private readonly RomInspector inspector;
     private readonly TuningCodeGuard codeGuard;
+    internal RomInspector TestInspector => inspector;
+    internal TuningCodeGuard TestGuard => codeGuard;
     private RomEditor? document;
+    internal IReadOnlyList<TuningDefinition>? Definitions { get; set; }
     private TuningTable? table;
     private bool refreshing, closingForTest;
     private TuningBaseline Baseline => (TuningBaseline)Math.Max(0, BaselineBox.SelectedIndex);
@@ -77,7 +80,7 @@ public partial class EditorWorkspace : UserControl
     }
     public void OpenRom(string path)
     {
-        var opened = new RomEditor(File.ReadAllBytes(path), path, inspector, codeGuard);
+        var opened = new RomEditor(File.ReadAllBytes(path), path, inspector, codeGuard, Definitions);
         document = opened; document.Changed += Document_Changed; table = null;
         MapTabs.Items.Clear(); BaselineBox.SelectedIndex = 0; SearchBox.Text = ""; ChangedOnly.IsChecked = false;
         FileText.Text = Path.GetFileName(path); FileText.ToolTip = path;
