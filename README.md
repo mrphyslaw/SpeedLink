@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.4-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.4-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.2)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -139,7 +139,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.4-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.1), a Windows Workbench alpha.**
+**Current release: [v0.5.4-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.2), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
