@@ -1,5 +1,22 @@
 # C# validation
 
+## Compact editor — 0.5.2-alpha.1
+
+- 259 C# tests pass, including all seven long MAF curves, clipboard bounds and
+  breakpoint checks, atomic failures, exact undo, full-precision no-op edits,
+  physical-axis interpolation, and layout settings persistence/recovery.
+- Seven desktop layout workflows fit a synthetic 16×16 table at both 1024×700
+  and 1280×720 logical window sizes with readable cells, visible axes and zero
+  horizontal/vertical table scrolling. This fixture is not a stock tuning map.
+- Layout checks exercise information, browser and graph windows, unchanged ROM
+  edits while moving panels, fresh-window restoration, surface fit in wide/tall
+  panes, and each 129-point MAF table's final point, scaling, interpolation,
+  clipboard round trip, full-precision cell entry and checksum-verified export.
+- Existing definition imports, Workbench navigation and logger/replay checks
+  remain required. These tests use synthetic images and offline replies.
+
+No physical adapter or ECU was accessed for this UI change.
+
 ## Definition import — 0.5.1-alpha.1
 
 - 249 C# tests pass, including import persistence and fallback for all seven ROMs,

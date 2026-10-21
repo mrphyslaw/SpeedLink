@@ -6,12 +6,12 @@ namespace SpeedLink.Desktop;
 public sealed class EditorWindow : Window
 {
     private readonly EditorWorkspace workspace;
-    public EditorWindow() : this(new(), new()) { }
+    public EditorWindow() : this(new(), new()) { workspace.ConfigureLayout(System.IO.Path.Combine(AppContext.BaseDirectory, "data", "editor-layout.json"), () => true); }
     internal EditorWindow(RomInspector inspector, TuningCodeGuard guard)
     {
         UiTheme.Ensure(); SetResourceReference(StyleProperty, typeof(Window)); Title = "SpeedLink · ROM editor"; Width = 1480; Height = 940; MinWidth = 1080; MinHeight = 720;
         workspace = new(inspector, guard); Content = workspace;
-        Closing += (_, e) => e.Cancel = !workspace.MayClose();
+        Closing += (_, e) => { e.Cancel = !workspace.MayClose(); if (!e.Cancel) workspace.PrepareHostClose(); };
     }
     public void OpenRom(string path) => workspace.OpenRom(path);
     internal void CloseOfflineTest() { workspace.CloseOfflineTest(); Close(); }

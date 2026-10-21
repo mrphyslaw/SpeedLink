@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.1-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.1-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.2-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.2-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -15,10 +15,11 @@ are not bundled. Real Mazda ECU validation remains pending.
 
 ### ROM editor
 
-[![SpeedLink ROM editor with a color map grid, table help and a 3D surface](docs/editor/images/surface-editor.png)](docs/editor/README.md)
+[![SpeedLink editor displaying a complete 16×16 synthetic map](docs/editor/images/fit-map.png)](docs/editor/README.md)
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
+Screenshots use synthetic test values; they are not tuning recommendations.
 
 ### Logging and recordings
 
@@ -44,24 +45,28 @@ a vehicle test or measured ECU logging rates.
 
 ## Edit a ROM
 
-The Workbench keeps editing, logging and recordings in one window. **Focused**
-hides the map browser. Choose **Details** for tuner help and selected-cell
-comparisons, or **Changes** to jump between edited maps. The view picker places
-the grid and graph below or beside one another, or shows either on its own.
+The Workbench keeps editing, logging and recordings in one window. **Fit map**
+gives the table the available workspace. The app navigation collapses to icons;
+the map browser and graph can be resized, hidden or moved into separate windows.
+Use **View** for layout options, map information and changed maps.
 
-1. Open **Editor**, then **Open ROM**.
+1. Open **Editor**, then **File → Open ROM…**.
 2. Select a map from the categorized list or use search. Related numbered maps
    are kept together. Each map opens in a tab with its units and tuner help.
 3. Edit the grid or apply arithmetic, clipboard values or interpolation to a
    selection. Review the 2D curve or rotate and zoom the 3D surface. Compare with
    the original, last save or another compatible ROM; Undo/Redo restores operations.
-4. Choose **Save new copy**. Every save corrects and verifies the checksum, then
+4. Choose **Save copy…**. Every save corrects and verifies the checksum, then
    creates and verifies a new file; the original and existing copies are preserved.
 
 Editing needs no adapter. Supported tuning profiles are **L33XEH000, L35HEH000,
 L38KEH000, L39SED000, L39SEE000, L39SEF000 and L3M7EF000**. A matching calibration,
 boot and program area are required. Patched/extended ROM layouts are unsupported.
 Static axes are read-only. See the [editor guide](docs/EDITOR.md) for details.
+
+Long MAF curves use a breakpoint/value list beside a zoomable curve. Click a
+point to reach its value, including either end of a 129-point calibration.
+Layout preferences are saved beside the EXE in `data/editor-layout.json`.
 
 Select **Definitions** to import editor XML or logger JSON updates for supported
 ROM layouts. Updates are kept in `data/definitions` beside the EXE; the bundled

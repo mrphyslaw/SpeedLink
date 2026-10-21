@@ -4,43 +4,61 @@ An offline editor for the seven bundled Mazdaspeed/MPS stock ROM layouts, built
 into the same Windows app as the reader and logger. No adapter is needed to edit
 a file. ECU programming remains disabled in this alpha.
 
-## Grid and 2D curves
+## Room for the map
 
-![Injector base pulsewidth table and its 2D curve in SpeedLink](images/curve-editor.png)
+![A complete synthetic 16×16 map with both axes visible](images/fit-map.png)
+
+**Fit map** (Ctrl+0) gives the table the available workspace. A full 16×16 map
+and both axes fit without table scrollbars at 1024×700 and 1280×720 logical
+window sizes with app navigation collapsed. Larger maps retain scrolling.
+The ☰ button expands or collapses navigation; Ctrl+B hides or restores the
+map browser. Use **View** for layout options and floating panels.
+
+Screenshots use synthetic layout/curve fixtures, not vehicle tuning values.
+The 16×16 example is a layout test, not an added stock calibration map.
+
+## Long MAF curves
+
+![A 129-point MAF calibration with a voltage/value list beside its curve](images/curve-editor.png)
 
 Search or browse the map list, keep related maps in separate tabs, and edit
 numeric cells directly. Curves use the definition's physical axis values.
-Use **Details** for the map's purpose and selected-cell comparison. Units and
-axis names remain visible beneath the title.
+Long MAF curves use a voltage/value list beside the graph. Click any point to
+reach its value, use the wheel to zoom, and Shift+drag to pan. Static breakpoints
+stay read-only. Arithmetic and interpolation work across selected points; copy
+and paste retain full precision. Units and axis names stay above the table.
 
 ## Rotatable 3D surfaces
 
-![Overboost protection table and its rotatable 3D surface in SpeedLink](images/surface-editor.png)
+![A 3D surface in its separate graph window](images/surface-editor.png)
 
 Drag to rotate a surface and use the mouse wheel to zoom. Click a point on the
 graph to select its grid cell. Resizable panes let you give the grid or graph
-more room. Screenshots show the L38KEH000 reference image; they are examples of
-the editor, not recommended tuning values.
+more room. **Fit view** frames the entire surface. Pop the graph into a separate
+window to use another monitor; closing that window docks it again.
 
 ## Map information and changes
 
-![Workbench map details with tuner help and selected-cell comparisons](images/details-editor.png)
+![Map information in a separate window](images/details-editor.png)
 
-**Details** opens the panel beneath the map. **Storage details** expands address,
-data type and dimensions; long content can be scrolled. **Changes** opens a drawer
+**View → Map information…** opens help without reducing the map's height.
+**Storage details** expands address, data type and dimensions; long content can
+be scrolled. Cell tooltips and the status strip show comparison values.
+**View → Changes** opens a drawer
 of maps that differ from the selected baseline. Select a map there to jump to it.
 
-Use **Focused** to hide the browser. The view picker supports table and graph
-below or beside one another, plus table-only and graph-only views. Open maps
-and unsaved edits remain in place when switching to Logger or Recordings.
+The **View** menu supports table and graph above/beside one another, plus
+table-only and graph-only views. The browser can also pop into a separate
+window. Layout preferences are remembered. Open maps and unsaved edits remain
+in place when switching to Logger or Recordings.
 
 ## First edit
 
-1. Open **Editor → Open ROM**.
+1. Open **Editor → File → Open ROM…**.
 2. Choose a map. Double-click a numeric cell, enter a value and press Enter.
 3. Review the original/last-save/comparison values and the curve or surface.
    Use Undo/Redo to restore complete operations.
-4. Select **Save new copy**. Every save corrects and verifies the checksum, uses
+4. Select **Save copy…**. Every save corrects and verifies the checksum, uses
    a new filename and verifies the written bytes.
 
 For a rectangular selection, the toolbar supports Set, Add, Multiply, copy/paste

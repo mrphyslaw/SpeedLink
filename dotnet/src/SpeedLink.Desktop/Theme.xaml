@@ -2,6 +2,8 @@
  <SolidColorBrush x:Key="ShellBrush" Color="#191C1F"/><SolidColorBrush x:Key="PanelBrush" Color="#23272B"/><SolidColorBrush x:Key="RaisedBrush" Color="#2D3237"/>
  <SolidColorBrush x:Key="LineBrush" Color="#434A50"/><SolidColorBrush x:Key="TextBrush" Color="#EDF0F2"/><SolidColorBrush x:Key="MutedBrush" Color="#B2BBC2"/>
  <SolidColorBrush x:Key="AmberBrush" Color="#F2B65D"/><SolidColorBrush x:Key="AmberSoftBrush" Color="#493A25"/><SolidColorBrush x:Key="InkBrush" Color="#211C15"/>
+ <SolidColorBrush x:Key="{x:Static SystemColors.MenuBrushKey}" Color="#23272B"/><SolidColorBrush x:Key="{x:Static SystemColors.MenuTextBrushKey}" Color="#EDF0F2"/>
+ <Style TargetType="MenuItem"><Setter Property="Foreground" Value="{StaticResource TextBrush}"/><Setter Property="Padding" Value="7,4"/></Style>
  <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#23272B"/><SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#EDF0F2"/>
  <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#2D3237"/><SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#EDF0F2"/>
  <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#F2B65D"/><SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#211C15"/>

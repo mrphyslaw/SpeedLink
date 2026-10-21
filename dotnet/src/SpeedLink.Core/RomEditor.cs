@@ -208,6 +208,25 @@ public sealed class RomEditor
         if (rows.Length == 0 || rows.Any(r => r.Length != rows[0].Length)) throw new InvalidDataException("Clipboard must be a rectangle.");
         return rows;
     }
+    public void PasteCurve(TuningTable table, int start, string text)
+    {
+        if (table.Rows != 1 || table.IsChoice) throw new ArgumentException("Select a numeric curve.");
+        var rows = ParseClipboard(text);
+        double[] values;
+        if (rows.Length == 1 && rows[0].Length > 2) values = rows[0];
+        else
+        {
+            if (rows[0].Length > 2) throw new InvalidDataException("Paste one value column, or matching breakpoint and value columns.");
+            if (start < 0 || start > table.Count - rows.Length) throw new ArgumentException("Pasted values exceed the curve.");
+            if (rows[0].Length == 2)
+                for (int i = 0; i < rows.Length; i++)
+                    if (Math.Abs(rows[i][0] - table.X.Values[start + i]) > 1e-10 * Math.Max(1, Math.Abs(table.X.Values[start + i])))
+                        throw new InvalidDataException("Breakpoints do not match. Paste only the value column to keep the existing axis.");
+            values = rows.Select(row => row[^1]).ToArray();
+        }
+        if (start < 0 || start > table.Count - values.Length) throw new ArgumentException("Pasted values exceed the curve.");
+        Apply(values.Select((value, index) => new CellEdit(table, start + index, value)), "Paste curve: " + table.Name);
+    }
     public void Paste(TuningTable table, int row, int col, string text)
     {
         if (table.IsChoice) throw new InvalidOperationException("Use the switch selector.");

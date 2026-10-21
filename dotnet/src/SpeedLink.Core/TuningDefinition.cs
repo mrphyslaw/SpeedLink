@@ -37,6 +37,14 @@ public sealed class TuningTable
     public int AddressAt(int index) => Address + (Bits.Length > 0 ? 0 : index * Width);
     public bool IsChoice => Kind is "Switch" or "BitwiseSwitch";
     public string Display(double value) => double.IsFinite(value) ? value.ToString("G10", CultureInfo.InvariantCulture) : "Invalid";
+    public string Compact(double value)
+    {
+        if (!double.IsFinite(value)) return "Invalid";
+        int point = Format.IndexOf('.');
+        int decimals = point < 0 ? 3 : Math.Clamp(Format[(point + 1)..].TakeWhile(c => c is '0' or '#').Count(), 0, 4);
+        string result = value.ToString(decimals == 0 ? "0" : "0." + new string('#', decimals), CultureInfo.InvariantCulture);
+        return result.Length > 9 || value != 0 && double.TryParse(result, CultureInfo.InvariantCulture, out double rounded) && rounded == 0 ? value.ToString("G4", CultureInfo.InvariantCulture) : result;
+    }
 }
 
 public sealed class TuningDefinition

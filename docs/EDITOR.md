@@ -10,7 +10,7 @@ See [definition import](DEFINITIONS.md) for supported files and bundled fallback
 
 ## Open and browse
 
-Open **Editor**, then **Open ROM**. A complete
+Open **Editor**, then **File → Open ROM…**. A complete
 1 MiB image with a matching calibration, boot, checksum layout and program-area
 signature is required. The program signature allows edits to the defined controls
 and checksum word while rejecting other program changes. Patched/extended ROMs
@@ -20,7 +20,7 @@ does not establish a file's factory provenance or vehicle compatibility.
 
 Expand a category or search by map name, description or category. Numbered maps
 are sorted naturally. Each selected map opens in a tab; use × to close its tab.
-The information pane explains the control in tuner terms. Static axes are display
+The map-information window explains the control in tuner terms. Static axes are display
 metadata and cannot be edited. No extended-table patch is installed by this editor.
 
 ## Edit and view
@@ -37,7 +37,19 @@ metadata and cannot be edited. No extended-table patch is installed by this edit
   200 operations are retained for the current open ROM.
 - Curves and surfaces reflect the current values. Click a curve point or surface
   vertex to select its grid cell. Drag a surface to rotate, use the wheel to zoom,
-  and use Reset view to restore the camera.
+  and use **Fit view** to restore the camera. Curves support wheel zoom and
+  Shift+drag panning; selecting a list value brings that point into view.
+
+Long curves, including the 129-point MAF calibrations, use a vertical breakpoint
+and value list alongside the graph. Only the value column is editable. Copy
+includes both columns at full precision; paste accepts a value column, matching
+breakpoint/value rows, or a horizontal row of three or more values. Breakpoints
+must match when supplied, and the complete paste must fit. Interpolate operates
+along the physical X axis between the first and last selected points.
+
+Cells use compact numbers for readability. Double-click to see the full stored
+value; accepting it unchanged preserves the original bytes. Cell tooltips show
+full current, baseline and difference values. Copy also retains full precision.
 
 Values are quantized to their actual storage resolution. Nonfinite values and
 values outside encodable storage are rejected. Existing invalid values display
@@ -48,10 +60,11 @@ If two controls share storage, editing one updates every view of those bytes.
 
 Choose Original ROM, Last save or a separately loaded same-calibration Comparison
 ROM. Orange cell borders and browser dots show differences from that baseline.
-Tooltips and Selected cell show reference values and differences. Changed maps
-only filters the browser. Reset restores the selected cells from that baseline.
+Tooltips and the compact selection status show reference values and differences.
+Changed maps only filters the browser. **Edit → Reset selection to baseline**
+restores the selected cells from that baseline.
 
-Save new copy writes a new binary file, flushes and verifies its bytes, and refuses
+**Save copy…** writes a new binary file, flushes and verifies its bytes, and refuses
 to overwrite an existing file or the original. Choose a new filename for every
 revision. Every save corrects the checksum and verifies it against the written
 bytes. There is no checksum opt-out. Checksum correction is recorded as an undoable operation if
@@ -70,12 +83,27 @@ vehicle data; offline editor validation cannot verify engine behavior.
 Choose **Editor** in the left navigation. Your open ROM, map tabs and edits stay
 in place when you switch to Logger, Recordings or another workspace.
 
-**Focused** hides the map browser to give the current map more room. The view
-picker offers **Split below**, **Split beside**, **Table only** and **Graph only**.
-Choose **Details** for tuner help and the selected cells' current value, baseline
-and difference. Expand **Storage details** for address, type and dimensions.
-Units and axis names always stay beneath the map title.
+The ☰ button expands or collapses the app navigation. **Fit map** (Ctrl+0) hides
+the map browser and changed-maps drawer and shows the complete table. With
+navigation collapsed, a 16×16 map and both axes fit at 1024×700 and 1280×720
+logical window sizes without table scrollbars. Larger maps retain scrolling;
+the editor keeps readable cell sizes. Long curves keep their list/graph view.
 
-**Changes** opens a list of maps that differ from the selected baseline. Select
+**View** offers table above graph, table beside graph, table only and graph only.
+Drag the divider to resize the panes. **Hide map browser** (Ctrl+B) gives the
+map more room; use the same command to restore it. Both the map browser and
+graph can pop into separate windows, with dock commands in **View**. Closing
+a floating window docks it again. Floating panels move between monitors.
+
+Choose **View → Map information…** for tuner help in a separate window that
+does not reduce the table's height. Expand **Storage details** for address,
+type and dimensions. Units and axis names remain visible above the table.
+The status strip and cell tooltips provide selected-value comparisons.
+
+Navigation, browser visibility/width, curve-list width, table/graph view and
+split, Fit map sizing, and floating panel positions are saved in
+`data/editor-layout.json`. Off-screen saved windows reopen near the app.
+
+**View → Changes** opens a list of maps that differ from the selected baseline. Select
 an entry to jump to that map. The original ROM and every existing saved copy
 remain protected; every new editor save corrects and verifies its checksum.
