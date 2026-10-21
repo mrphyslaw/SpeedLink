@@ -14,6 +14,10 @@ window sizes with app navigation collapsed. Larger maps retain scrolling.
 The ☰ button expands or collapses navigation; Ctrl+B hides or restores the
 map browser. Use **View** for layout options and floating panels.
 
+Axis names sit directly above the column breakpoints and beside the row
+breakpoints, with value units beside the map tabs. The labels stay visible while
+scrolling. Selecting cells highlights their row and column headers.
+
 The 16×16 and MAF examples use synthetic layout/curve fixtures. The 16×16
 example is a layout test, not an added stock calibration map. VVT screenshots
 show an L38KEH000 ROM example. These are interface examples, not tuning advice.
@@ -27,7 +31,7 @@ numeric cells directly. Curves use the definition's physical axis values.
 Long MAF curves use a voltage/value list beside the graph. Click any point to
 reach its value, use the wheel to zoom, and Shift+drag to pan. Static breakpoints
 stay read-only. Arithmetic and interpolation work across selected points; copy
-and paste retain full precision. Units and axis names stay above the table.
+and paste retain full precision. Axis names and units label the list's two columns.
 
 ## Rotatable 3D surfaces
 

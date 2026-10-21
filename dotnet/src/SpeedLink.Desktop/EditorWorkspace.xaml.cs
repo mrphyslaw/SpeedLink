@@ -158,13 +158,12 @@ public partial class EditorWorkspace : UserControl
             MapGrid.Columns.Clear(); MapGrid.ItemsSource = null; ChoiceBox.Visibility = Visibility.Collapsed;
             if (document is null || table is null)
             {
-                MapTitle.Text = "Select a map"; AxesText.Text = ""; HelpText.Text = "Choose a map from the list.";
+                MapTitle.Text = "Select a map"; RefreshAxes(); HelpText.Text = "Choose a map from the list.";
                 StorageText.Text = ""; CellText.Text = ""; GraphTitle.Text = "2D curve / 3D surface"; Graph.SetData(null, [], -1); return;
             }
             MapTitle.Text = table.Name;
             InterpolationBox.Visibility = CurveList ? Visibility.Collapsed : Visibility.Visible;
             HelpText.Text = table.Description;
-            AxesText.Text = table.Columns == 1 && table.Rows == 1 ? table.Units : $"X: {table.X.Name}" + (table.Rows > 1 ? $"   ·   Y: {table.Y.Name}" : "") + $"   ·   Values: {table.Units}";
             StorageText.Text = $"{table.Units}\n{table.Columns} × {table.Rows} · {table.Storage} · {(table.BigEndian ? "big endian" : "little endian")}\nAddress 0x{table.Address:X}" + (table.Bit is int b ? $" · bit {b}" : "") + "\nStock definition · " + document.Definition.Version + "\nAxes: static display values";
             var values = Enumerable.Range(0, table.Count).Select(i => document.Read(table, i)).ToArray();
             var finite = values.Where(double.IsFinite).ToArray(); double min = finite.DefaultIfEmpty(0).Min(), max = finite.DefaultIfEmpty(1).Max();
@@ -191,6 +190,7 @@ public partial class EditorWorkspace : UserControl
             }
             foreach (int index in selection.Where(i => i < table.Count)) MapGrid.SelectedCells.Add(new(MapGrid.Items[CurveList ? index : index / table.Columns], MapGrid.Columns[CurveList ? 1 : index % table.Columns]));
             MapGrid.RowHeaderWidth = table.Bits.Length > 0 ? 230 : CurveList ? 36 : 64;
+            RefreshAxes();
             Graph.SetData(table.IsChoice ? null : table, values, selection.FirstOrDefault(-1));
             GraphTitle.Text = table.IsChoice ? "Choose a row, then a named state" : table.Rows > 1 ? "3D · drag to rotate · wheel to zoom" : table.Columns > 1 ? "Curve · wheel to zoom · Shift+drag to pan · click a point" : "Scalar";
             UpdateCellText();
@@ -199,7 +199,11 @@ public partial class EditorWorkspace : UserControl
     }
     private void Grid_LoadingRow(object? sender, DataGridRowEventArgs e)
     {
-        if (table is not null && e.Row.Item is EditorRow row) e.Row.Header = table.Bits.Length > 0 ? table.BitNames[row.Index] : CurveList ? (row.Index + 1).ToString(CultureInfo.InvariantCulture) : table.Rows > 1 ? table.Y.Values[row.Index].ToString("G5", CultureInfo.InvariantCulture) : "Value";
+        if (table is not null && e.Row.Item is EditorRow row)
+        {
+            e.Row.Header = table.Bits.Length > 0 ? table.BitNames[row.Index] : CurveList ? (row.Index + 1).ToString(CultureInfo.InvariantCulture) : table.Rows > 1 ? table.Y.Values[row.Index].ToString("G5", CultureInfo.InvariantCulture) : "Value";
+            SetIsAxisSelected(e.Row, selectedAxisRows.Contains(row.Index));
+        }
     }
     private void Grid_PreparingEdit(object sender, DataGridPreparingCellForEditEventArgs e)
     {
@@ -222,7 +226,7 @@ public partial class EditorWorkspace : UserControl
     }
     private void Grid_SelectionChanged(object sender, SelectedCellsChangedEventArgs e)
     {
-        if (refreshing) return; UpdateCellText(); Graph.Select(SelectedIndices().FirstOrDefault(-1));
+        if (refreshing) return; UpdateSelectedAxes(); UpdateCellText(); Graph.Select(SelectedIndices().FirstOrDefault(-1));
         if (table?.IsChoice == true && document is not null)
         {
             refreshing = true; double value = document.Read(table, SelectedIndices().FirstOrDefault(0)); ChoiceBox.SelectedItem = ChoiceBox.Items.Cast<TuningState>().FirstOrDefault(s => s.Value == value); refreshing = false;

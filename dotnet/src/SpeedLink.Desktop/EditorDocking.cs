@@ -112,13 +112,13 @@ public partial class EditorWorkspace
         TableRow.Height = new(below ? tableFraction : 1, GridUnitType.Star); GraphRow.Height = below ? new(1 - tableFraction, GridUnitType.Star) : new(0);
         DataDividerRow.Height = new(below ? 5 : 0); DataDividerColumn.Width = new(preview || beside ? 5 : 0);
         TableColumn.Width = beside && CurveList ? new(Math.Min(curveWidth, Math.Max(180, DataLayout.ActualWidth - 200))) : new(beside ? tableFraction : 1, GridUnitType.Star);
-        var thumbnail = TablePreviewSize.Calculate(DataLayout.ActualWidth, DataLayout.ActualHeight, table?.Columns ?? 1, MapGrid.RowHeaderWidth);
+        var thumbnail = TablePreviewSize.Calculate(DataLayout.ActualWidth, DataLayout.ActualHeight, table?.Columns ?? 1, MapGrid.RowHeaderWidth + AxisLabelColumn.Width.Value);
         GraphColumn.Width = preview ? new(thumbnail.Width) : beside ? new(1 - tableFraction, GridUnitType.Star) : new(0);
         GraphPanel.Height = preview ? thumbnail.Height : double.NaN; GraphPanel.VerticalAlignment = preview ? VerticalAlignment.Top : VerticalAlignment.Stretch;
         Graph.SetCompactPreview(preview); FitViewButton.Content = preview ? "↺" : "Fit view";
         if (preview) GraphTitle.Text = "3D preview";
         else GraphTitle.Text = surface ? "3D · drag to rotate · wheel to zoom" : "Curve · wheel to zoom · Shift+drag to pan · click a point";
-        MapGrid.Visibility = graphOnly ? Visibility.Collapsed : Visibility.Visible; GraphPanel.Visibility = floating || ViewMode != 2 ? Visibility.Visible : Visibility.Collapsed;
+        TablePanel.Visibility = graphOnly ? Visibility.Collapsed : Visibility.Visible; GraphPanel.Visibility = floating || ViewMode != 2 ? Visibility.Visible : Visibility.Collapsed;
         Grid.SetRow(DataSplitter, beside ? 0 : 1); Grid.SetColumn(DataSplitter, beside ? 1 : 0);
         DataSplitter.Width = beside ? 5 : double.NaN; DataSplitter.Height = beside ? double.NaN : 5;
         DataSplitter.HorizontalAlignment = beside ? HorizontalAlignment.Center : HorizontalAlignment.Stretch;
