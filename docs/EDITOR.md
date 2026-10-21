@@ -4,6 +4,10 @@ This first editor supports the seven bundled MazdaSpeedDefs stock layouts.
 No adapter is needed. ECU programming remains disabled. Existing reading and
 logging functions are unchanged.
 
+Use **Definitions → Import…** to install an editor XML update for a supported ROM.
+Reopen the ROM to use the update; existing edits stay with their current definition.
+See [definition import](DEFINITIONS.md) for supported files and bundled fallback.
+
 ## Open and browse
 
 Open **Editor**, then **Open ROM**. A complete

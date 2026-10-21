@@ -1,5 +1,19 @@
 # C# validation
 
+## Definition import — 0.5.1-alpha.1
+
+- 249 C# tests pass, including import persistence and fallback for all seven ROMs,
+  stale replacement/concurrent-writer checks, corrupted-file recovery, parser
+  bounds, protected storage, logger compatibility checks and corrected exports.
+- Seven desktop import workflows cover both definition types, review metadata,
+  retained open edits, fresh-window persistence and restoring bundled copies.
+- Seven existing Workbench and fourteen normal/fault logger workflows pass.
+- The importer does not add new ROM layouts or expand the logger request allowlist.
+  Program guards and mandatory checksum correction remain application controlled.
+
+These are offline software checks. No adapter or Mazda ECU was accessed for this
+change, and existing ECU validation remains pending.
+
 ECU access is read-only. Offline ROM editing is available.
 Real Mazda ECU validation is pending; the physical tests below use two adapters
 on an isolated, terminated bench and a RAM ECU model. The adapter roles are

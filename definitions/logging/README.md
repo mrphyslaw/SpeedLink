@@ -13,6 +13,9 @@ vectors and evidence. All 258 included ROM/channel combinations need ECU testing
 Ambiguous identities and unreviewed code changes are rejected. Unknown ROMs can
 still be dumped by the reader. No ROM files are bundled.
 
+The application can overlay imported `*.logger.json` updates through **Definitions**.
+See [definition import](../../docs/DEFINITIONS.md) for file selection and compatibility limits.
+
 The following is the original L38KEH000 research record; its counts and addresses
 apply to that profile only.
 

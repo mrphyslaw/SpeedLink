@@ -13,6 +13,7 @@ public sealed class RomEditor
 {
     private readonly RomInspector inspector;
     private readonly TuningCodeGuard codeGuard;
+    private readonly TuningDefinition codeDefinition;
     private readonly HashSet<TuningTable> tables;
     private readonly byte[] original;
     private byte[] current, lastSave;
@@ -28,15 +29,17 @@ public sealed class RomEditor
     public string UndoDescription => CanUndo ? undo[^1].Description : "";
     public string RedoDescription => CanRedo ? redo[^1].Description : "";
     public event EventHandler? Changed;
-    public RomEditor(byte[] image, string sourcePath, RomInspector? inspector = null, TuningCodeGuard? codeGuard = null)
+    public RomEditor(byte[] image, string sourcePath, RomInspector? inspector = null, TuningCodeGuard? codeGuard = null, IReadOnlyList<TuningDefinition>? definitions = null)
     {
         this.inspector = inspector ?? new();
         this.codeGuard = codeGuard ?? new();
         var inspection = this.inspector.Inspect(image);
-        Definition = TuningDefinition.Known.SingleOrDefault(d => d.Matches(image)) ?? throw new InvalidDataException("No matching tuning definition for this ROM. Unknown ROMs remain readable in Connection & backup.");
+        Definition = (definitions ?? TuningDefinition.Known).SingleOrDefault(d => d.Matches(image)) ?? throw new InvalidDataException("No matching tuning definition for this ROM. Unknown ROMs remain readable in Connection & backup.");
+        if (definitions is not null) DefinitionPolicy.ValidateEditor(Definition);
+        codeDefinition = TuningDefinition.Known.Single(d => d.Calibration == Definition.Calibration);
         tables = new(Definition.Tables);
         if (!inspection.CanCorrectChecksum) throw new InvalidDataException("ROM boot or layout does not match this stock definition. Editing is unavailable for this image.");
-        if (!this.codeGuard.Matches(image, Definition, this.inspector.ProfileFor(image)!))
+        if (!this.codeGuard.Matches(image, codeDefinition, this.inspector.ProfileFor(image)!))
             throw new InvalidDataException("The ROM program area differs from this stock definition. Patched or extended layouts are not supported by this editor.");
         SourcePath = Path.GetFullPath(sourcePath);
         original = (byte[])image.Clone(); current = (byte[])image.Clone(); lastSave = (byte[])image.Clone();
@@ -53,7 +56,7 @@ public sealed class RomEditor
     public void LoadComparison(byte[] image, string path)
     {
         if (!Definition.Matches(image) || !inspector.Inspect(image).CanCorrectChecksum) throw new InvalidDataException("Comparison requires the same calibration and compatible stock layout.");
-        if (!codeGuard.Matches(image, Definition, inspector.ProfileFor(image)!)) throw new InvalidDataException("Comparison ROM has an unsupported program modification.");
+        if (!codeGuard.Matches(image, codeDefinition, inspector.ProfileFor(image)!)) throw new InvalidDataException("Comparison ROM has an unsupported program modification.");
         comparison = (byte[])image.Clone(); ComparisonPath = Path.GetFullPath(path); Changed?.Invoke(this, EventArgs.Empty);
     }
     private void Check(TuningTable table, int index)

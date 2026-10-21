@@ -10,6 +10,7 @@ dotnet test SpeedLink.slnx -c Release --no-restore
 ./tools/Test-LoggerUi.ps1
 ./tools/Test-ReplayUi.ps1
 ./tools/Test-EditorUi.ps1
+./tools/Test-DefinitionImportUi.ps1
 ./tools/Publish-Windows.ps1 -Output publish
 ```
 

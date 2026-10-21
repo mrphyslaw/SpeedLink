@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.1-alpha.1 — definition import
+
+- Import editor XML and logger JSON updates through the Definitions window.
+- Keep imported copies in `data/definitions`, with explicit replacement review,
+  version/source details, bundled fallback and retained previous imports.
+- Preserve open ROM edits during imports; apply updates when a ROM is next loaded.
+- Reject unsupported layouts, protected storage, unrecognized logger requests
+  and invalid files while retaining mandatory checksum verification on exports.
+
 ## v0.5.0-alpha.1 — Workbench UI
 
 - Added a single-window workspace with vertical navigation and graphite/amber styling.

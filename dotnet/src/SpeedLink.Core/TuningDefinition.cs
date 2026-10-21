@@ -63,7 +63,9 @@ public sealed class TuningDefinition
     public static TuningDefinition Parse(Stream input)
     {
         using var reader = XmlReader.Create(input, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
-        var rom = XDocument.Load(reader).Root?.Elements("rom").Single() ?? throw new InvalidDataException("One ROM definition required.");
+        var root = XDocument.Load(reader).Root;
+        if (root?.Name != "roms" || root.Elements().Count() != 1 || root.Element("rom") is not { } rom || rom.Attribute("base") is not null)
+            throw new InvalidDataException("A complete, standalone definition for one ROM is required.");
         var id = rom.Element("romid") ?? throw new InvalidDataException("ROM identity missing.");
         string Text(string name) => id.Element(name)?.Value ?? throw new InvalidDataException("Missing " + name);
         static string Attr(XElement node, string name) => node.Attribute(name)?.Value ?? throw new InvalidDataException("Missing " + name);
@@ -81,7 +83,9 @@ public sealed class TuningDefinition
             if (values.Length != count || values.Any(v => !double.IsFinite(v))) throw new InvalidDataException("Axis dimensions do not match.");
             return new((string?)axis.Attribute("name") ?? "Axis", values);
         }
-        var tables = rom.Elements("table").Select(node =>
+        var nodes = rom.Elements("table").ToArray();
+        if (nodes.Length is < 1 or > 4096) throw new InvalidDataException("Unexpected table count.");
+        var tables = nodes.Select(node =>
         {
             var kind = Attr(node, "type");
             if (kind is not ("1D" or "2D" or "3D" or "Switch" or "BitwiseSwitch")) throw new InvalidDataException("Unsupported table type: " + kind);
@@ -89,6 +93,9 @@ public sealed class TuningDefinition
             var bits = node.Elements("bit").Select(b => int.Parse(Attr(b, "position"), CultureInfo.InvariantCulture)).ToArray();
             var columns = kind == "BitwiseSwitch" ? 1 : int.Parse(Attr(node, "sizex"), CultureInfo.InvariantCulture);
             var rows = kind == "BitwiseSwitch" ? bits.Length : int.Parse((string?)node.Attribute("sizey") ?? "1", CultureInfo.InvariantCulture);
+            if (columns < 1 || rows < 1 || (long)columns * rows > 16384 ||
+                node.Elements("table").Any(t => (string?)t.Attribute("type") is not ("Static X Axis" or "Static Y Axis")))
+                throw new InvalidDataException("Invalid dimensions or unsupported dynamic axes.");
             var endian = Attr(node, "endian");
             if (endian is not ("big" or "little")) throw new InvalidDataException("Invalid byte order.");
             var result = new TuningTable
@@ -111,6 +118,10 @@ public sealed class TuningDefinition
         }).OrderBy(t => t.Category, NaturalOrder.Instance).ThenBy(t => t.Name, NaturalOrder.Instance).ToArray();
         if (tables.Select(t => t.Name).Distinct().Count() != tables.Length) throw new InvalidDataException("Duplicate table names.");
         var identity = Text("internalidstring");
+        if (identity.Length is < 9 or > 128 || identity.Any(c => c < 32 || c > 126) ||
+            identity[..9].Any(c => !"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".Contains(c)) ||
+            tables.Sum(t => (long)t.Count) > 1_000_000)
+            throw new InvalidDataException("Invalid ROM identity or table size.");
         return new() { Calibration = identity[..9], Identity = identity, IdentityAddress = Address(Text("internalidaddress")), Model = Text("model"), Version = Text("version"), Tables = Array.AsReadOnly(tables) };
     }
 }
@@ -138,6 +149,12 @@ internal sealed class ScalingExpression(string expression)
     public static Func<double, double> Compile(string expression)
     {
         if (expression.Length > 1024) throw new InvalidDataException("Scaling too long.");
+        int depth = 0;
+        foreach (char c in expression)
+        {
+            if (c == '(' && ++depth > 64) throw new InvalidDataException("Scaling nesting is too deep.");
+            if (c == ')') depth--;
+        }
         var parser = new ScalingExpression(expression); var result = parser.Compare(); parser.Space();
         if (parser.at != expression.Length) throw new InvalidDataException("Invalid scaling: " + expression);
         return result;
