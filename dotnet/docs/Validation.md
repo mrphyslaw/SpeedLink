@@ -1,6 +1,6 @@
 # C# validation
 
-## Definition import — local 0.5.1-alpha.1 candidate
+## Definition import — 0.5.1-alpha.1
 
 - 249 C# tests pass, including import persistence and fallback for all seven ROMs,
   stale replacement/concurrent-writer checks, corrupted-file recovery, parser

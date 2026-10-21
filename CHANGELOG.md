@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — v0.5.1-alpha.1
+## v0.5.1-alpha.1 — definition import
 
 - Import editor XML and logger JSON updates through the Definitions window.
 - Keep imported copies in `data/definitions`, with explicit replacement review,
