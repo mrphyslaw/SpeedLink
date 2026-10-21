@@ -1,0 +1,37 @@
+[
+  {
+    "Calibration": "L38KEH000",
+    "CodeStart": 294912,
+    "Sha256": "8f5670bbde85da4ca79199177cdbd777cdae79c17e68d46ca68bdc894531aeb2"
+  },
+  {
+    "Calibration": "L39SED000",
+    "CodeStart": 294912,
+    "Sha256": "500c623a77c921cf827b8a1ec40a9fb13127c75d463dac52b2e7ab2e52da82e0"
+  },
+  {
+    "Calibration": "L39SEE000",
+    "CodeStart": 294912,
+    "Sha256": "500c623a77c921cf827b8a1ec40a9fb13127c75d463dac52b2e7ab2e52da82e0"
+  },
+  {
+    "Calibration": "L39SEF000",
+    "CodeStart": 294912,
+    "Sha256": "afef5ad33838888a7dac7a89b68c7f0ce3fc771fd5dd2fd169f5974229afc4e3"
+  },
+  {
+    "Calibration": "L3M7EF000",
+    "CodeStart": 258048,
+    "Sha256": "02d74b719b2505707b81b327685cce6aac527515c5fc8f78c5dcbcc3b3dc33bb"
+  },
+  {
+    "Calibration": "L35HEH000",
+    "CodeStart": 294912,
+    "Sha256": "d488b7c46ed5479314a21f6b5d45cb0d67384f8bdea9d7f1f750fe6bac264e2e"
+  },
+  {
+    "Calibration": "L33XEH000",
+    "CodeStart": 294912,
+    "Sha256": "8013cbf66ced6f3874e5daf6969b94e1900be1d5f5d33b5d26d1bb174c422369"
+  }
+]

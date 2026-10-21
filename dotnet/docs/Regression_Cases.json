@@ -1,0 +1,158 @@
+[
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_single_and_echo"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_multiline_wrap_padding"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_bad_messages_rejected"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_pending_then_final"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_pending_without_final_or_bad_negative"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_negative_response_code"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_live_programming_blocked_before_io"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_adapter_init_and_multiframe_diagnostics"
+  },
+  {
+    "test": "SpeedLink.Tests.ParserTests.test_missing_prompt_invalidates_connection_no_retry"
+  },
+  {
+    "test": "SpeedLink.Tests.StorageTests.test_durable_complete_chain"
+  },
+  {
+    "test": "SpeedLink.Tests.StorageTests.test_interrupted_truncated_modified_reordered"
+  },
+  {
+    "test": "SpeedLink.Tests.StorageTests.test_exclusive_output"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_image_and_corrected_copy"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_wrong_profile_cannot_correct"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_two_pass_backup_manifest_and_mode_separation"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_short_read_stops_and_keeps_journal"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_second_read_mismatch_never_seals_backup"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_incomplete_journal_cannot_be_loaded_as_backup"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_identity_changed_blocks_read_before_unlock"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_engine_running_blocks_read"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_unknown_calibration_can_be_dumped"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_cancel_before_read"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_recovery_and_pending_complete_with_full_readback"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_lost_ack_stops_then_new_full_recovery_repairs"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_negative_erase_does_not_erase_or_continue"
+  },
+  {
+    "test": "SpeedLink.Tests.RomAndWorkflowTests.test_real_transport_cannot_enter_simulated_writer"
+  },
+  {
+    "test": "SpeedLink.Tests.KnownAndUnknownRomTests.test_all_known_layouts_validate_and_correct_only_their_sum_word"
+  },
+  {
+    "test": "SpeedLink.Tests.KnownAndUnknownRomTests.test_unknown_image_is_dumped_reopened_and_never_assigned_a_checksum"
+  },
+  {
+    "test": "SpeedLink.Tests.KnownAndUnknownRomTests.test_all_known_images_can_also_be_dumped"
+  },
+  {
+    "test": "SpeedLink.Tests.KnownAndUnknownRomTests.test_bad_checksum_and_unrecognized_boot_do_not_block_dump"
+  },
+  {
+    "test": "SpeedLink.Tests.KnownAndUnknownRomTests.test_unreported_calibration_does_not_require_a_definition"
+  },
+  {
+    "test": "SpeedLink.Tests.KnownAndUnknownRomTests.test_changed_checksum_code_disables_correction"
+  },
+  {
+    "test": "SpeedLink.Tests.KnownAndUnknownRomTests.test_build_identity_mismatch_and_ambiguous_images_are_not_guessed"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_complete_span_page_alignment_and_last_marker"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_checksum_valid_tuning_edit_is_accepted"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_bad_images_are_rejected"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_unrecognized_matching_boot_is_rejected"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_no_partial_recovery_request"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_native_key_vectors"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_pending_does_not_resend_or_advance"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_ambiguous_transfer_timeouts_block_further_requests"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_negative_or_malformed_response_halts"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_already_unlocked_zero_seed_skips_key"
+  },
+  {
+    "test": "SpeedLink.Tests.RecoveryChecks.test_reset_ack_is_not_recovery_verification"
+  },
+  {
+    "test": "SpeedLink.Tests.StorageFailureTests.test_programming_fault_matrix"
+  },
+  {
+    "test": "SpeedLink.Tests.StorageFailureTests.test_read_and_backup_fault_matrix"
+  },
+  {
+    "test": "SpeedLink.Tests.StorageFailureTests.test_journal_open_denied_sends_nothing"
+  },
+  {
+    "test": "SpeedLink.Tests.StorageFailureTests.test_completion_marker_removal_denied_remains_incomplete"
+  },
+  {
+    "test": "SpeedLink.Tests.VLinkerTests.test_initialize_long_read_and_restore_baud"
+  },
+  {
+    "test": "SpeedLink.Tests.VLinkerTests.test_all_programming_and_out_of_profile_reads_blocked_before_io"
+  },
+  {
+    "test": "SpeedLink.Tests.VLinkerTests.test_error_invalidates_connection_and_does_not_retry"
+  },
+  {
+    "test": "SpeedLink.Tests.VLinkerTests.test_wrong_adapter_is_rejected"
+  }
+]

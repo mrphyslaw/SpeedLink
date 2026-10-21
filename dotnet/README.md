@@ -1,0 +1,61 @@
+# SpeedLink — C#/.NET
+
+ROM reading, offline editing and data logging for Mazdaspeed and Mazda MPS, built with .NET 10 and WPF for Windows. ECU programming is disabled.
+
+Connect a Vgate vLinker FS USB or Tactrix Openport 2.0 and select it in the adapter list. For vLinker, also select its COM port. Switch ignition on with the engine stopped, then choose **Connect & identify** followed by **Read & verify backup**.
+
+A definition is not required to dump a ROM. Two matching full 1 MiB reads are required before a verified backup is sealed. Original captures, manifest and durable journal are retained in the `data` folder beside the executable. Keep the whole backup folder.
+
+**Editor** provides the offline editor and opens known and unknown images for inspection. Seven known layouts have optional guarded checks and separate checksum-corrected-copy export. Unknown layouts have no guessed checksum. Vehicle match and factory provenance remain unverified.
+
+Install the manufacturer's Windows driver and close other diagnostic apps before connecting. SpeedLink uses FTDI D2XX for vLinker and SAE J2534 ISO 15765 for Tactrix. The self-contained x86 build loads Tactrix's 32-bit driver directly and runs on 64-bit Windows. No driver is bundled.
+
+The vLinker temporarily uses 2000000 baud during reads and restores 115200 on a clean disconnect. After reconnecting USB, start with 115200. If the app was interrupted while the adapter stayed connected, select 2000000 to reconnect. Baud selection is explicit; the port is never probed automatically. Tactrix uses its J2534 driver and needs no serial baud selection. Both adapters use 500 kbit/s CAN.
+
+Offline ECU models are developer test fixtures; there is no Simulator connection in the application. ECU flashing remains planned.
+
+The **Logger** tab provides stock logging for all seven defined ROMs with both adapters:
+35–38 selectable parameters, display units, measured sample rates, a rolling chart
+and CSV recording. Load the ECU's current matching ROM backup for MAP calibration.
+Live ECU calibration identity must match. See the [logger guide](../docs/LOGGER.md).
+ROM reads require an engine-stopped connection; logging uses the normal application
+session and can run with the engine running. Real-ECU logger validation is pending.
+
+## Offline ROM editing
+
+Open **Editor**. The seven bundled tuning
+definitions provide grid editing, 2D curves, rotatable 3D surfaces, comparison,
+selection arithmetic, clipboard, interpolation and undo/redo. Saves create new
+verified copies with mandatory checksum correction. Original files are preserved.
+Program-area signatures reject incompatible patched layouts while allowing
+changes to defined tuning controls. See the [editor guide](../docs/EDITOR.md).
+
+## Build and test
+
+Use the .NET SDK pinned in `global.json` on Windows. From this folder:
+
+```powershell
+dotnet restore SpeedLink.slnx --locked-mode
+dotnet test SpeedLink.slnx -c Release --no-restore
+./tools/Test-EditorUi.ps1
+./tools/Publish-Windows.ps1 -Output publish
+```
+
+The release is a self-contained **SpeedLink.exe**; users do not need to install .NET. The runtime may extract its native libraries into a temporary directory. Backups stay beside the EXE.
+
+The [logger catalog](../definitions/logging/All_ROM_Coverage.md) includes each
+ROM's parameters, exclusions, native test vectors and pending ECU checks.
+`SpeedLink.Core.LoggerDefinition` provides decoding and calibration binding;
+`LiveLogger` handles sequential identifier polling, dependencies, rejection status
+and sample freshness. `LoggerRecording` saves CSV, raw replies and session metadata.
+
+Run both offline desktop workflows for every profile with `./tools/Test-LoggerUi.ps1` after
+building the solution. These use fixtures and do not access adapters or an ECU.
+
+## Validation
+
+This alpha has passed offline and isolated-adapter checks. The [measured results](docs/Validation.md) and regression case matrix distinguish offline, physical-adapter/ECU-model and real-ECU coverage. Real Mazda ECU validation remains pending. Hardware tests require an isolated, terminated vLinker FS/Tactrix bench with no vehicle or ECU attached.
+
+## License
+
+GPL-3.0-or-later. See the repository LICENSE and this folder’s ATTRIBUTIONS.md. Runtime and dependency notices are bundled under Help & licenses. No ROM images or vendor drivers are included.

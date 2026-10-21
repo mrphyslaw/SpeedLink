@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "calibration": "L33XEH000",
+  "romSha256": "6110a26bcdafaa2f739153a1a098c7f6928fe613cae5888a02d798a76a44042d",
+  "channels": 35,
+  "distinctRequests": 31,
+  "nativeVectors": 277,
+  "independentScalarChecks": 217,
+  "instructionSteps": 357693,
+  "executedInstructionWords": 1805,
+  "realEcuTested": false,
+  "loggerAdapterBenchTested": false,
+  "excludedChannels": [
+    {
+      "id": "desired_fuel_rail_pressure",
+      "name": "Desired fuel rail pressure",
+      "reason": "Identifier absent from this ROM",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "ambient_air_temperature",
+      "name": "Ambient air temperature",
+      "reason": "Inactive native lookup; no active encoder established",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "catalyst_temperature",
+      "name": "Catalyst temperature",
+      "reason": "Inactive native lookup; no active encoder established",
+      "ecu": "not_offered_by_this_profile"
+    }
+  ],
+  "sourceRomUnchanged": true,
+  "scope": "Original bounded encoders and descriptor copy paths with synthetic RAM; bitmap refresh and unrelated capture/status paths held out. No peripheral, scheduler or physical ECU validation.",
+  "csharpVectorsPassed": true,
+  "offlineDesktopWorkflowsPassed": [
+    "record-stop",
+    "connection-failure"
+  ]
+}

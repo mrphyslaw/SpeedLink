@@ -1,0 +1,22 @@
+SpeedLink {version}
+Mazdaspeed ECU tools
+
+Workbench alpha
+ROM reading, verified backups, offline ROM editing and live logging.
+One workspace for editing, live logging and recorded logs.
+Seven tuning definitions, Focused mode, map details, changes and undo/redo.
+Every editor save corrects and verifies its checksum. Originals are preserved.
+A definition is not required to dump a ROM.
+
+Adapters: Vgate vLinker FS (USB), Tactrix Openport 2.0
+Stock-ROM logger: seven defined Mazdaspeed/MPS ROMs, 35–38 parameters.
+Parameter selection, up to six synchronized charts, CSV and recorded-log viewer.
+ROM/offline checked; real-ECU logging validation pending.
+ECU flashing is planned.
+
+Source: github.com/mrphyslaw/SpeedLink
+Definitions: github.com/mrphyslaw/MazdaSpeedDefs
+
+Copyright (C) 2026 SpeedLink contributors.
+GPL version 3 or later. Provided without warranty.
+See Help & licenses for full notices.

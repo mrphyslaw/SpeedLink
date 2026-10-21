@@ -1,0 +1,449 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:speedlink:logger-definition:1",
+  "title": "SpeedLink read-only logger definition, version1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "definitionVersion",
+    "id",
+    "softwareIds",
+    "protocol",
+    "calibration",
+    "queries",
+    "channels",
+    "codeFingerprints",
+    "validation"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "definitionVersion": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "softwareIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9]{9}$"
+      }
+    },
+    "referenceRomSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "protocol": {
+      "type": "object",
+      "required": [
+        "service",
+        "positiveService",
+        "identifierBytes",
+        "byteOrder",
+        "sessionPolicy",
+        "sessionChanges",
+        "canBitrate",
+        "requestCanId",
+        "responseCanId",
+        "requireExactResponseLength",
+        "requireIdentifierEcho"
+      ],
+      "properties": {
+        "service": {
+          "const": "0x22"
+        },
+        "positiveService": {
+          "const": "0x62"
+        },
+        "identifierBytes": {
+          "const": 2
+        },
+        "byteOrder": {
+          "const": "big"
+        },
+        "canBitrate": {
+          "const": 500000
+        },
+        "requestCanId": {
+          "const": "0x7E0"
+        },
+        "responseCanId": {
+          "const": "0x7E8"
+        },
+        "sessionPolicy": {
+          "const": "normal_application_logging"
+        },
+        "sessionChanges": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "requireExactResponseLength": {
+          "const": true
+        },
+        "requireIdentifierEcho": {
+          "const": true
+        }
+      }
+    },
+    "calibration": {
+      "type": "object"
+    },
+    "queries": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 128,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[0-9A-F]{4}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "requestHex",
+          "positiveHeaderHex",
+          "dataBytes",
+          "nativeDescriptorOffset",
+          "nativePayloadRam",
+          "descriptorSha256"
+        ],
+        "properties": {
+          "requestHex": {
+            "type": "string",
+            "pattern": "^22[0-9A-F]{4}$"
+          },
+          "positiveHeaderHex": {
+            "type": "string",
+            "pattern": "^62[0-9A-F]{4}$"
+          },
+          "dataBytes": {
+            "enum": [
+              1,
+              2,
+              4
+            ]
+          },
+          "nativeDescriptorOffset": {
+            "type": "string",
+            "pattern": "^0x[0-9A-Fa-f]{6,8}$"
+          },
+          "nativePayloadRam": {
+            "type": "string",
+            "pattern": "^0x[0-9A-Fa-f]{6,8}$"
+          },
+          "descriptorSha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "group",
+          "unit",
+          "help",
+          "kind",
+          "nativeSourceRam",
+          "verification"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,99}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "group": {
+            "enum": [
+              "Boost",
+              "Fuel",
+              "General",
+              "Ignition"
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "help": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "query",
+              "calculated"
+            ]
+          },
+          "nativeSourceRam": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^0x[0-9A-Fa-f]{6,8}$"
+            }
+          },
+          "verification": {
+            "type": "object"
+          },
+          "query": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{4}$"
+          },
+          "decode": {
+            "type": "object",
+            "required": [
+              "operation",
+              "byteOffset",
+              "byteLength",
+              "signed"
+            ],
+            "properties": {
+              "operation": {
+                "enum": [
+                  "linear",
+                  "bit"
+                ]
+              },
+              "byteOffset": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "byteLength": {
+                "enum": [
+                  1,
+                  2,
+                  4
+                ]
+              },
+              "signed": {
+                "type": "boolean"
+              },
+              "mask": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "multiplier": {
+                "type": "number"
+              },
+              "offset": {
+                "type": "number"
+              },
+              "labels": {
+                "type": "object"
+              },
+              "afterLinear": {
+                "type": "object",
+                "required": [
+                  "operation",
+                  "gain",
+                  "subtract"
+                ],
+                "properties": {
+                  "operation": {
+                    "const": "calibrated_affine"
+                  },
+                  "gain": {
+                    "const": "map_gain_kpa_per_v"
+                  },
+                  "subtract": {
+                    "const": "map_offset_kpa"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "operation": {
+                      "const": "linear"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "multiplier",
+                    "offset"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "operation": {
+                      "const": "bit"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "mask"
+                  ]
+                }
+              }
+            ],
+            "additionalProperties": false
+          },
+          "signalType": {
+            "type": "string"
+          },
+          "displayConversions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "encodingRange": {
+            "type": "object"
+          },
+          "calculation": {
+            "type": "object",
+            "required": [
+              "operation",
+              "inputs",
+              "requireValidFreshInputs"
+            ],
+            "properties": {
+              "operation": {
+                "enum": [
+                  "subtract",
+                  "product_divide"
+                ]
+              },
+              "inputs": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "divisor": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "crankWindowDegrees": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "requireValidFreshInputs": {
+                "const": true
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "query"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "query",
+                "decode"
+              ],
+              "not": {
+                "required": [
+                  "calculation"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "calculated"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "calculation"
+              ],
+              "not": {
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "codeFingerprints": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "ranges",
+          "sha256"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ranges": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "required": [
+                "start",
+                "length"
+              ],
+              "properties": {
+                "start": {
+                  "type": "string",
+                  "pattern": "^0x[0-9A-Fa-f]{6,8}$"
+                },
+                "length": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1048576
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "validation": {
+      "type": "object"
+    }
+  }
+}

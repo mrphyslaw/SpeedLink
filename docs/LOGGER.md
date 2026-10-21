@@ -1,0 +1,133 @@
+# Stock-ROM logger
+
+For a visual tour, see the [logger overview and screenshots](logger/README.md).
+
+The logger draft covers all seven ROMs with tuning definitions, with 35–38
+parameters per profile. It uses the
+factory application's read-identifier interface; a logging patch is not required.
+The ROM encoders and offline conversions have been checked. Real-ECU acceptance,
+sensor readings and achievable logging rates still need testing.
+
+Both vLinker FS and Tactrix logger paths have passed isolated bench tests across
+all seven profiles, including sustained requests, fault handling, desktop
+recording and USB interruption/reconnect checks. These tests use simulated ECU
+replies through real adapters. See the [validation results](../dotnet/docs/Validation.md).
+
+## Before you start
+
+Download **SpeedLink.exe** from [Releases](https://github.com/mrphyslaw/SpeedLink/releases)
+and keep it in a writable folder. Install your adapter manufacturer's driver,
+select the adapter in SpeedLink, and select its COM port for vLinker FS. For
+Tactrix, choose its installed J2534 driver.
+
+Have a full backup of the ROM currently installed in the ECU ready. If you need
+to make one, use **Read & verify backup** with the engine stopped, then disconnect
+and reconnect before logging. Use the verified `rom.bin` from that backup.
+
+## Start logging
+
+1. Connect your vLinker FS or Tactrix and select **Connect & identify**.
+2. Open **Logger**, then **Load current ECU ROM…**. Select a full backup of the
+   image currently installed in the ECU. SpeedLink selects its profile and reads its MAP calibration.
+3. Select parameters and display units. **Essentials** is a tuning preset;
+   **All** includes every available parameter for that profile. More parameters reduce each parameter's rate.
+4. For AFR display, enter your fuel's stoichiometric AFR, then choose AFR on the
+   actual or desired mixture row. Leave it blank to log lambda.
+5. Leave **Record CSV** checked to save a recording, then select **Start logging**.
+   Use **Plot** to select up to six synchronized charts for logged parameters. **Stop** ends the recording
+   and disconnects; reconnect before starting again or reading a ROM. **Open logs**
+   opens the recording folder location.
+
+Logging can run with the engine running. **ROM backup reads require the engine
+stopped**. They use a different diagnostic session. A connection used for a ROM
+read must be disconnected before logging. SpeedLink never flashes the ECU.
+
+The live calibration identifier must match the logger profile. Unknown ROMs can
+still be read and saved; their logging layout is not guessed. Switching profiles
+clears the previous ROM calibration. The loaded image's software marker and its
+profile's code fingerprints are checked.
+Matching a file and calibration ID does not prove the file is installed in the
+vehicle; use the vehicle's current backup, especially with a changed MAP sensor.
+
+## Rates and unavailable data
+
+**Target scans/s** limits complete polling rounds. It is a requested ceiling,
+not an achieved rate. The table shows each channel's measured host sample rate;
+the footer shows completed scans per second. These are request/response rates,
+not proof that the ECU refreshed the underlying value at that rate. Transport
+timing remains conservative pending ECU testing. The
+[protocol guide](LOGGER_PROTOCOL.md) documents the current request scheduling
+and timing limits; measured ECU update rates remain unverified.
+
+Only selected parameters and their dependencies are polled. Shared identifiers
+are queried once per scan. Calculated boost and injector duty require fresh
+inputs no more than 500 ms apart. Data older than five seconds is unavailable.
+These initial limits are explicit draft settings, pending ECU validation.
+
+A rejected channel shows its negative-response code instead of a number.
+Unsupported identifiers are skipped until the next connection. Transient
+condition rejections remain eligible on the next normal scan. Malformed replies,
+timeouts and adapter failures stop the logger without resending the uncertain
+request or automatically reconnecting. Stop waits for the bounded exchange in
+progress; the window remains responsive.
+
+## Recordings
+
+Each recording creates a new folder under `data/logs` beside the EXE:
+
+- `log.csv`: selected display values, a timestamp and status for each channel,
+  plus the scan timestamp and monotonic elapsed time. Unavailable values are blank.
+- `responses.jsonl`: raw diagnostic replies, requests, timing and rejection/error
+  information, for troubleshooting and later verification.
+- `session.json`: app/profile versions, selected units, ECU identity, loaded ROM
+  hash, MAP calibration, AFR setting, timing limits and recording status.
+
+The CSV is a sequential scan, **not an atomic ECU snapshot**. Use the per-channel
+timestamps when comparing signals. Files flush after each scan. An interrupted
+process can leave a partial final line; earlier flushed rows remain available.
+A recording left marked `Recording or interrupted` did not close normally.
+Keep the whole folder. ECU identity includes the VIN when available; review it
+before sharing a log publicly.
+
+Selections and units are remembered in `data/logger-settings.json`. No ROM,
+commercial software or driver is bundled. ECU flashing and modified-ROM
+logging extensions remain outside this release.
+
+See the [per-ROM coverage](../definitions/logging/All_ROM_Coverage.md) and
+[ECU test checklist](../definitions/logging/All_ROM_ECU_Checklist.csv) for each
+parameter's status and remaining checks.
+
+## View a saved recording
+
+Select **Recordings**, then **Open recording…** and choose a SpeedLink
+`log.csv`. This works without an adapter. Select up to six parameters for plots
+with a shared time axis. Move the cursor slider or click a plot to inspect the
+latest preceding observation; use Zoom to narrow the displayed time range.
+
+Values keep their recorded units. Missing readings and long gaps break the
+lines. Cursor readings become unavailable when their sample is too old. Plot
+reduction retains narrow peaks and dips. Each channel shows its recorded host
+sample rate, unavailable count and sample-age information; these do not establish
+the ECU's internal update rate.
+
+Opening a recording does not modify it. Complete earlier rows remain readable
+if an interrupted recording ends with an incomplete CSV row; the viewer displays
+a warning. The current viewer accepts SpeedLink's timestamp/status CSV format,
+with a 128 MiB / one-million-observation limit.
+
+See [protocol research](LOGGER_PROTOCOL.md) for the reviewed scheduling and
+transport behavior and its remaining validation limits.
+
+## Quick checks
+
+- **Start logging is disabled:** connect a fresh session, load a supported current
+  ECU ROM and select at least one parameter.
+- **A ROM/profile mismatch appears:** check that the file is the current full
+  backup from the connected ECU and that its calibration is listed in the coverage.
+- **Updates are slow:** select fewer parameters and watch the measured **Hz**
+  column. Increasing **Target scans/s** does not make the ECU or adapter reply faster.
+- **A timeout or USB disconnect stops logging:** reconnect manually, then start a
+  new recording. The logger does not retry an uncertain request. Keep any partial
+  recording for troubleshooting.
+- **No recording was saved:** check **Record CSV** before starting and use
+  **Open logs** to find the recording folders beside the EXE.

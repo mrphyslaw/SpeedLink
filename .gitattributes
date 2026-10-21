@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.png binary
+*.cmd text eol=crlf
+*.bat text eol=crlf
+# Preserve the upstream tuning snapshots byte for byte, including their CRLFs.
+definitions/tuning/*.xml -text -whitespace

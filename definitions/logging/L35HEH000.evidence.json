@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "calibration": "L35HEH000",
+  "romSha256": "6064ecaf2c5358bf19a95315fcba973974289900c40dd3f35056c61acd057908",
+  "channels": 36,
+  "distinctRequests": 32,
+  "nativeVectors": 284,
+  "independentScalarChecks": 224,
+  "instructionSteps": 373907,
+  "executedInstructionWords": 2239,
+  "realEcuTested": false,
+  "loggerAdapterBenchTested": false,
+  "excludedChannels": [
+    {
+      "id": "desired_fuel_rail_pressure",
+      "name": "Desired fuel rail pressure",
+      "reason": "Identifier absent from this ROM",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "ambient_air_temperature",
+      "name": "Ambient air temperature",
+      "reason": "Inactive native lookup; no active encoder established",
+      "ecu": "not_offered_by_this_profile"
+    }
+  ],
+  "sourceRomUnchanged": true,
+  "scope": "Original bounded encoders and descriptor copy paths with synthetic RAM; bitmap refresh and unrelated capture/status paths held out. No peripheral, scheduler or physical ECU validation.",
+  "csharpVectorsPassed": true,
+  "offlineDesktopWorkflowsPassed": [
+    "record-stop",
+    "connection-failure"
+  ]
+}

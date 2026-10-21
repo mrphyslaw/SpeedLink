@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "romSHA256": "1b9a8b78ef9fe1a346a32865ffa0e5a2bd971d7383c5b39db35392f959349a85",
+  "channelCount": 38,
+  "distinctRequests": 34,
+  "vectorCount": 298,
+  "scalarOracleCases": 238,
+  "switchCombinationCases": 16,
+  "unsupportedIdentifierCases": 4,
+  "instructionSteps": 473544,
+  "distinctExecutedInstructions": 1993,
+  "calibration": {
+    "map_gain_kpa_per_v": 54.117647260427475,
+    "map_offset_kpa": 1.6469999551773071
+  },
+  "sourceRomUnchanged": true,
+  "scope": "Bounded original numeric encoders and native descriptor payload copies with synthetic RAM. Standard bitmap refresh is held out; extended capture services/unrelated status paths are excluded. SR is modeled synchronously; no peripherals, scheduler, adapter or real ECU testing.",
+  "actualEcuTested": false,
+  "loggerAdapterBenchTested": false,
+  "queriedChannelsRomChecked": 36,
+  "calculatedChannelsChecked": 2,
+  "descriptorPayloadCopyCases": 130,
+  "offlineCSharpTestsPassed": 108,
+  "originalParityCasesPassed": 52,
+  "nativeImageBindingCheckedInCSharp": true,
+  "secondaryTrimUnitCheck": {
+    "nativePercentageConsumer": "0x06E25A..0x06E26E",
+    "nativeCallerConstants": {
+      "fr15": 100,
+      "fr14": 1
+    },
+    "cases": 11,
+    "canonicalPercent": "signed16*100/8192",
+    "normalizedFraction": "signed16/8192",
+    "metadataUnitLabelDiscrepancy": true,
+    "ecuComparisonPending": true
+  }
+}

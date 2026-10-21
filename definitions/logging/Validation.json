@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "channelsReviewed": 38,
+  "queriedChannelsRomChecked": 36,
+  "distinctIdentifiers": 34,
+  "calculatedChannelsChecked": 2,
+  "nativeVectors": 298,
+  "independentScalarChecks": 238,
+  "nativeInstructionSteps": 473544,
+  "nativeInstructionsReRead": 1993,
+  "offlineCSharpTestsPassed": 108,
+  "originalParityCasesPassed": 52,
+  "jsonSchemaValidated": true,
+  "nativeImageCSharpBindingPassed": true,
+  "ecuChannelsTested": 0,
+  "ecuChannelsPending": 38,
+  "loggerAdapterBenchTested": false,
+  "romSha256": "1b9a8b78ef9fe1a346a32865ffa0e5a2bd971d7383c5b39db35392f959349a85",
+  "sourceRomUnchanged": true,
+  "definitionVersion": "0.1.0",
+  "githubPublished": false
+}

@@ -1,0 +1,53 @@
+name: CSharp checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    defaults:
+      run:
+        working-directory: dotnet
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+        with:
+          global-json-file: dotnet/global.json
+      - run: dotnet restore SpeedLink.slnx --locked-mode
+      - run: dotnet test SpeedLink.slnx -c Release --no-restore --logger "trx;LogFileName=CSharp.trx" --results-directory TestResults
+      - run: ./tools/Verify-Regression.ps1 -Results TestResults/CSharp.trx
+      - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi
+      - run: ./tools/Test-ReplayUi.ps1 -Output TestResults/ReplayUi
+      - run: ./tools/Test-EditorUi.ps1 -Output TestResults/EditorUi
+      - run: ./tools/Test-WorkbenchUi.ps1 -Output TestResults/WorkbenchUi
+      - name: Check developer ECU peer parser
+        run: |
+          dotnet build tools/SpeedLink.Bench -c Release --no-restore
+          if ($LASTEXITCODE -ne 0) { throw 'Bench tools build failed.' }
+          & ./tools/SpeedLink.Bench/bin/Release/net10.0/win-x86/SpeedLink.Bench.exe --mode peer-parser-self-test --report TestResults/PeerParser.json
+          if ($LASTEXITCODE -ne 0) { throw 'Peer parser regression checks failed.' }
+      - run: ./tools/Publish-Windows.ps1 -Output publish
+      - name: Check standalone startup and bundled resources
+        run: |
+          $report = Join-Path (Get-Location) 'TestResults/Standalone_GUI.json'
+          $process = Start-Process -FilePath './publish/SpeedLink.exe' -ArgumentList @('--smoke-test', '--smoke-report', ('"' + $report + '"')) -WindowStyle Hidden -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw 'Standalone startup failed.' }
+          $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
+          if ($result.passed -ne $true -or $result.simulatorAvailable -ne $false -or $result.liveProgrammingEnabled -ne $false) { throw 'Unexpected standalone smoke-test result.' }
+      - name: Check standalone saved-log viewer
+        run: |
+          $report = Join-Path (Get-Location) 'TestResults/Standalone_Replay.json'
+          $fixture = Join-Path (Get-Location) 'tests/fixtures/Synthetic-Speed6-log.csv'
+          $image = Join-Path (Get-Location) 'TestResults/Standalone_Replay.png'
+          $before = (Get-FileHash -LiteralPath $fixture -Algorithm SHA256).Hash
+          $args = @('--replay-smoke', '--file', ('"' + $fixture + '"'), '--screenshot', ('"' + $image + '"'), '--smoke-report', ('"' + $report + '"'))
+          $process = Start-Process -FilePath './publish/SpeedLink.exe' -ArgumentList $args -WindowStyle Hidden -PassThru
+          if (-not $process.WaitForExit(45000)) { $process.Kill(); throw 'Standalone viewer timed out.' }
+          if ($process.ExitCode -ne 0) { throw 'Standalone viewer failed.' }
+          $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
+          if ($result.passed -ne $true -or $result.hardwareAccessed -ne $false -or $result.rows -ne 300 -or $before -ne (Get-FileHash -LiteralPath $fixture -Algorithm SHA256).Hash) { throw 'Unexpected standalone viewer result.' }

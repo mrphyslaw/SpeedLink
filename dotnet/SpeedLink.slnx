@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="src/SpeedLink.Core/SpeedLink.Core.csproj" />
+  <Project Path="src/SpeedLink.Desktop/SpeedLink.Desktop.csproj" />
+  <Project Path="tests/SpeedLink.Tests/SpeedLink.Tests.csproj" />
+  <Project Path="src/SpeedLink.Serial/SpeedLink.Serial.csproj" />
+  <Project Path="src/SpeedLink.J2534/SpeedLink.J2534.csproj" />
+  <Project Path="tools/SpeedLink.Bench/SpeedLink.Bench.csproj" />
+  <Project Path="tools/SpeedLink.UiHarness/SpeedLink.UiHarness.csproj" />
+  <Project Path="tools/SpeedLink.EditorAudit/SpeedLink.EditorAudit.csproj" />
+</Solution>

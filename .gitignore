@@ -1,0 +1,22 @@
+build/
+dist/
+data/
+*.bin
+*.rom
+*.hex
+*.srf
+*.srr
+*.dll
+*.exe
+*.zip
+*.log
+*smoke*.json
+
+
+# C#/.NET build output
+**/bin/
+**/obj/
+**/TestResults/
+dotnet/publish/
+.vs/
+*.user

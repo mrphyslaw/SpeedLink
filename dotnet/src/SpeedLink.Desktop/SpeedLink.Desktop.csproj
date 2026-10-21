@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>SpeedLink</AssemblyName>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishTrimmed>false</PublishTrimmed>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../SpeedLink.Core/SpeedLink.Core.csproj" />
+    <ProjectReference Include="../SpeedLink.Serial/SpeedLink.Serial.csproj" />
+    <ProjectReference Include="../SpeedLink.J2534/SpeedLink.J2534.csproj" />
+    <EmbeddedResource Include="../../README.md" LogicalName="SpeedLink.Help.md" />
+    <EmbeddedResource Include="../../../LICENSE" LogicalName="SpeedLink.LICENSE" />
+    <EmbeddedResource Include="../../../docs/ABOUT.txt" LogicalName="SpeedLink.About.txt" />
+    <EmbeddedResource Include="../../../docs/SUPPORTED_ROMS.md" LogicalName="SpeedLink.Profiles.md" />
+    <EmbeddedResource Include="../../../docs/LOGGER.md" LogicalName="SpeedLink.LoggerHelp.md" />
+    <EmbeddedResource Include="../../../docs/EDITOR.md" LogicalName="SpeedLink.EditorHelp.md" />
+    <EmbeddedResource Include="../../third_party/*" LogicalName="SpeedLink.Notices.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

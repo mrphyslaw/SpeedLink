@@ -1,0 +1,53 @@
+# Changelog
+
+## v0.5.0-alpha.1 — Workbench UI
+
+- Added a single-window workspace with vertical navigation and graphite/amber styling.
+- Embedded the ROM editor and recording viewer; switching workspaces retains edits.
+- Added Focused mode, four grid/graph layouts, collapsible map details and a changed-maps drawer.
+- Added up to six live logger plots sharing a 30-second time axis and remembered plot selections.
+- Editor saves always correct and verify the checksum; removed the checksum opt-out from the UI and save API.
+- Added seven-profile Workbench UI checks and checksum-repair regression tests.
+- ECU access remains read-only; real Mazda ECU validation remains pending.
+
+## v0.4.0-alpha.1 — offline ROM editor
+
+- Added definition-driven editing for all seven existing tuning ROM profiles.
+- Added searchable categories, naturally ordered related maps, map tabs, resizable
+  panes, tuner help, a heat-map grid, 2D curves and rotatable/zoomable 3D surfaces.
+- Added named switches and individual DTC bits with preservation of shared bytes.
+- Added original/last-save/compatible-ROM comparison, changed-map filtering,
+  selection arithmetic, spreadsheet clipboard, physical-axis interpolation,
+  byte-exact undo/redo and reset to baseline.
+- Saves create a new verified file, with checksum correction and original
+  preservation. ECU programming remains disabled. No ROMs are bundled.
+- Reject other program modifications with masked program-area signatures; retain
+  unknown-ROM reading. Added synthetic editor desktop checks to CI.
+
+## v0.3.0-alpha.2 — 2026-10-19
+
+- Add a saved-log viewer with up to six synchronized plots, cursor inspection and zoom.
+- Preserve recorded units, missing-data gaps and narrow peaks/dips during plot reduction.
+- Show sample ages and unavailable counts; refuse stale cursor values.
+- Read complete rows from an interrupted CSV tail without modifying the recording.
+- Retain partial logger frames on cancellation even without a progress callback.
+- Add replay parsing, malformed-data, timestamp, gap/spike and seven-profile round-trip tests.
+- Document stock logger request scheduling and timing limits.
+- Add developer-only physical logger fixtures; real-ECU logging validation remains pending.
+
+## v0.3.0-alpha.1 — 2026-10-19
+
+- Add stock-ROM logging for all seven defined Mazdaspeed/MPS ROMs: 35–38 channels over 31–34 identifiers per profile.
+- Check each ROM's native encoder paths, calibration locations and available identifiers; exclude unverified channels rather than copying addresses.
+- Select profiles automatically from a matching current ECU backup and calibration identity; clear calibration when switching profiles.
+- Add parameter selection, display units, measured host sample rates and a rolling chart.
+- Save CSV with per-channel timestamps/status, raw replies and recording metadata.
+- Bind MAP calibration from a matching ECU backup and check live calibration identity.
+- Keep unsupported readings unavailable and stop on transport failures without retries.
+- Add 2,030 native-derived vectors, 146 offline C# tests and recording/fault desktop workflows for all seven profiles.
+- Real-ECU logger readings and performance remain pending validation.
+
+## v0.2.0-alpha.2 — 2026-10-19
+
+- Add Tactrix Openport 2.0 ROM reading through J2534 alongside vLinker FS.
+- Publish a self-contained Windows x86 EXE with 95 offline tests and isolated adapter qualification.

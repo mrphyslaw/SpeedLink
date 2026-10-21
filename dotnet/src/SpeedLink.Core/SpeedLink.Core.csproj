@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Profiles.json" />
+    <EmbeddedResource Include="TuningCode.json" />
+    <EmbeddedResource Include="../../../definitions/tuning/*.xml" LogicalName="SpeedLink.Core.Tuning.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../../definitions/logging/*.logger.json" LogicalName="SpeedLink.Core.Logging.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

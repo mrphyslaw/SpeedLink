@@ -1,0 +1,354 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using Microsoft.Win32;
+using SpeedLink.Core;
+
+namespace SpeedLink.Desktop;
+
+internal sealed class LoggerRow(LoggerChannel channel) : INotifyPropertyChanged
+{
+    public LoggerChannel Channel { get; } = channel;
+    public string Id => Channel.Id;
+    public string Name => Channel.Name;
+    public string Group => Channel.Group;
+    public IReadOnlyList<string> Units => Channel.DisplayUnits;
+    private bool selected, plotted, canEdit = true;
+    public bool Plotted { get => plotted; set { if (plotted == value) return; plotted = value; Changed(nameof(Plotted)); } }
+    private string unit = channel.Unit;
+    public bool Selected { get => selected; set { selected = value; Changed(nameof(Selected)); } }
+    public bool CanEdit { get => canEdit; set { canEdit = value; Changed(nameof(CanEdit)); } }
+    public string Unit { get => unit; set { unit = value; Changed(nameof(Unit)); } }
+    public string ValueText { get; private set; } = "—";
+    public string Status { get; private set; } = "Not logging";
+    public string RateText { get; private set; } = "—";
+    public List<(DateTimeOffset Time, double Value)> Points { get; } = [];
+    private readonly Queue<DateTimeOffset> times = new();
+    private DateTimeOffset? last;
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private void Changed(string name) => PropertyChanged?.Invoke(this, new(name));
+    public void Reset()
+    {
+        Points.Clear(); times.Clear(); last = null; SetUnavailable(Selected ? "Waiting" : "Not selected");
+    }
+    public void SetUnavailable(string state)
+    {
+        ValueText = "—"; Status = state; RateText = "—";
+        Changed(nameof(ValueText)); Changed(nameof(Status)); Changed(nameof(RateText));
+    }
+    public void Observe(LoggerReading reading, LoggerDefinition definition, IReadOnlyDictionary<string, double>? parameters)
+    {
+        if (reading.Value is not double value || reading.Timestamp is not DateTimeOffset timestamp)
+        { SetUnavailable(reading.Status); return; }
+        double display = definition.ConvertDisplay(Id, value, Unit, parameters);
+        ValueText = display.ToString("0.###", CultureInfo.CurrentCulture); Status = reading.Status;
+        if (timestamp != last)
+        {
+            if (last is not null && timestamp < last) throw new InvalidDataException("Logger time moved backwards.");
+            last = timestamp; Points.Add((timestamp, display));
+            if (Points.Count > 300) Points.RemoveAt(0);
+            times.Enqueue(timestamp);
+            while (times.Count > 20) times.Dequeue();
+        }
+        RateText = times.Count >= 2 && timestamp > times.Peek() ?
+            ((times.Count - 1) / (timestamp - times.Peek()).TotalSeconds).ToString("0.0", CultureInfo.CurrentCulture) : "—";
+        Changed(nameof(ValueText)); Changed(nameof(Status)); Changed(nameof(RateText));
+    }
+}
+
+public partial class MainWindow
+{
+    private LoggerDefinition loggerDefinition = null!;
+    private LoggerCalibration? loggerCalibration;
+    private readonly ObservableCollection<LoggerRow> loggerRows = [];
+    private bool loggingActive;
+    private long loggerScans;
+    private static readonly string[] EssentialChannels = ["engine_rpm", "absolute_load", "boost_pressure", "actual_lambda", "desired_lambda",
+        "fuel_rail_pressure", "desired_fuel_rail_pressure", "injection_pulsewidth", "injector_duty_cycle", "knock_retard", "boost_air_temperature", "relative_throttle_position"];
+    private string LoggerFolder => System.IO.Path.Combine(vault, "logs");
+
+    private void InitializeLogger()
+    {
+        ConfigureLoggerProfile(LoggerDefinition.Speed6);
+        LoggerGrid.ItemsSource = loggerRows;
+        LoggerRateBox.ItemsSource = new[] { 1, 2, 5, 10, 20 }; LoggerRateBox.SelectedItem = 5;
+        var view = CollectionViewSource.GetDefaultView(loggerRows);
+        view.Filter = item => item is LoggerRow row && (row.Name.Contains(LoggerSearchBox.Text, StringComparison.CurrentCultureIgnoreCase) || row.Group.Contains(LoggerSearchBox.Text, StringComparison.CurrentCultureIgnoreCase));
+        LoadLoggerSettings();
+        LoggerGrid.SelectedItem = loggerRows.First(row => row.Id == "engine_rpm");
+    }
+    private void ConfigureLoggerProfile(LoggerDefinition profile)
+    {
+        var previous = loggerRows.ToDictionary(row => row.Id, row => (row.Selected, row.Unit, row.Plotted));
+        loggerDefinition = profile; loggerCalibration = null; loggerRows.Clear();
+        LoggerRomText.Text = "Load the current ECU backup for its MAP calibration.";
+        LoggerProfileText.Text = $"{profile.Vehicle} · {string.Join(", ", profile.SoftwareIds)} · {profile.ChannelIds.Count} parameters · ECU testing pending";
+        LoggerProfileText.ToolTip = profile.UnavailableChannels.Count == 0 ? "All parameters in the current logging set are available in this profile." :
+            "Not offered by this ROM profile: " + string.Join(", ", profile.UnavailableChannels.Select(c => c.Name));
+        foreach (var channel in profile.Channels)
+        {
+            var row = new LoggerRow(channel) { Selected = previous.TryGetValue(channel.Id, out var prior) ? prior.Selected : EssentialChannels.Contains(channel.Id, StringComparer.Ordinal) };
+            row.Plotted = previous.TryGetValue(channel.Id, out prior) ? prior.Plotted : new[] { "engine_rpm", "boost_pressure", "actual_lambda" }.Contains(channel.Id);
+            if (previous.TryGetValue(channel.Id, out prior) && row.Units.Contains(prior.Unit)) row.Unit = prior.Unit;
+            row.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(LoggerRow.Selected) && IsLoaded) Controls();
+                if (e.PropertyName == nameof(LoggerRow.Plotted))
+                {
+                    if (loggerRows.Count(r => r.Plotted) > 6) { row.Plotted = false; LoggerHelpText.Text = "Select up to six plots."; return; }
+                    DrawLoggerChart();
+                }
+                if (e.PropertyName == nameof(LoggerRow.Selected)) DrawLoggerChart();
+                if (e.PropertyName == nameof(LoggerRow.Unit)) { row.Reset(); DrawLoggerChart(); }
+            };
+            loggerRows.Add(row);
+        }
+        LoggerGrid.SelectedItem = loggerRows.First(row => row.Id == "engine_rpm");
+    }
+    private void LoggerIdentityChanged()
+    {
+        var match = LoggerDefinition.ForCalibration(identity?.Calibration);
+        if (match is not null && match.Id != loggerDefinition.Id) ConfigureLoggerProfile(match);
+        if (match is null)
+        {
+            loggerCalibration = null;
+            LoggerProfileText.Text = "No logger profile matches this ECU calibration. ROM backup reading is available.";
+            LoggerRomText.Text = "A matching supported ROM is needed for logging.";
+        }
+    }
+
+    private void LoggerControls(bool idle)
+    {
+        if (LoggerStartButton is null || loggerDefinition is null) return;
+        LoggerStartButton.IsEnabled = idle && transport is not null && !transport.ReadAttempted && loggerCalibration is not null &&
+            LoggerDefinition.ForCalibration(identity?.Calibration) is not null && loggerDefinition.MatchesCalibrationId(identity?.Calibration) && loggerRows.Any(row => row.Selected);
+        LoggerStopButton.IsEnabled = loggingActive && !closing;
+        LoggerRomButton.IsEnabled = idle; LoggerRateBox.IsEnabled = idle; StoichBox.IsEnabled = idle; RecordCsvBox.IsEnabled = idle;
+        LoggerEssentialsButton.IsEnabled = idle; LoggerAllButton.IsEnabled = idle; LoggerNoneButton.IsEnabled = idle;
+        foreach (var row in loggerRows) row.CanEdit = idle;
+    }
+    private void BindLoggerRom(string path)
+    {
+        if (new FileInfo(path).Length != RomInspector.RomSize) throw new InvalidDataException("Load a full 1 MiB ECU image.");
+        var binding = LoggerDefinition.BindKnownRom(File.ReadAllBytes(path));
+        if (identity is not null && (LoggerDefinition.ForCalibration(identity.Calibration) is null || !binding.Definition.MatchesCalibrationId(identity.Calibration)))
+            throw new InvalidDataException("The selected ROM does not match the connected ECU calibration.");
+        ConfigureLoggerProfile(binding.Definition); loggerCalibration = binding.Calibration;
+        LoggerRomText.Text = $"{string.Join(", ", binding.Definition.SoftwareIds)} · {System.IO.Path.GetFileName(path)} · MAP calibration loaded";
+        Log("Logger ROM: " + binding.Calibration.SourceRomSha256);
+        Controls();
+    }
+    private void LoggerRom_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog { Title = "Select the current ECU backup · logger profile is detected automatically", Filter = "ROM images|*.bin;*.rom|All files|*.*" };
+        if (dialog.ShowDialog(this) == true) TryFile(() => BindLoggerRom(dialog.FileName));
+    }
+    private IReadOnlyDictionary<string, double>? LoggerDisplayParameters()
+    {
+        if (string.IsNullOrWhiteSpace(StoichBox.Text)) return null;
+        if (!double.TryParse(StoichBox.Text, NumberStyles.Float, CultureInfo.CurrentCulture, out double stoich) || !double.IsFinite(stoich) || stoich is < 1 or > 30)
+            throw new InvalidDataException("Enter a fuel stoichiometric AFR between 1 and 30, or leave it blank for lambda.");
+        return new Dictionary<string, double> { ["stoichiometric_afr"] = stoich };
+    }
+    private async void LoggerStart_Click(object sender, RoutedEventArgs e)
+    {
+        if (transport is null || identity is null || loggerCalibration is null) return;
+        var link = transport; var ecu = identity; var calibration = loggerCalibration;
+        var selected = loggerRows.Where(row => row.Selected).ToArray();
+        var units = selected.ToDictionary(row => row.Id, row => row.Unit);
+        int target = (int)LoggerRateBox.SelectedItem;
+        bool recording = RecordCsvBox.IsChecked == true;
+        loggingActive = true;
+        await Run(async () =>
+        {
+            try
+            {
+                var parameters = LoggerDisplayParameters();
+                foreach (var row in selected) loggerDefinition.ConvertDisplay(row.Id, 0, row.Unit, parameters);
+                var logger = new LiveLogger(loggerDefinition, calibration, link, ecu, selected.Select(row => row.Id));
+                SaveLoggerSettings();
+                foreach (var row in loggerRows) row.Reset();
+                loggerScans = 0;
+                LoggerFileText.Text = recording ? "Starting a new recording…" : "Live view · CSV recording off";
+                StatusText.Text = "Logging · stock application identifiers";
+                var uiTimer = Stopwatch.StartNew();
+                await Task.Run(() =>
+                {
+                    LoggerRecording? file = null;
+                    long recordedScan = 0;
+                    string finish = "Stopped";
+                    try
+                    {
+                        if (recording)
+                        {
+                            file = new(LoggerFolder, loggerDefinition, calibration, ecu, selected.Select(row => row.Id), units, parameters, Version, target);
+                            Dispatcher.Invoke(() => LoggerFileText.Text = file.Folder);
+                        }
+                        while (!stop!.IsCancellationRequested)
+                        {
+                            var scanTimer = Stopwatch.StartNew();
+                            var frame = logger.ReadFrame(stop.Token, partial =>
+                            {
+                                if (uiTimer.ElapsedMilliseconds < 100) return;
+                                Dispatcher.Invoke(() => ShowLoggerFrame(partial, parameters, false)); uiTimer.Restart();
+                            });
+                            recordedScan = frame.Scan; file?.Append(frame);
+                            Dispatcher.Invoke(() => ShowLoggerFrame(frame, parameters, true)); uiTimer.Restart();
+                            if (logger.ActiveQueryCount == 0) throw new TransportException("The ECU rejected every selected query. Logging stopped; inspect channel statuses and reconnect.");
+                            int delay = (int)Math.Max(0, 1000.0 / target - scanTimer.Elapsed.TotalMilliseconds);
+                            if (delay > 0) stop.Token.WaitHandle.WaitOne(delay);
+                        }
+                    }
+                    catch (OperationCanceledException) when (stop!.IsCancellationRequested)
+                    {
+                        if (file is not null && logger.LastFrame is { } partial && partial.Scan > recordedScan)
+                        { recordedScan = partial.Scan; file.Append(partial); }
+                    }
+                    catch (Exception error)
+                    {
+                        finish = "Stopped after error: " + error.Message;
+                        if (file is not null && logger.LastFrame is { } partial && partial.Scan > recordedScan)
+                        {
+                            recordedScan = partial.Scan; file.Append(partial);
+                            Dispatcher.Invoke(() => ShowLoggerFrame(partial, parameters, true));
+                        }
+                        throw;
+                    }
+                    finally
+                    {
+                        try { file?.Complete(finish); }
+                        finally { file?.Dispose(); }
+                    }
+                });
+            }
+            finally
+            {
+                loggingActive = false;
+                await Disconnect(); // A fresh connection is required before switching to a ROM-read session.
+                foreach (var row in selected) row.SetUnavailable(row.Status.StartsWith("Unavailable", StringComparison.Ordinal) ? "Stopped · " + row.Status : "Stopped · reconnect to log");
+            }
+            StatusText.Text = "Logging stopped · recording retained";
+        });
+    }
+    private void ShowLoggerFrame(LoggerFrame frame, IReadOnlyDictionary<string, double>? parameters, bool scanComplete)
+    {
+        foreach (var row in loggerRows)
+            if (frame.Readings.TryGetValue(row.Id, out var reading)) row.Observe(reading, loggerDefinition, parameters);
+        if (scanComplete)
+        {
+            loggerScans = frame.Scan;
+            double elapsed = frame.Elapsed.TotalSeconds;
+            LoggerRateText.Text = $"{frame.Scan:N0} scans · {(elapsed > 0 ? frame.Scan / elapsed : 0):0.0} scans/s overall · {frame.Exchanges.Count} requests in last scan · per-channel Hz shown above";
+        }
+        DrawLoggerChart();
+    }
+    private void LoggerEssentials_Click(object sender, RoutedEventArgs e) { foreach (var row in loggerRows) row.Selected = EssentialChannels.Contains(row.Id, StringComparer.Ordinal); }
+    private void LoggerAll_Click(object sender, RoutedEventArgs e) { foreach (var row in loggerRows) row.Selected = true; }
+    private void LoggerNone_Click(object sender, RoutedEventArgs e) { foreach (var row in loggerRows) row.Selected = false; }
+    private void LoggerSearch_Changed(object sender, TextChangedEventArgs e) { if (loggerRows.Count > 0) CollectionViewSource.GetDefaultView(loggerRows).Refresh(); }
+    private void LoggerSelection_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (LoggerGrid.SelectedItem is LoggerRow row) LoggerHelpText.Text = row.Channel.Help;
+        DrawLoggerChart();
+    }
+    private bool drawingLogger;
+    private void LoggerChart_SizeChanged(object sender, SizeChangedEventArgs e) { if (Math.Abs(e.NewSize.Width - e.PreviousSize.Width) > 1) DrawLoggerChart(); }
+    private void DrawLoggerChart()
+    {
+        if (LoggerPlots is null || drawingLogger) return;
+        drawingLogger = true;
+        try
+        {
+            LoggerPlots.Children.Clear();
+            var charts = loggerRows.Where(r => r.Plotted && r.Selected).Take(6).ToArray();
+            if (charts.Length == 0) { LoggerPlots.Children.Add(new TextBlock { Text = "Select Log and Plot for up to six parameters.", Foreground = UiTheme.Muted, TextWrapping = TextWrapping.Wrap, Margin = new(12) }); return; }
+            var all = charts.SelectMany(r => r.Points).ToArray();
+            var end = all.Length == 0 ? DateTimeOffset.UtcNow : all.Max(p => p.Time);
+            double seconds = all.Length == 0 ? 30 : Math.Clamp((end - all.Min(p => p.Time)).TotalSeconds, 1, 30); var start = end.AddSeconds(-seconds);
+            double width = Math.Max(100, LoggerPlots.ActualWidth - 24), height = 112;
+            foreach (var row in charts)
+            {
+                var panel = new StackPanel { Margin = new(8, 0, 8, 16) };
+                panel.Children.Add(new TextBlock { Text = $"{row.Name} · {row.ValueText} {row.Unit}", TextTrimming = TextTrimming.CharacterEllipsis, ToolTip = row.Channel.Help, FontWeight = FontWeights.SemiBold });
+                var canvas = new Canvas { Height = height + 16, Background = UiTheme.Panel, ClipToBounds = true, Margin = new(0, 7, 0, 4) };
+                var points = row.Points.Where(p => p.Time >= start && p.Time <= end).ToArray();
+                if (points.Length > 1)
+                {
+                    double min = points.Min(p => p.Value), max = points.Max(p => p.Value), scale = Math.Max(1, Math.Max(Math.Abs(min), Math.Abs(max)));
+                    double low = min / scale, high = max / scale; if (high - low < 1e-12) { low -= .5; high += .5; }
+                    Polyline Segment() { var line = new Polyline { Stroke = UiTheme.Amber, StrokeThickness = 1.8 }; canvas.Children.Add(line); return line; }
+                    var plot = Segment(); DateTimeOffset? previous = null;
+                    foreach (var point in points)
+                    {
+                        if (previous is not null && point.Time - previous > LiveLogger.MaximumSampleAge) plot = Segment();
+                        plot.Points.Add(new(8 + (point.Time - start).TotalSeconds / seconds * (width - 16), 8 + height - (point.Value / scale - low) / (high - low) * height)); previous = point.Time;
+                    }
+                }
+                panel.Children.Add(canvas);
+                panel.Children.Add(new TextBlock { Text = $"{row.Status} · {row.RateText} Hz · shared {seconds:0.#} s time axis", Foreground = UiTheme.Muted, TextWrapping = TextWrapping.Wrap });
+                LoggerPlots.Children.Add(panel);
+            }
+        }
+        finally { drawingLogger = false; }
+    }
+    private void OpenLogs_Click(object sender, RoutedEventArgs e)
+    {
+        TryFile(() => { Directory.CreateDirectory(LoggerFolder); Process.Start(new ProcessStartInfo(LoggerFolder) { UseShellExecute = true }); });
+    }
+    private void ViewRecording_Click(object sender, RoutedEventArgs e) => Navigate(3);
+    private void SaveLoggerSettings()
+    {
+        Directory.CreateDirectory(vault);
+        string path = System.IO.Path.Combine(vault, "logger-settings.json"), pending = path + ".pending";
+        var settings = new { version = 1, target = LoggerRateBox.SelectedItem, stoich = StoichBox.Text,
+            record = RecordCsvBox.IsChecked == true, channels = loggerRows.Select(row => new { id = row.Id, selected = row.Selected, unit = row.Unit, plotted = row.Plotted }) };
+        File.WriteAllText(pending, JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true })); File.Move(pending, path, true);
+    }
+    private void LoadLoggerSettings()
+    {
+        string path = System.IO.Path.Combine(vault, "logger-settings.json");
+        if (!File.Exists(path)) return;
+        try
+        {
+            if (new FileInfo(path).Length > 65536) throw new InvalidDataException("Settings file is too large.");
+            using var doc = JsonDocument.Parse(File.ReadAllBytes(path)); var data = doc.RootElement;
+            if (data.GetProperty("version").GetInt32() != 1) throw new InvalidDataException("Unknown settings version.");
+            int target = data.GetProperty("target").GetInt32();
+            if (new[] { 1, 2, 5, 10, 20 }.Contains(target)) LoggerRateBox.SelectedItem = target;
+            StoichBox.Text = data.GetProperty("stoich").GetString() ?? ""; RecordCsvBox.IsChecked = data.GetProperty("record").GetBoolean();
+            var savedChannels = data.GetProperty("channels").EnumerateArray().ToArray();
+            if (savedChannels.Any(item => item.TryGetProperty("plotted", out _))) foreach (var row in loggerRows) row.Plotted = false;
+            foreach (var item in savedChannels)
+            {
+                var row = loggerRows.FirstOrDefault(r => r.Id == item.GetProperty("id").GetString()); if (row is null) continue;
+                row.Selected = item.GetProperty("selected").GetBoolean(); string? unit = item.GetProperty("unit").GetString();
+                if (unit is not null && row.Units.Contains(unit)) row.Unit = unit;
+                if (item.TryGetProperty("plotted", out var plot) && plot.ValueKind is JsonValueKind.True or JsonValueKind.False) row.Plotted = plot.GetBoolean();
+            }
+        }
+        catch (Exception error) when (error is IOException or JsonException or InvalidOperationException or KeyNotFoundException or FormatException)
+        { Log("Logger settings could not be loaded: " + error.Message); }
+    }
+    private void VerifyLoggerSmoke(string[] args)
+    {
+        if (loggerRows.Count != 38 || LoggerDefinition.Known.Count != 7 || LoggerStartButton.IsEnabled || LoggerStopButton.IsEnabled || loggerCalibration is not null)
+            throw new InvalidOperationException("Unexpected logger startup state.");
+        if (!Resource("SpeedLink.LoggerHelp.md").Contains("Start logging", StringComparison.Ordinal)) throw new InvalidDataException("Logger help missing.");
+        Pages.SelectedIndex = 2; LoggerSearchBox.Text = "fuel";
+        if (CollectionViewSource.GetDefaultView(loggerRows).IsEmpty) throw new InvalidOperationException("Logger search failed.");
+        LoggerSearchBox.Text = "";
+        int rom = Array.IndexOf(args, "--logger-rom");
+        if (rom >= 0 && rom + 1 < args.Length) BindLoggerRom(args[rom + 1]);
+        UpdateLayout(); DrawLoggerChart();
+        Pages.SelectedIndex = args.Contains("--logger-page", StringComparer.Ordinal) ? 2 : 0;
+    }
+}

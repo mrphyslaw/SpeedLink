@@ -1,0 +1,445 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Microsoft.Win32;
+using SpeedLink.Core;
+using SpeedLink.Hardware;
+using SpeedLink.J2534;
+
+namespace SpeedLink.Desktop;
+
+public partial class MainWindow : Window
+{
+    public const string Version = "0.5.0-alpha.1";
+    private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
+    private readonly string vault;
+    private readonly RomInspector inspector = new();
+    private readonly BackupStore store = new();
+    private IReadTransport? transport;
+    private FtdiSerialConnection? connection;
+    private EcuIdentity? identity;
+    private byte[]? image;
+    private string? imagePath;
+    private RomInspection? inspection;
+    private bool busy, closing;
+    private CancellationTokenSource? stop;
+    private Task? activeWork;
+    public MainWindow() : this(null) { }
+    internal MainWindow(string? testVault, RomInspector? editorInspector = null, TuningCodeGuard? editorGuard = null)
+    {
+        vault = testVault ?? Path.Combine(AppContext.BaseDirectory, "data");
+        UiTheme.Ensure(); InitializeComponent();
+        if (editorInspector is not null && editorGuard is not null)
+        {
+            EditorPane = new(editorInspector, editorGuard); ((TabItem)Pages.Items[1]).Content = EditorPane;
+        }
+        Width = Math.Min(Width, Math.Max(MinWidth, SystemParameters.WorkArea.Width));
+        Height = Math.Min(Height, Math.Max(MinHeight, SystemParameters.WorkArea.Height));
+        Navigate(0);
+        Closed += (_, _) => RecordingsPane.CancelLoading();
+        Title = $"SpeedLink · Alpha {Version}";
+        VersionLabel.Text = $"ALPHA {Version}";
+        BaudBox.ItemsSource = new[] { 115200, 38400, 57600, 230400, 500000, 1000000, 2000000 };
+        BaudBox.SelectedItem = 115200;
+        AdapterBox.ItemsSource = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0" };
+        AdapterBox.SelectedIndex = 0;
+        InitializeLogger();
+        RefreshPorts();
+        RefreshHistory();
+        Controls();
+    }
+    private void Log(string message)
+    {
+        LogBox.AppendText(DateTime.Now.ToString("HH:mm:ss") + "  " + message + Environment.NewLine);
+        LogBox.ScrollToEnd();
+    }
+    private void Controls()
+    {
+        bool idle = !busy && !closing;
+        SessionText.Text = transport is null ? "Offline" : identity?.Calibration ?? "Adapter connected";
+        ConnectButton.IsEnabled = idle && transport is null;
+        DisconnectButton.IsEnabled = idle && transport is not null;
+        ReadButton.IsEnabled = idle && transport is not null && identity is not null && !transport.ReadAttempted;
+        StopButton.IsEnabled = busy;
+        OpenRomButton.IsEnabled = idle;
+        CorrectButton.IsEnabled = idle && inspection?.CanCorrectChecksum == true;
+        OpenBackupButton.IsEnabled = idle;
+        PortBox.IsEnabled = idle && transport is null;
+        BaudBox.IsEnabled = PortBox.IsEnabled;
+        RefreshPortsButton.IsEnabled = PortBox.IsEnabled;
+        RefreshHistoryButton.IsEnabled = idle;
+        AdapterBox.IsEnabled = idle && transport is null;
+        DriverBox.IsEnabled = AdapterBox.IsEnabled;
+        LoggerControls(idle);
+    }
+    private Task Run(Func<Task> action)
+    {
+        activeWork = RunCore(action);
+        return activeWork;
+    }
+    private async Task RunCore(Func<Task> action)
+    {
+        if (busy)
+            return;
+        busy = true;
+        stop?.Dispose();
+        stop = new();
+        Controls();
+        try
+        {
+            await action();
+        }
+        catch (OperationCanceledException) { StatusText.Text = "Stopped · partial files and journal retained"; Log(StatusText.Text); RefreshHistory(); }
+        catch (Exception error) { StatusText.Text = "Stopped · " + error.Message; Log(error.Message); RefreshHistory(); }
+        finally
+        {
+            busy = false;
+            Controls();
+            if (closing)
+                await FinishClose();
+        }
+    }
+    private async void Connect_Click(object sender, RoutedEventArgs e)
+    {
+        bool tactrix = AdapterBox.SelectedIndex == 1;
+        var name = PortBox.Text.Trim();
+        var baud = (int)BaudBox.SelectedItem;
+        var driver = DriverBox.SelectedItem as TactrixDriver;
+        if (tactrix && driver is null)
+        {
+            MessageBox.Show(this, "Install the Tactrix Openport drivers, then refresh devices.", "Tactrix driver needed");
+            return;
+        }
+        if (!tactrix && name.Length == 0)
+        {
+            MessageBox.Show(this, "Choose the COM port assigned to your adapter.", "Select a port");
+            return;
+        }
+        StatusText.Text = "Connecting and identifying…";
+        await Run(async () =>
+        {
+            var connected = await Task.Run(() =>
+            {
+                FtdiSerialConnection? serial = null;
+                IReadTransport link;
+                if (tactrix)
+                {
+                    var passThru = new J2534ReadTransport(new NativeJ2534Channel(driver!));
+                    link = passThru;
+                    try { passThru.Initialize(); }
+                    catch { passThru.Dispose(); throw; }
+                }
+                else
+                {
+                    serial = new FtdiSerialConnection(name, baud);
+                    var elm = new VLinkerReadTransport(serial);
+                    link = elm;
+                    try { elm.Initialize(); }
+                    catch { elm.Dispose(); throw; }
+                }
+                try
+                {
+                    return (Link: link, Connection: serial, Identity: ReadWorkflow.Identify(link));
+                }
+                catch { link.Dispose(); throw; }
+            });
+            transport = connected.Link;
+            connection = connected.Connection;
+            identity = connected.Identity;
+            LoggerIdentityChanged();
+            IdentityText.Text = $"{identity.Adapter}\nVIN: {identity.Vin ?? "unavailable"}    Calibration: {identity.Calibration ?? "unavailable"}";
+            StatusText.Text = "Connected · identification recorded";
+            Log(IdentityText.Text);
+        });
+    }
+    private async void Disconnect_Click(object sender, RoutedEventArgs e) => await Run(Disconnect);
+    private async Task Disconnect()
+    {
+        var link = transport;
+        var serial = connection;
+        transport = null;
+        connection = null;
+        identity = null;
+        if (link is not null)
+        {
+            await Task.Run(link.Dispose);
+            if (link is VLinkerReadTransport elm)
+            {
+                BaudBox.SelectedItem = elm.Baud;
+                if (elm.CloseWarning is not null)
+                    Log("Adapter baud restore: " + elm.CloseWarning);
+            }
+            if (link is J2534ReadTransport passThru && passThru.CloseWarning is not null)
+                Log("Tactrix cleanup: " + passThru.CloseWarning);
+            if (serial?.CleanupWarning is not null)
+                Log("Adapter driver cleanup: " + serial.CleanupWarning);
+        }
+        IdentityText.Text = "Disconnected. No ECU has been identified.";
+        StatusText.Text = "Disconnected";
+        Log("Disconnected.");
+    }
+    private async void Read_Click(object sender, RoutedEventArgs e)
+    {
+        if (transport is null || identity is null)
+            return;
+        var link = transport;
+        var expected = identity;
+        ProgressBar.Value = 0;
+        await Run(async () =>
+        {
+            var progress = new Progress<ReadProgress>(value => { ProgressBar.Value = value.Fraction * 100; StatusText.Text = value.Message; });
+            var result = await Task.Run(() => new ReadWorkflow(store, inspector).ReadBackup(link, expected, vault, progress, stop!.Token));
+            BackupText.Text = "Verified backup: " + result.Path;
+            Log("Verified backup saved: " + result.Path);
+            if (!result.Inspection.ProfileRecognized)
+                Log("Unknown ROM saved. The two reads match; checksum validation is unavailable for this layout.");
+            else if (!result.Inspection.ProfileValid)
+                Log("ROM saved. The two reads match, but one or more known-ROM checks did not pass.");
+            StatusText.Text = "Backup verified · two matching reads";
+            RefreshHistory();
+        });
+    }
+    private void Stop_Click(object sender, RoutedEventArgs e)
+    {
+        stop?.Cancel();
+        StatusText.Text = "Stopping after the current exchange…";
+    }
+    private void RefreshPorts()
+    {
+        var found = SerialConnection.GetPorts();
+        PortBox.ItemsSource = found;
+        if (PortBox.Text.Length == 0 && found.Length > 0)
+            PortBox.Text = found[0];
+        var selectedDriver = (DriverBox.SelectedItem as TactrixDriver)?.LibraryPath;
+        var drivers = TactrixDrivers.Discover();
+        DriverBox.ItemsSource = drivers;
+        if (drivers.Count > 0)
+            DriverBox.SelectedItem = drivers.FirstOrDefault(item => item.LibraryPath.Equals(selectedDriver, StringComparison.OrdinalIgnoreCase))
+                ?? drivers.FirstOrDefault(item => Path.GetFileName(item.LibraryPath).Equals("op20pt32.dll", StringComparison.OrdinalIgnoreCase)) ?? drivers[0];
+    }
+    private void Adapter_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (SerialPanel is null || TactrixPanel is null)
+            return;
+        bool tactrix = AdapterBox.SelectedIndex == 1;
+        SerialPanel.Visibility = tactrix ? Visibility.Collapsed : Visibility.Visible;
+        TactrixPanel.Visibility = tactrix ? Visibility.Visible : Visibility.Collapsed;
+        StatusText.Text = tactrix ? "Ready · select the installed Tactrix driver" : "Ready · select your adapter COM port";
+    }
+    private void RefreshPorts_Click(object sender, RoutedEventArgs e) => RefreshPorts();
+    private void RefreshHistory()
+    {
+        var entries = store.Scan(vault);
+        HistoryGrid.ItemsSource = entries.Select(row => new { row.Mode, row.Operation, Status = row.Complete ? "Complete" : row.Valid ? "Interrupted / stopped" : "Journal damaged", Folder = Path.GetDirectoryName(row.Path) }).ToArray();
+        HistoryNote.Text = $"{entries.Count} saved operation(s). Storage: {vault}";
+    }
+    private void RefreshHistory_Click(object sender, RoutedEventArgs e) => RefreshHistory();
+    private void OpenFolder_Click(object sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(vault);
+        Process.Start(new ProcessStartInfo(vault) { UseShellExecute = true });
+    }
+    private void LoadImage(string path)
+    {
+        if (new FileInfo(path).Length != RomInspector.RomSize)
+            throw new InvalidDataException("Select a complete 1 MiB image.");
+        var data = File.ReadAllBytes(path);
+        var info = inspector.Inspect(data);
+        image = data;
+        imagePath = path;
+        inspection = info;
+        static string Show(bool? value) => value is null ? "Not available" : value.Value ? "PASS" : "FAIL";
+        var text = new StringBuilder($"File: {path}\n\n{(info.ProfileRecognized ? "Known ROM: " + info.Calibration : "Unknown ROM — no known checksum layout")}\nSize: {info.Size:N0} bytes\n\nSHA-256:\n{info.Sha256}\n\n");
+        if (info.ProfileRecognized)
+        {
+            text.AppendLine($"Software identity: {Show(info.IdentityValid)}\nRecognized boot code: {Show(info.BootRecognized)}\nChecksum layout: {Show(info.ChecksumLayoutRecognized)}");
+            if (info.ChecksumLayoutRecognized)
+                text.AppendLine($"Checksum: {info.Checksum} / expected {info.ExpectedChecksum} [{Show(info.ChecksumValid)}]\nChecksum region: 0x{info.ChecksumStart:X6}–0x0FFFFF\nCorrection word: 0x{info.CorrectionAddress:X6}\n");
+            else
+                text.AppendLine("Checksum validation: unavailable for this layout.\n");
+        }
+        else
+            text.AppendLine("Checksum validation: unavailable for this layout. A definition is not required to read or save the ROM.\n");
+        text.AppendLine("Vehicle match and factory provenance: unverified. Checksum correction saves a separate file.");
+        RomText.Text = text.ToString();
+        Controls();
+    }
+    private void OpenRom_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog { Title = "Open full 1 MiB ROM", Filter = "ROM images|*.bin;*.rom|All files|*.*" };
+        if (dialog.ShowDialog(this) == true)
+            TryFile(() => LoadImage(dialog.FileName));
+    }
+    private void Correct_Click(object sender, RoutedEventArgs e)
+    {
+        if (image is null || imagePath is null || inspection?.CanCorrectChecksum != true)
+            return;
+        TryFile(() =>
+        {
+            var corrected = inspector.CorrectedCopy(image);
+            var dialog = new SaveFileDialog { Title = "Save a new checksum-corrected copy", FileName = Path.GetFileNameWithoutExtension(imagePath) + "_checksum.bin", DefaultExt = ".bin", Filter = "ROM images|*.bin" };
+            if (dialog.ShowDialog(this) == true)
+            {
+                DurableStorage.NewFile(store.FileSystem, dialog.FileName, corrected);
+                Log("Saved corrected copy: " + dialog.FileName);
+            }
+        });
+    }
+    private void OpenBackup_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog { Title = "Select rom.bin from a verified backup", Filter = "Backup ROM|rom.bin" };
+        if (dialog.ShowDialog(this) == true)
+            TryFile(() => LoadVerifiedBackup(dialog.FileName));
+    }
+    private void LoadVerifiedBackup(string path)
+    {
+        store.Load(path);
+        LoadImage(path);
+        BackupText.Text = "Verified backup: " + path;
+    }
+    private void TryFile(Action action)
+    {
+        try
+        {
+            action();
+        }
+        catch (Exception error) { MessageBox.Show(this, error.Message, "Cannot open or save file", MessageBoxButton.OK, MessageBoxImage.Error); }
+    }
+    private static string Resource(string name)
+    {
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name) ?? throw new InvalidDataException("Missing resource: " + name);
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+    private void About_Click(object sender, RoutedEventArgs e) => MessageBox.Show(this, Resource("SpeedLink.About.txt").Replace("{version}", Version), "About SpeedLink");
+    private Window HelpWindow()
+    {
+        var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
+        foreach (var name in Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith("SpeedLink.Notices.", StringComparison.Ordinal)))
+            documents["Notices / " + name[18..]] = name;
+        var panel = new DockPanel { Margin = new Thickness(16) };
+        var chooser = new ComboBox { ItemsSource = documents.Keys, Margin = new Thickness(0, 0, 0, 12) };
+        DockPanel.SetDock(chooser, Dock.Top);
+        panel.Children.Add(chooser);
+        var text = new TextBox { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Padding = new Thickness(12) };
+        panel.Children.Add(text);
+        chooser.SelectionChanged += (_, _) => text.Text = Resource(documents[(string)chooser.SelectedItem]);
+        chooser.SelectedIndex = 0;
+        return new Window { Owner = this, Title = "SpeedLink — Help & licenses", Width = 860, Height = 650, Content = panel };
+    }
+    private void Help_Click(object sender, RoutedEventArgs e) => HelpWindow().Show();
+    private bool closeApproved;
+    private async void Window_Closing(object? sender, CancelEventArgs e)
+    {
+        if (!closeApproved && !EditorPane.MayClose()) { e.Cancel = true; return; }
+        closeApproved = true;
+        if (transport is null && !busy)
+            return;
+        e.Cancel = true;
+        closing = true;
+        if (busy)
+        {
+            stop?.Cancel();
+            StatusText.Text = "Stopping before closing…";
+        }
+        else
+            await FinishClose();
+    }
+    private async Task FinishClose()
+    {
+        try
+        {
+            await Disconnect();
+        }
+        catch (Exception error) { Log(error.Message); }
+        finally { closing = false; stop?.Dispose(); Close(); }
+    }
+    public void RunSmoke(string[] args)
+    {
+        Show();
+        UpdateLayout();
+        if (new System.Windows.Automation.Peers.TabControlAutomationPeer(Pages).GetChildren()?.Count != 6) throw new InvalidOperationException("Workspace automation containers missing.");
+        if (Pages.Items.Count != 6 || transport is not null || image is not null || !ConnectButton.IsEnabled || ReadButton.IsEnabled || CorrectButton.IsEnabled)
+            throw new InvalidOperationException("Unexpected startup state.");
+        if (AdapterBox.Items.Count != 2 || AdapterBox.SelectedIndex != 0 || typeof(ReadWorkflow).Assembly.GetType("SpeedLink.Core.Simulator") is not null)
+            throw new InvalidOperationException("Unexpected connection modes.");
+        AdapterBox.SelectedIndex = 1;
+        UpdateLayout();
+        if (SerialPanel.Visibility != Visibility.Collapsed || TactrixPanel.Visibility != Visibility.Visible || ReadButton.IsEnabled)
+            throw new InvalidOperationException("Unexpected Tactrix selection state.");
+        if (DriverBox.Items.Count > 1)
+        {
+            var originalDriver = DriverBox.SelectedItem as TactrixDriver;
+            DriverBox.SelectedIndex = 0;
+            var selected = ((TactrixDriver)DriverBox.SelectedItem).LibraryPath;
+            RefreshPorts();
+            if ((DriverBox.SelectedItem as TactrixDriver)?.LibraryPath != selected)
+                throw new InvalidOperationException("Driver refresh lost the selected registered entry.");
+            DriverBox.SelectedItem = DriverBox.Items.Cast<TactrixDriver>().First(item => item.LibraryPath == originalDriver!.LibraryPath);
+        }
+        AdapterBox.SelectedIndex = 0;
+        VerifyLoggerSmoke(args);
+        if (!Resource("SpeedLink.About.txt").Contains("{version}", StringComparison.Ordinal))
+            throw new InvalidDataException("About resource missing.");
+        var help = HelpWindow();
+        help.Show();
+        help.UpdateLayout();
+        help.Close();
+        int open = Array.IndexOf(args, "--open-backup");
+        if (open >= 0 && open + 1 < args.Length)
+        {
+            LoadVerifiedBackup(args[open + 1]);
+            Pages.SelectedIndex = 4;
+        }
+        open = Array.IndexOf(args, "--open-rom");
+        if (open >= 0 && open + 1 < args.Length)
+        {
+            LoadImage(args[open + 1]);
+            Pages.SelectedIndex = 4;
+        }
+        UpdateLayout();
+        int at = Array.IndexOf(args, "--screenshot");
+        if (at >= 0 && at + 1 < args.Length)
+        {
+            var bitmap = new RenderTargetBitmap((int)ActualWidth, (int)ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(this);
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            using var file = File.Create(args[at + 1]);
+            encoder.Save(file);
+        }
+        at = Array.IndexOf(args, "--smoke-report");
+        if (at >= 0 && at + 1 < args.Length)
+            File.WriteAllText(args[at + 1], JsonSerializer.Serialize(new
+            {
+                passed = true,
+                version = Version,
+                framework = "WPF / .NET 10",
+                pages = 6,
+                loggerChannels = loggerRows.Count,
+                loggerProfiles = LoggerDefinition.Known.Count,
+                loggerCalibration = loggerDefinition.SoftwareIds.Single(),
+                stockRomLogger = true,
+                realEcuLoggerValidated = false,
+                supportedHardware = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0" },
+                processBits = IntPtr.Size * 8,
+                tactrixSelectionVerified = true,
+                registeredDriverNames = DriverBox.Items.Cast<TactrixDriver>().Select(item => item.Name).ToArray(),
+                simulatorAvailable = false,
+                liveProgrammingEnabled = false,
+                noRomBundled = true,
+                bundledHelpVerified = true,
+                openedImageSha256 = image is null ? null : RomInspector.Hash(image),
+                checksumCorrectionAvailable = CorrectButton.IsEnabled,
+                backupReopened = args.Contains("--open-backup", StringComparer.Ordinal)
+            }, new JsonSerializerOptions { WriteIndented = true }));
+        Close();
+    }
+}

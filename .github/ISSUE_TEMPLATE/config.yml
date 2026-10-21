@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Start here — dump a ROM
+    url: https://github.com/mrphyslaw/SpeedLink/blob/main/docs/DUMP_A_ROM.md
+    about: Step-by-step adapter setup, verified reading, ZIP preparation and ROM contribution.

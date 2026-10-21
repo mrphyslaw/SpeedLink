@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "calibration": "L39SEF000",
+  "romSha256": "9d26f7d7d2519619996ce0dfa7fe093d6d124eb50b66a1d2f30dee2b307b4631",
+  "channels": 38,
+  "distinctRequests": 34,
+  "nativeVectors": 298,
+  "independentScalarChecks": 238,
+  "instructionSteps": 394832,
+  "executedInstructionWords": 1991,
+  "realEcuTested": false,
+  "loggerAdapterBenchTested": false,
+  "excludedChannels": [],
+  "sourceRomUnchanged": true,
+  "scope": "Original bounded encoders and descriptor copy paths with synthetic RAM; bitmap refresh and unrelated capture/status paths held out. No peripheral, scheduler or physical ECU validation.",
+  "csharpVectorsPassed": true,
+  "offlineDesktopWorkflowsPassed": [
+    "record-stop",
+    "connection-failure"
+  ]
+}

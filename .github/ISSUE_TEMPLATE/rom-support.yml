@@ -1,0 +1,86 @@
+name: ROM dump / add ROM support
+description: Get help dumping a ROM, or contribute a verified dump for definition/logger support.
+title: "[ROM support] Model / year / calibration"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Start with the [guided ROM-dump workflow](https://github.com/mrphyslaw/SpeedLink/blob/main/docs/DUMP_A_ROM.md).
+        Unknown calibrations are welcome. You do not need a definition to attempt a compatible-family read.
+        Attach only files you have reviewed for public sharing. Keep your full backup folder private.
+  - type: dropdown
+    id: request
+    attributes:
+      label: Where are you in the workflow?
+      options:
+        - Verified ROM dump — two matching complete reads
+        - Need help getting a dump
+        - Existing full ROM from another reader — provenance described below
+    validations:
+      required: true
+  - type: input
+    id: vehicle
+    attributes:
+      label: Vehicle, year, market and transmission
+      placeholder: "Mazdaspeed6 / 2007 / US / manual"
+    validations:
+      required: true
+  - type: input
+    id: calibration
+    attributes:
+      label: Calibration ID and ECU part number
+      description: Copy the calibration shown by SpeedLink; include the ECU label if available. Do not include a VIN.
+      placeholder: "Calibration / ECU label, or unknown"
+    validations:
+      required: true
+  - type: dropdown
+    id: provenance
+    attributes:
+      label: ECU software history
+      options:
+        - Unknown
+        - Believed factory stock
+        - Tuned or modified — describe below
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: SpeedLink version, Windows version and adapter
+      placeholder: "v0.5.0-alpha.1 / Windows 11 / vLinker FS USB"
+    validations:
+      required: true
+  - type: textarea
+    id: read_result
+    attributes:
+      label: Read result / problem
+      description: State the last completed step, whether both passes matched, and the exact error or failed check. Remove VINs and personal paths.
+      placeholder: "Two matching reads; unknown checksum layout. Or: Connect & identify failed with…"
+    validations:
+      required: true
+  - type: input
+    id: size_hash
+    attributes:
+      label: ROM size and SHA-256
+      description: Copy from ROM checks if you have a complete dump; otherwise leave blank.
+      placeholder: "1048576 bytes / SHA-256"
+  - type: upload
+    id: dump
+    attributes:
+      label: ROM contribution ZIP (optional)
+      description: Unedited rom.bin plus ROM_INFO.txt from the guide. Leave out backup.json, journals and raw captures. You may ask for a private route instead.
+    validations:
+      required: false
+      accept: ".zip"
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Tune/vendor history, source of a ROM from another reader, or anything else useful. Do not post license keys or personal information.
+  - type: checkboxes
+    id: sharing
+    attributes:
+      label: Public sharing
+      options:
+        - label: I understand this request and attachments are public, and I have reviewed what I am sharing.
+          required: true

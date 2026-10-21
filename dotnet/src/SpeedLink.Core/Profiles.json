@@ -1,0 +1,223 @@
+[
+  {
+    "Calibration": "L38KEH000",
+    "Model": "Mazdaspeed6 / Mazda 6 MPS",
+    "IdentityOffset": 174040,
+    "Identity": "L38KEH000L3T6021",
+    "BootSha256": "9a7a2f7dc31cb76bed51d622b8f72a41c24d1028abd07eab7680c2d7a8107ff6",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [],
+    "LoopAddress": null,
+    "LoopSize": null,
+    "LoopSha256": null
+  },
+  {
+    "Calibration": "L39SED000",
+    "Model": "Mazdaspeed3",
+    "IdentityOffset": 191260,
+    "Identity": "L39SED000L3T6020",
+    "BootSha256": "9f7af26ae1e93d54a3b3c904851a98eebd570b4dce3190df28ae581486231632",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [
+      {
+        "Address": 863404,
+        "Value": 294912
+      },
+      {
+        "Address": 863392,
+        "Value": 1048576
+      },
+      {
+        "Address": 863340,
+        "Value": 1520786085
+      },
+      {
+        "Address": 294916,
+        "Value": 4294967295
+      },
+      {
+        "Address": 294920,
+        "Value": 2147241762
+      }
+    ],
+    "LoopAddress": 862572,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  },
+  {
+    "Calibration": "L39SEE000",
+    "Model": "Mazdaspeed3",
+    "IdentityOffset": 191260,
+    "Identity": "L39SEE000L3T6020",
+    "BootSha256": "2af5252e691e0c4689cd83ee1d9c5c4926e6ddb5033d6d1d61e7ecd59b3a285f",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [
+      {
+        "Address": 863404,
+        "Value": 294912
+      },
+      {
+        "Address": 863392,
+        "Value": 1048576
+      },
+      {
+        "Address": 863340,
+        "Value": 1520786085
+      },
+      {
+        "Address": 294916,
+        "Value": 4294967295
+      },
+      {
+        "Address": 294920,
+        "Value": 2147241762
+      }
+    ],
+    "LoopAddress": 862572,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  },
+  {
+    "Calibration": "L39SEF000",
+    "Model": "Mazdaspeed3",
+    "IdentityOffset": 191580,
+    "Identity": "L39SEF000L3T6020",
+    "BootSha256": "0bd40fce391b6eba4c3ffb7e8d4406a2b3aa91120307d2b779ae1195e23fea0f",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [
+      {
+        "Address": 863336,
+        "Value": 294912
+      },
+      {
+        "Address": 863324,
+        "Value": 1048576
+      },
+      {
+        "Address": 863272,
+        "Value": 1520786085
+      },
+      {
+        "Address": 294916,
+        "Value": 4294967295
+      },
+      {
+        "Address": 294920,
+        "Value": 2147241762
+      }
+    ],
+    "LoopAddress": 862504,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  },
+  {
+    "Calibration": "L3M7EF000",
+    "Model": "Mazdaspeed6 / Mazda 6 MPS",
+    "IdentityOffset": 172748,
+    "Identity": "L3M7EF000L3T6061",
+    "BootSha256": "bb1fefa774162078c694639c1be4edb334d15761f94284b6c5831c07ff4bf733",
+    "ChecksumStart": 258048,
+    "CorrectionAddress": 1048564,
+    "LayoutWords": [
+      {
+        "Address": 688624,
+        "Value": 258048
+      },
+      {
+        "Address": 688612,
+        "Value": 1048576
+      },
+      {
+        "Address": 688560,
+        "Value": 1520786085
+      },
+      {
+        "Address": 1048560,
+        "Value": 4294967295
+      },
+      {
+        "Address": 1048568,
+        "Value": 2857740885
+      },
+      {
+        "Address": 1048572,
+        "Value": 42330
+      }
+    ],
+    "LoopAddress": 687792,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  },
+  {
+    "Calibration": "L35HEH000",
+    "Model": "Mazda3 MPS",
+    "IdentityOffset": 191130,
+    "Identity": "L35HEH000L3T6060",
+    "BootSha256": "558826c595e48174a63114b2c70a2c2b0b8ba9cabc39f61c99fb81e6c95cdf52",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [
+      {
+        "Address": 790568,
+        "Value": 294912
+      },
+      {
+        "Address": 790556,
+        "Value": 1048576
+      },
+      {
+        "Address": 790504,
+        "Value": 1520786085
+      },
+      {
+        "Address": 294916,
+        "Value": 4294967295
+      },
+      {
+        "Address": 294920,
+        "Value": 2147241762
+      }
+    ],
+    "LoopAddress": 789736,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  },
+  {
+    "Calibration": "L33XEH000",
+    "Model": "Mazdaspeed3 / Axela",
+    "IdentityOffset": 191126,
+    "Identity": "L33XEH000L3T60A0",
+    "BootSha256": "70d0b9809132f46ababa09b8e4221e379d0904a053e43a970b7cda6f76146b8f",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [
+      {
+        "Address": 758892,
+        "Value": 294912
+      },
+      {
+        "Address": 758880,
+        "Value": 1048576
+      },
+      {
+        "Address": 758828,
+        "Value": 1520786085
+      },
+      {
+        "Address": 294916,
+        "Value": 4294967295
+      },
+      {
+        "Address": 294920,
+        "Value": 2147241762
+      }
+    ],
+    "LoopAddress": 758060,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  }
+]

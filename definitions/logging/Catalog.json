@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "coverageTarget": "Existing 38-channel baseline evaluated separately in each ROM",
+  "profiles": [
+    {
+      "calibration": "L38KEH000",
+      "vehicle": "Mazdaspeed6 / Mazda6 MPS, MZR DISI",
+      "profileFile": "L38KEH000.logger.json",
+      "channels": 38,
+      "queries": 34,
+      "unavailable": 0,
+      "vectors": 298,
+      "romSha256": "1b9a8b78ef9fe1a346a32865ffa0e5a2bd971d7383c5b39db35392f959349a85",
+      "definitionSha256": "316aa7511d819d7a717545f13f77713b13d98dc3671df2853d92129f2c12ecd0",
+      "realEcuTested": false
+    },
+    {
+      "calibration": "L39SED000",
+      "vehicle": "Mazdaspeed3",
+      "profileFile": "L39SED000.logger.json",
+      "channels": 38,
+      "queries": 34,
+      "unavailable": 0,
+      "vectors": 298,
+      "romSha256": "34e8e15bccd4aa959da538c64837306b4cadf41aae772cb4689fe134eaea8339",
+      "definitionSha256": "a9293ce4e2540b9a9b2455a0a4aa3eacfc8786ed205bef8a48489e1c95e32d4a",
+      "realEcuTested": false
+    },
+    {
+      "calibration": "L39SEE000",
+      "vehicle": "Mazdaspeed3",
+      "profileFile": "L39SEE000.logger.json",
+      "channels": 38,
+      "queries": 34,
+      "unavailable": 0,
+      "vectors": 298,
+      "romSha256": "d6efae18dbb016d6a5056c953d8ac54e92cff90f014757e1ef77eb6c5442fac2",
+      "definitionSha256": "704da252a4043fe4929c9c5422692031d9dee1e5d1cc4e7e4f86779c7461c0c8",
+      "realEcuTested": false
+    },
+    {
+      "calibration": "L39SEF000",
+      "vehicle": "Mazdaspeed3",
+      "profileFile": "L39SEF000.logger.json",
+      "channels": 38,
+      "queries": 34,
+      "unavailable": 0,
+      "vectors": 298,
+      "romSha256": "9d26f7d7d2519619996ce0dfa7fe093d6d124eb50b66a1d2f30dee2b307b4631",
+      "definitionSha256": "9649f31963a24ae264d57296aa3e6eb7c8682dc4873ffddda7d561ffd821d62c",
+      "realEcuTested": false
+    },
+    {
+      "calibration": "L3M7EF000",
+      "vehicle": "Mazdaspeed6 / Mazda 6 MPS",
+      "profileFile": "L3M7EF000.logger.json",
+      "channels": 35,
+      "queries": 31,
+      "unavailable": 3,
+      "vectors": 277,
+      "romSha256": "a953a9102dc56e44056dbaa9613d3c8fbda99e2f89c340949317d12f2cee515a",
+      "definitionSha256": "0430cc240b3f1aa226b3edf9cbcadf662a4b104de38582bcb097adb46a211b12",
+      "realEcuTested": false
+    },
+    {
+      "calibration": "L35HEH000",
+      "vehicle": "Mazda3 MPS",
+      "profileFile": "L35HEH000.logger.json",
+      "channels": 36,
+      "queries": 32,
+      "unavailable": 2,
+      "vectors": 284,
+      "romSha256": "6064ecaf2c5358bf19a95315fcba973974289900c40dd3f35056c61acd057908",
+      "definitionSha256": "57202dba1ad005c69eae28e4b2e92a7c2dfa8831535350ed2449318638a3678d",
+      "realEcuTested": false
+    },
+    {
+      "calibration": "L33XEH000",
+      "vehicle": "Mazdaspeed3 / Axela",
+      "profileFile": "L33XEH000.logger.json",
+      "channels": 35,
+      "queries": 31,
+      "unavailable": 3,
+      "vectors": 277,
+      "romSha256": "6110a26bcdafaa2f739153a1a098c7f6928fe613cae5888a02d798a76a44042d",
+      "definitionSha256": "abbda7bb130fddde14d5e8af26bdbfddfc8c32c44dc0bab0d1ed2d1019e3ee98",
+      "realEcuTested": false
+    }
+  ]
+}
