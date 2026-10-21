@@ -22,6 +22,7 @@ public partial class EditorWorkspace
         document = new(snapshot, path, inspector, codeGuard, [definition]); document.Changed += Document_Changed;
         MapTabs.Items.Clear(); OpenTable(sample);
         document.Apply(Enumerable.Range(0, 256).Select(i => { double x = i % 16 / 15d, y = i / 16 / 15d; return new CellEdit(sample, i, 12 + 24 * Math.Exp(-18 * ((x - .45) * (x - .45) + (y - .6) * (y - .6))) + 7 * Math.Sin(x * 6) * Math.Cos(y * 4)); }), "Synthetic surface fixture");
+        SelectCell(8 * 16 + 8);
         var measurements = new List<object>();
         foreach (var size in new[] { (1280d, 720d), (1024d, 700d) })
         {
@@ -35,12 +36,13 @@ public partial class EditorWorkspace
             var last = MapGrid.Columns[15].GetCellContent(MapGrid.Items[15]) ?? throw new InvalidOperationException("Last table cell was virtualized.");
             var lastRect = last.TransformToAncestor(MapGrid).TransformBounds(new Rect(last.RenderSize));
             if (scroll.ScrollableWidth > .5 || scroll.ScrollableHeight > .5 || lastRect.Right > MapGrid.ActualWidth + .5 || lastRect.Bottom > MapGrid.ActualHeight + .5 ||
-                MapGrid.FontSize < 12 || MapGrid.RowHeight < 22 || MapGrid.Columns.Any(c => c.ActualWidth < 44) || !AxesText.IsVisible || ViewMode != 4 || !GraphPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || GraphPanel.ActualHeight > 210 || GraphPanel.ActualWidth < 150)
+                MapGrid.FontSize < 12 || MapGrid.RowHeight < 22 || MapGrid.Columns.Any(c => c.ActualWidth < 44) || !XAxisText.IsVisible || !YAxisText.IsVisible || ViewMode != 4 || !GraphPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || GraphPanel.ActualHeight > 210 || GraphPanel.ActualWidth < 150)
                 throw new InvalidOperationException($"16×16 map does not fit at {size}: scroll {scroll.ScrollableWidth}/{scroll.ScrollableHeight}, grid {MapGrid.ActualWidth}/{MapGrid.ActualHeight}, last {lastRect}, columns {string.Join(',', MapGrid.Columns.Select(c => c.ActualWidth))}.");
             CaptureHost(Path.Combine(folder, $"Fit16x16-{size.Item1:0}x{size.Item2:0}.png"));
             measurements.Add(new { windowWidth = size.Item1, windowHeight = size.Item2, actualWindowWidth = Window.GetWindow(this).ActualWidth, actualWindowHeight = Window.GetWindow(this).ActualHeight, gridWidth = MapGrid.ActualWidth, gridHeight = MapGrid.ActualHeight, rowHeight = MapGrid.RowHeight,
                 columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, lastCellVisible = true, previewWidth = GraphPanel.ActualWidth, previewHeight = GraphPanel.ActualHeight });
         }
+        await CheckTableAxes(sample);
         SelectCell(0); byte[] precise = document.Snapshot(); double exact = document.Read(sample, 0);
         if (!MapGrid.BeginEdit()) throw new InvalidOperationException("Cannot enter a fitted table cell."); UpdateLayout();
         if (MapGrid.Columns[0].GetCellContent(MapGrid.Items[0]) is not TextBox input || input.Text != exact.ToString("R", CultureInfo.InvariantCulture))
@@ -72,6 +74,9 @@ public partial class EditorWorkspace
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
         if (!CurveList || MapGrid.Columns.Count != 2 || !MapGrid.Columns[0].IsReadOnly || MapGrid.Items.Count != maf.Count || ViewMode != 1)
             throw new InvalidOperationException("Long curve did not use breakpoint/value rows.");
+        if (XAxisBand.IsVisible || YAxisBand.IsVisible || AxisLabelColumn.ActualWidth != 0 || AxisTitleRow.ActualHeight != 0 ||
+            MapGrid.Columns[0].Header?.ToString() != maf.X.Name || MapGrid.Columns[1].Header?.ToString() != maf.Units)
+            throw new InvalidOperationException("Long curves did not retain their direct column labels.");
         BrowserColumn.Width = new(50); UpdateLayout(); LayoutSplitter_Completed(BrowserSplitter, new System.Windows.Controls.Primitives.DragCompletedEventArgs(0, 0, false)); UpdateLayout();
         if (BrowserColumn.ActualWidth < 160) throw new InvalidOperationException("Browser divider did not retain a usable width.");
         TableColumn.Width = new(340); UpdateLayout(); LayoutSplitter_Completed(DataSplitter, new System.Windows.Controls.Primitives.DragCompletedEventArgs(0, 0, false)); UpdateLayout();
@@ -103,7 +108,7 @@ public partial class EditorWorkspace
         if (!saved.BrowserHidden || saved.View != 2 || saved.BrowserWidth != 230) throw new InvalidOperationException("Layout did not persist.");
         curveWidth = 325; PopBrowser_Click(this, new()); PopGraph_Click(this, new()); SaveLayout();
         return new { passed = true, hardwareAccessed = false, synthetic = true, full16x16 = measurements, precisionPreserved = true, mapInfoUsesNoTableSpace = true,
-            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, compactPreview = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
+            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, compactPreview = true, axisLabelsAligned = true, axisTitlesFrozen = true, selectedHeadersHighlighted = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
             mafBulkEditsAndClipboard = true, checksumVerified = true, layoutPersisted = true };
     }
     internal void CheckRestoredLayout()

@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.3-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.3-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.4-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -52,6 +52,9 @@ the map browser and graph can be resized, hidden or moved into separate windows.
 Use **View** for layout options, map information and changed maps. 3D tables can
 keep a small surface preview at the upper-right of the grid; MAF curves keep
 their value list on the left and graph on the right.
+Axis names sit directly above the column breakpoints and beside the row
+breakpoints. Selected row and column headers highlight together; value units
+stay beside the map tabs.
 
 1. Open **Editor**, then **File → Open ROM…**.
 2. Select a map from the categorized list or use search. Related numbered maps
@@ -136,7 +139,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.1-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.1-alpha.1), a Windows Workbench alpha.**
+**Current release: [v0.5.4-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.1), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
@@ -144,7 +147,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   The reader covers the 1 MiB MZR DISI ECU family.
 - **Logger coverage:** seven ROM profiles with 35–38 stock-ROM parameters each.
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
-- **Checked:** 249 C# tests, 2,030 native-derived logger vectors and 174,741
+- **Checked:** 261 C# tests, 2,030 native-derived logger vectors and 174,741
   independently decoded editor values/switches. Seven-profile editor desktop
   checks cover direct cell entry, comparison, undo/redo and byte-identical no-edit
   exports. See [validation](dotnet/docs/Validation.md). Physical

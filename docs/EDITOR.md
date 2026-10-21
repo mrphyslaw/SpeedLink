@@ -25,6 +25,12 @@ metadata and cannot be edited. No extended-table patch is installed by this edit
 
 ## Edit and view
 
+Column-axis names sit directly above their breakpoints; row-axis names run
+beside the row breakpoints. Labels stay visible when the table scrolls. Selected
+cells highlight their row and column headers, and value units sit beside the map
+tabs. Scalar and switch controls omit unused axis labels. Long MAF curves keep
+their directly labeled breakpoint/value columns.
+
 - Double-click a numeric cell, type a value using a decimal point, and press Enter.
 - Drag or Shift-click to select a rectangle. Set, Add and × apply the amount in
   the adjoining box. Use a negative Add amount to subtract.

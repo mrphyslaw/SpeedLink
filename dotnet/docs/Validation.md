@@ -1,5 +1,20 @@
 # C# validation
 
+## Table axis labels — 0.5.4-alpha.1
+
+- 261 C# regression tests remain required, alongside the editor, logger,
+  recording, Workbench and definition-import desktop workflows.
+- Seven layout workflows check labels against definition metadata, visible
+  selection highlighting, rectangular selections and fixed axis-title positions
+  while both table scrollbars are in use. Scrolled headers retain highlighting.
+- A complete synthetic 16×16 grid and the 3D preview still fit at 1024×700 and
+  1280×720 logical window sizes without table scrolling. Long row-axis names
+  remain visible beside the breakpoints; labels consume no additional map height.
+- The existing 129-point MAF list retains its direct column labels, read-only
+  breakpoints, final-point navigation, arithmetic, interpolation and clipboard
+  checks. Precision, exact undo and mandatory checksum exports remain covered.
+- These are offline UI changes; no new adapter or real-ECU validation is claimed.
+
 ## Table preview — 0.5.3-alpha.1
 
 - 261 C# tests pass, including preview sizing and layout persistence.
