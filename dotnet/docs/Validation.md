@@ -7,6 +7,7 @@
   a complete synthetic 16×16 grid fits at both target logical window sizes.
   The same workflows cover linked selection, pop-out/dock behavior, precision,
   checksum exports and the existing 129-point MAF editor.
+  Each fit starts with an oversized grid to exercise removal of both scrollbars.
 - Seven Workbench and seven definition-import workflows pass. An L38KEH000
   intake-cam VVT example verifies the standalone editor and illustrates a
   surface with distinct levels and transitions. The original ROM is preserved.

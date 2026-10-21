@@ -176,10 +176,13 @@ public partial class EditorWorkspace
         if (table is null || MapGrid.ActualWidth < 10 || MapGrid.Columns.Count == 0) return;
         if (CurveList)
         { MapGrid.Columns[0].Width = new(1, DataGridLengthUnitType.Star); MapGrid.Columns[1].Width = new(1, DataGridLengthUnitType.Star); MapGrid.RowHeight = 25; return; }
-        var size = TableFit.Calculate(MapGrid.ActualWidth, MapGrid.ActualHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth);
+        // Leave room for a transient horizontal scrollbar so it cannot keep the
+        // vertical scrollbar alive and prevent an otherwise fitting grid from settling.
+        double availableHeight = MapGrid.ActualHeight - (fitTable ? SystemParameters.HorizontalScrollBarHeight : 0);
+        var size = TableFit.Calculate(MapGrid.ActualWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth);
         double rowHeight = fitTable ? size.RowHeight : 25;
         if (table.Rows * rowHeight + MapGrid.ColumnHeaderHeight > MapGrid.ActualHeight)
-            size = TableFit.Calculate(MapGrid.ActualWidth - SystemParameters.VerticalScrollBarWidth, MapGrid.ActualHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth);
+            size = TableFit.Calculate(MapGrid.ActualWidth - SystemParameters.VerticalScrollBarWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth);
         foreach (var column in MapGrid.Columns) column.Width = table.Columns == 1 ? new(1, DataGridLengthUnitType.Star) : new(size.ColumnWidth);
         MapGrid.RowHeight = fitTable ? size.RowHeight : 25;
     }

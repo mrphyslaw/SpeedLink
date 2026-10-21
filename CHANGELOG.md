@@ -9,6 +9,8 @@
 - Add Table with 3D preview to View and make it the Fit map view for surfaces.
   Popping the graph out and docking it restores the compact preview.
 - Use an intake-cam VVT map with clear changes in height for 3D screenshots.
+- Prevent scrollbars from keeping one another visible when fitting a table
+  after opening or resizing on a narrow desktop.
 
 ## v0.5.2-alpha.1 — compact editor
 

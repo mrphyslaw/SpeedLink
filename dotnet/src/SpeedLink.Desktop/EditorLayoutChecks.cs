@@ -25,7 +25,10 @@ public partial class EditorWorkspace
         var measurements = new List<object>();
         foreach (var size in new[] { (1280d, 720d), (1024d, 700d) })
         {
-            resize(size.Item1, size.Item2); FitMap_Click(this, new()); UpdateLayout();
+            resize(size.Item1, size.Item2);
+            foreach (var column in MapGrid.Columns) column.Width = new(90);
+            MapGrid.RowHeight = 28; UpdateLayout();
+            FitMap_Click(this, new()); UpdateLayout();
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateTableSizing(); UpdateLayout();
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
             var scroll = Descendants(MapGrid).OfType<ScrollViewer>().First();
@@ -35,7 +38,7 @@ public partial class EditorWorkspace
                 MapGrid.FontSize < 12 || MapGrid.RowHeight < 22 || MapGrid.Columns.Any(c => c.ActualWidth < 44) || !AxesText.IsVisible || ViewMode != 4 || !GraphPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || GraphPanel.ActualHeight > 210 || GraphPanel.ActualWidth < 150)
                 throw new InvalidOperationException($"16×16 map does not fit at {size}: scroll {scroll.ScrollableWidth}/{scroll.ScrollableHeight}, grid {MapGrid.ActualWidth}/{MapGrid.ActualHeight}, last {lastRect}, columns {string.Join(',', MapGrid.Columns.Select(c => c.ActualWidth))}.");
             CaptureHost(Path.Combine(folder, $"Fit16x16-{size.Item1:0}x{size.Item2:0}.png"));
-            measurements.Add(new { windowWidth = size.Item1, windowHeight = size.Item2, gridWidth = MapGrid.ActualWidth, gridHeight = MapGrid.ActualHeight, rowHeight = MapGrid.RowHeight,
+            measurements.Add(new { windowWidth = size.Item1, windowHeight = size.Item2, actualWindowWidth = Window.GetWindow(this).ActualWidth, actualWindowHeight = Window.GetWindow(this).ActualHeight, gridWidth = MapGrid.ActualWidth, gridHeight = MapGrid.ActualHeight, rowHeight = MapGrid.RowHeight,
                 columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, lastCellVisible = true, previewWidth = GraphPanel.ActualWidth, previewHeight = GraphPanel.ActualHeight });
         }
         SelectCell(0); byte[] precise = document.Snapshot(); double exact = document.Read(sample, 0);
