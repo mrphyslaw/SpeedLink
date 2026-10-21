@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.5.2-alpha.1 — compact editor (unreleased)
+## v0.5.2-alpha.1 — compact editor
 
 - Collapse app navigation to icons and reduce the editor's top and bottom bars.
 - Add Fit map, a resizable/hideable/floating map browser, floating graph and

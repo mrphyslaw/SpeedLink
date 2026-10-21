@@ -1,6 +1,6 @@
 # C# validation
 
-## Compact editor — 0.5.2-alpha.1 (local candidate)
+## Compact editor — 0.5.2-alpha.1
 
 - 259 C# tests pass, including all seven long MAF curves, clipboard bounds and
   breakpoint checks, atomic failures, exact undo, full-precision no-op edits,
