@@ -21,12 +21,12 @@ jobs:
       - run: dotnet restore SpeedLink.slnx --locked-mode
       - run: dotnet test SpeedLink.slnx -c Release --no-restore --logger "trx;LogFileName=CSharp.trx" --results-directory TestResults
       - run: ./tools/Verify-Regression.ps1 -Results TestResults/CSharp.trx
+      - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
       - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi
       - run: ./tools/Test-ReplayUi.ps1 -Output TestResults/ReplayUi
       - run: ./tools/Test-EditorUi.ps1 -Output TestResults/EditorUi
       - run: ./tools/Test-WorkbenchUi.ps1 -Output TestResults/WorkbenchUi
       - run: ./tools/Test-DefinitionImportUi.ps1 -Output TestResults/DefinitionImportUi
-      - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
       - name: Check developer ECU peer parser
         run: |
           dotnet build tools/SpeedLink.Bench -c Release --no-restore
