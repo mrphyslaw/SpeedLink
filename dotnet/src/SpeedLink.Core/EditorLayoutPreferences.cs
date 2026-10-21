@@ -11,7 +11,7 @@ public sealed record EditorLayoutPreferences
     public bool GraphFloating { get; init; }
     public double BrowserWidth { get; init; } = 200;
     public double CurveWidth { get; init; } = 300;
-    public int View { get; init; }
+    public int View { get; init; } = 4;
     public double TableFraction { get; init; } = .6;
     public bool FitTable { get; init; }
     public PanelBounds BrowserBounds { get; init; } = new();
@@ -24,7 +24,7 @@ public sealed record EditorLayoutPreferences
             double.IsFinite(p.Height) ? Math.Clamp(p.Height, 200, 1400) : fallback.Height);
         return this with { BrowserWidth = double.IsFinite(BrowserWidth) ? Math.Clamp(BrowserWidth, 160, 480) : 200,
             CurveWidth = double.IsFinite(CurveWidth) ? Math.Clamp(CurveWidth, 180, 600) : 300,
-            View = Math.Clamp(View, 0, 3), TableFraction = double.IsFinite(TableFraction) ? Math.Clamp(TableFraction, .2, .8) : .6,
+            View = Math.Clamp(View, 0, 4), TableFraction = double.IsFinite(TableFraction) ? Math.Clamp(TableFraction, .2, .8) : .6,
             BrowserBounds = Bounds(BrowserBounds, new()), GraphBounds = Bounds(GraphBounds, new(Width: 700, Height: 520)) };
     }
     public static EditorLayoutPreferences Load(string path)
@@ -59,5 +59,15 @@ public readonly record struct TableFit(double ColumnWidth, double RowHeight, boo
         double cell = Math.Max(44, Math.Min(90, Math.Floor((width - rowHeader - 4) / columns)));
         double row = Math.Max(22, Math.Min(28, Math.Floor((height - 30) / rows)));
         return new(cell, row, columns * cell + rowHeader + 4 <= width && rows * row + 30 <= height);
+    }
+}
+
+public readonly record struct TablePreviewSize(double Width, double Height)
+{
+    public static TablePreviewSize Calculate(double width, double height, int columns, double rowHeader = 64)
+    {
+        if (columns < 1) throw new ArgumentOutOfRangeException(nameof(columns));
+        double previewWidth = Math.Clamp(width - (columns * 44 + rowHeader + 4) - 5, 160, 224);
+        return new(previewWidth, Math.Min(height, Math.Clamp(previewWidth * .8 + 28, 156, 208)));
     }
 }

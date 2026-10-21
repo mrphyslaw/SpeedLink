@@ -6,6 +6,7 @@ ROM reading, verified backups, offline ROM editing and live logging.
 One workspace for editing, live logging and recorded logs.
 Seven tuning definitions, Fit map, floating panels, changes and undo/redo.
 Compact navigation, saved layouts and zoomable long MAF curves.
+Compact 3D table preview beside the grid, with a larger floating graph.
 Import editor/logger definition updates and restore bundled copies.
 Every editor save corrects and verifies its checksum. Originals are preserved.
 A definition is not required to dump a ROM.

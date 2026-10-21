@@ -24,6 +24,12 @@ public sealed class TuningGraph : Grid
     private GeometryModel3D? surface;
     internal Rect SurfaceFrame { get; private set; }
     internal Size SurfaceViewport => viewport.RenderSize;
+    internal int SelectedCell => selected;
+    internal void SetCompactPreview(bool compact)
+    {
+        legend.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
+        viewport.Margin = compact ? new(4) : new(4, 4, 4, 24);
+    }
     public event Action<int>? CellPicked;
     public TuningGraph()
     {

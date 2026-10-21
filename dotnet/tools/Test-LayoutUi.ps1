@@ -12,7 +12,10 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
     $report = Join-Path $folder 'report.json'
     $process = Start-Process -FilePath $harness -ArgumentList @('--layout-offline','--calibration',$calibration,'--output',('"' + $folder + '"'),'--report',('"' + $report + '"')) -WindowStyle Hidden -PassThru
     if (-not $process.WaitForExit(45000)) { $process.Kill(); throw "Layout UI timed out: $calibration" }
-    if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $report)) { throw "Layout UI failed: $calibration; see $report" }
+    if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $report)) {
+        if (Test-Path -LiteralPath $report) { Get-Content -LiteralPath $report -Raw | Write-Output }
+        throw "Layout UI failed: $calibration; see $report"
+    }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
     if ($result.passed -ne $true -or $result.hardwareAccessed -ne $false -or $result.workflow.freshWorkspaceRestored -ne $true -or $result.workflow.acceptance.mafBulkEditsAndClipboard -ne $true) { throw "Unexpected layout result: $calibration" }
     $reports += $result

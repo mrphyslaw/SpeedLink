@@ -90,6 +90,11 @@ logical window sizes without table scrollbars. Larger maps retain scrolling;
 the editor keeps readable cell sizes. Long curves keep their list/graph view.
 
 **View** offers table above graph, table beside graph, table only and graph only.
+**Table with 3D preview** keeps a small, rotatable surface at the upper-right of
+the grid. **Fit map** uses this view for 3D tables, preserving the grid's full
+height. The MAF layout keeps its value list on the left and curve on the right.
+The preview shares the graph's fit-view and pop-out controls. Docking the graph
+returns it to the preview; choose another View layout for a larger docked graph.
 Drag the divider to resize the panes. **Hide map browser** (Ctrl+B) gives the
 map more room; use the same command to restore it. Both the map browser and
 graph can pop into separate windows, with dock commands in **View**. Closing

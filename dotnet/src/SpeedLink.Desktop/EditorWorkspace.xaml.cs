@@ -42,7 +42,7 @@ public partial class EditorWorkspace : UserControl
     {
         this.inspector = inspector; this.codeGuard = codeGuard;
         UiTheme.Ensure(); InitializeComponent(); BaselineBox.ItemsSource = new[] { "Original ROM", "Last save", "Comparison ROM" }; BaselineBox.SelectedIndex = 0;
-        Graph.CellPicked += index => SelectCell(index); RefreshControls(); SetViewMode(0);
+        Graph.CellPicked += index => SelectCell(index); RefreshControls(); SetViewMode(4);
     }
     public void OpenRom(string path)
     {
@@ -143,7 +143,7 @@ public partial class EditorWorkspace : UserControl
         bool wasCurve = CurveList;
         table = (MapTabs.SelectedItem as TabItem)?.Tag as TuningTable;
         if (CurveList && !wasCurve) SetViewMode(1);
-        else if (wasCurve && !CurveList) SetViewMode(0);
+        else if (wasCurve && !CurveList) SetViewMode(table?.Rows > 1 ? 4 : 0);
         RefreshTable(); RefreshControls(); ApplyView();
     }
     private int NativeIndex(EditorRow row, int column) => CurveList ? row.Index : row.Index * table!.Columns + column;
@@ -343,7 +343,13 @@ public partial class EditorWorkspace : UserControl
         OpenTable(documentationCurve); SelectCell(0);
         foreach (var category in MapTree.Items.OfType<TreeViewItem>()) category.IsExpanded = (string?)category.Tag == documentationCurve.Category;
         UpdateLayout(); Capture(Path.Combine(folder, "CurveEditor.png"));
-        OpenTable(surface); SelectCell(surface.Columns + 2); UpdateLayout(); Capture(Path.Combine(folder, "SurfaceEditor.png"));
+        var illustrated = doc.Definition.Tables.FirstOrDefault(t => t.Name == "Intake Cam Advance (VVT)") ?? surface;
+        OpenTable(illustrated); FocusButton.IsChecked = true; DetailsButton.IsChecked = false; FitMap_Click(this, new()); SelectCell(illustrated.Columns + 2); UpdateLayout();
+        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
+        Capture(Path.Combine(folder, "SurfaceEditor.png"));
+        PopGraph_Click(this, new()); graphWindow!.UpdateLayout();
+        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        CaptureWindow(graphWindow, Path.Combine(folder, "VvtSurface.png")); DockGraph_Click(this, new());
         return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
     }
     private void Capture(string path)

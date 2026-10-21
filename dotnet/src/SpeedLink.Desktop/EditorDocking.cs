@@ -22,7 +22,7 @@ public partial class EditorWorkspace
     {
         layoutPath = path; navigationCollapsed = getNavigationCollapsed; preferences = EditorLayoutPreferences.Load(path);
         restoringLayout = true; browserWidth = preferences.BrowserWidth; curveWidth = preferences.CurveWidth; tableFraction = preferences.TableFraction; fitTable = preferences.FitTable;
-        FocusButton.IsChecked = preferences.BrowserHidden; SetViewMode(preferences.View);
+        FocusButton.IsChecked = preferences.BrowserHidden; SetViewMode(preferences.FitTable && preferences.View == 2 ? 4 : preferences.View);
         Loaded += RestoreFloating;
     }
     private void RestoreFloating(object sender, RoutedEventArgs e)
@@ -97,19 +97,27 @@ public partial class EditorWorkspace
     }
     internal void SetViewMode(int mode)
     {
-        ViewMode = Math.Clamp(mode, 0, 3);
+        ViewMode = Math.Clamp(mode, 0, 4);
         if (DataLayout is null) return;
-        BelowItem.IsChecked = ViewMode == 0; BesideItem.IsChecked = ViewMode == 1; TableItem.IsChecked = ViewMode == 2; GraphItem.IsChecked = ViewMode == 3;
         ApplyView(); SaveLayout();
     }
     private void ApplyView()
     {
-        bool floating = graphWindow is not null, beside = ViewMode == 1 && !floating, graphOnly = ViewMode == 3 && !floating, below = ViewMode == 0 && !floating;
-        Grid.SetRow(GraphPanel, beside || graphOnly ? 0 : 2); Grid.SetColumn(GraphPanel, beside ? 2 : 0);
+        bool surface = table is { Rows: > 1, IsChoice: false };
+        bool floating = graphWindow is not null, preview = ViewMode == 4 && surface && !floating;
+        bool beside = ViewMode == 1 && !floating, graphOnly = ViewMode == 3 && !floating, below = (ViewMode == 0 || ViewMode == 4 && !surface) && !floating;
+        PreviewItem.IsChecked = ViewMode == 4 && surface; PreviewItem.IsEnabled = surface;
+        BelowItem.IsChecked = ViewMode == 0 || ViewMode == 4 && !surface; BesideItem.IsChecked = ViewMode == 1; TableItem.IsChecked = ViewMode == 2; GraphItem.IsChecked = ViewMode == 3;
+        Grid.SetRow(GraphPanel, preview || beside || graphOnly ? 0 : 2); Grid.SetColumn(GraphPanel, preview || beside ? 2 : 0);
         TableRow.Height = new(below ? tableFraction : 1, GridUnitType.Star); GraphRow.Height = below ? new(1 - tableFraction, GridUnitType.Star) : new(0);
-        DataDividerRow.Height = new(below ? 5 : 0); DataDividerColumn.Width = new(beside ? 5 : 0);
+        DataDividerRow.Height = new(below ? 5 : 0); DataDividerColumn.Width = new(preview || beside ? 5 : 0);
         TableColumn.Width = beside && CurveList ? new(Math.Min(curveWidth, Math.Max(180, DataLayout.ActualWidth - 200))) : new(beside ? tableFraction : 1, GridUnitType.Star);
-        GraphColumn.Width = beside ? new(1 - tableFraction, GridUnitType.Star) : new(0);
+        var thumbnail = TablePreviewSize.Calculate(DataLayout.ActualWidth, DataLayout.ActualHeight, table?.Columns ?? 1, MapGrid.RowHeaderWidth);
+        GraphColumn.Width = preview ? new(thumbnail.Width) : beside ? new(1 - tableFraction, GridUnitType.Star) : new(0);
+        GraphPanel.Height = preview ? thumbnail.Height : double.NaN; GraphPanel.VerticalAlignment = preview ? VerticalAlignment.Top : VerticalAlignment.Stretch;
+        Graph.SetCompactPreview(preview); FitViewButton.Content = preview ? "↺" : "Fit view";
+        if (preview) GraphTitle.Text = "3D preview";
+        else GraphTitle.Text = surface ? "3D · drag to rotate · wheel to zoom" : "Curve · wheel to zoom · Shift+drag to pan · click a point";
         MapGrid.Visibility = graphOnly ? Visibility.Collapsed : Visibility.Visible; GraphPanel.Visibility = floating || ViewMode != 2 ? Visibility.Visible : Visibility.Collapsed;
         Grid.SetRow(DataSplitter, beside ? 0 : 1); Grid.SetColumn(DataSplitter, beside ? 1 : 0);
         DataSplitter.Width = beside ? 5 : double.NaN; DataSplitter.Height = beside ? double.NaN : 5;
@@ -123,7 +131,7 @@ public partial class EditorWorkspace
     private void FitMap_Click(object sender, RoutedEventArgs e)
     {
         FocusButton.IsChecked = true; ChangesButton.IsChecked = false; DetailsButton.IsChecked = false; fitTable = true;
-        SetViewMode(CurveList ? 1 : 2); Graph.ResetView();
+        SetViewMode(CurveList ? 1 : table?.Rows > 1 ? 4 : 2); Graph.ResetView();
         Dispatcher.BeginInvoke(new Action(() => { UpdateLayout(); UpdateTableSizing(); SaveLayout(); }));
     }
     private void HideBrowser_Click(object sender, RoutedEventArgs e) => FocusButton.IsChecked = true;
@@ -148,7 +156,8 @@ public partial class EditorWorkspace
         window.Closed += (_, _) =>
         {
             preferences = preferences with { GraphBounds = Bounds(window, preferences.GraphBounds) };
-            window.Content = null; DataLayout.Children.Add(GraphPanel); graphWindow = null; SetViewMode(0); ApplyLayout(); SaveLayout();
+            window.Content = null; DataLayout.Children.Add(GraphPanel); graphWindow = null;
+            if (ViewMode == 2) SetViewMode(table?.Rows > 1 ? 4 : 0); ApplyLayout(); SaveLayout();
         };
         ApplyView(); window.Show(); SaveLayout();
     }
@@ -161,13 +170,19 @@ public partial class EditorWorkspace
         else if (ViewMode == 1) tableFraction = Math.Clamp(TableColumn.ActualWidth / Math.Max(1, TableColumn.ActualWidth + GraphColumn.ActualWidth), .2, .8);
         ApplyLayout(); SaveLayout();
     }
-    private void DataLayout_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateTableSizing();
+    private void DataLayout_SizeChanged(object sender, SizeChangedEventArgs e) { if (ViewMode == 4) ApplyView(); else UpdateTableSizing(); }
     private void UpdateTableSizing()
     {
         if (table is null || MapGrid.ActualWidth < 10 || MapGrid.Columns.Count == 0) return;
         if (CurveList)
         { MapGrid.Columns[0].Width = new(1, DataGridLengthUnitType.Star); MapGrid.Columns[1].Width = new(1, DataGridLengthUnitType.Star); MapGrid.RowHeight = 25; return; }
-        var size = TableFit.Calculate(MapGrid.ActualWidth, MapGrid.ActualHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth);
+        // Leave room for a transient horizontal scrollbar so it cannot keep the
+        // vertical scrollbar alive and prevent an otherwise fitting grid from settling.
+        double availableHeight = MapGrid.ActualHeight - (fitTable ? SystemParameters.HorizontalScrollBarHeight : 0);
+        var size = TableFit.Calculate(MapGrid.ActualWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth);
+        double rowHeight = fitTable ? size.RowHeight : 25;
+        if (table.Rows * rowHeight + MapGrid.ColumnHeaderHeight > MapGrid.ActualHeight)
+            size = TableFit.Calculate(MapGrid.ActualWidth - SystemParameters.VerticalScrollBarWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth);
         foreach (var column in MapGrid.Columns) column.Width = table.Columns == 1 ? new(1, DataGridLengthUnitType.Star) : new(size.ColumnWidth);
         MapGrid.RowHeight = fitTable ? size.RowHeight : 25;
     }
