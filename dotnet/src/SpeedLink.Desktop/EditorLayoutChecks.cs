@@ -21,7 +21,7 @@ public partial class EditorWorkspace
         var snapshot = document.Snapshot(); string path = document.SourcePath;
         document = new(snapshot, path, inspector, codeGuard, [definition]); document.Changed += Document_Changed;
         MapTabs.Items.Clear(); OpenTable(sample);
-        document.Apply(Enumerable.Range(0, 256).Select(i => new CellEdit(sample, i, 19.091319625854492 + i / 16 * .8 + i % 16 * .12)), "Synthetic surface fixture");
+        document.Apply(Enumerable.Range(0, 256).Select(i => { double x = i % 16 / 15d, y = i / 16 / 15d; return new CellEdit(sample, i, 12 + 24 * Math.Exp(-18 * ((x - .45) * (x - .45) + (y - .6) * (y - .6))) + 7 * Math.Sin(x * 6) * Math.Cos(y * 4)); }), "Synthetic surface fixture");
         var measurements = new List<object>();
         foreach (var size in new[] { (1280d, 720d), (1024d, 700d) })
         {
@@ -32,11 +32,11 @@ public partial class EditorWorkspace
             var last = MapGrid.Columns[15].GetCellContent(MapGrid.Items[15]) ?? throw new InvalidOperationException("Last table cell was virtualized.");
             var lastRect = last.TransformToAncestor(MapGrid).TransformBounds(new Rect(last.RenderSize));
             if (scroll.ScrollableWidth > .5 || scroll.ScrollableHeight > .5 || lastRect.Right > MapGrid.ActualWidth + .5 || lastRect.Bottom > MapGrid.ActualHeight + .5 ||
-                MapGrid.FontSize < 12 || MapGrid.RowHeight < 22 || MapGrid.Columns.Any(c => c.ActualWidth < 44) || !AxesText.IsVisible)
+                MapGrid.FontSize < 12 || MapGrid.RowHeight < 22 || MapGrid.Columns.Any(c => c.ActualWidth < 44) || !AxesText.IsVisible || ViewMode != 4 || !GraphPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || GraphPanel.ActualHeight > 210 || GraphPanel.ActualWidth < 150)
                 throw new InvalidOperationException($"16×16 map does not fit at {size}: scroll {scroll.ScrollableWidth}/{scroll.ScrollableHeight}, grid {MapGrid.ActualWidth}/{MapGrid.ActualHeight}, last {lastRect}, columns {string.Join(',', MapGrid.Columns.Select(c => c.ActualWidth))}.");
             CaptureHost(Path.Combine(folder, $"Fit16x16-{size.Item1:0}x{size.Item2:0}.png"));
             measurements.Add(new { windowWidth = size.Item1, windowHeight = size.Item2, gridWidth = MapGrid.ActualWidth, gridHeight = MapGrid.ActualHeight, rowHeight = MapGrid.RowHeight,
-                columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, lastCellVisible = true });
+                columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, lastCellVisible = true, previewWidth = GraphPanel.ActualWidth, previewHeight = GraphPanel.ActualHeight });
         }
         SelectCell(0); byte[] precise = document.Snapshot(); double exact = document.Read(sample, 0);
         if (!MapGrid.BeginEdit()) throw new InvalidOperationException("Cannot enter a fitted table cell."); UpdateLayout();
@@ -60,6 +60,8 @@ public partial class EditorWorkspace
         }
         graphWindow!.Width = 740; graphWindow.Height = 510; graphWindow.UpdateLayout();
         CaptureWindow(graphWindow, Path.Combine(folder, "SurfacePopout.png")); DockGraph_Click(this, new());
+        UpdateLayout(); if (ViewMode != 4 || !GraphPanel.IsVisible || GraphPanel.ActualHeight > 210) throw new InvalidOperationException("Docking did not restore the compact preview.");
+        SelectCell(8 * 16 + 8); if (Graph.SelectedCell != 8 * 16 + 8) throw new InvalidOperationException("Preview selection did not follow the table.");
         resize(1280, 720); FocusButton.IsChecked = false;
         var maf = document.Definition.Tables.First(t => t.Name.StartsWith("MAF Calibration", StringComparison.Ordinal) && t.Columns > 100);
         OpenTable(maf);
@@ -98,7 +100,7 @@ public partial class EditorWorkspace
         if (!saved.BrowserHidden || saved.View != 2 || saved.BrowserWidth != 230) throw new InvalidOperationException("Layout did not persist.");
         curveWidth = 325; PopBrowser_Click(this, new()); PopGraph_Click(this, new()); SaveLayout();
         return new { passed = true, hardwareAccessed = false, synthetic = true, full16x16 = measurements, precisionPreserved = true, mapInfoUsesNoTableSpace = true,
-            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
+            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, compactPreview = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
             mafBulkEditsAndClipboard = true, checksumVerified = true, layoutPersisted = true };
     }
     internal void CheckRestoredLayout()

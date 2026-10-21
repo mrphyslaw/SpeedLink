@@ -1,5 +1,18 @@
 # C# validation
 
+## Table preview — 0.5.3-alpha.1
+
+- 261 C# tests pass, including preview sizing and layout persistence.
+- Seven desktop layout workflows retain a visible upper-right 3D preview while
+  a complete synthetic 16×16 grid fits at both target logical window sizes.
+  The same workflows cover linked selection, pop-out/dock behavior, precision,
+  checksum exports and the existing 129-point MAF editor.
+- Seven Workbench and seven definition-import workflows pass. An L38KEH000
+  intake-cam VVT example verifies the standalone editor and illustrates a
+  surface with distinct levels and transitions. The original ROM is preserved.
+- Existing reader/logger behavior is unchanged. Tests remain offline; no new
+  adapter or real-ECU validation is claimed.
+
 ## Compact editor — 0.5.2-alpha.1
 
 - 259 C# tests pass, including all seven long MAF curves, clipboard bounds and

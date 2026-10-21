@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.2-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.2-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.3-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.3-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -19,7 +19,8 @@ are not bundled. Real Mazda ECU validation remains pending.
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
-Screenshots use synthetic test values; they are not tuning recommendations.
+The layout and MAF examples use synthetic values; the VVT surface shows an
+L38KEH000 ROM example. Screenshots are not tuning recommendations.
 
 ### Logging and recordings
 
@@ -48,7 +49,9 @@ a vehicle test or measured ECU logging rates.
 The Workbench keeps editing, logging and recordings in one window. **Fit map**
 gives the table the available workspace. The app navigation collapses to icons;
 the map browser and graph can be resized, hidden or moved into separate windows.
-Use **View** for layout options, map information and changed maps.
+Use **View** for layout options, map information and changed maps. 3D tables can
+keep a small surface preview at the upper-right of the grid; MAF curves keep
+their value list on the left and graph on the right.
 
 1. Open **Editor**, then **File → Open ROM…**.
 2. Select a map from the categorized list or use search. Related numbered maps

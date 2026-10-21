@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.3-alpha.1 — table preview
+
+- Keep a compact 3D preview at the upper-right of the map grid, using the same
+  right-hand graph position and controls as the MAF editor.
+- Retain the full table height and fit a complete 16×16 grid at both tested
+  logical window sizes while the preview remains visible.
+- Add Table with 3D preview to View and make it the Fit map view for surfaces.
+  Popping the graph out and docking it restores the compact preview.
+- Use an intake-cam VVT map with clear changes in height for 3D screenshots.
+
 ## v0.5.2-alpha.1 — compact editor
 
 - Collapse app navigation to icons and reduce the editor's top and bottom bars.

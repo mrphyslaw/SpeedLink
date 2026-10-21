@@ -14,8 +14,9 @@ window sizes with app navigation collapsed. Larger maps retain scrolling.
 The ☰ button expands or collapses navigation; Ctrl+B hides or restores the
 map browser. Use **View** for layout options and floating panels.
 
-Screenshots use synthetic layout/curve fixtures, not vehicle tuning values.
-The 16×16 example is a layout test, not an added stock calibration map.
+The 16×16 and MAF examples use synthetic layout/curve fixtures. The 16×16
+example is a layout test, not an added stock calibration map. VVT screenshots
+show an L38KEH000 ROM example. These are interface examples, not tuning advice.
 
 ## Long MAF curves
 
@@ -30,12 +31,19 @@ and paste retain full precision. Units and axis names stay above the table.
 
 ## Rotatable 3D surfaces
 
-![A 3D surface in its separate graph window](images/surface-editor.png)
+![Intake cam advance table with a compact 3D preview at the upper-right](images/table-preview.png)
+
+**Table with 3D preview** places the surface at the upper-right of the grid,
+keeping the table's full height. **Fit map** retains this preview while a full
+16×16 grid fits at both tested sizes. The graph stays on the right, like the
+MAF editor. Its controls and linked cell selection work the same way.
+
+![An intake cam advance VVT surface showing its raised areas and transitions](images/surface-editor.png)
 
 Drag to rotate a surface and use the mouse wheel to zoom. Click a point on the
 graph to select its grid cell. Resizable panes let you give the grid or graph
 more room. **Fit view** frames the entire surface. Pop the graph into a separate
-window to use another monitor; closing that window docks it again.
+window to use another monitor; closing that window restores the preview.
 
 ## Map information and changes
 

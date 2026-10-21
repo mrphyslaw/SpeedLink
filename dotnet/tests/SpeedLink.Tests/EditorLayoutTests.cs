@@ -18,7 +18,7 @@ public sealed class EditorLayoutTests
         foreach (string corrupt in new[] { "{", "null", "{\"View\":\"bad\"}", new string(' ', 65537) })
         { File.WriteAllText(path, corrupt); Assert.Equal(new EditorLayoutPreferences(), EditorLayoutPreferences.Load(path)); }
         File.WriteAllText(path, "{\"BrowserBounds\":null,\"GraphBounds\":null,\"View\":99,\"BrowserWidth\":-100,\"CurveWidth\":900,\"TableFraction\":1}");
-        var recovered = EditorLayoutPreferences.Load(path); Assert.Equal(3, recovered.View); Assert.Equal(160, recovered.BrowserWidth);
+        var recovered = EditorLayoutPreferences.Load(path); Assert.Equal(4, recovered.View); Assert.Equal(160, recovered.BrowserWidth);
         Assert.Equal(600, recovered.CurveWidth); Assert.Equal(.8, recovered.TableFraction); Assert.Equal(new PanelBounds(), recovered.BrowserBounds);
         var nonfinite = (expected with { BrowserWidth = double.NaN, CurveWidth = double.PositiveInfinity, TableFraction = double.NaN, GraphBounds = new(double.NaN, double.PositiveInfinity, double.NaN, double.NegativeInfinity) }).Validate();
         Assert.Equal(200, nonfinite.BrowserWidth); Assert.Equal(300, nonfinite.CurveWidth); Assert.Null(nonfinite.GraphBounds.Left); Assert.Null(nonfinite.GraphBounds.Top);
@@ -32,6 +32,19 @@ public sealed class EditorLayoutTests
         Assert.True(fit.Fits); Assert.InRange(fit.ColumnWidth, 44, 90); Assert.InRange(fit.RowHeight, 22, 28);
         Assert.True(fit.ColumnWidth * 16 + 68 <= width); Assert.True(fit.RowHeight * 16 + 30 <= height);
         Assert.False(TableFit.Calculate(600, 300, 16, 16).Fits);
+    }
+    [Theory]
+    [InlineData(940, 443)]
+    [InlineData(1196, 463)]
+    public void PreviewLeavesRoomForAll16RowsAndColumns(double width, double height)
+    {
+        var preview = TablePreviewSize.Calculate(width, height, 16);
+        var table = TableFit.Calculate(width - preview.Width - 5, height, 16, 16);
+        Assert.True(table.Fits); Assert.InRange(preview.Width, 160, 224); Assert.InRange(preview.Height, 156, 208);
+        Assert.True(preview.Height < height / 2);
+        using var folder = new TempFolder(); string path = Path.Combine(folder.Path, "preview.json");
+        new EditorLayoutPreferences { View = 4, FitTable = true }.Save(path);
+        Assert.Equal(4, EditorLayoutPreferences.Load(path).View);
     }
     public static IEnumerable<object[]> Profiles => Fixture.Profiles.Select(p => new object[] { p.Calibration });
     [Theory, MemberData(nameof(Profiles))]
