@@ -144,15 +144,59 @@ public class J2534TransportTests
         Assert.Single(channel.Writes);
     }
 
+    [Fact]
+    public void experimental_adapter_keeps_driver_identity_for_reads_and_logging()
+    {
+        var channel = new Channel { AdapterName = "Mongoose-Plus ISO/CAN3 (experimental)", Experimental = true };
+        channel.Replies.Enqueue(new(0x7E8, 0, [0x62, 0, 0x0C, 0x1F, 0x40]));
+        using var link = Link(channel);
+        Assert.Contains("Mongoose-Plus ISO/CAN3 (experimental)", link.Adapter);
+        Assert.Contains("driver test", link.Adapter);
+        Assert.Contains("API 04.04", link.Adapter);
+        Assert.DoesNotContain("Tactrix", link.Adapter);
+        Assert.Equal((500000u, 0x7E0u, 0x7E8u), channel.Configuration);
+        Assert.Equal(2000, LoggerDefinition.Speed6.Decode("engine_rpm", link.Exchange([0x22, 0, 0x0C])));
+        Assert.Single(channel.Writes);
+    }
+    [Theory]
+    [InlineData("05.00")]
+    [InlineData("")]
+    [InlineData("04.03")]
+    public void experimental_adapter_rejects_wrong_api_before_can_connect(string api)
+    {
+        var channel = new Channel { Experimental = true, Api = api };
+        var link = new J2534ReadTransport(channel);
+        Assert.Contains("04.04", Assert.Throws<TransportException>(link.Initialize).Message);
+        Assert.Equal(default, channel.Configuration);
+        Assert.Empty(channel.Writes);
+        Assert.Equal(1, channel.Closes);
+        link.Dispose();
+        Assert.Equal(1, channel.Closes);
+    }
+    [Fact]
+    public void experimental_adapter_blocks_programming_before_driver_io()
+    {
+        var channel = new Channel { Experimental = true };
+        using var link = Link(channel);
+        foreach (var entry in Forbidden)
+            Assert.Throws<TransportException>(() => link.Exchange(Convert.FromHexString((string)entry[0])));
+        Assert.Empty(channel.Writes);
+        Assert.Equal(0, channel.Clears);
+        Assert.Equal(0, channel.Reads);
+    }
+
     private sealed class Channel : IJ2534Channel
     {
+        public string AdapterName { get; init; } = "Tactrix Openport 2.0";
+        public bool Experimental { get; init; }
+        public string Api { get; init; } = "04.04";
         public Queue<J2534Frame> Replies = new();
         public List<byte[]> Writes = [];
         public int Clears, Reads, Closes;
         public bool FailConnect, FailRead;
         public (uint, uint, uint) Configuration;
         public string? CleanupWarning => null;
-        public J2534Version Open() => new("test", "test", "04.04");
+        public J2534Version Open() => new("test", "test", Api);
         public void Connect(uint bitrate, uint requestId, uint responseId)
         {
             Configuration = (bitrate, requestId, responseId);

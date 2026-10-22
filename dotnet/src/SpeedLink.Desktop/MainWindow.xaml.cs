@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.5.4-alpha.2";
+    public const string Version = "0.5.4-alpha.3";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -31,6 +31,8 @@ public partial class MainWindow : Window
     private bool busy, closing;
     private CancellationTokenSource? stop;
     private Task? activeWork;
+    private readonly Dictionary<J2534AdapterKind, string> selectedDrivers = [];
+    private J2534AdapterKind SelectedDriverKind => AdapterBox.SelectedIndex == 2 ? J2534AdapterKind.MongoosePlusIsoCan3 : J2534AdapterKind.Tactrix;
     public MainWindow() : this(null) { }
     internal MainWindow(string? testVault, RomInspector? editorInspector = null, TuningCodeGuard? editorGuard = null)
     {
@@ -51,7 +53,7 @@ public partial class MainWindow : Window
         VersionLabel.Text = $"ALPHA {Version}";
         BaudBox.ItemsSource = new[] { 115200, 38400, 57600, 230400, 500000, 1000000, 2000000 };
         BaudBox.SelectedItem = 115200;
-        AdapterBox.ItemsSource = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0" };
+        AdapterBox.ItemsSource = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0", "Mongoose-Plus ISO/CAN3 (experimental)" };
         AdapterBox.SelectedIndex = 0;
         InitializeLogger();
         RefreshPorts();
@@ -113,16 +115,18 @@ public partial class MainWindow : Window
     }
     private async void Connect_Click(object sender, RoutedEventArgs e)
     {
-        bool tactrix = AdapterBox.SelectedIndex == 1;
+        bool passThruAdapter = AdapterBox.SelectedIndex > 0;
         var name = PortBox.Text.Trim();
         var baud = (int)BaudBox.SelectedItem;
-        var driver = DriverBox.SelectedItem as TactrixDriver;
-        if (tactrix && driver is null)
+        var driver = DriverBox.SelectedItem as J2534Driver;
+        if (passThruAdapter && (driver is null || driver.Kind != SelectedDriverKind))
         {
-            MessageBox.Show(this, "Install the Tactrix Openport drivers, then refresh devices.", "Tactrix driver needed");
+            MessageBox.Show(this, SelectedDriverKind == J2534AdapterKind.MongoosePlusIsoCan3
+                ? "Install the manufacturer's Mongoose-Plus ISO/CAN3 driver with 32-bit J2534-1 04.04 / ISO15765 support, then refresh devices."
+                : "Install the Tactrix Openport drivers, then refresh devices.", "J2534 driver needed");
             return;
         }
-        if (!tactrix && name.Length == 0)
+        if (!passThruAdapter && name.Length == 0)
         {
             MessageBox.Show(this, "Choose the COM port assigned to your adapter.", "Select a port");
             return;
@@ -134,7 +138,7 @@ public partial class MainWindow : Window
             {
                 FtdiSerialConnection? serial = null;
                 IReadTransport link;
-                if (tactrix)
+                if (passThruAdapter)
                 {
                     var passThru = new J2534ReadTransport(new NativeJ2534Channel(driver!));
                     link = passThru;
@@ -182,7 +186,7 @@ public partial class MainWindow : Window
                     Log("Adapter baud restore: " + elm.CloseWarning);
             }
             if (link is J2534ReadTransport passThru && passThru.CloseWarning is not null)
-                Log("Tactrix cleanup: " + passThru.CloseWarning);
+                Log("J2534 cleanup: " + passThru.CloseWarning);
             if (serial?.CleanupWarning is not null)
                 Log("Adapter driver cleanup: " + serial.CleanupWarning);
         }
@@ -222,8 +226,15 @@ public partial class MainWindow : Window
         PortBox.ItemsSource = found;
         if (PortBox.Text.Length == 0 && found.Length > 0)
             PortBox.Text = found[0];
-        var selectedDriver = (DriverBox.SelectedItem as TactrixDriver)?.LibraryPath;
-        var drivers = TactrixDrivers.Discover();
+        RefreshDrivers();
+    }
+    private void RefreshDrivers()
+    {
+        if (DriverBox.SelectedItem is J2534Driver selected)
+            selectedDrivers[selected.Kind] = selected.LibraryPath;
+        var kind = SelectedDriverKind;
+        selectedDrivers.TryGetValue(kind, out var selectedDriver);
+        var drivers = J2534Drivers.Discover(kind);
         DriverBox.ItemsSource = drivers;
         if (drivers.Count > 0)
             DriverBox.SelectedItem = drivers.FirstOrDefault(item => item.LibraryPath.Equals(selectedDriver, StringComparison.OrdinalIgnoreCase))
@@ -233,10 +244,13 @@ public partial class MainWindow : Window
     {
         if (SerialPanel is null || TactrixPanel is null)
             return;
-        bool tactrix = AdapterBox.SelectedIndex == 1;
-        SerialPanel.Visibility = tactrix ? Visibility.Collapsed : Visibility.Visible;
-        TactrixPanel.Visibility = tactrix ? Visibility.Visible : Visibility.Collapsed;
-        StatusText.Text = tactrix ? "Ready · select the installed Tactrix driver" : "Ready · select your adapter COM port";
+        bool passThruAdapter = AdapterBox.SelectedIndex > 0;
+        bool experimental = AdapterBox.SelectedIndex == 2;
+        SerialPanel.Visibility = passThruAdapter ? Visibility.Collapsed : Visibility.Visible;
+        TactrixPanel.Visibility = passThruAdapter ? Visibility.Visible : Visibility.Collapsed;
+        AdapterNote.Visibility = experimental ? Visibility.Visible : Visibility.Collapsed;
+        RefreshDrivers();
+        StatusText.Text = experimental ? "Experimental · select the installed Mongoose-Plus ISO/CAN3 driver" : passThruAdapter ? "Ready · select the installed Tactrix driver" : "Ready · select your adapter COM port";
     }
     private void RefreshPorts_Click(object sender, RoutedEventArgs e) => RefreshPorts();
     private void RefreshHistory()
@@ -326,7 +340,7 @@ public partial class MainWindow : Window
     private void About_Click(object sender, RoutedEventArgs e) => MessageBox.Show(this, Resource("SpeedLink.About.txt").Replace("{version}", Version), "About SpeedLink");
     private Window HelpWindow()
     {
-        var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
+        var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Adapters / testing"] = "SpeedLink.AdapterHelp.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["Editor"] = "SpeedLink.EditorHelp.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
         foreach (var name in Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith("SpeedLink.Notices.", StringComparison.Ordinal)))
             documents["Notices / " + name[18..]] = name;
         var panel = new DockPanel { Margin = new Thickness(16) };
@@ -374,7 +388,7 @@ public partial class MainWindow : Window
         if (new System.Windows.Automation.Peers.TabControlAutomationPeer(Pages).GetChildren()?.Count != 6) throw new InvalidOperationException("Workspace automation containers missing.");
         if (Pages.Items.Count != 6 || transport is not null || image is not null || !ConnectButton.IsEnabled || ReadButton.IsEnabled || CorrectButton.IsEnabled)
             throw new InvalidOperationException("Unexpected startup state.");
-        if (AdapterBox.Items.Count != 2 || AdapterBox.SelectedIndex != 0 || typeof(ReadWorkflow).Assembly.GetType("SpeedLink.Core.Simulator") is not null)
+        if (AdapterBox.Items.Count != 3 || AdapterBox.SelectedIndex != 0 || typeof(ReadWorkflow).Assembly.GetType("SpeedLink.Core.Simulator") is not null)
             throw new InvalidOperationException("Unexpected connection modes.");
         AdapterBox.SelectedIndex = 1;
         UpdateLayout();
@@ -382,18 +396,29 @@ public partial class MainWindow : Window
             throw new InvalidOperationException("Unexpected Tactrix selection state.");
         if (DriverBox.Items.Count > 1)
         {
-            var originalDriver = DriverBox.SelectedItem as TactrixDriver;
+            var originalDriver = DriverBox.SelectedItem as J2534Driver;
             DriverBox.SelectedIndex = 0;
-            var selected = ((TactrixDriver)DriverBox.SelectedItem).LibraryPath;
+            var selected = ((J2534Driver)DriverBox.SelectedItem).LibraryPath;
             RefreshPorts();
-            if ((DriverBox.SelectedItem as TactrixDriver)?.LibraryPath != selected)
+            if ((DriverBox.SelectedItem as J2534Driver)?.LibraryPath != selected)
                 throw new InvalidOperationException("Driver refresh lost the selected registered entry.");
-            DriverBox.SelectedItem = DriverBox.Items.Cast<TactrixDriver>().First(item => item.LibraryPath == originalDriver!.LibraryPath);
+            DriverBox.SelectedItem = DriverBox.Items.Cast<J2534Driver>().First(item => item.LibraryPath == originalDriver!.LibraryPath);
         }
+        AdapterBox.SelectedIndex = 2; UpdateLayout();
+        if (SerialPanel.Visibility != Visibility.Collapsed || TactrixPanel.Visibility != Visibility.Visible || AdapterNote.Visibility != Visibility.Visible ||
+            !StatusText.Text.Contains("Experimental", StringComparison.Ordinal) || ReadButton.IsEnabled ||
+            DriverBox.Items.Cast<J2534Driver>().Any(d => d.Kind != J2534AdapterKind.MongoosePlusIsoCan3 || !d.Experimental))
+            throw new InvalidOperationException("Unexpected experimental Mongoose selection state.");
+        RefreshPorts();
+        AdapterBox.SelectedIndex = 1; UpdateLayout();
+        if (AdapterNote.Visibility != Visibility.Collapsed || DriverBox.Items.Cast<J2534Driver>().Any(d => d.Kind != J2534AdapterKind.Tactrix))
+            throw new InvalidOperationException("Experimental driver selection leaked into the Tactrix path.");
         AdapterBox.SelectedIndex = 0;
         VerifyLoggerSmoke(args);
         if (!Resource("SpeedLink.About.txt").Contains("{version}", StringComparison.Ordinal))
             throw new InvalidDataException("About resource missing.");
+        if (!Resource("SpeedLink.AdapterHelp.md").Contains("Mongoose-Plus ISO/CAN3 (experimental)", StringComparison.Ordinal))
+            throw new InvalidDataException("Adapter testing guide missing.");
         var help = HelpWindow();
         help.Show();
         help.UpdateLayout();
@@ -440,7 +465,10 @@ public partial class MainWindow : Window
                 supportedHardware = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0" },
                 processBits = IntPtr.Size * 8,
                 tactrixSelectionVerified = true,
-                registeredDriverNames = DriverBox.Items.Cast<TactrixDriver>().Select(item => item.Name).ToArray(),
+                mongooseSelectionVerified = true,
+                experimentalHardware = new[] { "Mongoose-Plus ISO/CAN3" },
+                mongooseHardwareTested = false,
+                registeredDriverNames = DriverBox.Items.Cast<J2534Driver>().Select(item => item.Name).ToArray(),
                 simulatorAvailable = false,
                 liveProgrammingEnabled = false,
                 noRomBundled = true,

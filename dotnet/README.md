@@ -14,6 +14,10 @@ The vLinker temporarily uses 2000000 baud during reads and restores 115200 on a 
 
 Offline ECU models are developer test fixtures; there is no Simulator connection in the application. ECU flashing remains planned.
 
+Mongoose-Plus ISO/CAN3 is an experimental J2534 reader/logger option. Select it
+and its registered 32-bit 04.04 driver; no serial settings are needed. Hardware
+validation is pending. See the [adapter testing guide](../docs/ADAPTERS.md).
+
 The **Logger** tab provides stock logging for all seven defined ROMs with both adapters:
 35–38 selectable parameters, display units, measured sample rates, a rolling chart
 and CSV recording. Load the ECU's current matching ROM backup for MAP calibration.

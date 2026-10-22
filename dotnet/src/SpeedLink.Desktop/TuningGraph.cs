@@ -9,7 +9,7 @@ using SpeedLink.Core;
 namespace SpeedLink.Desktop;
 
 /// <summary>Independent WPF curve/surface viewer. Graph gestures select cells; values are edited in the grid.</summary>
-public sealed class TuningGraph : Grid
+public sealed partial class TuningGraph : Grid
 {
     private readonly Viewport3D viewport = new() { Margin = new(4, 4, 4, 24) };
     private readonly CurvePlot curve = new();
@@ -127,7 +127,14 @@ public sealed class TuningGraph : Grid
         }
         if (table?.Rows <= 1)
         { var p = e.GetPosition(this); if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) curve.Pan(p.X - lastDrag.X); lastDrag = p; return; }
-        var point = e.GetPosition(this); yaw += (point.X - lastDrag.X) * .5; elevation = Math.Clamp(elevation + (point.Y - lastDrag.Y) * .4, 10, 80); lastDrag = point; Camera();
+        var point = e.GetPosition(this); RotateSurface(point - lastDrag); lastDrag = point;
+    }
+    private void RotateSurface(Vector movement)
+    {
+        // Orbit opposite the horizontal drag so the visible surface follows it.
+        yaw -= movement.X * .5;
+        elevation = Math.Clamp(elevation + movement.Y * .4, 10, 80);
+        Camera();
     }
     private void Up(object sender, MouseButtonEventArgs e)
     {

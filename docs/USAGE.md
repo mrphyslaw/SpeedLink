@@ -7,6 +7,10 @@ For Tactrix, select its installed driver and choose **Connect & identify**.
 No COM port or serial baud selection is needed. Registered Openport-compatible
 driver entries remain available in the driver list.
 
+For Mongoose-Plus ISO/CAN3, select its **experimental** option and registered
+32-bit 04.04 driver. Reading and logging are available for testing; hardware
+validation is pending. Follow the [adapter testing guide](ADAPTERS.md).
+
 For vLinker, select its COM port. The normal initial baud is 115200.
 The adapter temporarily uses 2,000,000 baud while reading and normally returns
 to 115200 on disconnect. If interrupted, the UI reports any restore error;

@@ -1,5 +1,22 @@
 # C# validation
 
+## Surface dragging and experimental Mongoose — 0.5.4-alpha.3
+
+- Horizontal dragging now makes the visible surface follow the pointer.
+  Vertical tilt retains its existing direction and limits.
+- Seven layout workflows check the camera-facing reference geometry through
+  WPF's actual 3D projection. Left, right, up and down movement are checked in
+  the compact preview and in wide/tall floating graph windows, along with tilt
+  limits, reset, full 16×16 fitting and the existing MAF workflow.
+- 279 C# tests pass. Additional cases cover candidate driver names and ISO15765
+  capability filtering, preserved Tactrix discovery, actual adapter identity,
+  wrong API rejection before CAN connect and blocked programming requests.
+- Mongoose-Plus ISO/CAN3 has an experimental J2534 reader/logger option. Its
+  registered 32-bit 04.04 driver is selected separately from Tactrix. Startup
+  checks select both paths, refresh driver lists and check the visible status.
+- No Mongoose hardware or real ECU was accessed. Driver loading, multi-frame
+  behavior, full reads, measured logging rates and USB recovery need user tests.
+
 ## Editor menu fix — 0.5.4-alpha.2
 
 - File, Edit and View use explicit popup surfaces and item templates, independent
