@@ -6,7 +6,11 @@ Connect a Vgate vLinker FS USB or Tactrix Openport 2.0 and select it in the adap
 
 A definition is not required to dump a ROM. Two matching full 1 MiB reads are required before a verified backup is sealed. Original captures, manifest and durable journal are retained in the `data` folder beside the executable. Keep the whole backup folder.
 
-**Editor** provides the offline editor and opens known and unknown images for inspection. Seven known layouts have optional guarded checks and separate checksum-corrected-copy export. Unknown layouts have no guessed checksum. Vehicle match and factory provenance remain unverified.
+**Editor** opens the seven supported stock layouts for offline editing.
+**ROM checks → Inspect ROM…** opens known or unknown complete 1 MiB images for
+inspection. Known layouts have guarded checks and separate checksum-corrected-copy
+export; unknown layouts have no guessed checksum. Vehicle match and factory
+provenance remain unverified.
 
 Install the manufacturer's Windows driver and close other diagnostic apps before connecting. SpeedLink uses FTDI D2XX for vLinker and SAE J2534 ISO 15765 for Tactrix. The self-contained x86 build loads Tactrix's 32-bit driver directly and runs on 64-bit Windows. No driver is bundled.
 
@@ -18,8 +22,8 @@ Mongoose-Plus ISO/CAN3 is an experimental J2534 reader/logger option. Select it
 and its registered 32-bit 04.04 driver; no serial settings are needed. Hardware
 validation is pending. See the [adapter testing guide](../docs/ADAPTERS.md).
 
-The **Logger** tab provides stock logging for all seven defined ROMs with both adapters:
-35–38 selectable parameters, display units, measured sample rates, a rolling chart
+The **Logger** workspace provides stock logging for all seven defined ROMs with both adapters:
+35–38 selectable parameters, display units, measured sample rates, up to six synchronized plots
 and CSV recording. Load the ECU's current matching ROM backup for MAP calibration.
 Live ECU calibration identity must match. See the [logger guide](../docs/LOGGER.md).
 ROM reads require an engine-stopped connection; logging uses the normal application
@@ -29,7 +33,10 @@ session and can run with the engine running. Real-ECU logger validation is pendi
 
 Open **Editor**. The seven bundled tuning
 definitions provide grid editing, 2D curves, rotatable 3D surfaces, comparison,
-selection arithmetic, clipboard, interpolation and undo/redo. Saves create new
+selection arithmetic, clipboard, interpolation and undo/redo. Single values use
+a dedicated value/state card; small grids and previews stay proportional to the
+data. Fit map, the draggable preview divider and floating panels control the
+workspace. Map info / F1 opens contextual help. Saves create new
 verified copies with mandatory checksum correction. Original files are preserved.
 Program-area signatures reject incompatible patched layouts while allowing
 changes to defined tuning controls. See the [editor guide](../docs/EDITOR.md).

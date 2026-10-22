@@ -21,7 +21,8 @@ still need validation.
 
 ![SpeedLink recorded-log viewer with channel selection and synchronized engine speed, boost, lambda and fuel-pressure plots](images/recorded-log.png)
 
-Open a recording without connecting an adapter. Select up to six channels, move
+Choose **Recordings** in the left navigation to open a recording without an
+adapter. Select up to six channels, move
 the shared cursor to inspect readings, and zoom into part of the run. Missing
 readings appear as gaps. This screenshot uses the bundled synthetic example log.
 

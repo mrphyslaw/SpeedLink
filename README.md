@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.4-alpha.9](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.9)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.4-alpha.10](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.10)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -21,7 +21,7 @@ Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
 Axis headers have a distinct background and bright separators. **Map info**
 beside the tabs, or **F1**, shows units, correction direction and practical examples.
-The preview shows the released v0.5.4-alpha.9 app with an L38KEH000 VVT map.
+The preview shows the v0.5.4-alpha.9 app with an L38KEH000 VVT map.
 
 Single values have a focused editor with units, help and baseline comparison.
 Small maps stay proportional to their contents, and the table/preview divider
@@ -68,9 +68,11 @@ directly on their frame, aligned with the surface as it rotates.
 1. Open **Editor**, then **File → Open ROM…**.
 2. Select a map from the categorized list or use search. Related numbered maps
    are kept together. Each map opens in a tab with its units and tuner help.
-3. Edit the grid or apply arithmetic, clipboard values or interpolation to a
-   selection. Review the 2D curve or rotate and zoom the 3D surface. Compare with
-   the original, last save or another compatible ROM; Undo/Redo restores operations.
+3. For a single value, type in the field and choose **Apply value** or Enter;
+   Cancel or Escape discards typing. For a table, double-click a cell or apply
+   arithmetic, paste or interpolation to a selection. State controls use named
+   choices. Compare with the original, last save or another compatible ROM;
+   Undo/Redo restores operations. Review a curve or surface when available.
 4. Choose **Save copy…**. Every save corrects and verifies the checksum, then
    creates and verifies a new file; the original and existing copies are preserved.
 
@@ -134,7 +136,7 @@ See the [logger guide](docs/LOGGER.md) for setup, recordings and troubleshooting
 
 ## Review a recording
 
-1. Open **Logger** and select **Recordings**. No adapter is needed.
+1. Choose **Recordings** in the left navigation. No adapter is needed.
 2. Select **Open recording…** and choose the recording folder's `log.csv`.
 3. Select up to six parameters. Move the shared cursor or click a plot to inspect
    readings, and use **Zoom** to focus on part of the recording. Missing data appears
@@ -154,7 +156,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.4-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.4), a Windows Workbench alpha.**
+**Current release: [v0.5.4-alpha.10](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.10), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
@@ -162,7 +164,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   The reader covers the 1 MiB MZR DISI ECU family.
 - **Logger coverage:** seven ROM profiles with 35–38 stock-ROM parameters each.
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
-- **Checked:** 261 C# tests, 2,030 native-derived logger vectors and 174,741
+- **Checked:** 292 C# tests, 2,030 native-derived logger vectors and 174,741
   independently decoded editor values/switches. Seven-profile editor desktop
   checks cover direct cell entry, comparison, undo/redo and byte-identical no-edit
   exports. See [validation](dotnet/docs/Validation.md). Physical

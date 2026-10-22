@@ -103,11 +103,18 @@ table-only and graph-only views. The browser can also pop into a separate
 window. Layout preferences are remembered. Open maps and unsaved edits remain
 in place when switching to Logger or Recordings.
 
+Tabs scroll horizontally and keep the active map visible. Use the mouse wheel
+over the tab strip to reach other open maps. Closing a tab keeps the ROM edits.
+For step-by-step controls and shortcuts, open **File → Editor guide** in the app
+or use the [full editor guide](../EDITOR.md).
+
 ## First edit
 
 1. Open **Editor → File → Open ROM…**.
-2. Choose a map. Edit a single-value field, or double-click a table cell, enter
-   a value and press Enter.
+2. Choose a map and check **Map info**. For a single value, type in the field
+   and choose **Apply value** or Enter; Cancel or Escape discards typing.
+   For a table, double-click a cell, enter a value and press Enter. State
+   controls use named choices.
 3. Review the original/last-save/comparison values and the curve or surface.
    Use Undo/Redo to restore complete operations.
 4. Select **Save copy…**. Every save corrects and verifies the checksum, uses

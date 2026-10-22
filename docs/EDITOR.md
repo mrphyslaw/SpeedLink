@@ -1,152 +1,200 @@
-# SpeedLink ROM editor
+# SpeedLink ROM editor guide
 
-This first editor supports the seven bundled MazdaSpeedDefs stock layouts.
-No adapter is needed. ECU programming remains disabled. Existing reading and
-logging functions are unchanged.
+Edit a supported ROM without an adapter. SpeedLink keeps the original file and
+exports each revision as a new file with a corrected, verified checksum.
+ECU programming remains disabled.
 
-Use **Definitions → Import…** to install an editor XML update for a supported ROM.
-Reopen the ROM to use the update; existing edits stay with their current definition.
-See [definition import](DEFINITIONS.md) for supported files and bundled fallback.
+This guide is also included in the app: choose **File → Editor guide**, or
+choose **Help** and select **Editor**. **Map info** beside the map tabs, or
+**F1**, opens help for the selected map instead.
 
-## Open and browse
+## Make your first edit
 
-Open **Editor**, then **File → Open ROM…**. A complete
-1 MiB image with a matching calibration, boot, checksum layout and program-area
-signature is required. The program signature allows edits to the defined controls
-and checksum word while rejecting other program changes. Patched/extended ROMs
-are unsupported, even when they retain a stock calibration ID.
-Unknown images can still be dumped with the reader. A recognized calibration
-does not establish a file's factory provenance or vehicle compatibility.
+1. Choose **Editor** in the left navigation, then **File → Open ROM…**.
+2. Find a map in the category list or search by name, description or category.
+   Click **Map info** to check its units, purpose and correction direction.
+3. Edit the control using the instructions below for its shape. Compare with
+   the baseline and use Undo/Redo to review or reverse an operation.
+4. Choose **Save copy…** or press Ctrl+S. Pick a new filename. Every export
+   corrects the checksum and verifies the written bytes.
 
-Expand a category or search by map name, description or category. Numbered maps
-are sorted naturally. Each selected map opens in a tab; use × to close its tab.
-The tab strip scrolls horizontally and brings the active map into view. Use the
-mouse wheel over the strip to reach other open maps.
-Use **Map info** beside the map tabs, or press **F1**, for help with the active map.
-The map-information window explains the control in tuner terms. Static axes are display
-metadata and cannot be edited. No extended-table patch is installed by this editor.
+### Single values, such as rev limits
 
-## Edit and view
+The value card groups the name, explanation, units, baseline and change.
+Click the numeric field, type the value in the displayed units, then choose
+**Apply value** or press Enter. **Cancel** or Escape discards the typed value.
+**Reset to baseline** restores the selected reference value.
 
-Single-value maps, such as rev limits, use a dedicated value editor. Units sit
-beside the field, with help, the selected baseline and the change in the same
-panel. Type a value and choose **Apply value** or press Enter. Escape or **Cancel**
-discards typing. **Reset to baseline** restores the comparison value. Applied
-changes use the normal Undo/Redo history. Focusing the field exposes full stored
-precision; accepting it unchanged preserves its bytes. Invalid input stays
-visible and blocks saving or leaving the map until corrected or canceled. A
-valid pending value is applied when saving or switching maps. Single-state
-controls use a named selector in the same panel.
+Focusing the field shows full stored precision. Accepting the value unchanged
+preserves its bytes. A valid pending value is applied when saving or switching
+maps. Invalid or unencodable input stays visible and prevents saving, switching
+maps or changing the baseline until corrected or canceled.
 
-Small tables stay proportional to their contents. Short curves have a readable
-preview; small multi-state controls omit the unused graph. Drag the divider at
-the table's right edge to resize the preview. Its width is remembered across
-launches and docking; **Fit map** restores the automatic compact preview.
+Single-state controls use a named selector in the same card. Choosing a state
+applies it immediately. These controls do not need a grid or graph.
 
-Column-axis names sit directly above their breakpoints; row-axis names run
-beside the row breakpoints. Labels stay visible when the table scrolls. Selected
-cells highlight their row and column headers, and value units sit beside the map
-tabs. Scalar and switch controls omit unused axis labels. Long MAF curves keep
-their directly labeled breakpoint/value columns.
+### Tables and short curves
 
-- Double-click a numeric cell, type a value using a decimal point, and press Enter.
-- Drag or Shift-click to select a rectangle. Set, Add and × apply the amount in
-  the adjoining box. Use a negative Add amount to subtract.
-- Copy and Paste use tab-separated values without headers. Paste starts at the
-  upper-left selected cell; it must fit completely. Spreadsheet values are accepted.
-- Interpolation uses the physical axis values and selected endpoint cells.
-  Horizontal works along X, Vertical along Y, and 2D uses the four corners.
-- Switches use the named selector. Bit controls alter only their selected bit.
-- Undo/Redo restore entire operations, including exact prior bytes. The latest
-  200 operations are retained for the current open ROM.
-- Curves and surfaces reflect the current values. Click a curve point or surface
-  vertex to select its grid cell. Drag a surface to rotate it with your mouse,
-  use the wheel to zoom,
-  and use **Fit view** to restore the camera. Curves support wheel zoom and
-  Shift+drag panning; selecting a list value brings that point into view.
+Double-click a numeric cell, enter a value using a decimal point, and press
+Enter. Drag or Shift-click to select a rectangle. Axis names label the column
+and row breakpoints directly; their distinct header bands stay visible while
+scrolling. The selected cells highlight their row and column headers.
+Static breakpoints are read-only.
 
-3D maps carry their axis lines, labels and tick values directly on the surface
-frame. Blue identifies the column axis, green the row axis, and amber the map's
-value/height axis. The rulers stay aligned while you rotate. The compact preview
-uses fewer tick labels; the floating graph shows more detail.
+Small maps use a grid proportional to their contents. A short curve has a curve
+preview; a small surface has a 3D preview beside the grid. Multi-state controls
+keep labeled rows and a named selector without an unused graph. Select the row
+or cell you want to change, then choose its state. Bit controls preserve the
+other bits sharing the byte.
 
-Long curves, including the 129-point MAF calibrations, use a vertical breakpoint
-and value list alongside the graph. Only the value column is editable. Copy
-includes both columns at full precision; paste accepts a value column, matching
-breakpoint/value rows, or a horizontal row of three or more values. Breakpoints
-must match when supplied, and the complete paste must fit. Interpolate operates
-along the physical X axis between the first and last selected points.
+### Long curves, including MAF calibrations
 
-Cells use compact numbers for readability. Double-click to see the full stored
-value; accepting it unchanged preserves the original bytes. Cell tooltips show
-full current, baseline and difference values. Copy also retains full precision.
+Long curves use a vertical breakpoint/value list beside a 2D graph. Only the
+value column is editable. Click a graph point to select its list value; selecting
+a list value also brings the point into view. Use the wheel to zoom and
+Shift+drag to pan. The first and last points remain reachable in a 129-point curve.
 
-Values are quantized to their actual storage resolution. Nonfinite values and
-values outside encodable storage are rejected. Existing invalid values display
-as Invalid. Storage bounds are not a recommendation for safe engine operation.
-If two controls share storage, editing one updates every view of those bytes.
+Copy includes both columns at full precision. Paste accepts a value column,
+matching breakpoint/value rows, or one horizontal row of three or more values.
+Supplied breakpoints must match, and the whole paste must fit. Interpolate uses
+the physical X-axis values between the first and last selected points.
 
-## Compare and save
+## Work on a selection
 
-Choose Original ROM, Last save or a separately loaded same-calibration Comparison
-ROM. Orange cell borders and browser dots show differences from that baseline.
-Tooltips and the compact selection status show reference values and differences.
-Changed maps only filters the browser. **Edit → Reset selection to baseline**
-restores the selected cells from that baseline.
+| Operation | Result |
+| --- | --- |
+| Set | Replace selected values with the amount in the box. |
+| Add | Add the amount to each selected value. Use a negative amount to subtract. |
+| × | Multiply each selected value by the amount. For example, 1.1 applies 110%. |
+| Copy / Paste | Use tab-separated values without headers. Paste starts at the upper-left selected cell and must fit completely. |
+| Interpolate | Fill between selected endpoints using physical axis values: Horizontal along X, Vertical along Y, or 2D between four corners. |
+| Reset selection to baseline | Restore selected cells from the chosen comparison baseline. |
 
-**Save copy…** writes a new binary file, flushes and verifies its bytes, and refuses
-to overwrite an existing file or the original. Choose a new filename for every
-revision. Every save corrects the checksum and verifies it against the written
-bytes. There is no checksum opt-out. Checksum correction is recorded as an undoable operation if
-it changes bytes. The original ROM baseline never changes during the session.
+Undo/Redo restores complete operations and exact prior bytes. The latest 200
+operations are retained for the open ROM. Shared-storage controls update together.
 
-Ctrl+S saves a new copy. Ctrl+Z / Ctrl+Y undo/redo table operations when a text
-field is not being edited. Ctrl+C / Ctrl+V copy/paste the selected numeric cells.
+Cells display compact numbers. Double-click a cell to see its full stored value;
+accepting it unchanged preserves the original bytes. Copy and tooltips retain
+full precision. Entered values are quantized to the ROM's storage resolution.
+Nonfinite and out-of-storage-range values are rejected; existing invalid values
+display as **Invalid**. Storage limits do not establish a suitable tuning range.
 
-This version does not include axis editing, patch installation, graph dragging
-to change values, tune-project metadata, smoothing or log-to-map overlays.
-Those are separate follow-up features. Validate tuning decisions with suitable
-vehicle data; offline editor validation cannot verify engine behavior.
+## Compare revisions
 
-## Workbench layout
+Use **Edit → Compare ROM…** to load a comparison file with the same calibration.
+Choose **Original ROM**, **Last save** or **Comparison ROM** in the baseline
+selector. The single-value card has its own baseline selector.
 
-Choose **Editor** in the left navigation. Your open ROM, map tabs and edits stay
-in place when you switch to Logger, Recordings or another workspace.
+Orange cell borders and browser dots identify differences from that baseline.
+Cell tooltips and the selection status show current, baseline and difference
+values. **Changed maps only** filters the browser. **View → Changes** opens a
+list of changed maps; select an entry to jump to it. These are comparison views,
+not a record of the order in which edits were made.
 
-The ☰ button expands or collapses the app navigation. **Fit map** (Ctrl+0) hides
-the map browser and changed-maps drawer and shows the complete table. With
-navigation collapsed, a 16×16 map and both axes fit at 1024×700 and 1280×720
-logical window sizes without table scrollbars. Larger maps retain scrolling;
-the editor keeps readable cell sizes. Long curves keep their list/graph view.
+## Arrange the workspace
 
-**View** offers table above graph, table beside graph, table only and graph only.
-**Table with 3D preview** keeps a small, rotatable surface at the upper-right of
-the grid. **Fit map** uses this view for 3D tables, preserving the grid's full
-height. The MAF layout keeps its value list on the left and curve on the right.
-The preview shares the graph's fit-view and pop-out controls. Docking the graph
-returns it to the preview; choose another View layout for a larger docked graph.
-Drag the divider to resize the panes. **Hide map browser** (Ctrl+B) gives the
-map more room; use the same command to restore it. Both the map browser and
-graph can pop into separate windows, with dock commands in **View**. Closing
-a floating window docks it again. Floating panels move between monitors.
+Open maps stay in tabs when you change maps or switch to Logger, Recordings or
+another workspace. Numbered maps are sorted naturally in the browser. Tabs
+scroll horizontally and keep the active map visible; use the mouse wheel over
+the tab strip to reach other tabs. Closing a tab with × keeps the ROM's edits.
 
-Click **Map info** beside the tabs, or press **F1**, for tuner help in a separate window that
-does not reduce the table's height. Value units and input axes are always shown
-at the top of that window. Descriptions explain whether values are targets,
-limits, multipliers or added/subtracted corrections, with sign and neutral-value
-examples where established. Unconfirmed physical units are identified explicitly.
-Expand **Storage details** for address, type and dimensions.
-The axis-label bands and breakpoint headers use a blue-gray background with
-bright separators; editable cells retain their value shading. The read-only
-breakpoint column in long MAF curves uses the same visual treatment.
-A continuous outline joins the axis bands and table. Dark scrollbars match the
-workspace and sit outside that outline.
-The status strip and cell tooltips provide selected-value comparisons.
+Use the app's **☰** button to collapse navigation to icons. **View → Hide map
+browser** (Ctrl+B) hides or restores the map list. Drag its edge to change its
+width, or pop it into a separate window.
 
-Navigation, browser visibility/width, curve-list width, table/graph view and
-split, Fit map sizing, and floating panel positions are saved in
-`data/editor-layout.json`. Off-screen saved windows reopen near the app.
+**Fit map** (Ctrl+0) restores automatic sizing and hides the browser, Changes
+drawer and map-information window. With navigation collapsed, a full 16×16 map,
+both axes and a compact preview fit at 1024×700 and 1280×720 logical window
+sizes. Larger maps scroll at readable cell sizes; long curves retain their
+list/graph layout. Windows display scaling affects the available logical size.
 
-**View → Changes** opens a list of maps that differ from the selected baseline. Select
-an entry to jump to that map. The original ROM and every existing saved copy
-remain protected; every new editor save corrects and verifies its checksum.
+| View option | Use it for |
+| --- | --- |
+| Table with 3D preview / Table with curve preview | A compact graph at the right while keeping the full table height. The label follows the selected map. |
+| Table above graph | A larger graph beneath the table, separated by a draggable horizontal divider. |
+| Table beside graph | Side-by-side panes with a draggable vertical divider. Long MAF curves use this layout. |
+| Table only / Graph only | Give the selected view the available space. |
+
+Drag the divider at the table's right edge to resize the preview. Its width is
+remembered across launches and graph docking. **Fit map** resets that custom
+width to automatic sizing. Small-map previews stay directly beside their grids.
+Graph options are disabled for controls without a curve or surface.
+
+Use the graph's **↗** button or **View → Pop out graph** for a larger floating
+view. **Dock graph** or closing the floating window returns it to the workspace.
+The map browser has equivalent pop-out/dock commands. Floating panels can move
+to another monitor. Navigation, browser visibility/width, curve-list width,
+preview width, view, split, Fit map sizing and floating-panel bounds are saved
+beside the EXE in `data/editor-layout.json`.
+
+### Read the graph
+
+Drag a 3D surface to rotate it in the direction of the mouse; use the wheel to
+zoom. The on-map rulers identify the column axis in blue, the row axis in green
+and value/height in amber. Labels and tick values stay aligned while rotating.
+Compact previews show fewer ticks than larger graphs.
+
+Click a curve point or surface vertex to select its table value. Graph dragging
+changes the view, not the ROM value. **Fit view** restores the camera; compact
+previews use a **↺** button with the same function. Fit view changes the camera;
+Fit map changes the workspace layout.
+
+## Understand the active map
+
+Click **Map info**, press F1, or choose **View → Map information…**. The same
+window comes forward and follows the active tab without reducing table height.
+It is unavailable until a map is selected.
+
+Value units and input axes appear above the tuning explanation. Descriptions
+distinguish targets, limits, multipliers and signed corrections, with examples
+where established. Unconfirmed physical units are identified explicitly. Expand
+**Storage details** for the address, type and dimensions. Imported definitions
+supply their own descriptions and units. See [map-help conventions](TUNING_HELP.md)
+for examples of interpreting corrections and coefficients.
+
+## Save a revision
+
+**Save copy…** writes a new binary, flushes it and verifies its bytes. It refuses
+to overwrite the original or any existing file. Pick a new filename for every
+revision. Every export corrects and verifies the checksum; there is no opt-out.
+Checksum correction is undoable if it changes bytes. The Original ROM baseline
+always remains the image first opened in this session.
+
+Use a descriptive filename and keep the current ECU backup separately. Closing
+SpeedLink with unsaved edits prompts before discarding them. There is no saved
+tune-project format or recovery of unsaved work in this version.
+
+## Keyboard shortcuts
+
+| Shortcut | Action |
+| --- | --- |
+| Ctrl+O | Open ROM. |
+| Ctrl+S | Save a new copy. |
+| Ctrl+0 | Fit map. |
+| Ctrl+B | Hide/restore the map browser. |
+| F1 | Open/restore help for the active map. |
+| Ctrl+Z / Ctrl+Y | Undo/Redo ROM operations when a text field is not being edited. |
+| Ctrl+C / Ctrl+V | Copy/paste selected table values; in a focused text field, edit its text. |
+| Enter / Escape in a single-value field | Apply / cancel typing. |
+
+Layout shortcuts apply when you are not typing in a text field.
+
+## Compatible files and definition updates
+
+Supported stock layouts: **L33XEH000, L35HEH000, L38KEH000, L39SED000,
+L39SEE000, L39SEF000 and L3M7EF000**. Opening requires a complete 1 MiB image
+with matching calibration, boot, checksum layout and program-area signature.
+The program check allows defined tuning controls and checksum changes while
+rejecting other program changes. Patched/extended layouts are unsupported.
+Recognizing a calibration does not prove factory provenance or vehicle fit.
+Unknown images can still be dumped with the reader and inspected in ROM checks.
+
+Use **Definitions → Import…** to install an editor XML update for a supported
+layout. Save open work before reopening the ROM to use it; importing does not
+change existing edits or their definition. [Definition import](DEFINITIONS.md)
+explains supported files and restoring a bundled copy.
+
+Axis editing, patch installation, smoothing, tune-project history and log-to-map
+overlays are not included. Offline checks do not validate engine behavior.
+
+[Editor screenshots](editor/README.md) · [Documentation index](README.md)

@@ -13,6 +13,9 @@ all seven profiles, including sustained requests, fault handling, desktop
 recording and USB interruption/reconnect checks. These tests use simulated ECU
 replies through real adapters. See the [validation results](../dotnet/docs/Validation.md).
 
+Choose **Help**, then select **Logger** for this guide inside the app. Choose Logger or
+Recordings in the left navigation; **☰** expands the workspace names.
+
 ## Before you start
 
 Download **SpeedLink.exe** from [Releases](https://github.com/mrphyslaw/SpeedLink/releases)
@@ -28,7 +31,7 @@ and reconnect before logging. Use the verified `rom.bin` from that backup.
 
 ## Start logging
 
-1. Connect your vLinker FS or Tactrix and select **Connect & identify**.
+1. In **Connection**, select your adapter and choose **Connect & identify**.
 2. Open **Logger**, then **Load current ECU ROM…**. Select a full backup of the
    image currently installed in the ECU. SpeedLink selects its profile and reads its MAP calibration.
 3. Select parameters and display units. **Essentials** is a tuning preset;
@@ -101,7 +104,7 @@ parameter's status and remaining checks.
 
 ## View a saved recording
 
-Select **Recordings**, then **Open recording…** and choose a SpeedLink
+Choose **Recordings** in the left navigation, then **Open recording…** and choose a SpeedLink
 `log.csv`. This works without an adapter. Select up to six parameters for plots
 with a shared time axis. Move the cursor slider or click a plot to inspect the
 latest preceding observation; use Zoom to narrow the displayed time range.

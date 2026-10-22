@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.4-alpha.10 — updated user guides
+
+- Reorganize the editor guide around first edits, single values, small tables,
+  long MAF curves, selections, comparisons, layout and checksum-verified exports.
+- Explain preview resizing, Fit map versus Fit view, Map info and shortcuts.
+- Align the included Getting started and Logger help with workspace navigation.
+- Refresh the documentation index, editor overview, About text and release status.
+- Retain the existing editor, definitions and ECU-access behavior.
+
 ## v0.5.4-alpha.9 — single values and resizable previews
 
 - Replace the one-cell grid with a dedicated value editor: units, explanation,

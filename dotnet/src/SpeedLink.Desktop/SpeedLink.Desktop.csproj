@@ -15,7 +15,7 @@
     <ProjectReference Include="../SpeedLink.Core/SpeedLink.Core.csproj" />
     <ProjectReference Include="../SpeedLink.Serial/SpeedLink.Serial.csproj" />
     <ProjectReference Include="../SpeedLink.J2534/SpeedLink.J2534.csproj" />
-    <EmbeddedResource Include="../../README.md" LogicalName="SpeedLink.Help.md" />
+    <EmbeddedResource Include="../../../docs/USAGE.md" LogicalName="SpeedLink.Help.md" />
     <EmbeddedResource Include="../../../LICENSE" LogicalName="SpeedLink.LICENSE" />
     <EmbeddedResource Include="../../../docs/ABOUT.txt" LogicalName="SpeedLink.About.txt" />
     <EmbeddedResource Include="../../../docs/SUPPORTED_ROMS.md" LogicalName="SpeedLink.Profiles.md" />
