@@ -15,14 +15,15 @@ are not bundled. Real Mazda ECU validation remains pending.
 
 ### ROM editor
 
-[![SpeedLink editor displaying a complete 16×16 synthetic map](docs/editor/images/fit-map.png)](docs/editor/README.md)
+[![SpeedLink alpha.6 editor showing an intake cam advance table with labeled axes and a compact 3D preview](docs/editor/images/workspace-alpha6.png)](docs/editor/README.md)
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
 Axis headers have a distinct background and bright separators. Map information
 shows units, correction direction and practical examples without opening storage details.
-The layout and MAF examples use synthetic values; the VVT surface shows an
-L38KEH000 ROM example. Screenshots are not tuning recommendations.
+The preview shows the released v0.5.4-alpha.6 app with an L38KEH000 VVT map.
+The gallery's layout and MAF examples use synthetic values. Screenshots are not
+tuning recommendations.
 
 ### Logging and recordings
 
