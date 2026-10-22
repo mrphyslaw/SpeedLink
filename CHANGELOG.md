@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.5.4-alpha.9 — single values and resizable previews
+
+- Replace the one-cell grid with a dedicated value editor: units, explanation,
+  baseline and change together, with Apply/Enter, Cancel/Escape, reset and Undo/Redo.
+- Preserve full stored precision, reject invalid or unencodable values inline,
+  retain invalid drafts, and commit valid drafts before saving or switching maps.
+- Use the same focused layout for single-state selectors. Size small grids and
+  multi-state controls to their contents, and improve short-curve preview labels.
+- Make the right-hand table/preview divider draggable. Remember its width across
+  launches and docking; Fit map restores the automatic compact preview.
+- Retain complete 16×16 fitting, long MAF editing and mandatory checksum correction.
+- Update the editor guide and screenshots. Definitions and ECU access are unchanged.
+
 ## v0.5.3-alpha.1 — table preview
 
 - Keep a compact 3D preview at the upper-right of the map grid, using the same

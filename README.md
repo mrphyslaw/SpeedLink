@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.4-alpha.8](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.8)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.4-alpha.9](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.9)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -15,13 +15,17 @@ are not bundled. Real Mazda ECU validation remains pending.
 
 ### ROM editor
 
-[![SpeedLink alpha.8 editor showing an intake cam advance table with labeled axes and a compact 3D preview](docs/editor/images/workspace-alpha8.png)](docs/editor/README.md)
+[![SpeedLink alpha.9 editor showing an intake cam advance table with labeled axes and a compact 3D preview](docs/editor/images/workspace-alpha9.png)](docs/editor/README.md)
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
 Axis headers have a distinct background and bright separators. **Map info**
 beside the tabs, or **F1**, shows units, correction direction and practical examples.
-The preview shows the released v0.5.4-alpha.8 app with an L38KEH000 VVT map.
+The preview shows the released v0.5.4-alpha.9 app with an L38KEH000 VVT map.
+
+Single values have a focused editor with units, help and baseline comparison.
+Small maps stay proportional to their contents, and the table/preview divider
+can be dragged to resize it. See the [editor guide and screenshots](docs/editor/README.md).
 The gallery's layout and MAF examples use synthetic values. Screenshots are not
 tuning recommendations.
 

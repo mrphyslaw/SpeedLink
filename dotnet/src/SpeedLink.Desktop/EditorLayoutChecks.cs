@@ -43,6 +43,7 @@ public partial class EditorWorkspace
             measurements.Add(new { windowWidth = size.Item1, windowHeight = size.Item2, actualWindowWidth = Window.GetWindow(this).ActualWidth, actualWindowHeight = Window.GetWindow(this).ActualHeight, gridWidth = MapGrid.ActualWidth, gridHeight = MapGrid.ActualHeight, rowHeight = MapGrid.RowHeight,
                 columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, lastCellVisible = true, previewWidth = GraphPanel.ActualWidth, previewHeight = GraphPanel.ActualHeight });
         }
+        await CheckPreviewSplitter(folder, resize);
         await CheckTableAxes(sample);
         Graph.CheckSurfaceDrag();
         Graph.CheckSurfaceAxes();
@@ -115,14 +116,14 @@ public partial class EditorWorkspace
         FocusButton.IsChecked = true; SetViewMode(2); browserWidth = 230; SaveLayout();
         var saved = EditorLayoutPreferences.Load(layoutPath!);
         if (!saved.BrowserHidden || saved.View != 2 || saved.BrowserWidth != 230) throw new InvalidOperationException("Layout did not persist.");
-        curveWidth = 325; PopBrowser_Click(this, new()); PopGraph_Click(this, new()); SaveLayout();
+        curveWidth = 325; previewWidth = 365; PopBrowser_Click(this, new()); PopGraph_Click(this, new()); SaveLayout();
         return new { passed = true, hardwareAccessed = false, synthetic = true, full16x16 = measurements, precisionPreserved = true, mapInfoUsesNoTableSpace = true,
-            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, compactPreview = true, axisFrameJoined = true, axisLabelsAligned = true, axisTitlesFrozen = true, selectedHeadersHighlighted = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
+            popoutsPreserveEdits = true, previewResizeBothDirections = true, previewWidthPersisted = true, fitMapResetsPreview = true, surfaceFitsWideAndTallPanes = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, compactPreview = true, axisFrameJoined = true, axisLabelsAligned = true, axisTitlesFrozen = true, selectedHeadersHighlighted = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
             mafBulkEditsAndClipboard = true, checksumVerified = true, layoutPersisted = true };
     }
     internal void CheckRestoredLayout()
     {
-        if (browserWindow is null || graphWindow is null || !browserWindow.IsVisible || !graphWindow.IsVisible || browserWidth != 230 || curveWidth != 325 || !fitTable)
+        if (browserWindow is null || graphWindow is null || !browserWindow.IsVisible || !graphWindow.IsVisible || browserWidth != 230 || curveWidth != 325 || previewWidth != 365 || !fitTable)
             throw new InvalidOperationException("Saved popout layout did not restore in a fresh workspace.");
     }
     private static IEnumerable<DependencyObject> Descendants(DependencyObject root)

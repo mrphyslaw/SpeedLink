@@ -11,6 +11,7 @@ public sealed record EditorLayoutPreferences
     public bool GraphFloating { get; init; }
     public double BrowserWidth { get; init; } = 200;
     public double CurveWidth { get; init; } = 300;
+    public double? PreviewWidth { get; init; }
     public int View { get; init; } = 4;
     public double TableFraction { get; init; } = .6;
     public bool FitTable { get; init; }
@@ -24,6 +25,7 @@ public sealed record EditorLayoutPreferences
             double.IsFinite(p.Height) ? Math.Clamp(p.Height, 200, 1400) : fallback.Height);
         return this with { BrowserWidth = double.IsFinite(BrowserWidth) ? Math.Clamp(BrowserWidth, 160, 480) : 200,
             CurveWidth = double.IsFinite(CurveWidth) ? Math.Clamp(CurveWidth, 180, 600) : 300,
+            PreviewWidth = PreviewWidth is double preview && double.IsFinite(preview) ? Math.Clamp(preview, 160, 800) : null,
             View = Math.Clamp(View, 0, 4), TableFraction = double.IsFinite(TableFraction) ? Math.Clamp(TableFraction, .2, .8) : .6,
             BrowserBounds = Bounds(BrowserBounds, new()), GraphBounds = Bounds(GraphBounds, new(Width: 700, Height: 520)) };
     }
@@ -64,10 +66,25 @@ public readonly record struct TableFit(double ColumnWidth, double RowHeight, boo
 
 public readonly record struct TablePreviewSize(double Width, double Height)
 {
-    public static TablePreviewSize Calculate(double width, double height, int columns, double rowHeader = 64)
+    public static TablePreviewSize Calculate(double width, double height, int columns, double rowHeader = 64, double? requestedWidth = null)
     {
         if (columns < 1) throw new ArgumentOutOfRangeException(nameof(columns));
-        double previewWidth = Math.Clamp(width - (columns * 44 + rowHeader + 4) - 5, 160, 224);
-        return new(previewWidth, Math.Min(height, Math.Clamp(previewWidth * .8 + 28, 156, 208)));
+        double automatic = Math.Clamp(width - (columns * 44 + rowHeader + 4) - 7, 160, 224);
+        double previewWidth = requestedWidth is double requested && double.IsFinite(requested)
+            ? Math.Clamp(requested, 160, Math.Max(160, Math.Min(800, width - 207))) : automatic;
+        return new(previewWidth, Math.Max(0, Math.Min(height, Math.Clamp(previewWidth * .8 + 28, 156, requestedWidth is null ? 208 : 480))));
+    }
+}
+
+/// <summary>Keep small maps proportional to their data instead of filling an empty viewport.</summary>
+public readonly record struct CompactMapSize(double Width, double Height)
+{
+    public static CompactMapSize? Calculate(int columns, int rows, double rowHeader, double axisWidth, double axisHeight, bool choice = false)
+    {
+        if (columns < 1 || rows < 1) throw new ArgumentOutOfRangeException(nameof(columns));
+        if (columns * (long)rows == 1 || columns > 8 || rows > 8) return null;
+        double cell = columns <= 4 ? 112 : 88;
+        return new(axisWidth + rowHeader + (choice ? Math.Max(200, columns * cell) : columns * cell) + 4,
+            axisHeight + 26 + rows * 28 + 4);
     }
 }

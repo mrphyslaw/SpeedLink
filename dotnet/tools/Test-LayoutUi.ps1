@@ -17,6 +17,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
         throw "Layout UI failed: $calibration; see $report"
     }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
+    if ($result.workflow.acceptance.previewResizeBothDirections -ne $true -or $result.workflow.acceptance.previewWidthPersisted -ne $true -or $result.workflow.acceptance.fitMapResetsPreview -ne $true) { throw "Preview resizing failed: $calibration" }
     if ($result.passed -ne $true -or $result.hardwareAccessed -ne $false -or $result.workflow.freshWorkspaceRestored -ne $true -or $result.workflow.acceptance.mafBulkEditsAndClipboard -ne $true -or $result.workflow.acceptance.axisLabelsAligned -ne $true -or $result.workflow.acceptance.axisTitlesFrozen -ne $true -or $result.workflow.acceptance.selectedHeadersHighlighted -ne $true -or $result.workflow.acceptance.surfaceFollowsDrag -ne $true -or $result.workflow.acceptance.surfaceAxesFollowCamera -ne $true) { throw "Unexpected layout result: $calibration" }
     $reports += $result
 }

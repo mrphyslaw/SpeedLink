@@ -23,6 +23,7 @@ public sealed partial class TuningGraph : Grid
     private Point lastDrag;
     private GeometryModel3D? surface;
     private bool compactPreview;
+    private bool Surface => table is { Rows: > 1, Columns: > 1 };
     internal Rect SurfaceFrame { get; private set; }
     internal Size SurfaceViewport => viewport.RenderSize;
     internal int SelectedCell => selected;
@@ -38,7 +39,7 @@ public sealed partial class TuningGraph : Grid
         Background = Brushes.Transparent; ClipToBounds = true;
         Children.Add(viewport); Children.Add(curve); Children.Add(axes); viewport.Camera = camera;
         MouseLeftButtonDown += Down; MouseMove += Move; MouseLeftButtonUp += Up;
-        MouseWheel += (_, e) => { if (table?.Rows > 1) { distance = Math.Clamp(distance * (e.Delta > 0 ? .9 : 1.1), 2.6, 12); Camera(); } else curve.Zoom(e.GetPosition(curve).X, e.Delta > 0 ? .8 : 1.25); e.Handled = true; };
+        MouseWheel += (_, e) => { if (Surface) { distance = Math.Clamp(distance * (e.Delta > 0 ? .9 : 1.1), 2.6, 12); Camera(); } else curve.Zoom(e.GetPosition(curve).X, e.Delta > 0 ? .8 : 1.25); e.Handled = true; };
         LostMouseCapture += (_, _) => dragStart = null;
         SizeChanged += (_, _) => Camera();
         viewport.SizeChanged += (_, _) => Camera();
@@ -77,11 +78,11 @@ public sealed partial class TuningGraph : Grid
     private void Render()
     {
         viewport.Children.Clear(); surface = null; SurfaceFrame = Rect.Empty;
-        viewport.Visibility = axes.Visibility = table?.Rows > 1 ? Visibility.Visible : Visibility.Collapsed;
-        curve.Visibility = table?.Rows > 1 ? Visibility.Collapsed : Visibility.Visible;
+        viewport.Visibility = axes.Visibility = Surface ? Visibility.Visible : Visibility.Collapsed;
+        curve.Visibility = Surface ? Visibility.Collapsed : Visibility.Visible;
         curve.Table = table; curve.Values = values; curve.Selected = selected; curve.InvalidateVisual();
         axes.SetData(table, values, compactPreview);
-        if (table is null || table.Rows <= 1) return;
+        if (!Surface || table is null) return;
         var finite = values.Where(double.IsFinite).ToArray(); if (finite.Length == 0) return;
         double min = finite.Min(), max = finite.Max(), scale = Math.Max(1, Math.Max(Math.Abs(min), Math.Abs(max))), low = min / scale, span = max / scale - low;
         static double Coordinate(double value, double[] axis) { double min = axis.Min(), max = axis.Max(); return max == min ? 0 : (value - min) / (max - min) * 2 - 1; }
@@ -129,10 +130,10 @@ public sealed partial class TuningGraph : Grid
     {
         if (dragStart is null || e.LeftButton != MouseButtonState.Pressed)
         {
-            if (table?.Rows == 1 && values.Length > 1) { int i = curve.Nearest(e.GetPosition(curve).X); if (i >= 0) ToolTip = $"{table.X.Name}: {table.X.Values[i]:G8}\n{values[i]:G10} {table.Units}"; }
+            if (!Surface && table is not null && values.Length > 1) { int i = curve.Nearest(e.GetPosition(curve).X); var axis = table.Columns == 1 ? table.Y : table.X; if (i >= 0) ToolTip = $"{axis.Name}: {axis.Values[i]:G8}\n{values[i]:G10} {table.Units}"; }
             return;
         }
-        if (table?.Rows <= 1)
+        if (!Surface)
         { var p = e.GetPosition(this); if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) curve.Pan(p.X - lastDrag.X); lastDrag = p; return; }
         var point = e.GetPosition(this); RotateSurface(point - lastDrag); lastDrag = point;
     }
@@ -148,7 +149,7 @@ public sealed partial class TuningGraph : Grid
         if (dragStart is not Point start || table is null) { ReleaseMouseCapture(); return; }
         var point = e.GetPosition(this); bool click = (point - start).Length < 4; ReleaseMouseCapture();
         if (!click) return;
-        if (table.Rows <= 1)
+        if (!Surface)
         {
             int index = curve.Nearest(point.X); if (index >= 0) CellPicked?.Invoke(index);
         }
@@ -185,14 +186,15 @@ internal sealed class CurvePlot : FrameworkElement
         double next = Math.Clamp(width * factor, .02, 1); Range(start + position * width - position * next, next);
     }
     public void Pan(double pixels) => Range(start - pixels / Math.Max(1, ActualWidth - 100) * (end - start), end - start);
+    private TuningAxis? Axis => Table is { Columns: 1, Rows: > 1 } ? Table.Y : Table?.X;
     private double Fraction(int i)
     {
         if (Table is null) return .5;
-        double min = Table.X.Values.Min(), max = Table.X.Values.Max(); return max == min ? .5 : (Table.X.Values[i] - min) / (max - min);
+        double min = Axis!.Values.Min(), max = Axis!.Values.Max(); return max == min ? .5 : (Axis!.Values[i] - min) / (max - min);
     }
     public void EnsureVisible(int index)
     {
-        if (Table is null || Table.Rows != 1 || index < 0 || index >= Table.X.Values.Length) return;
+        if (Table is null || Table.Columns > 1 && Table.Rows > 1 || index < 0 || index >= Axis!.Values.Length) return;
         double point = Fraction(index), width = end - start;
         if (point < start || point > end) Range(point - width / 2, width);
     }
@@ -232,8 +234,20 @@ internal sealed class CurvePlot : FrameworkElement
             dc.DrawEllipse(i == Selected ? Brushes.OrangeRed : pen.Brush, null, point, i == Selected ? 5 : 2.5, i == Selected ? 5 : 2.5);
         }
         dc.Pop();
-        double first = Table.X.Values.Min(), span = Table.X.Values.Max() - first;
-        for (int tick = 0; tick <= 4; tick++) Text((first + (start + (end - start) * tick / 4) * span).ToString("G5", CultureInfo.InvariantCulture), 60 + tick * Math.Max(1, ActualWidth - 110) / 4, ActualHeight - 32);
-        Text(Table.X.Name + "   ·   " + Table.Units, Math.Max(65, ActualWidth / 2 - 70), ActualHeight - 20);
+        double first = Axis!.Values.Min(), span = Axis!.Values.Max() - first;
+        int ticks = ActualWidth < 260 ? 1 : ActualWidth < 360 ? 2 : 4;
+        for (int tick = 0; tick <= ticks; tick++)
+        {
+            string label = (first + (start + (end - start) * tick / ticks) * span).ToString("G4", CultureInfo.InvariantCulture);
+            Text(label, Math.Clamp(65 + tick * Math.Max(1, ActualWidth - 100) / ticks - label.Length * 2.8, 0, Math.Max(0, ActualWidth - label.Length * 6)), ActualHeight - 32);
+        }
+        void Caption(string label, Point position, double width)
+        {
+            var text = new FormattedText(label, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Segoe UI"), 10, UiTheme.Muted, VisualTreeHelper.GetDpi(this).PixelsPerDip)
+                { MaxTextWidth = Math.Max(1, width), MaxLineCount = 1, Trimming = TextTrimming.CharacterEllipsis };
+            dc.DrawText(text, position);
+        }
+        Caption(Axis!.Name, new(60, ActualHeight - 17), ActualWidth - 65);
+        Caption(Table.Units, new(2, ActualHeight - 17), 55);
     }
 }

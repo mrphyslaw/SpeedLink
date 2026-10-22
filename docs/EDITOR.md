@@ -20,11 +20,28 @@ does not establish a file's factory provenance or vehicle compatibility.
 
 Expand a category or search by map name, description or category. Numbered maps
 are sorted naturally. Each selected map opens in a tab; use × to close its tab.
+The tab strip scrolls horizontally and brings the active map into view. Use the
+mouse wheel over the strip to reach other open maps.
 Use **Map info** beside the map tabs, or press **F1**, for help with the active map.
 The map-information window explains the control in tuner terms. Static axes are display
 metadata and cannot be edited. No extended-table patch is installed by this editor.
 
 ## Edit and view
+
+Single-value maps, such as rev limits, use a dedicated value editor. Units sit
+beside the field, with help, the selected baseline and the change in the same
+panel. Type a value and choose **Apply value** or press Enter. Escape or **Cancel**
+discards typing. **Reset to baseline** restores the comparison value. Applied
+changes use the normal Undo/Redo history. Focusing the field exposes full stored
+precision; accepting it unchanged preserves its bytes. Invalid input stays
+visible and blocks saving or leaving the map until corrected or canceled. A
+valid pending value is applied when saving or switching maps. Single-state
+controls use a named selector in the same panel.
+
+Small tables stay proportional to their contents. Short curves have a readable
+preview; small multi-state controls omit the unused graph. Drag the divider at
+the table's right edge to resize the preview. Its width is remembered across
+launches and docking; **Fit map** restores the automatic compact preview.
 
 Column-axis names sit directly above their breakpoints; row-axis names run
 beside the row breakpoints. Labels stay visible when the table scrolls. Selected

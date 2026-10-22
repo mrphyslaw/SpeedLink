@@ -59,7 +59,7 @@ public partial class EditorWorkspace : UserControl
         catch (Exception error) when (error is IOException or ArgumentException or InvalidOperationException or System.Xml.XmlException or FormatException or OverflowException)
         { EditorStatus.Text = error.Message; MessageBox.Show(Window.GetWindow(this), error.Message, "SpeedLink ROM editor", MessageBoxButton.OK, MessageBoxImage.Information); }
     }
-    private bool FinishEdit() => MapGrid.CommitEdit(DataGridEditingUnit.Row, true);
+    private bool FinishEdit() => CommitScalar() && MapGrid.CommitEdit(DataGridEditingUnit.Row, true);
     private bool MayReplace() => document?.IsDirty != true || MessageBox.Show(Window.GetWindow(this), "Discard unsaved changes? Saved copies and the original ROM are kept.", "Unsaved ROM edits", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
     private void Open_Click(object sender, RoutedEventArgs e)
     {
@@ -119,6 +119,14 @@ public partial class EditorWorkspace : UserControl
     private void Filter_Changed(object sender, RoutedEventArgs e) => RefreshBrowser();
     private void Baseline_Changed(object sender, SelectionChangedEventArgs e)
     {
+        if (revertingBaseline) return;
+        if (scalarDraft && !CommitScalar())
+        {
+            revertingBaseline = true;
+            if (e.RemovedItems.Count > 0) BaselineBox.SelectedItem = e.RemovedItems[0];
+            revertingBaseline = false;
+            return;
+        }
         if (BaselineBox.SelectedIndex == 2 && document?.HasComparison != true) { BaselineBox.SelectedIndex = 0; if (EditorStatus is not null) EditorStatus.Text = "Load a comparison ROM first."; return; }
         if (MapTree is not null) { RefreshBrowser(); RefreshTable(); RefreshChanges(); }
     }
@@ -140,16 +148,29 @@ public partial class EditorWorkspace : UserControl
     }
     private void Tab_Changed(object sender, SelectionChangedEventArgs e)
     {
-        if (!ReferenceEquals(e.Source, MapTabs)) return;
+        if (!ReferenceEquals(e.Source, MapTabs) || revertingTab) return;
+        if (!FinishEdit())
+        {
+            revertingTab = true;
+            MapTabs.SelectedItem = MapTabs.Items.OfType<TabItem>().FirstOrDefault(t => ReferenceEquals(t.Tag, table));
+            revertingTab = false; return;
+        }
         refreshing = true; MapGrid.SelectedCells.Clear(); refreshing = false;
         bool wasCurve = CurveList;
         table = (MapTabs.SelectedItem as TabItem)?.Tag as TuningTable;
         if (CurveList && !wasCurve) SetViewMode(1);
         else if (wasCurve && !CurveList) SetViewMode(table?.Rows > 1 ? 4 : 0);
         RefreshTable(); RefreshControls(); ApplyView();
+        Dispatcher.BeginInvoke(new Action(() => { if (MapTabs.SelectedItem is TabItem active) { active.UpdateLayout(); active.BringIntoView(); } }));
+    }
+    private void MapTabs_Wheel(object sender, MouseWheelEventArgs e)
+    {
+        var scroll = Descendants(MapTabs).OfType<ScrollViewer>().FirstOrDefault();
+        if (scroll is null || scroll.ScrollableWidth <= 0) return;
+        scroll.ScrollToHorizontalOffset(scroll.HorizontalOffset - e.Delta); e.Handled = true;
     }
     private int NativeIndex(EditorRow row, int column) => CurveList ? row.Index : row.Index * table!.Columns + column;
-    private int[] SelectedIndices() => table is null ? [] : MapGrid.SelectedCells.Where(c => c.Item is EditorRow && c.Column.DisplayIndex >= 0).Select(c => NativeIndex((EditorRow)c.Item, c.Column.DisplayIndex)).Distinct().Order().ToArray();
+    private int[] SelectedIndices() => table is null ? [] : ScalarMap ? [0] : MapGrid.SelectedCells.Where(c => c.Item is EditorRow && c.Column.DisplayIndex >= 0).Select(c => NativeIndex((EditorRow)c.Item, c.Column.DisplayIndex)).Distinct().Order().ToArray();
     private void RefreshTable()
     {
         if (MapGrid is null || refreshing) return;
@@ -206,7 +227,7 @@ public partial class EditorWorkspace : UserControl
             GraphTitle.Text = table.IsChoice ? "Choose a row, then a named state" : table.Rows > 1 ? "3D · drag to rotate · wheel to zoom" : table.Columns > 1 ? "Curve · wheel to zoom · Shift+drag to pan · click a point" : "Scalar";
             UpdateCellText();
         }
-        finally { refreshing = false; UpdateTableSizing(); }
+        finally { refreshing = false; RefreshScalar(); UpdateCompactMap(); UpdateTableSizing(); }
     }
     private void Grid_LoadingRow(object? sender, DataGridRowEventArgs e)
     {
@@ -290,9 +311,9 @@ public partial class EditorWorkspace : UserControl
     {
         if (document is null || table is null) return; Attempt(() => { var r = Rectangle(); document.Interpolate(table, r.Left, r.Top, r.Right, r.Bottom, CurveList ? "Horizontal" : ((ComboBoxItem)InterpolationBox.SelectedItem).Content.ToString()!); });
     }
-    private void Reset_Click(object sender, RoutedEventArgs e) { if (document is not null && table is not null) Attempt(() => document.Reset(table, SelectedIndices(), Baseline)); }
-    private void Undo_Click(object sender, RoutedEventArgs e) { MapGrid.CancelEdit(); document?.Undo(); }
-    private void Redo_Click(object sender, RoutedEventArgs e) { MapGrid.CancelEdit(); document?.Redo(); }
+    private void Reset_Click(object sender, RoutedEventArgs e) { if (document is not null && table is not null) { RefreshScalar(); Attempt(() => document.Reset(table, SelectedIndices(), Baseline)); } }
+    private void Undo_Click(object sender, RoutedEventArgs e) { MapGrid.CancelEdit(); RefreshScalar(); document?.Undo(); }
+    private void Redo_Click(object sender, RoutedEventArgs e) { MapGrid.CancelEdit(); RefreshScalar(); document?.Redo(); }
     private void ResetView_Click(object sender, RoutedEventArgs e) => Graph.ResetView();
     private void Guide_Click(object sender, RoutedEventArgs e)
     {
@@ -326,10 +347,8 @@ public partial class EditorWorkspace : UserControl
         CheckNoMapHelp();
         var doc = document!; var scalar = doc.Definition.Tables.First(t => t.Kind == "1D" && t.Storage == "float");
         OpenTable(scalar); SelectCell(0); UpdateLayout();
-        if (MapGrid.Columns[0].IsReadOnly || !MapGrid.BeginEdit()) throw new InvalidOperationException("Numeric grid is not editable.");
-        UpdateLayout();
-        if (MapGrid.Columns[0].GetCellContent(MapGrid.Items[0]) is not TextBox entry) throw new InvalidOperationException("Numeric editing textbox missing.");
-        entry.Text = "8123";
+        if (!ScalarInput.IsVisible || TablePanel.IsVisible || GraphPanel.IsVisible) throw new InvalidOperationException("Single value editor is not active.");
+        ScalarInput.Text = "8123";
         if (!FinishEdit() || doc.Read(scalar, 0) != 8123) throw new InvalidOperationException("Direct cell commit did not edit ROM bytes.");
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         var dirtySnapshot = doc.Snapshot(); switchWorkspaces?.Invoke();
@@ -374,9 +393,10 @@ public partial class EditorWorkspace : UserControl
         PopGraph_Click(this, new()); graphWindow!.UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         CaptureWindow(graphWindow, Path.Combine(folder, "VvtSurface.png")); DockGraph_Click(this, new());
+        await CheckCompactEditors(folder);
         await CheckMapInformation(folder);
         await CheckStockScrolling(folder);
-        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, axisFrameJoined = true, mapInfoDirectAccess = true, mapInfoF1 = true, themedScrollbars = true, scrollbarInputAndEdges = true, scrollbarLayoutScales = new[] { 1d, 1.25 }, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
+        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, scalarEditor = true, compactMaps = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, axisFrameJoined = true, mapInfoDirectAccess = true, mapInfoF1 = true, themedScrollbars = true, scrollbarInputAndEdges = true, scrollbarLayoutScales = new[] { 1d, 1.25 }, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
     }
     private void Capture(string path) => CaptureElement(this, path);
     private static void CaptureElement(FrameworkElement element, string path)

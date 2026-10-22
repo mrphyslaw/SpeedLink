@@ -16,6 +16,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
     if (-not $process.WaitForExit(45000)) { $process.Kill(); throw "Workbench UI timed out: $calibration" }
     if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $report)) { throw "Workbench UI failed: $calibration; see $report" }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
+    if ($result.workflow.editor.scalarEditor -ne $true -or $result.workflow.editor.compactMaps -ne $true) { throw "Compact map editing failed: $calibration" }
     if ($result.passed -ne $true -or $result.synthetic -ne $true -or $result.hardwareAccessed -ne $false -or $result.workflow.navigationPreservesEdits -ne $true -or $result.workflow.minimumLayout -ne $true -or $result.workflow.editor.mapInformationShowsUnits -ne $true -or $result.workflow.editor.mapInfoDirectAccess -ne $true -or $result.workflow.editor.mapInfoF1 -ne $true -or $result.workflow.editor.axisFrameJoined -ne $true -or $result.workflow.editor.themedScrollbars -ne $true -or $result.workflow.editor.scrollbarInputAndEdges -ne $true) { throw "Unexpected workbench result: $calibration" }
     $reports += $result
 }
