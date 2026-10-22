@@ -1,5 +1,17 @@
 # C# validation
 
+## Scrollbars and table edges — 0.5.4-alpha.6
+
+- Dark scrollbar templates retain the standard track, arrow, page and thumb
+  interaction paths. Native editor checks exercise both scroll directions,
+  page commands and forward/reverse thumb drags on the stock ignition map.
+- Axis bands use the rendered scrollbar sizes and stop before their corners.
+  Checks reach the last row/column and verify the final value is unobscured.
+- The scrolling checks run at 100% and a 125% layout transform. This exercises
+  scaled layout; it is not a claim of physical multi-monitor DPI testing.
+- The seven-profile editor/layout/import checks retain full 16×16 fitting,
+  frozen axis labels, long MAF editing, unchanged ROM bytes and checksum repair.
+
 ## Map help and axis separation — 0.5.4-alpha.5
 
 - Reviewed 6,185 entries across the seven bundled profiles, including 300 distinct

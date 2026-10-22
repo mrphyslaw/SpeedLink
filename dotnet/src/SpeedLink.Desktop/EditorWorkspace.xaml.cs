@@ -367,7 +367,8 @@ public partial class EditorWorkspace : UserControl
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         CaptureWindow(graphWindow, Path.Combine(folder, "VvtSurface.png")); DockGraph_Click(this, new());
         await CheckMapInformation(folder);
-        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
+        await CheckStockScrolling(folder);
+        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, themedScrollbars = true, scrollbarInputAndEdges = true, scrollbarLayoutScales = new[] { 1d, 1.25 }, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
     }
     private void Capture(string path) => CaptureElement(this, path);
     private static void CaptureElement(FrameworkElement element, string path)
