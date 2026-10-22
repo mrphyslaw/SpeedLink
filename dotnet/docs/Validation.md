@@ -1,5 +1,18 @@
 # C# validation
 
+## Map-mounted 3D axes — 0.5.4-alpha.4
+
+- Blue column-axis, green row-axis and amber value-axis rulers are projected
+  from the map's 3D coordinates. Names, units and ticks come from the current
+  definition and values. The compact preview uses fewer tick labels.
+- Native projection checks compare all three directions with WPF at five
+  azimuths and three elevations, in compact and wide/tall floating views.
+- The existing 279 C# tests and seven-profile layout, Workbench and import
+  workflows remain required, including full 16×16 fitting, long MAF editing,
+  linked selection, precision, menu behavior and mandatory checksum exports.
+- The VVT example demonstrates the approved labeled surface. Its source ROM
+  remains unchanged. No new adapter or real-ECU validation is claimed.
+
 ## Surface dragging and experimental Mongoose — 0.5.4-alpha.3
 
 - Horizontal dragging now makes the visible surface follow the pointer.

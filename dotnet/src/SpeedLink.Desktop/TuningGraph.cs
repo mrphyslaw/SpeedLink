@@ -11,9 +11,9 @@ namespace SpeedLink.Desktop;
 /// <summary>Independent WPF curve/surface viewer. Graph gestures select cells; values are edited in the grid.</summary>
 public sealed partial class TuningGraph : Grid
 {
-    private readonly Viewport3D viewport = new() { Margin = new(4, 4, 4, 24) };
+    private readonly Viewport3D viewport = new() { Margin = new(4) };
     private readonly CurvePlot curve = new();
-    private readonly TextBlock legend = new() { Foreground = Brushes.White, Margin = new(8), IsHitTestVisible = false, VerticalAlignment = VerticalAlignment.Bottom, FontSize = 11 };
+    private readonly SurfaceAxes axes = new() { IsHitTestVisible = false, Margin = new(4) };
     private readonly OrthographicCamera camera = new() { UpDirection = new(0, 1, 0), NearPlaneDistance = .1, FarPlaneDistance = 200 };
     private TuningTable? table;
     private double[] values = [];
@@ -22,18 +22,21 @@ public sealed partial class TuningGraph : Grid
     private Point? dragStart;
     private Point lastDrag;
     private GeometryModel3D? surface;
+    private bool compactPreview;
     internal Rect SurfaceFrame { get; private set; }
     internal Size SurfaceViewport => viewport.RenderSize;
     internal int SelectedCell => selected;
     internal void SetCompactPreview(bool compact)
     {
-        legend.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
-        viewport.Margin = compact ? new(4) : new(4, 4, 4, 24);
+        compactPreview = compact;
+        axes.SetData(table, values, compact);
+        Camera();
     }
     public event Action<int>? CellPicked;
     public TuningGraph()
     {
-        Background = Brushes.Transparent; ClipToBounds = true; Children.Add(viewport); Children.Add(curve); Children.Add(legend); viewport.Camera = camera;
+        Background = Brushes.Transparent; ClipToBounds = true;
+        Children.Add(viewport); Children.Add(curve); Children.Add(axes); viewport.Camera = camera;
         MouseLeftButtonDown += Down; MouseMove += Move; MouseLeftButtonUp += Up;
         MouseWheel += (_, e) => { if (table?.Rows > 1) { distance = Math.Clamp(distance * (e.Delta > 0 ? .9 : 1.1), 2.6, 12); Camera(); } else curve.Zoom(e.GetPosition(curve).X, e.Delta > 0 ? .8 : 1.25); e.Handled = true; };
         LostMouseCapture += (_, _) => dragStart = null;
@@ -58,25 +61,29 @@ public sealed partial class TuningGraph : Grid
         var direction = new Vector3D(Math.Cos(el) * Math.Sin(az), Math.Sin(el), Math.Cos(el) * Math.Cos(az));
         var right = Vector3D.CrossProduct(-direction, new(0, 1, 0)); right.Normalize(); var up = Vector3D.CrossProduct(right, -direction); up.Normalize();
         var bounds = mesh.Bounds; var center = new Point3D(bounds.X + bounds.SizeX / 2, bounds.Y + bounds.SizeY / 2, bounds.Z + bounds.SizeZ / 2);
-        var projected = mesh.Positions.Select(p => new Point(Vector3D.DotProduct(p - center, right), Vector3D.DotProduct(p - center, up))).ToArray();
+        var frame = mesh.Positions.Concat(from x in new[] { -1d, 1d } from y in new[] { 0d, 1d } from z in new[] { -1d, 1d } select new Point3D(x, y, z));
+        var projected = frame.Select(p => new Point(Vector3D.DotProduct(p - center, right), Vector3D.DotProduct(p - center, up))).ToArray();
         double spanX = Math.Max(.01, projected.Max(p => p.X) - projected.Min(p => p.X)), spanY = Math.Max(.01, projected.Max(p => p.Y) - projected.Min(p => p.Y));
         center += right * ((projected.Max(p => p.X) + projected.Min(p => p.X)) / 2) + up * ((projected.Max(p => p.Y) + projected.Min(p => p.Y)) / 2);
-        double aspect = Math.Max(1, viewport.ActualWidth) / Math.Max(1, viewport.ActualHeight);
-        camera.Width = Math.Max(spanX, spanY * aspect) * 1.12 * distance / 5;
+        double width = Math.Max(1, viewport.ActualWidth), height = Math.Max(1, viewport.ActualHeight);
+        double padding = Math.Clamp(Math.Min(width, height) * .1, 8, 40);
+        double usableWidth = Math.Max(1, width - padding * 2), usableHeight = Math.Max(1, height - padding * 2);
+        camera.Width = Math.Max(spanX / usableWidth, spanY / usableHeight) * width * 1.04 * distance / 5;
         camera.Position = center + direction * 10; camera.LookDirection = -direction * 10;
+        axes.SetCamera(camera);
         double pixelScale = viewport.ActualWidth / camera.Width;
         SurfaceFrame = new((viewport.ActualWidth - spanX * pixelScale) / 2, (viewport.ActualHeight - spanY * pixelScale) / 2, spanX * pixelScale, spanY * pixelScale);
     }
     private void Render()
     {
-        viewport.Children.Clear(); viewport.Visibility = table?.Rows > 1 ? Visibility.Visible : Visibility.Collapsed;
+        viewport.Children.Clear(); surface = null; SurfaceFrame = Rect.Empty;
+        viewport.Visibility = axes.Visibility = table?.Rows > 1 ? Visibility.Visible : Visibility.Collapsed;
         curve.Visibility = table?.Rows > 1 ? Visibility.Collapsed : Visibility.Visible;
         curve.Table = table; curve.Values = values; curve.Selected = selected; curve.InvalidateVisual();
-        legend.Text = table is null ? "" : table.Rows > 1 ? $"X: {table.X.Name} [{table.X.Values[0]:G5} … {table.X.Values[^1]:G5}]   ·   Y: {table.Y.Name} [{table.Y.Values[0]:G5} … {table.Y.Values[^1]:G5}]   ·   Height: {table.Units}" : "";
+        axes.SetData(table, values, compactPreview);
         if (table is null || table.Rows <= 1) return;
         var finite = values.Where(double.IsFinite).ToArray(); if (finite.Length == 0) return;
         double min = finite.Min(), max = finite.Max(), scale = Math.Max(1, Math.Max(Math.Abs(min), Math.Abs(max))), low = min / scale, span = max / scale - low;
-        legend.Text += $" [{min:G5} … {max:G5}]";
         static double Coordinate(double value, double[] axis) { double min = axis.Min(), max = axis.Max(); return max == min ? 0 : (value - min) / (max - min) * 2 - 1; }
         var mesh = new MeshGeometry3D();
         for (int row = 0; row < table.Rows; row++) for (int col = 0; col < table.Columns; col++)

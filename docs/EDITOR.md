@@ -47,6 +47,11 @@ their directly labeled breakpoint/value columns.
   and use **Fit view** to restore the camera. Curves support wheel zoom and
   Shift+drag panning; selecting a list value brings that point into view.
 
+3D maps carry their axis lines, labels and tick values directly on the surface
+frame. Blue identifies the column axis, green the row axis, and amber the map's
+value/height axis. The rulers stay aligned while you rotate. The compact preview
+uses fewer tick labels; the floating graph shows more detail.
+
 Long curves, including the 129-point MAF calibrations, use a vertical breakpoint
 and value list alongside the graph. Only the value column is editable. Copy
 includes both columns at full precision; paste accepts a value column, matching
