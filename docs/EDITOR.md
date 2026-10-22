@@ -42,7 +42,8 @@ their directly labeled breakpoint/value columns.
 - Undo/Redo restore entire operations, including exact prior bytes. The latest
   200 operations are retained for the current open ROM.
 - Curves and surfaces reflect the current values. Click a curve point or surface
-  vertex to select its grid cell. Drag a surface to rotate, use the wheel to zoom,
+  vertex to select its grid cell. Drag a surface to rotate it with your mouse,
+  use the wheel to zoom,
   and use **Fit view** to restore the camera. Curves support wheel zoom and
   Shift+drag panning; selecting a list value brings that point into view.
 

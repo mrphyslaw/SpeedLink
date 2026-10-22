@@ -350,11 +350,12 @@ public partial class EditorWorkspace : UserControl
         var illustrated = doc.Definition.Tables.FirstOrDefault(t => t.Name == "Intake Cam Advance (VVT)") ?? surface;
         OpenTable(illustrated); FocusButton.IsChecked = true; DetailsButton.IsChecked = false; FitMap_Click(this, new()); SelectCell(illustrated.Columns + 2); UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
+        Graph.CheckSurfaceDrag();
         Capture(Path.Combine(folder, "SurfaceEditor.png"));
         PopGraph_Click(this, new()); graphWindow!.UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         CaptureWindow(graphWindow, Path.Combine(folder, "VvtSurface.png")); DockGraph_Click(this, new());
-        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
+        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
     }
     private void Capture(string path)
     {

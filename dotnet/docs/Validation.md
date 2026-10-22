@@ -1,5 +1,16 @@
 # C# validation
 
+## Surface drag direction — 0.5.4-alpha.3
+
+- Horizontal dragging now makes the visible surface follow the pointer.
+  Vertical tilt retains its existing direction and limits.
+- Seven layout workflows check the camera-facing reference geometry through
+  WPF's actual 3D projection. Left, right, up and down movement are checked in
+  the compact preview and in wide/tall floating graph windows, along with tilt
+  limits, reset, full 16×16 fitting and the existing MAF workflow.
+- Mongoose-Plus ISO/CAN3 is recorded as a testing candidate. Discovery and
+  transport behavior are unchanged; no Mongoose qualification is claimed.
+
 ## Editor menu fix — 0.5.4-alpha.2
 
 - File, Edit and View use explicit popup surfaces and item templates, independent

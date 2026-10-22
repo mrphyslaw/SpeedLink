@@ -44,7 +44,8 @@ MAF editor. Its controls and linked cell selection work the same way.
 
 ![An intake cam advance VVT surface showing its raised areas and transitions](images/surface-editor.png)
 
-Drag to rotate a surface and use the mouse wheel to zoom. Click a point on the
+Drag to rotate a surface in the direction of your mouse and use the wheel to zoom.
+The preview and floating graph use the same controls. Click a point on the
 graph to select its grid cell. Resizable panes let you give the grid or graph
 more room. **Fit view** frames the entire surface. Pop the graph into a separate
 window to use another monitor; closing that window restores the preview.
