@@ -38,6 +38,7 @@ public partial class EditorWorkspace
             if (scroll.ScrollableWidth > .5 || scroll.ScrollableHeight > .5 || lastRect.Right > MapGrid.ActualWidth + .5 || lastRect.Bottom > MapGrid.ActualHeight + .5 ||
                 MapGrid.FontSize < 12 || MapGrid.RowHeight < 22 || MapGrid.Columns.Any(c => c.ActualWidth < 44) || !XAxisText.IsVisible || !YAxisText.IsVisible || ViewMode != 4 || !GraphPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || GraphPanel.ActualHeight > 210 || GraphPanel.ActualWidth < 150)
                 throw new InvalidOperationException($"16×16 map does not fit at {size}: scroll {scroll.ScrollableWidth}/{scroll.ScrollableHeight}, grid {MapGrid.ActualWidth}/{MapGrid.ActualHeight}, last {lastRect}, columns {string.Join(',', MapGrid.Columns.Select(c => c.ActualWidth))}.");
+            CheckMapHelpPlacement();
             CaptureHost(Path.Combine(folder, $"Fit16x16-{size.Item1:0}x{size.Item2:0}.png"));
             measurements.Add(new { windowWidth = size.Item1, windowHeight = size.Item2, actualWindowWidth = Window.GetWindow(this).ActualWidth, actualWindowHeight = Window.GetWindow(this).ActualHeight, gridWidth = MapGrid.ActualWidth, gridHeight = MapGrid.ActualHeight, rowHeight = MapGrid.RowHeight,
                 columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, lastCellVisible = true, previewWidth = GraphPanel.ActualWidth, previewHeight = GraphPanel.ActualHeight });

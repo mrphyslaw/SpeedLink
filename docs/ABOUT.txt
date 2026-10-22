@@ -11,6 +11,7 @@ Labeled 3D axes and tick values sit directly on the map and follow rotation.
 Axis labels beside their breakpoints and linked row/column highlighting.
 Distinct axis header bands and borders separate inputs from editable values.
 Tuner-focused map help with visible units, arithmetic and correction examples.
+Map info beside the tabs and F1 open help for the active map.
 Import editor/logger definition updates and restore bundled copies.
 Every editor save corrects and verifies its checksum. Originals are preserved.
 A definition is not required to dump a ROM.

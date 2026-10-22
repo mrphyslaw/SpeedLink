@@ -1,5 +1,15 @@
 # C# validation
 
+## Direct map help — 0.5.4-alpha.7
+
+- A labeled Map info button shares the map-tab row. Native layout checks keep it
+  visible while retaining full 16×16 fitting at both supported compact sizes.
+- Editor checks open help through the button and a routed F1 key event, reopen
+  it after closing, and bring the same window back from its minimized state.
+- Help updates when changing maps and closes when no map is active. Both entry
+  points are disabled or ignored without a selected map. Viewing help preserves
+  ROM bytes and table height.
+
 ## Scrollbars and table edges — 0.5.4-alpha.6
 
 - Dark scrollbar templates retain the standard track, arrow, page and thumb

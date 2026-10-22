@@ -58,7 +58,10 @@ window to use another monitor; closing that window restores the preview.
 
 ![Map information in a separate window](images/details-editor.png)
 
-**View → Map information…** opens help without reducing the map's height.
+Click **Map info** beside the map tabs, or press **F1**, to open help without
+reducing the map's height. Reusing either control brings the same window forward;
+it follows the active map when you switch tabs. **View → Map information…**
+remains available too. Map info is disabled until a map is selected.
 Value units and input axes stay visible above the explanation. Help distinguishes
 targets and thresholds from multipliers and signed corrections, with simple
 examples. [Map-help conventions](../TUNING_HELP.md) explain the common units.
