@@ -87,7 +87,7 @@ public partial class EditorWorkspace
         ChangesPanel.Visibility = ChangesSplitter.Visibility = changes ? Visibility.Visible : Visibility.Collapsed;
         if (DetailsButton.IsChecked && infoWindow is null)
         {
-            var window = Floating("SpeedLink · Map information", 470, 270); infoWindow = window;
+            var window = Floating("SpeedLink · Map information", 540, 400); infoWindow = window;
             EditorLayout.Children.Remove(DetailsPanel); DetailsPanel.Visibility = Visibility.Visible; window.Content = DetailsPanel;
             window.Closed += (_, _) => { window.Content = null; EditorLayout.Children.Add(DetailsPanel); DetailsPanel.Visibility = Visibility.Collapsed; infoWindow = null; DetailsButton.IsChecked = false; };
             window.Show();
