@@ -9,7 +9,7 @@ Start with the workflow you need. ECU programming remains disabled.
 | --- | --- |
 | [Dump a ROM / request support](DUMP_A_ROM.md) | Guided adapter setup, two-pass reading, verification and ROM contribution |
 | [ROM editor overview](editor/README.md) | Screenshots, features and a short editing workflow |
-| [ROM editor operations](EDITOR.md) | Selections, arithmetic, clipboard, interpolation, comparison, undo and saving |
+| [ROM editor guide](EDITOR.md) | First edit, single values, small tables, MAF curves, layout, map help, comparison and saving |
 | [Map-help conventions](TUNING_HELP.md) | Units, sign conventions, multipliers, corrections and interpretation limits |
 | [Logger overview](logger/README.md) | Live-data and recorded-log screenshots, features and a quick start |
 | [Logger](LOGGER.md) | Adapter setup, ROM binding, parameters, units, charts, CSV recording and log viewing |
@@ -18,6 +18,10 @@ Start with the workflow you need. ECU programming remains disabled.
 | [Adapter status and testing candidates](ADAPTERS.md) | Qualified adapter paths, planned hardware and the test checklist |
 | [Definition import](DEFINITIONS.md) | Import editor/logger updates, persistence and bundled fallback |
 | [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all seven profiles |
+
+The app includes Getting started, Editor and Logger guides under **Help**.
+**File → Editor guide** opens the editing guide; **Map info** / F1 explains
+the selected map. Expand the app navigation with **☰** to see workspace names.
 
 ## Development and validation
 
