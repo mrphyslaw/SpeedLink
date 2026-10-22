@@ -26,6 +26,7 @@ public partial class EditorWorkspace
         XAxisBand.Visibility = x ? Visibility.Visible : Visibility.Collapsed;
         YAxisBand.Visibility = y ? Visibility.Visible : Visibility.Collapsed;
         AxisTitleRow.Height = new(x ? 21 : 0); AxisLabelColumn.Width = new(y ? 20 : 0);
+        AxisFrame.Visibility = x || y ? Visibility.Visible : Visibility.Collapsed;
         ValueUnitsText.Text = table is null ? "" : "Values: " + table.Units;
         ValueUnitsText.ToolTip = ValueUnitsText.Text;
         AutomationProperties.SetName(MapGrid, table is null ? "ROM map" :
@@ -65,6 +66,7 @@ public partial class EditorWorkspace
         AxisHeaderSpacer.Width = new(MapGrid.RowHeaderWidth);
         AxisScrollbarSpacer.Width = new(verticalBar);
         YAxisBand.Margin = new(0, 0, 0, horizontalBar);
+        AxisFrame.Margin = new(0, 0, verticalBar, horizontalBar);
         YAxisText.Margin = new(0, MapGrid.ColumnHeaderHeight, 0, 0);
     }
 }

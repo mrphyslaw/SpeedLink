@@ -32,6 +32,7 @@ public partial class EditorWorkspace
         MapGrid.RowHeight = 34; UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
         var scroll = Descendants(MapGrid).OfType<ScrollViewer>().First();
+        CheckAxisFrame();
         // DataGrid reports vertical extent in rows when content scrolling is on.
         if (scroll.ScrollableWidth < 100 || scroll.ScrollableHeight < .5)
             throw new InvalidOperationException($"Axis scrolling fixture did not overflow: {scroll.ScrollableWidth}/{scroll.ScrollableHeight}.");
@@ -51,5 +52,17 @@ public partial class EditorWorkspace
             throw new InvalidOperationException("Scrolled headers lost the current selection.");
         scroll.ScrollToLeftEnd(); scroll.ScrollToTop(); FitMap_Click(this, new()); UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        foreach (var (horizontal, vertical) in new[] { (false, false), (true, false), (false, true) })
+        {
+            double fitting = Math.Floor((MapGrid.ActualWidth - MapGrid.RowHeaderWidth - SystemParameters.VerticalScrollBarWidth - 2) / sample.Columns);
+            foreach (var column in MapGrid.Columns) column.Width = new(horizontal ? 100 : fitting);
+            MapGrid.RowHeight = vertical ? 40 : 22;
+            await Settle(); await Settle(); UpdateAxisGeometry(); UpdateLayout();
+            if ((scroll.ComputedHorizontalScrollBarVisibility == Visibility.Visible) != horizontal ||
+                (scroll.ComputedVerticalScrollBarVisibility == Visibility.Visible) != vertical)
+                throw new InvalidOperationException("Axis frame fixture did not reach the requested scrollbar combination.");
+            CheckAxisFrame();
+        }
+        FitMap_Click(this, new()); await Settle();
     }
 }

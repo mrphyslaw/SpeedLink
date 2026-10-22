@@ -376,7 +376,7 @@ public partial class EditorWorkspace : UserControl
         CaptureWindow(graphWindow, Path.Combine(folder, "VvtSurface.png")); DockGraph_Click(this, new());
         await CheckMapInformation(folder);
         await CheckStockScrolling(folder);
-        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, mapInfoDirectAccess = true, mapInfoF1 = true, themedScrollbars = true, scrollbarInputAndEdges = true, scrollbarLayoutScales = new[] { 1d, 1.25 }, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
+        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, axisFrameJoined = true, mapInfoDirectAccess = true, mapInfoF1 = true, themedScrollbars = true, scrollbarInputAndEdges = true, scrollbarLayoutScales = new[] { 1d, 1.25 }, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
     }
     private void Capture(string path) => CaptureElement(this, path);
     private static void CaptureElement(FrameworkElement element, string path)
