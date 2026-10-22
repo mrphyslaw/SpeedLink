@@ -59,13 +59,15 @@ public partial class EditorWorkspace
             if (((MenuItem)file.Items[1]).IsEnabled) throw new InvalidOperationException("Save is enabled without an open ROM.");
             var view = menus[2]; view.IsSubmenuOpen = true;
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-            GraphItem.Focus(); SendMenuKey(GraphItem, Key.Enter);
+            if (GraphItem.IsEnabled || BesideItem.IsEnabled || BelowItem.IsEnabled || PreviewItem.IsEnabled)
+                throw new InvalidOperationException("Graph commands are enabled without an active numeric map.");
+            TableItem.Focus(); SendMenuKey(TableItem, Key.Enter);
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-            if (ViewMode != 3 || !GraphItem.IsChecked || TablePanel.IsVisible || !GraphPanel.IsVisible)
+            if (ViewMode != 2 || !TableItem.IsChecked || !TablePanel.IsVisible || GraphPanel.IsVisible)
                 throw new InvalidOperationException("Keyboard menu activation did not run the selected action.");
             view.IsSubmenuOpen = true;
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-            GraphItem.Focus(); SendMenuKey(GraphItem, Key.Escape);
+            TableItem.Focus(); SendMenuKey(TableItem, Key.Escape);
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
             if (view.IsSubmenuOpen) throw new InvalidOperationException("Escape did not close the menu.");
             SetViewMode(4);

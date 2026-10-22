@@ -1,5 +1,21 @@
 # C# validation
 
+## Compact maps and preview resizing — 0.5.4-alpha.9
+
+- Native editor checks exercise the value field, units, explanation, full stored
+  precision, Enter/Escape, numeric validation, storage overflow, baseline reset
+  and byte-exact Undo/Redo. Valid drafts commit on map changes; invalid drafts
+  stay visible and block saving, map changes and baseline changes.
+- Single-state and multi-state controls retain named selections. Each bundled
+  small-map shape is checked at 1024/1280 logical window widths for proportional
+  bounds, readable rows, unclipped cells and the appropriate preview.
+- Native GridSplitter drag events exercise both directions with no snapback.
+  Checks cover persisted width, pop-out/docking, window resizing, Fit map reset
+  and restoration in a fresh workspace. Resizing preserves ROM bytes.
+- Existing full 16×16, long MAF, axis-frame, scrolling, help and checksum checks
+  remain required. Core tests cover preview bounds, preference compatibility
+  and natural small-map sizes. Definitions and ECU-access code are unchanged.
+
 ## Joined axis frame — 0.5.4-alpha.8
 
 - A single outline surrounds the axis bands and table viewport. The row- and

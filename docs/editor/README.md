@@ -20,7 +20,8 @@ scrolling. Selecting cells highlights their row and column headers.
 
 The 16×16 and MAF examples use synthetic layout/curve fixtures. The 16×16
 example is a layout test, not an added stock calibration map. VVT screenshots
-show an L38KEH000 ROM example. These are interface examples, not tuning advice.
+show an L38KEH000 ROM example, as do the single-value and small-map screenshots.
+These are interface examples, not tuning advice.
 
 ## Long MAF curves
 
@@ -33,6 +34,25 @@ reach its value, use the wheel to zoom, and Shift+drag to pan. Static breakpoint
 stay read-only. Arithmetic and interpolation work across selected points; copy
 and paste retain full precision. Axis names and units label the list's two columns.
 
+## Single values and small maps
+
+![A rev-limit value with RPM units, explanation and baseline together](images/single-value.png)
+
+Single-value maps use a numeric field with units beside it, an explanation above,
+and the comparison value and change below. Type a value and choose **Apply value**
+or press Enter. Escape or **Cancel** discards the typed value. **Reset to baseline**
+restores the chosen Original ROM, Last save or Comparison ROM value. Undo/Redo
+work on applied changes. The field exposes full stored precision when focused.
+Invalid or unencodable input stays visible and blocks saving or switching maps
+until corrected or canceled. A valid pending value is applied when saving or
+switching maps. Single-state maps use a named selector in the same layout.
+
+![A small fuel-control table with a compact surface preview](images/small-map.png)
+
+Small tables use a grid sized to their data, with clear axis bands and readable
+cells. Short curves get a curve preview with fewer ticks when space is limited.
+Multi-state controls retain their labeled rows without an empty graph.
+
 ## Rotatable 3D surfaces
 
 ![Intake cam advance table with a compact 3D preview at the upper-right](images/table-preview.png)
@@ -41,6 +61,11 @@ and paste retain full precision. Axis names and units label the list's two colum
 keeping the table's full height. **Fit map** retains this preview while a full
 16×16 grid fits at both tested sizes. The graph stays on the right, like the
 MAF editor. Its controls and linked cell selection work the same way.
+
+Drag the divider at the table's right edge to give the grid or preview more room.
+The width is remembered across launches and graph docking. **Fit map** resets it
+to the automatic compact preview so a full 16×16 grid can fit again. Short curves
+use the same divider, with a wider default preview for readable curve labels.
 
 ![An intake cam advance VVT surface showing its raised areas and transitions](images/surface-editor.png)
 
@@ -81,7 +106,8 @@ in place when switching to Logger or Recordings.
 ## First edit
 
 1. Open **Editor → File → Open ROM…**.
-2. Choose a map. Double-click a numeric cell, enter a value and press Enter.
+2. Choose a map. Edit a single-value field, or double-click a table cell, enter
+   a value and press Enter.
 3. Review the original/last-save/comparison values and the curve or surface.
    Use Undo/Redo to restore complete operations.
 4. Select **Save copy…**. Every save corrects and verifies the checksum, uses

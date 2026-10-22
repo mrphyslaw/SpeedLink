@@ -11,7 +11,7 @@ public sealed class EditorLayoutTests
         using var folder = new TempFolder(); string path = Path.Combine(folder.Path, "layout.json");
         Assert.Equal(new EditorLayoutPreferences(), EditorLayoutPreferences.Load(path));
         var expected = new EditorLayoutPreferences { NavigationCollapsed = false, BrowserFloating = true, GraphFloating = true, BrowserHidden = true,
-            BrowserWidth = 231, CurveWidth = 325, View = 1, TableFraction = .42, FitTable = true, GraphBounds = new(-800, 40, 900, 600) };
+            BrowserWidth = 231, CurveWidth = 325, PreviewWidth = 390, View = 1, TableFraction = .42, FitTable = true, GraphBounds = new(-800, 40, 900, 600) };
         expected.Save(path); Assert.Equal(expected, EditorLayoutPreferences.Load(path));
         (expected with { View = 2 }).Save(path); Assert.Equal(2, EditorLayoutPreferences.Load(path).View);
         Assert.Empty(Directory.EnumerateFiles(folder.Path, "*.partial"));
@@ -45,6 +45,35 @@ public sealed class EditorLayoutTests
         using var folder = new TempFolder(); string path = Path.Combine(folder.Path, "preview.json");
         new EditorLayoutPreferences { View = 4, FitTable = true }.Save(path);
         Assert.Equal(4, EditorLayoutPreferences.Load(path).View);
+    }
+    [Fact]
+    public void PreviewWidthIsBoundedWithoutLosingTheSavedPreference()
+    {
+        var wide = TablePreviewSize.Calculate(1100, 700, 16, requestedWidth: 440);
+        var narrow = TablePreviewSize.Calculate(550, 300, 16, requestedWidth: 440);
+        Assert.Equal(440, wide.Width); Assert.Equal(343, narrow.Width);
+        Assert.InRange(wide.Height, 156, 480); Assert.InRange(narrow.Height, 0, 300);
+        Assert.Null((new EditorLayoutPreferences { PreviewWidth = double.NaN }).Validate().PreviewWidth);
+        Assert.Equal(160, (new EditorLayoutPreferences { PreviewWidth = -20 }).Validate().PreviewWidth);
+        Assert.Equal(800, (new EditorLayoutPreferences { PreviewWidth = 1200 }).Validate().PreviewWidth);
+        using var folder = new TempFolder(); string path = Path.Combine(folder.Path, "layout.json");
+        new EditorLayoutPreferences { PreviewWidth = 440 }.Save(path);
+        Assert.Equal(440, EditorLayoutPreferences.Load(path).PreviewWidth);
+        File.WriteAllText(path, "{\"View\":4}"); Assert.Null(EditorLayoutPreferences.Load(path).PreviewWidth);
+    }
+    [Theory]
+    [InlineData(2, 1, 292, 79)]
+    [InlineData(1, 2, 180, 107)]
+    [InlineData(2, 2, 292, 107)]
+    [InlineData(4, 4, 516, 163)]
+    [InlineData(8, 1, 772, 79)]
+    public void SmallMapsUseTheirNaturalSize(int columns, int rows, double width, double height)
+    {
+        var size = CompactMapSize.Calculate(columns, rows, 64, 0, 21)!.Value;
+        Assert.Equal(width, size.Width); Assert.Equal(height, size.Height);
+        Assert.Null(CompactMapSize.Calculate(1, 1, 64, 0, 0));
+        Assert.Null(CompactMapSize.Calculate(16, 16, 64, 20, 21));
+        Assert.Null(CompactMapSize.Calculate(129, 1, 36, 0, 0));
     }
     public static IEnumerable<object[]> Profiles => Fixture.Profiles.Select(p => new object[] { p.Calibration });
     [Theory, MemberData(nameof(Profiles))]

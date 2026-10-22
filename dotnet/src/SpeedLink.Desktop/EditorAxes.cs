@@ -55,7 +55,11 @@ public partial class EditorWorkspace
     }
 
     private void Grid_ScrollChanged(object sender, ScrollChangedEventArgs e) => UpdateAxisGeometry();
-    private void Grid_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateAxisGeometry();
+    private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (resizingData) UpdateTableSizing();
+        UpdateAxisGeometry();
+    }
     private void UpdateAxisGeometry()
     {
         if (XAxisBand is null || MapGrid is null) return;
