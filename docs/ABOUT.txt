@@ -13,6 +13,7 @@ Every editor save corrects and verifies its checksum. Originals are preserved.
 A definition is not required to dump a ROM.
 
 Adapters: Vgate vLinker FS (USB), Tactrix Openport 2.0
+Experimental: Mongoose-Plus ISO/CAN3 reader/logger; hardware testing pending.
 Stock-ROM logger: seven defined Mazdaspeed/MPS ROMs, 35–38 parameters.
 Parameter selection, up to six synchronized charts, CSV and recorded-log viewer.
 ROM/offline checked; real-ECU logging validation pending.

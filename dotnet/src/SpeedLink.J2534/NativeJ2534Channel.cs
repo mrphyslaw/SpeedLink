@@ -4,7 +4,7 @@ using SpeedLink.Core;
 
 namespace SpeedLink.J2534;
 
-/// <summary>SAE J2534-1 v04.04 binding to the user's installed Openport driver.</summary>
+/// <summary>SAE J2534-1 v04.04 binding to a registered manufacturer driver.</summary>
 public sealed class NativeJ2534Channel : IJ2534Channel
 {
     [StructLayout(LayoutKind.Sequential)]
@@ -45,20 +45,25 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     public string? CleanupWarning { get; private set; }
     public long WriteRequests { get; private set; }
     public bool IsOpen => opened && !disposed;
+    public string AdapterName { get; }
+    public bool Experimental { get; }
 
-    public NativeJ2534Channel(TactrixDriver driver)
+    public NativeJ2534Channel(J2534Driver driver)
     {
         libraryPath = Path.GetFullPath(driver.LibraryPath);
         // Trust the registered installation, never a DLL supplied by a ROM or backup.
-        if (!TactrixDrivers.Discover().Any(item => item.LibraryPath.Equals(libraryPath, StringComparison.OrdinalIgnoreCase)))
-            throw new TransportException("The selected Tactrix driver is no longer registered. Refresh devices.");
+        var registered = J2534Drivers.Discover(driver.Kind).FirstOrDefault(item => item.LibraryPath.Equals(libraryPath, StringComparison.OrdinalIgnoreCase));
+        if (registered is null)
+            throw new TransportException("The selected J2534 driver is no longer registered for this adapter. Refresh devices.");
+        AdapterName = registered.AdapterName;
+        Experimental = registered.Experimental;
     }
 
     private T Bind<T>(string name, int bytes) where T : Delegate
     {
         if (!NativeLibrary.TryGetExport(module, name, out var address) &&
             !NativeLibrary.TryGetExport(module, $"_{name}@{bytes}", out address))
-            throw new TransportException("Tactrix driver export is missing: " + name);
+            throw new TransportException("J2534 driver export is missing: " + name);
         return Marshal.GetDelegateForFunctionPointer<T>(address);
     }
     private void Check(uint code, string action)
@@ -81,15 +86,15 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     {
         ObjectDisposedException.ThrowIf(disposed, this);
         if (!OperatingSystem.IsWindows() || IntPtr.Size != 4)
-            throw new TransportException("Use the 32-bit Windows SpeedLink build with the installed Tactrix driver.");
+            throw new TransportException("Use the 32-bit Windows SpeedLink build with the installed J2534 driver.");
         if (opened || module != 0)
-            throw new TransportException("The Tactrix channel is already open.");
+            throw new TransportException("The J2534 channel is already open.");
         try
         {
             // Restrict dependencies to the installation directory and Windows system.
             module = LoadLibraryExW(libraryPath, 0, 0x100 | 0x800);
             if (module == 0)
-                throw new TransportException($"Cannot load the installed Tactrix driver (Windows error {Marshal.GetLastWin32Error()}).");
+                throw new TransportException($"Cannot load the installed J2534 driver (Windows error {Marshal.GetLastWin32Error()}).");
             open = Bind<OpenFn>("PassThruOpen", 8);
             close = Bind<CloseFn>("PassThruClose", 4);
             connect = Bind<ConnectFn>("PassThruConnect", 20);
@@ -101,12 +106,12 @@ public sealed class NativeJ2534Channel : IJ2534Channel
             version = Bind<VersionFn>("PassThruReadVersion", 16);
             error = Bind<ErrorFn>("PassThruGetLastError", 4);
             ioctl = Bind<IoctlFn>("PassThruIoctl", 16);
-            Check(open(0, out device), "Open Tactrix");
+            Check(open(0, out device), "Open J2534");
             opened = true;
             var fw = new StringBuilder(256);
             var dll = new StringBuilder(256);
             var api = new StringBuilder(256);
-            Check(version(device, fw, dll, api), "Read Tactrix version");
+            Check(version(device, fw, dll, api), "Read J2534 version");
             return new(fw.ToString(), dll.ToString(), api.ToString());
         }
         catch { Dispose(); throw; }
@@ -116,7 +121,7 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     {
         ObjectDisposedException.ThrowIf(disposed, this);
         if (!opened || connected || bitrate != 500000 || requestId != 0x7E0 || responseId != 0x7E8)
-            throw new TransportException("Unsupported Tactrix connection configuration.");
+            throw new TransportException("Unsupported J2534 connection configuration.");
         Check(connect!(device, 6, 0, bitrate, out channel), "Connect CAN 500 kbit/s");
         connected = true;
         this.requestId = requestId;
@@ -130,7 +135,7 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     public void ClearReceive()
     {
         EnsureConnected();
-        Check(ioctl!(channel, 8, 0, 0), "Clear stale Tactrix receive messages");
+        Check(ioctl!(channel, 8, 0, 0), "Clear stale J2534 receive messages");
     }
     public void Write(byte[] request)
     {
@@ -141,7 +146,7 @@ public sealed class NativeJ2534Channel : IJ2534Channel
         WriteRequests++;
         Check(write!(channel, ref packet, ref count, 1000), "Send read-only diagnostic request");
         if (count != 1)
-            throw new TransportException("Tactrix did not accept exactly one request. No retry was attempted.");
+            throw new TransportException("J2534 did not accept exactly one request. No retry was attempted.");
     }
     public J2534Frame? Read(int timeoutMilliseconds)
     {
@@ -153,7 +158,7 @@ public sealed class NativeJ2534Channel : IJ2534Channel
         var status = read!(channel, ref packet, ref count, (uint)timeoutMilliseconds);
         if (status is 9 or 16)
             return null;
-        Check(status, "Receive Tactrix response");
+        Check(status, "Receive J2534 response");
         if (count == 0)
             return null;
         if (count != 1 || packet.ProtocolId != 6)
@@ -170,7 +175,7 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     {
         ObjectDisposedException.ThrowIf(disposed, this);
         if (!connected || !filtered)
-            throw new TransportException("The Tactrix channel is not ready.");
+            throw new TransportException("The J2534 channel is not ready.");
     }
     public void Dispose()
     {
@@ -181,11 +186,11 @@ public sealed class NativeJ2534Channel : IJ2534Channel
         try
         {
             if (filtered && stopFilter is not null && stopFilter(channel, filter) != 0)
-                warnings.Add("Tactrix filter cleanup failed.");
+                warnings.Add("J2534 filter cleanup failed.");
             if (connected && disconnect is not null && disconnect(channel) != 0)
-                warnings.Add("Tactrix disconnect failed.");
+                warnings.Add("J2534 disconnect failed.");
             if (opened && close is not null && close(device) != 0)
-                warnings.Add("Tactrix close failed.");
+                warnings.Add("J2534 close failed.");
         }
         finally
         {

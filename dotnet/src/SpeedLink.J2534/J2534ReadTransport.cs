@@ -9,6 +9,8 @@ public sealed record J2534Frame(uint Id, uint Status, byte[] Data);
 /// <summary>A single physical ISO 15765 channel; implementations must not retry requests.</summary>
 public interface IJ2534Channel : IDisposable
 {
+    string AdapterName => "J2534 adapter";
+    bool Experimental => false;
     J2534Version Open();
     void Connect(uint bitrate, uint requestId, uint responseId);
     void ClearReceive();
@@ -25,7 +27,7 @@ public sealed class J2534ReadTransport : IReadTransport
     private readonly TimeSpan pendingTimeout;
     private bool initialized, disposed, faulted;
     public string Mode => "hardware";
-    public string Adapter { get; private set; } = "Tactrix Openport 2.0";
+    public string Adapter { get; private set; }
     public int ReadChunkSize => 3968;
     public bool ReadAttempted { get; set; }
     public string? CloseWarning => channel.CleanupWarning;
@@ -33,6 +35,7 @@ public sealed class J2534ReadTransport : IReadTransport
     public J2534ReadTransport(IJ2534Channel channel, TimeSpan? responseTimeout = null, TimeSpan? pendingTimeout = null)
     {
         this.channel = channel;
+        Adapter = channel.AdapterName;
         this.responseTimeout = responseTimeout ?? TimeSpan.FromSeconds(10);
         this.pendingTimeout = pendingTimeout ?? TimeSpan.FromSeconds(30);
         if (this.responseTimeout <= TimeSpan.Zero || this.pendingTimeout < this.responseTimeout)
@@ -43,12 +46,14 @@ public sealed class J2534ReadTransport : IReadTransport
     {
         ObjectDisposedException.ThrowIf(disposed, this);
         if (initialized || faulted)
-            throw new TransportException("Reconnect the Tactrix before initializing again.");
+            throw new TransportException("Reconnect the J2534 adapter before initializing again.");
         try
         {
             var version = channel.Open();
+            if (channel.Experimental && !version.Api.StartsWith("04.04", StringComparison.Ordinal))
+                throw new TransportException("This experimental adapter requires a J2534-1 04.04 driver. No CAN connection was opened.");
             channel.Connect(500000, 0x7E0, 0x7E8);
-            Adapter = $"Tactrix Openport 2.0 · firmware {version.Firmware}";
+            Adapter = $"{channel.AdapterName} · firmware {version.Firmware} · driver {version.Driver} · API {version.Api}";
             initialized = true;
         }
         catch { faulted = true; Dispose(); throw; }
@@ -78,7 +83,7 @@ public sealed class J2534ReadTransport : IReadTransport
                 if ((frame.Status & 0x0B) != 0 || frame.Id != 0x7E8)
                     continue;
                 if ((frame.Status & 0x10) != 0)
-                    throw new TransportException("Tactrix reported invalid ISO-TP frame padding.");
+                    throw new TransportException("J2534 adapter reported invalid ISO-TP frame padding.");
                 if (frame.Data.Length is < 1 or > 4095)
                     throw new TransportException("Invalid J2534 response size.");
                 packets.Add(frame.Data);
@@ -92,7 +97,7 @@ public sealed class J2534ReadTransport : IReadTransport
                 }
                 return DiagnosticProtocol.FinalResponse(request, packets);
             }
-            throw new TransportException("Tactrix response timed out. No request was resent; reconnect before continuing.");
+            throw new TransportException("J2534 response timed out. No request was resent; reconnect before continuing.");
         }
         catch (NegativeResponseException) { throw; }
         catch { faulted = true; throw; }

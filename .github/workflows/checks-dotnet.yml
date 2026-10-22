@@ -51,7 +51,7 @@ jobs:
           $process = Start-Process -FilePath './publish/SpeedLink.exe' -ArgumentList @('--smoke-test', '--smoke-report', ('"' + $report + '"')) -WindowStyle Hidden -Wait -PassThru
           if ($process.ExitCode -ne 0) { throw 'Standalone startup failed.' }
           $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-          if ($result.passed -ne $true -or $result.simulatorAvailable -ne $false -or $result.liveProgrammingEnabled -ne $false) { throw 'Unexpected standalone smoke-test result.' }
+          if ($result.passed -ne $true -or $result.simulatorAvailable -ne $false -or $result.liveProgrammingEnabled -ne $false -or $result.mongooseSelectionVerified -ne $true) { throw 'Unexpected standalone smoke-test result.' }
       - name: Check standalone saved-log viewer
         run: |
           $report = Join-Path (Get-Location) 'TestResults/Standalone_Replay.json'

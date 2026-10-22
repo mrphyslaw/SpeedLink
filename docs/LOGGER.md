@@ -19,6 +19,8 @@ Download **SpeedLink.exe** from [Releases](https://github.com/mrphyslaw/SpeedLin
 and keep it in a writable folder. Install your adapter manufacturer's driver,
 select the adapter in SpeedLink, and select its COM port for vLinker FS. For
 Tactrix, choose its installed J2534 driver.
+Mongoose-Plus ISO/CAN3 uses the experimental adapter option and its registered
+J2534 driver. Hardware validation is pending; follow the [testing guide](ADAPTERS.md).
 
 Have a full backup of the ROM currently installed in the ECU ready. If you need
 to make one, use **Read & verify backup** with the engine stopped, then disconnect

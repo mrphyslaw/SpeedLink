@@ -108,7 +108,7 @@ try
             throw new ArgumentException("Explicit COM port is required.");
         if (Get("--adapter") == "tactrix")
         {
-            var drivers = TactrixDrivers.Discover();
+            var drivers = J2534Drivers.Discover();
             var matching = drivers.Where(item => Path.GetFileName(item.LibraryPath).Equals(Get("--driver-library", "op20pt32.dll"), StringComparison.OrdinalIgnoreCase)).ToArray();
             if (matching.Length != 1)
                 throw new InvalidOperationException("Select one registered bench driver with --driver-library.");

@@ -82,6 +82,9 @@ copies remain available. See [definition import](docs/DEFINITIONS.md).
 
 [Adapter status and testing candidates](docs/ADAPTERS.md) distinguishes available
 adapter paths from hardware awaiting qualification.
+**Mongoose-Plus ISO/CAN3** is available as an experimental J2534 reader/logger
+option for user testing; hardware validation is pending. See the guide for
+driver setup and reporting results.
 
 **First time, or contributing an unknown ROM?** Follow the
 [step-by-step ROM-dump workflow](docs/DUMP_A_ROM.md), then use the

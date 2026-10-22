@@ -19,6 +19,8 @@ You need a Windows PC and either:
 
 - **Vgate vLinker FS USB**, with its manufacturer's Windows driver installed.
 - **Tactrix Openport 2.0**, with the Tactrix Windows driver installed.
+- **Mongoose-Plus ISO/CAN3 (experimental)**, with its 32-bit J2534-1 04.04
+  manufacturer driver. Hardware validation is pending; see [testing instructions](ADAPTERS.md).
 
 Download **SpeedLink.exe** from Releases into a writable folder. You do not
 need an installer, a separate .NET installation, or a ROM definition.
@@ -37,6 +39,7 @@ Open SpeedLink and choose **Connection** in the left navigation.
 | --- | --- |
 | vLinker FS | **Vgate vLinker FS**, its COM port, and initial baud **115200** |
 | Openport 2.0 | **Tactrix Openport 2.0** and the installed Openport driver; no COM port or baud is needed |
+| Mongoose-Plus ISO/CAN3 | **Mongoose-Plus ISO/CAN3 (experimental)** and its registered 04.04 driver; no COM port or baud is needed |
 
 Select **Connect & identify**. Note the calibration ID and SpeedLink version.
 If identification fails, stop here and use the support form's **Need help**
