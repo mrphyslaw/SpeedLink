@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.4-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.4)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.4-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.5)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -19,6 +19,8 @@ are not bundled. Real Mazda ECU validation remains pending.
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
+Axis headers have a distinct background and bright separators. Map information
+shows units, correction direction and practical examples without opening storage details.
 The layout and MAF examples use synthetic values; the VVT surface shows an
 L38KEH000 ROM example. Screenshots are not tuning recommendations.
 
@@ -38,6 +40,7 @@ a vehicle test or measured ECU logging rates.
 | Dump an unknown ROM and help add support | [Guided ROM-dump workflow](docs/DUMP_A_ROM.md) |
 | Edit a ROM: map grid, 2D curves and 3D surfaces | [Editor overview and screenshots](docs/editor/README.md) |
 | Editing operations, comparison and saving | [Editor guide](docs/EDITOR.md) |
+| Understand map units, corrections and thresholds | [Map-help conventions](docs/TUNING_HELP.md) |
 | See the logger, record parameters and review logs | [Logger overview and screenshots](docs/logger/README.md) |
 | Logger setup, rates, units and troubleshooting | [Logger guide](docs/LOGGER.md) |
 | Check ROM/profile compatibility | [Supported ROMs](docs/SUPPORTED_ROMS.md) |

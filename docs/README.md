@@ -10,6 +10,7 @@ Start with the workflow you need. ECU programming remains disabled.
 | [Dump a ROM / request support](DUMP_A_ROM.md) | Guided adapter setup, two-pass reading, verification and ROM contribution |
 | [ROM editor overview](editor/README.md) | Screenshots, features and a short editing workflow |
 | [ROM editor operations](EDITOR.md) | Selections, arithmetic, clipboard, interpolation, comparison, undo and saving |
+| [Map-help conventions](TUNING_HELP.md) | Units, sign conventions, multipliers, corrections and interpretation limits |
 | [Logger overview](logger/README.md) | Live-data and recorded-log screenshots, features and a quick start |
 | [Logger](LOGGER.md) | Adapter setup, ROM binding, parameters, units, charts, CSV recording and log viewing |
 | [General usage](USAGE.md) | Reading, backups, transport settings and file inspection |

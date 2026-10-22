@@ -17,6 +17,11 @@ public partial class EditorWorkspace
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         var header = Descendants(MapGrid).OfType<DataGridColumnHeader>().Single(h => h.Column?.DisplayIndex == 4);
         var row = (DataGridRow)MapGrid.ItemContainerGenerator.ContainerFromIndex(5);
+        var rowHeader = Descendants(row).OfType<DataGridRowHeader>().Single();
+        if (header.BorderThickness.Bottom < 2 || rowHeader.BorderThickness.Right < 2 ||
+            header.BorderBrush is not SolidColorBrush axisLine || axisLine.Color != Color.FromRgb(137, 154, 168) ||
+            rowHeader.BorderBrush is not SolidColorBrush rowLine || rowLine.Color != axisLine.Color)
+            throw new InvalidOperationException("The axis headers lack a distinct separator from editable map cells.");
         if (!GetIsAxisSelected(header.Column) || !GetIsAxisSelected(row) || header.Background is not SolidColorBrush brush || brush.Color != Color.FromRgb(93, 70, 36))
             throw new InvalidOperationException("The selected cell's axis headers are not visibly highlighted.");
         MapGrid.SelectedCells.Clear();

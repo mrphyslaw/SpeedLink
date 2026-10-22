@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
  <SolidColorBrush x:Key="ShellBrush" Color="#191C1F"/><SolidColorBrush x:Key="PanelBrush" Color="#23272B"/><SolidColorBrush x:Key="RaisedBrush" Color="#2D3237"/>
  <SolidColorBrush x:Key="LineBrush" Color="#434A50"/><SolidColorBrush x:Key="TextBrush" Color="#EDF0F2"/><SolidColorBrush x:Key="MutedBrush" Color="#B2BBC2"/>
+ <SolidColorBrush x:Key="AxisBandBrush" Color="#303B45"/><SolidColorBrush x:Key="AxisBorderBrush" Color="#899AA8"/>
  <SolidColorBrush x:Key="AmberBrush" Color="#F2B65D"/><SolidColorBrush x:Key="AmberSoftBrush" Color="#493A25"/><SolidColorBrush x:Key="InkBrush" Color="#211C15"/>
  <SolidColorBrush x:Key="{x:Static SystemColors.MenuBrushKey}" Color="#23272B"/><SolidColorBrush x:Key="{x:Static SystemColors.MenuTextBrushKey}" Color="#EDF0F2"/>
  <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">

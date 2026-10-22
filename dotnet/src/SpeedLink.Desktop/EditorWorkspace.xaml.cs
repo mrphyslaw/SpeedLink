@@ -159,11 +159,14 @@ public partial class EditorWorkspace : UserControl
             if (document is null || table is null)
             {
                 MapTitle.Text = "Select a map"; RefreshAxes(); HelpText.Text = "Choose a map from the list.";
+                HelpUnitsText.Text = ""; HelpAxesText.Text = "";
                 StorageText.Text = ""; CellText.Text = ""; GraphTitle.Text = "2D curve / 3D surface"; Graph.SetData(null, [], -1); return;
             }
             MapTitle.Text = table.Name;
             InterpolationBox.Visibility = CurveList ? Visibility.Collapsed : Visibility.Visible;
             HelpText.Text = table.Description;
+            HelpUnitsText.Text = "Values: " + (string.IsNullOrWhiteSpace(table.Units) ? "Units not specified by this definition" : table.Units);
+            HelpAxesText.Text = string.Join("\n", new[] { table.Columns > 1 ? "Columns: " + table.X.Name : "", table.Rows > 1 ? "Rows: " + table.Y.Name : "" }.Where(s => s.Length > 0));
             StorageText.Text = $"{table.Units}\n{table.Columns} × {table.Rows} · {table.Storage} · {(table.BigEndian ? "big endian" : "little endian")}\nAddress 0x{table.Address:X}" + (table.Bit is int b ? $" · bit {b}" : "") + "\nStock definition · " + document.Definition.Version + "\nAxes: static display values";
             var values = Enumerable.Range(0, table.Count).Select(i => document.Read(table, i)).ToArray();
             var finite = values.Where(double.IsFinite).ToArray(); double min = finite.DefaultIfEmpty(0).Min(), max = finite.DefaultIfEmpty(1).Max();
@@ -175,6 +178,12 @@ public partial class EditorWorkspace : UserControl
                 style.Setters.Add(new Setter(ToolTipProperty, new Binding { Converter = converter, ConverterParameter = "tip" }));
                 style.Setters.Add(new Setter(BorderBrushProperty, new Binding { Converter = converter, ConverterParameter = "border" }));
                 style.Setters.Add(new Setter(BorderThicknessProperty, new Thickness(1)));
+                if (CurveList && col == 0)
+                {
+                    style.Setters.Add(new Setter(BackgroundProperty, FindResource("AxisBandBrush")));
+                    style.Setters.Add(new Setter(BorderBrushProperty, FindResource("AxisBorderBrush")));
+                    style.Setters.Add(new Setter(BorderThicknessProperty, new Thickness(0, 0, 2, 1)));
+                }
                 var trigger = new Trigger { Property = DataGridCell.IsSelectedProperty, Value = true }; trigger.Setters.Add(new Setter(BackgroundProperty, new SolidColorBrush(Color.FromRgb(93, 70, 36)))); trigger.Setters.Add(new Setter(ForegroundProperty, UiTheme.Text)); style.Triggers.Add(trigger);
                 string header = CurveList ? (col == 0 ? table.X.Name : table.Units) : table.Columns == 1 ? "Value" : table.X.Values[col].ToString("G5", CultureInfo.InvariantCulture);
                 MapGrid.Columns.Add(new DataGridTextColumn { Header = header, Width = new DataGridLength(70), Binding = new Binding($"Values[{col}]") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.Explicit }, IsReadOnly = table.IsChoice || CurveList && col == 0, CellStyle = style });
@@ -357,7 +366,8 @@ public partial class EditorWorkspace : UserControl
         PopGraph_Click(this, new()); graphWindow!.UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         CaptureWindow(graphWindow, Path.Combine(folder, "VvtSurface.png")); DockGraph_Click(this, new());
-        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
+        await CheckMapInformation(folder);
+        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
     }
     private void Capture(string path) => CaptureElement(this, path);
     private static void CaptureElement(FrameworkElement element, string path)

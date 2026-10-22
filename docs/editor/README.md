@@ -59,8 +59,14 @@ window to use another monitor; closing that window restores the preview.
 ![Map information in a separate window](images/details-editor.png)
 
 **View → Map information…** opens help without reducing the map's height.
+Value units and input axes stay visible above the explanation. Help distinguishes
+targets and thresholds from multipliers and signed corrections, with simple
+examples. [Map-help conventions](../TUNING_HELP.md) explain the common units.
 **Storage details** expands address, data type and dimensions; long content can
 be scrolled. Cell tooltips and the status strip show comparison values.
+Axis titles and breakpoint headers have a distinct blue-gray band and bright
+borders separating them from editable data. Read-only MAF breakpoints use the
+same treatment.
 **View → Changes** opens a drawer
 of maps that differ from the selected baseline. Select a map there to jump to it.
 

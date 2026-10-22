@@ -81,6 +81,10 @@ public partial class EditorWorkspace
         if (XAxisBand.IsVisible || YAxisBand.IsVisible || AxisLabelColumn.ActualWidth != 0 || AxisTitleRow.ActualHeight != 0 ||
             MapGrid.Columns[0].Header?.ToString() != maf.X.Name || MapGrid.Columns[1].Header?.ToString() != maf.Units)
             throw new InvalidOperationException("Long curves did not retain their direct column labels.");
+        var inputCell = (DataGridCell)MapGrid.Columns[0].GetCellContent(MapGrid.Items[0]).Parent;
+        if (inputCell.BorderThickness.Right < 2 || inputCell.Background is not System.Windows.Media.SolidColorBrush inputBrush ||
+            inputBrush.Color != System.Windows.Media.Color.FromRgb(48, 59, 69))
+            throw new InvalidOperationException("Read-only curve breakpoints are not visually separated from editable values.");
         BrowserColumn.Width = new(50); UpdateLayout(); LayoutSplitter_Completed(BrowserSplitter, new System.Windows.Controls.Primitives.DragCompletedEventArgs(0, 0, false)); UpdateLayout();
         if (BrowserColumn.ActualWidth < 160) throw new InvalidOperationException("Browser divider did not retain a usable width.");
         TableColumn.Width = new(340); UpdateLayout(); LayoutSplitter_Completed(DataSplitter, new System.Windows.Controls.Primitives.DragCompletedEventArgs(0, 0, false)); UpdateLayout();

@@ -16,7 +16,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
     if (-not $process.WaitForExit(45000)) { $process.Kill(); throw "Workbench UI timed out: $calibration" }
     if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $report)) { throw "Workbench UI failed: $calibration; see $report" }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-    if ($result.passed -ne $true -or $result.synthetic -ne $true -or $result.hardwareAccessed -ne $false -or $result.workflow.navigationPreservesEdits -ne $true -or $result.workflow.minimumLayout -ne $true) { throw "Unexpected workbench result: $calibration" }
+    if ($result.passed -ne $true -or $result.synthetic -ne $true -or $result.hardwareAccessed -ne $false -or $result.workflow.navigationPreservesEdits -ne $true -or $result.workflow.minimumLayout -ne $true -or $result.workflow.editor.mapInformationShowsUnits -ne $true) { throw "Unexpected workbench result: $calibration" }
     $reports += $result
 }
 @{ passed = $true; hardwareAccessed = $false; reports = $reports } | ConvertTo-Json -Depth 14 | Set-Content -LiteralPath (Join-Path $runRoot 'summary.json') -Encoding utf8

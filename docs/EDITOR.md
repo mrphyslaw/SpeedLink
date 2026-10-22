@@ -113,8 +113,14 @@ graph can pop into separate windows, with dock commands in **View**. Closing
 a floating window docks it again. Floating panels move between monitors.
 
 Choose **View → Map information…** for tuner help in a separate window that
-does not reduce the table's height. Expand **Storage details** for address,
-type and dimensions. Units and axis names remain visible above the table.
+does not reduce the table's height. Value units and input axes are always shown
+at the top of that window. Descriptions explain whether values are targets,
+limits, multipliers or added/subtracted corrections, with sign and neutral-value
+examples where established. Unconfirmed physical units are identified explicitly.
+Expand **Storage details** for address, type and dimensions.
+The axis-label bands and breakpoint headers use a blue-gray background with
+bright separators; editable cells retain their value shading. The read-only
+breakpoint column in long MAF curves uses the same visual treatment.
 The status strip and cell tooltips provide selected-value comparisons.
 
 Navigation, browser visibility/width, curve-list width, table/graph view and

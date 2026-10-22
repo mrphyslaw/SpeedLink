@@ -1,5 +1,23 @@
 # C# validation
 
+## Map help and axis separation — 0.5.4-alpha.5
+
+- Reviewed 6,185 entries across the seven bundled profiles, including 300 distinct
+  non-diagnostic map names. Descriptions distinguish targets, limits, thresholds,
+  multipliers, signed corrections, rate units and factory activation qualifications.
+- Corrected the knock-reference offset's misleading retard-degree label. Native
+  lookup and multiply/add instruction slices were checked in all seven baseline
+  images, including the older layout's branch around an inline literal pool.
+  The 504 arithmetic cases use explicit RAM inputs and a status-return fixture;
+  they are not physical knock-sensor or whole-ECU tests.
+- A metadata comparison preserves all table names, storage addresses, dimensions,
+  axis values, binary types, scaling expressions, switch states and bits.
+- Native editor checks verify visible value units with storage details collapsed,
+  help updates when switching maps, unchanged ROM bytes, header separators, frozen
+  axis alignment, MAF breakpoint separation and complete 16×16 fitting.
+- Seven additional C# cases protect critical help/unit contracts. ECU access and
+  the mandatory checksum-correction path retain their existing scope.
+
 ## Map-mounted 3D axes — 0.5.4-alpha.4
 
 - Blue column-axis, green row-axis and amber value-axis rulers are projected
