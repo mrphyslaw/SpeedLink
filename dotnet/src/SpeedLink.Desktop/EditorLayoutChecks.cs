@@ -44,6 +44,7 @@ public partial class EditorWorkspace
         }
         await CheckTableAxes(sample);
         Graph.CheckSurfaceDrag();
+        Graph.CheckSurfaceAxes();
         SelectCell(0); byte[] precise = document.Snapshot(); double exact = document.Read(sample, 0);
         if (!MapGrid.BeginEdit()) throw new InvalidOperationException("Cannot enter a fitted table cell."); UpdateLayout();
         if (MapGrid.Columns[0].GetCellContent(MapGrid.Items[0]) is not TextBox input || input.Text != exact.ToString("R", CultureInfo.InvariantCulture))
@@ -60,6 +61,7 @@ public partial class EditorWorkspace
             graphWindow!.Width = size.Item1; graphWindow.Height = size.Item2; graphWindow.UpdateLayout(); Graph.ResetView();
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
             Graph.CheckSurfaceDrag();
+            Graph.CheckSurfaceAxes();
             var frame = Graph.SurfaceFrame; var viewport = Graph.SurfaceViewport;
             double fill = Math.Max(frame.Width / viewport.Width, frame.Height / viewport.Height);
             if (fill < .75 || fill > 1 || frame.Left < -.5 || frame.Top < -.5 || frame.Right > viewport.Width + .5 || frame.Bottom > viewport.Height + .5)
@@ -110,7 +112,7 @@ public partial class EditorWorkspace
         if (!saved.BrowserHidden || saved.View != 2 || saved.BrowserWidth != 230) throw new InvalidOperationException("Layout did not persist.");
         curveWidth = 325; PopBrowser_Click(this, new()); PopGraph_Click(this, new()); SaveLayout();
         return new { passed = true, hardwareAccessed = false, synthetic = true, full16x16 = measurements, precisionPreserved = true, mapInfoUsesNoTableSpace = true,
-            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, surfaceFollowsDrag = true, compactPreview = true, axisLabelsAligned = true, axisTitlesFrozen = true, selectedHeadersHighlighted = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
+            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, compactPreview = true, axisLabelsAligned = true, axisTitlesFrozen = true, selectedHeadersHighlighted = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
             mafBulkEditsAndClipboard = true, checksumVerified = true, layoutPersisted = true };
     }
     internal void CheckRestoredLayout()

@@ -44,6 +44,10 @@ MAF editor. Its controls and linked cell selection work the same way.
 
 ![An intake cam advance VVT surface showing its raised areas and transitions](images/surface-editor.png)
 
+Axis lines, names and tick values sit directly on the map. Blue is the column
+axis, green is the row axis, and amber is the value/height axis. They stay aligned
+as you rotate. The preview keeps fewer ticks; the larger graph shows more detail.
+
 Drag to rotate a surface in the direction of your mouse and use the wheel to zoom.
 The preview and floating graph use the same controls. Click a point on the
 graph to select its grid cell. Resizable panes let you give the grid or graph
