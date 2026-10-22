@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace SpeedLink.Desktop;
@@ -58,10 +59,12 @@ public partial class EditorWorkspace
     {
         if (XAxisBand is null || MapGrid is null) return;
         var scroll = Descendants(MapGrid).OfType<ScrollViewer>().FirstOrDefault();
-        double verticalBar = scroll?.ComputedVerticalScrollBarVisibility == Visibility.Visible ? SystemParameters.VerticalScrollBarWidth : 0;
-        double horizontalBar = scroll?.ComputedHorizontalScrollBarVisibility == Visibility.Visible ? SystemParameters.HorizontalScrollBarHeight : 0;
+        var bars = scroll is null ? [] : Descendants(scroll).OfType<ScrollBar>().ToArray();
+        double verticalBar = bars.FirstOrDefault(b => b.Orientation == Orientation.Vertical && b.IsVisible)?.ActualWidth ?? 0;
+        double horizontalBar = bars.FirstOrDefault(b => b.Orientation == Orientation.Horizontal && b.IsVisible)?.ActualHeight ?? 0;
         AxisHeaderSpacer.Width = new(MapGrid.RowHeaderWidth);
         AxisScrollbarSpacer.Width = new(verticalBar);
-        YAxisText.Margin = new(0, MapGrid.ColumnHeaderHeight, 0, horizontalBar);
+        YAxisBand.Margin = new(0, 0, 0, horizontalBar);
+        YAxisText.Margin = new(0, MapGrid.ColumnHeaderHeight, 0, 0);
     }
 }
