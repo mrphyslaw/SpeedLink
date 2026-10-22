@@ -75,6 +75,14 @@ public partial class EditorWorkspace
         if (BrowserColumn is null || DetailsPanel is null || FocusButton is null || ChangesButton is null) return;
         ApplyLayout(); SaveLayout();
     }
+    private void MapInfo_Click(object sender, RoutedEventArgs e) => ShowMapInformation();
+    private void ShowMapInformation()
+    {
+        if (table is null) return;
+        DetailsButton.IsChecked = true;
+        if (infoWindow?.WindowState == WindowState.Minimized) infoWindow.WindowState = WindowState.Normal;
+        infoWindow?.Activate();
+    }
     private void ApplyLayout()
     {
         bool hidden = FocusButton.IsChecked;

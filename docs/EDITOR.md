@@ -20,6 +20,7 @@ does not establish a file's factory provenance or vehicle compatibility.
 
 Expand a category or search by map name, description or category. Numbered maps
 are sorted naturally. Each selected map opens in a tab; use × to close its tab.
+Use **Map info** beside the map tabs, or press **F1**, for help with the active map.
 The map-information window explains the control in tuner terms. Static axes are display
 metadata and cannot be edited. No extended-table patch is installed by this editor.
 
@@ -112,7 +113,7 @@ map more room; use the same command to restore it. Both the map browser and
 graph can pop into separate windows, with dock commands in **View**. Closing
 a floating window docks it again. Floating panels move between monitors.
 
-Choose **View → Map information…** for tuner help in a separate window that
+Click **Map info** beside the tabs, or press **F1**, for tuner help in a separate window that
 does not reduce the table's height. Value units and input axes are always shown
 at the top of that window. Descriptions explain whether values are targets,
 limits, multipliers or added/subtracted corrections, with sign and neutral-value
