@@ -122,8 +122,8 @@ Expand **Storage details** for address, type and dimensions.
 The axis-label bands and breakpoint headers use a blue-gray background with
 bright separators; editable cells retain their value shading. The read-only
 breakpoint column in long MAF curves uses the same visual treatment.
-Dark scrollbars match the workspace. Axis bands stop before the scrollbars,
-leaving their corners clear when a table needs horizontal or vertical scrolling.
+A continuous outline joins the axis bands and table. Dark scrollbars match the
+workspace and sit outside that outline.
 The status strip and cell tooltips provide selected-value comparisons.
 
 Navigation, browser visibility/width, curve-list width, table/graph view and

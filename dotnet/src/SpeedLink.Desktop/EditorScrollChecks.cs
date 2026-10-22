@@ -18,6 +18,7 @@ public partial class EditorWorkspace
         var bars = Descendants(scroll).OfType<ScrollBar>().Where(b => b.IsVisible).ToArray();
         var horizontal = bars.Single(b => b.Orientation == Orientation.Horizontal);
         var vertical = bars.Single(b => b.Orientation == Orientation.Vertical);
+        CheckAxisFrame();
         Rect Bounds(FrameworkElement e) => e.TransformToAncestor(TablePanel).TransformBounds(new Rect(e.RenderSize));
         if (Math.Abs(Bounds(XAxisChrome).Right - Bounds(vertical).Left) > 1 ||
             Math.Abs(Bounds(YAxisBand).Bottom - Bounds(horizontal).Top) > 1)
@@ -69,6 +70,20 @@ public partial class EditorWorkspace
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
     }
     private static double Brightness(Color c) => (.2126 * c.R + .7152 * c.G + .0722 * c.B) / 255;
+
+    private void CheckAxisFrame()
+    {
+        var scroll = Descendants(MapGrid).OfType<ScrollViewer>().First();
+        var bars = Descendants(scroll).OfType<ScrollBar>().Where(b => b.IsVisible).ToArray();
+        Rect Bounds(FrameworkElement e) => e.TransformToAncestor(TablePanel).TransformBounds(new Rect(e.RenderSize));
+        double right = bars.FirstOrDefault(b => b.Orientation == Orientation.Vertical) is { } v ? Bounds(v).Left : Bounds(MapGrid).Right;
+        double bottom = bars.FirstOrDefault(b => b.Orientation == Orientation.Horizontal) is { } h ? Bounds(h).Top : Bounds(MapGrid).Bottom;
+        var frame = Bounds(AxisFrame);
+        if (!AxisFrame.IsVisible || AxisFrame.BorderThickness != new Thickness(1) ||
+            Math.Abs(frame.Left) > 1 || Math.Abs(frame.Top) > 1 || Math.Abs(frame.Right - right) > 1 || Math.Abs(frame.Bottom - bottom) > 1 ||
+            Math.Abs(frame.Right - Bounds(XAxisChrome).Right) > 1 || Math.Abs(frame.Bottom - Bounds(YAxisBand).Bottom) > 1)
+            throw new InvalidOperationException("The table's axis frame does not join at its viewport corners.");
+    }
 
     private async Task CheckStockScrolling(string folder)
     {

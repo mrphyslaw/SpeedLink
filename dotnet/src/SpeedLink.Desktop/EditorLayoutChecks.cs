@@ -117,7 +117,7 @@ public partial class EditorWorkspace
         if (!saved.BrowserHidden || saved.View != 2 || saved.BrowserWidth != 230) throw new InvalidOperationException("Layout did not persist.");
         curveWidth = 325; PopBrowser_Click(this, new()); PopGraph_Click(this, new()); SaveLayout();
         return new { passed = true, hardwareAccessed = false, synthetic = true, full16x16 = measurements, precisionPreserved = true, mapInfoUsesNoTableSpace = true,
-            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, compactPreview = true, axisLabelsAligned = true, axisTitlesFrozen = true, selectedHeadersHighlighted = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
+            popoutsPreserveEdits = true, surfaceFitsWideAndTallPanes = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, compactPreview = true, axisFrameJoined = true, axisLabelsAligned = true, axisTitlesFrozen = true, selectedHeadersHighlighted = true, mafPoints = maf.Count, mafVoltageReadOnly = true, mafLastPointLinked = true, curveZoom = true,
             mafBulkEditsAndClipboard = true, checksumVerified = true, layoutPersisted = true };
     }
     internal void CheckRestoredLayout()

@@ -1,5 +1,14 @@
 # C# validation
 
+## Joined axis frame — 0.5.4-alpha.8
+
+- A single outline surrounds the axis bands and table viewport. The row- and
+  column-axis bands share its lower-left and upper-right corners.
+- Native layout checks verify the frame with no scrollbars, horizontal only,
+  vertical only and both. Scrolling checks also exercise a scaled layout.
+- Full 16×16 fitting, frozen axes, the final map cell and Map info/F1 access
+  retain their existing checks. Definitions and ECU-access code are unchanged.
+
 ## Direct map help — 0.5.4-alpha.7
 
 - A labeled Map info button shares the map-tab row. Native layout checks keep it
