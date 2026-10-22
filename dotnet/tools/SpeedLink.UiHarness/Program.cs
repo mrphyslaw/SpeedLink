@@ -12,6 +12,24 @@ internal static class Program
             int at = Array.IndexOf(args, key);
             return at >= 0 && at + 1 < args.Length ? args[at + 1] : throw new ArgumentException("Missing " + key);
         }
+        if (args.Contains("--menus-offline", StringComparer.Ordinal))
+        {
+            var menuApp = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int resultCode = 1;
+            menuApp.Startup += async (_, _) =>
+            {
+                MainWindow? window = null;
+                try
+                {
+                    string output = Get("--output"); Directory.CreateDirectory(output);
+                    window = new MainWindow(Path.Combine(output, "data")); menuApp.MainWindow = window;
+                    var report = await window.ExerciseMenusOffline(output);
+                    File.WriteAllText(Get("--report"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true })); resultCode = 0;
+                }
+                catch (Exception error) { File.WriteAllText(Get("--report"), JsonSerializer.Serialize(new { passed = false, error = error.ToString() })); }
+                finally { window?.CloseWorkbenchTest(); menuApp.Shutdown(resultCode); }
+            };
+            menuApp.Run(); return resultCode;
+        }
         if (args.Contains("--replay-offline", StringComparer.Ordinal))
         {
             var replayApp = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int resultCode = 1;

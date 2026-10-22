@@ -6,6 +6,26 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        if (e.Args.Contains("--menus-smoke", StringComparer.Ordinal))
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            string GetMenu(string key) { int at = Array.IndexOf(e.Args, key); return at >= 0 && at + 1 < e.Args.Length ? e.Args[at + 1] : throw new ArgumentException("Missing " + key); }
+            MainWindow? menuWindow = null;
+            try
+            {
+                string output = GetMenu("--output"); System.IO.Directory.CreateDirectory(output);
+                menuWindow = new MainWindow(System.IO.Path.Combine(output, "data")); MainWindow = menuWindow;
+                var result = await menuWindow.ExerciseMenusOffline(output);
+                System.IO.File.WriteAllText(GetMenu("--smoke-report"), System.Text.Json.JsonSerializer.Serialize(result));
+                menuWindow.CloseWorkbenchTest(); Shutdown(0);
+            }
+            catch (Exception error)
+            {
+                System.IO.File.WriteAllText(GetMenu("--smoke-report"), System.Text.Json.JsonSerializer.Serialize(new { passed = false, error = error.ToString() }));
+                menuWindow?.CloseWorkbenchTest(); Shutdown(1);
+            }
+            return;
+        }
         if (e.Args.Contains("--editor-smoke", StringComparer.Ordinal))
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;

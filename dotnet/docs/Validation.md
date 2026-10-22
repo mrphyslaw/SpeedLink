@@ -1,5 +1,15 @@
 # C# validation
 
+## Editor menu fix — 0.5.4-alpha.2
+
+- File, Edit and View use explicit popup surfaces and item templates, independent
+  of Windows menu colors. Desktop checks open each popup with conflicting host
+  colors and verify visible labels, shortcut hints, disabled Save and checkmarks.
+- Keyboard activation of a view command and Escape dismissal are exercised.
+  The same checks run against the published single EXE, including screenshots.
+- The existing core, layout, editing, logger, Workbench and import checks remain
+  required. ROM storage and ECU access are unchanged.
+
 ## Table axis labels — 0.5.4-alpha.1
 
 - 261 C# regression tests remain required, alongside the editor, logger,

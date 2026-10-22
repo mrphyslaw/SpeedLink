@@ -3,7 +3,43 @@
  <SolidColorBrush x:Key="LineBrush" Color="#434A50"/><SolidColorBrush x:Key="TextBrush" Color="#EDF0F2"/><SolidColorBrush x:Key="MutedBrush" Color="#B2BBC2"/>
  <SolidColorBrush x:Key="AmberBrush" Color="#F2B65D"/><SolidColorBrush x:Key="AmberSoftBrush" Color="#493A25"/><SolidColorBrush x:Key="InkBrush" Color="#211C15"/>
  <SolidColorBrush x:Key="{x:Static SystemColors.MenuBrushKey}" Color="#23272B"/><SolidColorBrush x:Key="{x:Static SystemColors.MenuTextBrushKey}" Color="#EDF0F2"/>
- <Style TargetType="MenuItem"><Setter Property="Foreground" Value="{StaticResource TextBrush}"/><Setter Property="Padding" Value="7,4"/></Style>
+ <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Background="{StaticResource LineBrush}" Margin="26,5,5,5"/></ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style TargetType="MenuItem">
+  <Setter Property="Foreground" Value="{StaticResource TextBrush}"/><Setter Property="Background" Value="Transparent"/><Setter Property="Padding" Value="7,4"/>
+  <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
+   <Grid SnapsToDevicePixels="True">
+    <Border x:Name="MenuChrome" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="1" Padding="{TemplateBinding Padding}">
+     <Grid x:Name="MenuContent" VerticalAlignment="Center">
+      <Grid.ColumnDefinitions><ColumnDefinition x:Name="MarkColumn" Width="22"/><ColumnDefinition Width="*" SharedSizeGroup="MenuHeader"/><ColumnDefinition Width="Auto" SharedSizeGroup="MenuGesture"/><ColumnDefinition x:Name="ArrowColumn" Width="16"/></Grid.ColumnDefinitions>
+      <ContentPresenter x:Name="MenuIcon" ContentSource="Icon" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+      <TextBlock x:Name="MenuCheck" Text="✓" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+      <ContentPresenter x:Name="MenuHeader" Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
+      <TextBlock x:Name="MenuGesture" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="24,0,0,0" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
+      <TextBlock x:Name="MenuArrow" Grid.Column="3" Text="›" Visibility="Hidden" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+     </Grid>
+    </Border>
+    <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsSubmenuOpen}" Placement="Right" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" AllowsTransparency="True" Focusable="False" PopupAnimation="None">
+     <Border x:Name="MenuSurface" Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Padding="4" MinWidth="220">
+      <ScrollViewer MaxHeight="480" CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Focusable="False">
+       <ItemsPresenter Grid.IsSharedSizeScope="True" KeyboardNavigation.DirectionalNavigation="Cycle" KeyboardNavigation.TabNavigation="Cycle"/>
+      </ScrollViewer>
+     </Border>
+    </Popup>
+   </Grid>
+   <ControlTemplate.Triggers>
+    <Trigger Property="HasItems" Value="True"><Setter TargetName="MenuArrow" Property="Visibility" Value="Visible"/></Trigger>
+    <Trigger Property="IsChecked" Value="True"><Setter TargetName="MenuCheck" Property="Visibility" Value="Visible"/><Setter TargetName="MenuIcon" Property="Visibility" Value="Collapsed"/></Trigger>
+    <Trigger Property="Role" Value="TopLevelHeader"><Setter TargetName="PART_Popup" Property="Placement" Value="Bottom"/><Setter TargetName="MarkColumn" Property="Width" Value="0"/><Setter TargetName="ArrowColumn" Property="Width" Value="0"/><Setter TargetName="MenuGesture" Property="Visibility" Value="Collapsed"/><Setter TargetName="MenuArrow" Property="Visibility" Value="Collapsed"/></Trigger>
+    <Trigger Property="Role" Value="TopLevelItem"><Setter TargetName="MarkColumn" Property="Width" Value="0"/><Setter TargetName="ArrowColumn" Property="Width" Value="0"/><Setter TargetName="MenuGesture" Property="Visibility" Value="Collapsed"/><Setter TargetName="MenuArrow" Property="Visibility" Value="Collapsed"/></Trigger>
+    <Trigger Property="IsSubmenuOpen" Value="True"><Setter TargetName="MenuChrome" Property="Background" Value="{StaticResource RaisedBrush}"/></Trigger>
+    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="MenuChrome" Property="Background" Value="{StaticResource AmberSoftBrush}"/><Setter TargetName="MenuChrome" Property="BorderBrush" Value="{StaticResource AmberBrush}"/></Trigger>
+    <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource MutedBrush}"/><Setter TargetName="MenuContent" Property="Opacity" Value="0.65"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
  <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#23272B"/><SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#EDF0F2"/>
  <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#2D3237"/><SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#EDF0F2"/>
  <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#F2B65D"/><SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#211C15"/>
