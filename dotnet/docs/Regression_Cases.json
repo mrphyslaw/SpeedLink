@@ -154,5 +154,17 @@
   },
   {
     "test": "SpeedLink.Tests.VLinkerTests.test_wrong_adapter_is_rejected"
+  },
+  {
+    "test": "SpeedLink.Tests.NativeJ2534ReceiveTests.full_two_pass_backup_accepts_timeout_data_without_duplicate_requests"
+  },
+  {
+    "test": "SpeedLink.Tests.NativeJ2534ReceiveTests.malformed_timeout_reply_faults_connection_without_resending"
+  },
+  {
+    "test": "SpeedLink.Tests.NativeJ2534ReceiveTests.native_output_buffers_are_clean_for_each_poll"
+  },
+  {
+    "test": "SpeedLink.Tests.NativeJ2534ReceiveTests.receive_diagnostics_include_metadata_and_reset_between_exchanges"
   }
 ]

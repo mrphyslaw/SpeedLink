@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using SpeedLink.Core;
@@ -29,9 +30,12 @@ public sealed class NativeJ2534Channel : IJ2534Channel
 
     private readonly string libraryPath;
     private readonly IDiagnosticSink? diagnostics;
-    private int readCalls, emptyReads;
-    private uint lastReadStatus, lastRxStatus, lastDataSize, lastExtraDataIndex;
-    public object ReadDiagnostics => new { readCalls, emptyReads, lastReadStatus = $"0x{lastReadStatus:X}", lastRxStatus = $"0x{lastRxStatus:X}", lastDataSize, lastExtraDataIndex };
+    private int readCalls, emptyReads, messagesWithTimeout, extraDataIndexMismatches;
+    private uint lastReadStatus, lastMessageCount, lastRxStatus, lastDataSize, lastExtraDataIndex;
+    private double lastReadDurationMs, maxReadDurationMs;
+    public object ReadDiagnostics => new { readCalls, emptyReads, messagesWithTimeout, extraDataIndexMismatches,
+        lastReadStatus = $"0x{lastReadStatus:X}", lastMessageCount, lastRxStatus = $"0x{lastRxStatus:X}",
+        lastDataSize, lastExtraDataIndex, lastReadDurationMs, maxReadDurationMs };
     private nint module;
     private uint device, channel, filter, requestId;
     private bool opened, connected, filtered, disposed;
@@ -143,7 +147,9 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     public void ClearReceive()
     {
         EnsureConnected();
-        readCalls = emptyReads = 0; lastReadStatus = lastRxStatus = lastDataSize = lastExtraDataIndex = 0;
+        readCalls = emptyReads = messagesWithTimeout = extraDataIndexMismatches = 0;
+        lastReadStatus = lastMessageCount = lastRxStatus = lastDataSize = lastExtraDataIndex = 0;
+        lastReadDurationMs = maxReadDurationMs = 0;
         Check(ioctl!(channel, 8, 0, 0), "Clear stale J2534 receive messages");
     }
     public void Write(byte[] request)
@@ -162,24 +168,44 @@ public sealed class NativeJ2534Channel : IJ2534Channel
         EnsureConnected();
         if (timeoutMilliseconds is < 1 or > 1000)
             throw new ArgumentOutOfRangeException(nameof(timeoutMilliseconds));
-        var packet = Packet(0, []);
+        // This is an output buffer. Do not prefill a plausible protocol/header:
+        // a driver that leaves the input count unchanged must not expose stale data.
+        var packet = new Message { Data = new byte[4128] };
         uint count = 1;
+        var started = Stopwatch.GetTimestamp();
         var status = read!(channel, ref packet, ref count, (uint)timeoutMilliseconds);
-        readCalls++; lastReadStatus = status; lastRxStatus = packet.RxStatus; lastDataSize = packet.DataSize; lastExtraDataIndex = packet.ExtraDataIndex;
-        if (status is 9 or 16)
-        { emptyReads++; return null; }
-        Check(status, "Receive J2534 response");
+        lastReadDurationMs = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        maxReadDurationMs = Math.Max(maxReadDurationMs, lastReadDurationMs);
+        readCalls++; lastReadStatus = status; lastMessageCount = count;
+        lastRxStatus = packet.RxStatus; lastDataSize = packet.DataSize; lastExtraDataIndex = packet.ExtraDataIndex;
+        bool timeoutStatus = status is 9 or 16;
+        // A timeout-like return does not erase messages the driver already read.
+        // Fatal errors remain fatal, even if the output buffer contains bytes.
+        if (!timeoutStatus)
+            Check(status, "Receive J2534 response");
         if (count == 0)
+        {
+            emptyReads++;
             return null;
+        }
+        diagnostics?.Record("driver.receive", new { status = $"0x{status:X}", messageCount = count,
+            protocol = packet.ProtocolId, rxStatus = $"0x{packet.RxStatus:X}", dataSize = packet.DataSize,
+            extraDataIndex = packet.ExtraDataIndex, durationMs = lastReadDurationMs });
         if (count != 1 || packet.ProtocolId != 6)
             throw new TransportException("Invalid J2534 receive message count or protocol.");
+        if (timeoutStatus)
+            messagesWithTimeout++;
         if ((packet.RxStatus & 0x0B) != 0)
             return new(0, packet.RxStatus, []);
-        uint end = packet.ExtraDataIndex == 0 ? packet.DataSize : packet.ExtraDataIndex;
-        if (packet.DataSize is < 5 or > 4128 || end < 5 || end > packet.DataSize || end > 4099)
+        if (packet.DataSize is < 5 or > 4099 || packet.ExtraDataIndex > packet.DataSize ||
+            packet.Data is null || packet.Data.Length < packet.DataSize)
             throw new TransportException("Malformed J2534 response bounds.");
+        // ISO15765 has no trailing checksum/extra-data bytes. Use its complete
+        // reported length; retain inconsistent extra-data metadata for diagnosis.
+        if (packet.ExtraDataIndex != 0 && packet.ExtraDataIndex != packet.DataSize)
+            extraDataIndexMismatches++;
         uint id = System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(packet.Data);
-        return new(id, packet.RxStatus, packet.Data.AsSpan(4, (int)end - 4).ToArray());
+        return new(id, packet.RxStatus, packet.Data.AsSpan(4, (int)packet.DataSize - 4).ToArray());
     }
     private void EnsureConnected()
     {

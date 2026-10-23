@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — J2534 receive compatibility
+
+- Preserve validated messages returned with timeout-like J2534 statuses instead
+  of treating every such return as empty. Keep fatal errors and malformed replies
+  fatal, bounded response waits and no automatic request resends.
+- Use the complete reported ISO15765 message length and record inconsistent
+  extra-data indexes rather than truncating the diagnostic reply.
+- Include returned-message counts, timeout-with-data counts and native-call
+  timings in support diagnostics. Mongoose hardware validation remains pending.
+
 ## v0.5.5-alpha.1 — diagnostic reports
 
 - Capture persistent, bounded diagnostics before the adapter opens: setup,
