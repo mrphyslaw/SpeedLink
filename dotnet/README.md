@@ -70,3 +70,13 @@ This alpha has passed offline and isolated-adapter checks. The [measured results
 ## License
 
 GPL-3.0-or-later. See the repository LICENSE and this folder’s ATTRIBUTIONS.md. Runtime and dependency notices are bundled under Help & licenses. No ROM images or vendor drivers are included.
+
+## Diagnostic support reports
+
+Capture starts before driver open and uses a bounded background writer in
+`data/diagnostics`. Connection provides a session picker, readable report preview,
+ZIP export and a link to the problem-report form. See the
+[reporting guide](../docs/TROUBLESHOOTING.md). `Test-SupportUi.ps1` exercises saved
+failure selection and export with the native UI and standalone build. Core tests
+cover security exchanges, redaction, payload exclusion, errors, storage failure,
+retention and unchanged request counts.

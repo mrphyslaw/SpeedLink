@@ -79,6 +79,8 @@ public sealed class ReadWorkflow
             transport.ReadAttempted = true;
         }
         var (folder, journal) = store.CreateOperation(vault, transport.Mode, "read_backup");
+        transport.Diagnostics?.AttachJournal(journal.Path);
+        transport.Diagnostics?.Record("read.started", new { chunkBytes = transport.ReadChunkSize });
         using (journal)
         {
             try
@@ -115,6 +117,7 @@ public sealed class ReadWorkflow
                     throw new TransportException("Unsupported read chunk size.");
                 for (int pass = 1; pass <= 2; pass++)
                 {
+                    transport.Diagnostics?.Record("read.pass_started", new { pass });
                     data = new byte[RomInspector.RomSize];
                     using var file = store.FileSystem.CreateNew(System.IO.Path.Combine(folder, $"pass{pass}.read"));
                     for (int address = 0; address < data.Length; address += chunk)

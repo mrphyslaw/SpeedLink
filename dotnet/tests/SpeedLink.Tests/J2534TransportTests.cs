@@ -69,6 +69,15 @@ public class J2534TransportTests
         Assert.Single(channel.Writes);
     }
     [Fact]
+    public void driver_write_time_does_not_consume_ecu_response_deadline()
+    {
+        var channel = new Channel { WriteDelayMilliseconds = 40 };
+        channel.Replies.Enqueue(new(0x7E8, 0, [0x41, 12, 0, 0]));
+        using var link = Link(channel);
+        Assert.Equal(new byte[] { 0x41, 12, 0, 0 }, link.Exchange([1, 12]));
+        Assert.Single(channel.Writes);
+    }
+    [Fact]
     public void timeout_latches_failure_without_retry()
     {
         var channel = new Channel();
@@ -193,6 +202,7 @@ public class J2534TransportTests
         public Queue<J2534Frame> Replies = new();
         public List<byte[]> Writes = [];
         public int Clears, Reads, Closes;
+        public int WriteDelayMilliseconds;
         public bool FailConnect, FailRead;
         public (uint, uint, uint) Configuration;
         public string? CleanupWarning => null;
@@ -204,7 +214,7 @@ public class J2534TransportTests
                 throw new TransportException("Channel setup failed.");
         }
         public void ClearReceive() => Clears++;
-        public void Write(byte[] request) => Writes.Add(request.ToArray());
+        public void Write(byte[] request) { Writes.Add(request.ToArray()); if (WriteDelayMilliseconds > 0) Thread.Sleep(WriteDelayMilliseconds); }
         public J2534Frame? Read(int timeoutMilliseconds)
         {
             Reads++;

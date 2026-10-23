@@ -173,6 +173,7 @@ public partial class MainWindow
             try
             {
                 var parameters = LoggerDisplayParameters();
+                diagnosticSession?.Record("logger.started", new { profile = loggerDefinition.SoftwareIds, loggerDefinition.DefinitionVersion, channels = units, targetScansPerSecond = target, recording });
                 foreach (var row in selected) loggerDefinition.ConvertDisplay(row.Id, 0, row.Unit, parameters);
                 var logger = new LiveLogger(loggerDefinition, calibration, link, ecu, selected.Select(row => row.Id));
                 SaveLoggerSettings();

@@ -1,0 +1,72 @@
+name: Problem / diagnostic report
+description: Report a connection, ROM read, logger, editor or app problem with a support ZIP.
+title: "[Problem] Brief description"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Follow the [problem-report guide](https://github.com/mrphyslaw/SpeedLink/blob/main/docs/TROUBLESHOOTING.md).
+        In SpeedLink, choose **Connection → Export support report…**, select the failed session and save the ZIP.
+        You can export after restarting without reconnecting. Review attachments: this issue is public.
+        The ZIP retains factory security access; ROM payloads and recordings are excluded.
+  - type: dropdown
+    id: operation
+    attributes:
+      label: What were you doing?
+      options:
+        - Connect & identify
+        - Read & verify backup
+        - Live logging
+        - Review a recording
+        - Edit or save a ROM
+        - Import definitions
+        - Start the app / other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SpeedLink version and Windows version
+      placeholder: "Copy the version from About; include Windows 10/11 and version if known"
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Adapter and driver
+      description: Include the model and driver version if known; use none for an offline editor problem. Do not post adapter serial numbers.
+    validations:
+      required: true
+  - type: input
+    id: vehicle
+    attributes:
+      label: Vehicle and calibration (if relevant)
+      description: Model, year, market and calibration ID; omit VINs.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and read progress
+      description: List what you selected, the last successful step and whether ROM-read progress appeared. Mention whether it happens every time.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected result, actual result and exact error
+      description: Remove personal information from pasted text or screenshots.
+    validations:
+      required: true
+  - type: textarea
+    id: support
+    attributes:
+      label: Support report
+      description: Drag your SpeedLink-support ZIP here, wait for the upload to finish, then submit. If export was unavailable, explain why. Do not attach your whole data/backup folder.
+    validations:
+      required: true
+  - type: checkboxes
+    id: sharing
+    attributes:
+      label: Public attachments
+      options:
+        - label: I reviewed the information I am sharing and understand that this issue and its attachments are public.
+          required: true

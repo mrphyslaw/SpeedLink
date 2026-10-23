@@ -136,3 +136,14 @@ transport behavior and its remaining validation limits.
   recording for troubleshooting.
 - **No recording was saved:** check **Record CSV** before starting and use
   **Open logs** to find the recording folders beside the EXE.
+
+## Reporting a problem
+
+Diagnostic capture starts automatically with **Connect & identify**, including
+failed driver opens. On **Connection**, choose **Export support report…**, select
+the session with the problem and save its ZIP. This also works after restarting
+without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
+the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+The report includes requests, timing, errors and factory security access; personal
+information is redacted and ROM bytes remain in your backup files. Review the ZIP
+before sharing.

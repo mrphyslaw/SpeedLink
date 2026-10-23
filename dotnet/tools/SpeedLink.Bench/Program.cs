@@ -33,6 +33,7 @@ ISerialConnection? serial = null;
 SerialConnection? win32 = null;
 FtdiSerialConnection? ftdi = null;
 TraceTransport? traced = null;
+DiagnosticSession? diagnostics = null;
 var watch = Stopwatch.StartNew();
 int exit = 0;
 try
@@ -106,14 +107,15 @@ try
         var port = Get("--port");
         if (port.Length == 0)
             throw new ArgumentException("Explicit COM port is required.");
+        if (Get("--diagnostics").Length > 0) diagnostics = new(Get("--diagnostics"), "bench", typeof(ReadWorkflow).Assembly.GetName().Version?.ToString() ?? "unknown");
         if (Get("--adapter") == "tactrix")
         {
             var drivers = J2534Drivers.Discover();
             var matching = drivers.Where(item => Path.GetFileName(item.LibraryPath).Equals(Get("--driver-library", "op20pt32.dll"), StringComparison.OrdinalIgnoreCase)).ToArray();
             if (matching.Length != 1)
                 throw new InvalidOperationException("Select one registered bench driver with --driver-library.");
-            native = new(matching[0]);
-            passThru = new(native);
+            native = new(matching[0], diagnostics);
+            passThru = new(native, diagnostics: diagnostics);
             passThru.Initialize();
             activeLink = passThru;
             report["driver"] = matching[0].Name;
@@ -127,11 +129,12 @@ try
                 "win32" => win32 = new(port, Number("--baud", 115200)),
                 _ => throw new ArgumentException("Select --backend ftdi or win32.")
             };
-            link = new(serial, transferBaud: Number("--transfer-baud", VLinkerReadTransport.TransferBaud));
+            link = new(serial, transferBaud: Number("--transfer-baud", VLinkerReadTransport.TransferBaud), diagnostics: diagnostics);
             report["transferBaud"] = link.ConfiguredTransferBaud;
             link.Initialize();
             activeLink = link;
         }
+        if (diagnostics is not null) activeLink = new DiagnosticTransport(activeLink, diagnostics);
         traced = new(activeLink, reportPath + ".requests.jsonl", Number("--delay-ms", 0), Number("--pause-after", 0), Get("--resume-file"), reportPath + ".paused.json");
         report["adapter"] = activeLink.Adapter;
         report["port"] = port;
@@ -288,6 +291,7 @@ try
 }
 catch (Exception error)
 {
+    diagnostics?.Error("operation.error", error);
     report["error"] = error.Message;
     report["errorType"] = error.GetType().FullName;
     bool expected = flags.Contains("--expect-error") && error.Message.Contains(Get("--expect-message"), StringComparison.OrdinalIgnoreCase);
@@ -347,6 +351,14 @@ finally
         report["exchangeCalls"] = traced.Requests;
         traced.Dispose();
     }
+    if (diagnostics is not null)
+    {
+        await diagnostics.DisposeAsync();
+        SupportReport.Export(diagnostics.Folder, reportPath + ".support.zip");
+        report["supportReport"] = reportPath + ".support.zip";
+        report["diagnosticStorageError"] = diagnostics.StorageError;
+        report["diagnosticDroppedEvents"] = diagnostics.DroppedEvents;
+    }
     report["seconds"] = watch.Elapsed.TotalSeconds;
     File.WriteAllText(reportPath, JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
     Console.WriteLine(JsonSerializer.Serialize(report));
@@ -361,6 +373,7 @@ sealed class TraceTransport(IReadTransport inner, string path, int delay, int pa
 {
     private readonly StreamWriter trace = new(path, append: false);
     public string Mode => inner.Mode; public string Adapter => inner.Adapter; public int ReadChunkSize => inner.ReadChunkSize;
+    public IDiagnosticSink? Diagnostics => inner.Diagnostics;
     public bool ReadAttempted
     {
         get => inner.ReadAttempted; set => inner.ReadAttempted = value;

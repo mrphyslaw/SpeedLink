@@ -28,6 +28,10 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     private static extern nint LoadLibraryExW(string path, nint reserved, uint flags);
 
     private readonly string libraryPath;
+    private readonly IDiagnosticSink? diagnostics;
+    private int readCalls, emptyReads;
+    private uint lastReadStatus, lastRxStatus, lastDataSize, lastExtraDataIndex;
+    public object ReadDiagnostics => new { readCalls, emptyReads, lastReadStatus = $"0x{lastReadStatus:X}", lastRxStatus = $"0x{lastRxStatus:X}", lastDataSize, lastExtraDataIndex };
     private nint module;
     private uint device, channel, filter, requestId;
     private bool opened, connected, filtered, disposed;
@@ -48,9 +52,11 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     public string AdapterName { get; }
     public bool Experimental { get; }
 
-    public NativeJ2534Channel(J2534Driver driver)
+    public NativeJ2534Channel(J2534Driver driver, IDiagnosticSink? diagnostics = null)
     {
         libraryPath = Path.GetFullPath(driver.LibraryPath);
+        this.diagnostics = diagnostics;
+        diagnostics?.Record("driver.selected", new { driver.Name, driverFile = Path.GetFileName(libraryPath), processBits = IntPtr.Size * 8 });
         // Trust the registered installation, never a DLL supplied by a ROM or backup.
         var registered = J2534Drivers.Discover(driver.Kind).FirstOrDefault(item => item.LibraryPath.Equals(libraryPath, StringComparison.OrdinalIgnoreCase));
         if (registered is null)
@@ -72,6 +78,7 @@ public sealed class NativeJ2534Channel : IJ2534Channel
             return;
         var text = new StringBuilder(256);
         error?.Invoke(text);
+        diagnostics?.Record("driver.error", new { action, status = $"0x{code:X}", lastError = text.ToString() });
         throw new TransportException($"{action}: J2534 0x{code:X} {text}. Reconnect before continuing.");
     }
     private static Message Packet(uint id, ReadOnlySpan<byte> payload, uint flags = 0x40)
@@ -130,11 +137,13 @@ public sealed class NativeJ2534Channel : IJ2534Channel
         var flow = Packet(requestId, []);
         Check(startFilter!(channel, 3, ref mask, ref pattern, ref flow, out filter), "Install ISO-TP flow-control filter");
         filtered = true;
+        diagnostics?.Record("driver.channel", new { bitrate, requestId = $"0x{requestId:X}", responseId = $"0x{responseId:X}", protocol = "ISO15765", flowControlFilter = true, padding = true });
     }
 
     public void ClearReceive()
     {
         EnsureConnected();
+        readCalls = emptyReads = 0; lastReadStatus = lastRxStatus = lastDataSize = lastExtraDataIndex = 0;
         Check(ioctl!(channel, 8, 0, 0), "Clear stale J2534 receive messages");
     }
     public void Write(byte[] request)
@@ -156,8 +165,9 @@ public sealed class NativeJ2534Channel : IJ2534Channel
         var packet = Packet(0, []);
         uint count = 1;
         var status = read!(channel, ref packet, ref count, (uint)timeoutMilliseconds);
+        readCalls++; lastReadStatus = status; lastRxStatus = packet.RxStatus; lastDataSize = packet.DataSize; lastExtraDataIndex = packet.ExtraDataIndex;
         if (status is 9 or 16)
-            return null;
+        { emptyReads++; return null; }
         Check(status, "Receive J2534 response");
         if (count == 0)
             return null;

@@ -13,13 +13,14 @@ Start with the workflow you need. ECU programming remains disabled.
 | [Map-help conventions](TUNING_HELP.md) | Units, sign conventions, multipliers, corrections and interpretation limits |
 | [Logger overview](logger/README.md) | Live-data and recorded-log screenshots, features and a quick start |
 | [Logger](LOGGER.md) | Adapter setup, ROM binding, parameters, units, charts, CSV recording and log viewing |
+| [Report a problem](TROUBLESHOOTING.md) | Export a support ZIP, review its contents and open a guided issue |
 | [General usage](USAGE.md) | Reading, backups, transport settings and file inspection |
 | [Supported ROMs](SUPPORTED_ROMS.md) | Known inspection layouts and compatibility limits |
 | [Adapter status and testing candidates](ADAPTERS.md) | Qualified adapter paths, planned hardware and the test checklist |
 | [Definition import](DEFINITIONS.md) | Import editor/logger updates, persistence and bundled fallback |
 | [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all seven profiles |
 
-The app includes Getting started, Editor and Logger guides under **Help**.
+The app includes Getting started, Editor, Logger and Report a problem guides under **Help**.
 **File → Editor guide** opens the editing guide; **Map info** / F1 explains
 the selected map. Expand the app navigation with **☰** to see workspace names.
 
@@ -33,3 +34,8 @@ the selected map. Expand the app navigation with **☰** to see workspace names.
 
 The reader can dump unknown compatible-family ROMs without a definition. Editing
 and logging each have stricter profile requirements, described in their guides.
+
+## Get help
+
+Use the [problem-report workflow](TROUBLESHOOTING.md) to export a diagnostic ZIP
+and open a guided GitHub report.

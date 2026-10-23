@@ -6,7 +6,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        if (e.Args.Contains("--menus-smoke", StringComparer.Ordinal))
+        if (e.Args.Contains("--menus-smoke", StringComparer.Ordinal) || e.Args.Contains("--support-smoke", StringComparer.Ordinal))
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
             string GetMenu(string key) { int at = Array.IndexOf(e.Args, key); return at >= 0 && at + 1 < e.Args.Length ? e.Args[at + 1] : throw new ArgumentException("Missing " + key); }
@@ -15,7 +15,7 @@ public partial class App : Application
             {
                 string output = GetMenu("--output"); System.IO.Directory.CreateDirectory(output);
                 menuWindow = new MainWindow(System.IO.Path.Combine(output, "data")); MainWindow = menuWindow;
-                var result = await menuWindow.ExerciseMenusOffline(output);
+                var result = e.Args.Contains("--support-smoke", StringComparer.Ordinal) ? await menuWindow.ExerciseDiagnosticsOffline(output) : await menuWindow.ExerciseMenusOffline(output);
                 System.IO.File.WriteAllText(GetMenu("--smoke-report"), System.Text.Json.JsonSerializer.Serialize(result));
                 menuWindow.CloseWorkbenchTest(); Shutdown(0);
             }

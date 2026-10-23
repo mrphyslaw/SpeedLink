@@ -40,6 +40,7 @@ public class ElmTransport : IReadTransport
 {
     protected readonly ISerialConnection Serial;
     protected readonly IMonotonicClock Clock;
+    protected readonly IDiagnosticSink? diagnostics;
     public string Mode => "hardware";
     public string Adapter { get; protected set; } = "";
     public virtual int ReadChunkSize => 256;
@@ -55,10 +56,11 @@ public class ElmTransport : IReadTransport
     {
         get; protected set;
     }
-    public ElmTransport(ISerialConnection serial, IMonotonicClock? clock = null)
+    public ElmTransport(ISerialConnection serial, IMonotonicClock? clock = null, IDiagnosticSink? diagnostics = null)
     {
         Serial = serial;
         Clock = clock ?? new MonotonicClock();
+        this.diagnostics = diagnostics;
     }
     protected void WriteExact(byte[] data)
     {
@@ -94,12 +96,20 @@ public class ElmTransport : IReadTransport
     {
         if (Failed)
             throw new TransportException("Connection is no longer synchronized. Disconnect and reconnect.");
+        bool control = command.StartsWith("AT", StringComparison.Ordinal) || command.StartsWith("ST", StringComparison.Ordinal) || command == "VTI";
+        var started = Clock.Elapsed;
+        if (control) diagnostics?.Record("serial.command_started", new { command, timeoutMs = timeout * 1000 });
         try
         {
             WriteExact(Encoding.ASCII.GetBytes(command + "\r"));
-            return Prompt(timeout);
+            string response = Prompt(timeout);
+            if (control) diagnostics?.Record("serial.command_completed", new { command, response = response.Length <= 256 ? response : response[..256], durationMs = (Clock.Elapsed - started).TotalMilliseconds });
+            else diagnostics?.Record("serial.reply", new { command, responseCharacters = response.Length,
+                response = command.StartsWith("09", StringComparison.Ordinal) || command.StartsWith("23", StringComparison.Ordinal) ? "[payload omitted]" : response[..Math.Min(512, response.Length)],
+                durationMs = (Clock.Elapsed - started).TotalMilliseconds });
+            return response;
         }
-        catch { Failed = true; throw; }
+        catch (Exception error) { if (control) diagnostics?.Record("serial.command_error", new { command, error = error.Message, durationMs = (Clock.Elapsed - started).TotalMilliseconds }); Failed = true; throw; }
     }
     public virtual void Initialize()
     {
@@ -153,7 +163,7 @@ public sealed class VLinkerReadTransport : ElmTransport
     {
         get; private set;
     }
-    public VLinkerReadTransport(ISerialConnection serial, IMonotonicClock? clock = null, int transferBaud = TransferBaud) : base(serial, clock)
+    public VLinkerReadTransport(ISerialConnection serial, IMonotonicClock? clock = null, int transferBaud = TransferBaud, IDiagnosticSink? diagnostics = null) : base(serial, clock, diagnostics)
     {
         if (transferBaud is not (115200 or 230400 or 500000 or 1000000 or 2000000))
             throw new ArgumentOutOfRangeException(nameof(transferBaud), "Select a supported serial transfer rate.");
@@ -175,6 +185,7 @@ public sealed class VLinkerReadTransport : ElmTransport
             SetBaud(ConfiguredTransferBaud);
             Adapter = firmware + " · segmented read";
             Ready = true;
+            diagnostics?.Record("adapter.ready", new { adapter = Adapter, serialBaud = Serial.BaudRate, canBitrate = 500000, readChunkBytes = ReadChunkSize, backend = "FTDI" });
         }
         catch { Failed = true; Ready = false; throw; }
     }
@@ -182,6 +193,7 @@ public sealed class VLinkerReadTransport : ElmTransport
     {
         if (baud == Serial.BaudRate)
             return;
+        diagnostics?.Record("serial.baud_change", new { previousBaud = Serial.BaudRate, requestedBaud = baud });
         if (Command("STBRT100").Trim() != "OK")
             throw new TransportException("Adapter rejected baud-switch timeout.");
         WriteExact(Encoding.ASCII.GetBytes("STSBR " + baud + "\r"));

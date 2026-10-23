@@ -235,7 +235,8 @@ public sealed class BackupStore
             {
                 ["mode"] = mode,
                 ["operation"] = operation,
-                ["version"] = "0.2.0-alpha.1"
+                ["version"] = typeof(BackupStore).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                    .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion
             });
         }
         catch { journal.Dispose(); throw; }
