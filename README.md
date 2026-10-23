@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.4-alpha.10](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.10)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.5-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -49,6 +49,7 @@ a vehicle test or measured ECU logging rates.
 | See the logger, record parameters and review logs | [Logger overview and screenshots](docs/logger/README.md) |
 | Logger setup, rates, units and troubleshooting | [Logger guide](docs/LOGGER.md) |
 | Check ROM/profile compatibility | [Supported ROMs](docs/SUPPORTED_ROMS.md) |
+| Report a connection, read, logger or app problem | [Export a support report](docs/TROUBLESHOOTING.md) |
 | Build from source or review validation | [Documentation index](docs/README.md) |
 | Install editor or logger definition updates | [Definition import](docs/DEFINITIONS.md) |
 
@@ -88,6 +89,16 @@ Layout preferences are saved beside the EXE in `data/editor-layout.json`.
 Select **Definitions** to import editor XML or logger JSON updates for supported
 ROM layouts. Updates are kept in `data/definitions` beside the EXE; the bundled
 copies remain available. See [definition import](docs/DEFINITIONS.md).
+
+## Report a problem
+
+Capture starts automatically before the adapter opens. After a problem, choose
+**Connection → Export support report…**, select the failed session and save its
+ZIP. You can do this after restarting without reconnecting. Follow the
+[reporting guide](docs/TROUBLESHOOTING.md) and attach it to the
+[problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+Factory seed/key exchanges are retained; personal information is redacted and
+ROM bytes stay in your backups.
 
 ## Read and back up a ROM
 
@@ -143,7 +154,8 @@ See the [logger guide](docs/LOGGER.md) for setup, recordings and troubleshooting
    as gaps; the viewer also shows sample ages and recorded rates.
 
 Keep the whole recording folder, including `responses.jsonl` and `session.json`,
-when sharing data for troubleshooting.
+locally. Start troubleshooting with a [support ZIP](docs/TROUBLESHOOTING.md);
+review any recording separately before deliberately sharing it.
 
 ## ROM checks
 
@@ -156,7 +168,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.4-alpha.10](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.4-alpha.10), a Windows Workbench alpha.**
+**Current release: [v0.5.5-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.1), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording

@@ -17,9 +17,9 @@
     </WrapPanel>
     <DockPanel Grid.Row="2" LastChildFill="False"><Button x:Name="ConnectButton" Content="Connect &amp; identify" Click="Connect_Click" Style="{DynamicResource PrimaryButton}"/>
      <Button x:Name="DisconnectButton" Content="Disconnect" Click="Disconnect_Click"/><Button x:Name="ReadButton" Content="Read &amp; verify backup" Click="Read_Click"/>
-     <Button x:Name="StopButton" DockPanel.Dock="Right" Content="Stop" Click="Stop_Click"/></DockPanel>
+     <Button x:Name="ExportReportButton" DockPanel.Dock="Right" Content="Export support report…" Click="ExportReport_Click"/><Button x:Name="StopButton" DockPanel.Dock="Right" Content="Stop" Click="Stop_Click"/></DockPanel>
     <TextBlock Grid.Row="3" x:Name="IdentityText" Text="Disconnected. No ECU has been identified." TextWrapping="Wrap" Margin="0,18,0,12"/>
-    <StackPanel Grid.Row="4" Margin="0,0,0,10"><TextBlock x:Name="AdapterNote" Visibility="Collapsed" Text="Mongoose support is experimental. Reading and logging need hardware testing; flashing is disabled." TextWrapping="Wrap" Foreground="{DynamicResource AmberBrush}" Margin="0,0,0,8"/><TextBlock Text="Two matching 1 MiB reads are required. Original captures, identity, SHA-256 hashes and the journal are retained." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}"/></StackPanel>
+    <StackPanel Grid.Row="4" Margin="0,0,0,10"><TextBlock x:Name="DiagnosticStatusText" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8"/><TextBlock x:Name="AdapterNote" Visibility="Collapsed" Text="Mongoose support is experimental. Reading and logging need hardware testing; flashing is disabled." TextWrapping="Wrap" Foreground="{DynamicResource AmberBrush}" Margin="0,0,0,8"/><TextBlock Text="Two matching 1 MiB reads are required. Original captures, identity, SHA-256 hashes and the journal are retained." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}"/></StackPanel>
     <TextBox Grid.Row="5" x:Name="LogBox" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontFamily="Consolas"/>
    </Grid></TabItem>
 <TabItem Header="Editor"><local:EditorWorkspace x:Name="EditorPane"/></TabItem>

@@ -13,7 +13,7 @@ public partial class MainWindow
         Show(); UpdateLayout(); AdapterBox.SelectedIndex = tactrix ? 1 : 0; PortBox.Text = port; BaudBox.SelectedItem = 115200;
         await ClickAndWait(ConnectButton);
         if (transport is null || identity is null) throw new InvalidOperationException("Bench UI identification failed: " + StatusText.Text);
-        var serial = connection; var passThru = transport as SpeedLink.J2534.J2534ReadTransport;
+        var serial = connection; var passThru = (transport is DiagnosticTransport captured ? captured.Inner : transport) as SpeedLink.J2534.J2534ReadTransport;
         BindLoggerRom(rom); Pages.SelectedIndex = 2;
         foreach (var row in loggerRows) row.Selected = new[] { "engine_rpm", "boost_pressure", "actual_lambda", "fuel_rail_pressure", "knock_retard", "injector_duty_cycle" }.Contains(row.Id);
         RecordCsvBox.IsChecked = true; Controls(); bool locked = false;
@@ -36,7 +36,10 @@ public partial class MainWindow
         var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)ActualWidth, (int)ActualHeight, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
         bitmap.Render(this); var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
         using (var output = System.IO.File.Create(screenshot)) encoder.Save(output);
-        return new() { ["passed"] = true, ["physicalAdapters"] = true, ["realEcuTested"] = false,
+        if (diagnosticSession is null) throw new InvalidOperationException("Physical UI workflow did not capture diagnostics.");
+        await diagnosticSession.FlushAsync();
+        string support = System.IO.Path.ChangeExtension(screenshot, ".support.zip"); SupportReport.Export(diagnosticSession.Folder, support);
+        return new() { ["passed"] = true, ["physicalAdapters"] = true, ["realEcuTested"] = false, ["supportReport"] = support,
             ["adapter"] = tactrix ? "Tactrix" : "vLinker", ["channels"] = 6, ["scans"] = loaded.Rows,
             ["actualButtons"] = true, ["connectionReleased"] = true, ["recording"] = recordings[0], ["replayLoaded"] = true, ["screenshot"] = screenshot };
     }

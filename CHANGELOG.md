@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.5-alpha.1 — diagnostic reports
+
+- Capture persistent, bounded diagnostics before the adapter opens: setup,
+  requests, timing, errors, J2534 receive statistics and factory seed/key access.
+- Export a support ZIP with a readable preview and session picker, including
+  failed sessions after restarting. Personal information is redacted; ROM bytes
+  stay in backups. Keep backup journals unchanged and export a sanitized copy.
+- Add a reporting guide in Help and a guided GitHub problem-report form.
+- Retain read-only ECU access, existing deadlines and no automatic resends.
+
 ## v0.5.4-alpha.10 — updated user guides
 
 - Reorganize the editor guide around first edits, single values, small tables,

@@ -90,7 +90,8 @@ local paths; review reports before sharing them.
 
 - **vLinker FS:** use initial baud **115200**. The adapter temporarily uses
   2,000,000 baud during reads and normally returns to 115200 on disconnect.
-  If interrupted while USB stays connected, select 2000000 to reconnect when
+  After a read transport error or interruption while USB stays connected, select
+  2000000 to reconnect when
   that temporary setting remains active. After reconnecting USB, start at
   115200. The app uses the installed FTDI driver with 1 ms latency and restores
   the prior latency setting when closing the connection.
@@ -111,3 +112,14 @@ supported layouts. Save open work, then reopen the ROM to use an editor update;
 reload the current ECU ROM for a logger update. Imported copies live under
 `data/definitions`; bundled copies remain available. See
 [definition import](DEFINITIONS.md) for accepted files and restoring a bundled copy.
+
+## Reporting a problem
+
+Diagnostic capture starts automatically with **Connect & identify**, including
+failed driver opens. On **Connection**, choose **Export support report…**, select
+the session with the problem and save its ZIP. This also works after restarting
+without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
+the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+The report includes requests, timing, errors and factory security access; personal
+information is redacted and ROM bytes remain in your backup files. Review the ZIP
+before sharing.

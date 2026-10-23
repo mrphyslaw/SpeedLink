@@ -58,20 +58,24 @@ body:
       placeholder: "Two matching reads; unknown checksum layout. Or: Connect & identify failed with…"
     validations:
       required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Support report for a failed read (optional)
+      description: Use Connection → Export support report… and drag the ZIP here. See the problem-report guide for details.
   - type: input
     id: size_hash
     attributes:
       label: ROM size and SHA-256
       description: Copy from ROM checks if you have a complete dump; otherwise leave blank.
       placeholder: "1048576 bytes / SHA-256"
-  - type: upload
+  - type: textarea
     id: dump
     attributes:
       label: ROM contribution ZIP (optional)
-      description: Unedited rom.bin plus ROM_INFO.txt from the guide. Leave out backup.json, journals and raw captures. You may ask for a private route instead.
+      description: Drag a ZIP containing unedited rom.bin plus ROM_INFO.txt from the guide here. Leave out backup.json, journals and raw captures. You may ask for a private route instead.
     validations:
       required: false
-      accept: ".zip"
   - type: textarea
     id: notes
     attributes:

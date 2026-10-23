@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.5.4-alpha.10";
+    public const string Version = "0.5.5-alpha.1";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -63,12 +63,13 @@ public partial class MainWindow : Window
     }
     private void Log(string message)
     {
+        diagnosticSession?.Record("ui.message", new { message });
         LogBox.AppendText(DateTime.Now.ToString("HH:mm:ss") + "  " + message + Environment.NewLine);
         LogBox.ScrollToEnd();
     }
     private void Controls()
     {
-        bool idle = !busy && !closing;
+        bool idle = !busy && !closing && !exportingReport;
         DefinitionsButton.IsEnabled = idle && transport is null;
         SessionText.Text = transport is null ? "Offline" : identity?.Calibration ?? "Adapter connected";
         ConnectButton.IsEnabled = idle && transport is null;
@@ -85,6 +86,7 @@ public partial class MainWindow : Window
         AdapterBox.IsEnabled = idle && transport is null;
         DriverBox.IsEnabled = AdapterBox.IsEnabled;
         LoggerControls(idle);
+        DiagnosticControls(idle);
     }
     private Task Run(Func<Task> action)
     {
@@ -104,7 +106,7 @@ public partial class MainWindow : Window
             await action();
         }
         catch (OperationCanceledException) { StatusText.Text = "Stopped · partial files and journal retained"; Log(StatusText.Text); RefreshHistory(); }
-        catch (Exception error) { StatusText.Text = "Stopped · " + error.Message; Log(error.Message); RefreshHistory(); }
+        catch (Exception error) { diagnosticSession?.Error("operation.error", error); StatusText.Text = "Stopped · " + error.Message; Log(error.Message); RefreshHistory(); }
         finally
         {
             busy = false;
@@ -134,13 +136,15 @@ public partial class MainWindow : Window
         StatusText.Text = "Connecting and identifying…";
         await Run(async () =>
         {
+            await BeginDiagnostics();
+            diagnosticSession?.Record("connection.opening", new { adapter = AdapterBox.Text, port = passThruAdapter ? null : name, baud = passThruAdapter ? 0 : baud });
             var connected = await Task.Run(() =>
             {
                 FtdiSerialConnection? serial = null;
                 IReadTransport link;
                 if (passThruAdapter)
                 {
-                    var passThru = new J2534ReadTransport(new NativeJ2534Channel(driver!));
+                    var passThru = new J2534ReadTransport(new NativeJ2534Channel(driver!, diagnosticSession), diagnostics: diagnosticSession);
                     link = passThru;
                     try { passThru.Initialize(); }
                     catch { passThru.Dispose(); throw; }
@@ -148,13 +152,15 @@ public partial class MainWindow : Window
                 else
                 {
                     serial = new FtdiSerialConnection(name, baud);
-                    var elm = new VLinkerReadTransport(serial);
+                    diagnosticSession?.Record("serial.opened", new { backend = FtdiSerialConnection.Backend, originalLatencyMs = serial.OriginalLatency, latencyMs = 1, baud });
+                    var elm = new VLinkerReadTransport(serial, diagnostics: diagnosticSession);
                     link = elm;
                     try { elm.Initialize(); }
                     catch { elm.Dispose(); throw; }
                 }
                 try
                 {
+                    if (diagnosticSession is not null) link = new DiagnosticTransport(link, diagnosticSession);
                     return (Link: link, Connection: serial, Identity: ReadWorkflow.Identify(link));
                 }
                 catch { link.Dispose(); throw; }
@@ -162,6 +168,7 @@ public partial class MainWindow : Window
             transport = connected.Link;
             connection = connected.Connection;
             identity = connected.Identity;
+            diagnosticSession?.Record("connection.ready", new { identity.Adapter, identity.Calibration, identity.VinStatus, identity.CalibrationStatus });
             LoggerIdentityChanged();
             IdentityText.Text = $"{identity.Adapter}\nVIN: {identity.Vin ?? "unavailable"}    Calibration: {identity.Calibration ?? "unavailable"}";
             StatusText.Text = "Connected · identification recorded";
@@ -179,13 +186,14 @@ public partial class MainWindow : Window
         if (link is not null)
         {
             await Task.Run(link.Dispose);
-            if (link is VLinkerReadTransport elm)
+            var device = link is DiagnosticTransport traced ? traced.Inner : link;
+            if (device is VLinkerReadTransport elm)
             {
                 BaudBox.SelectedItem = elm.Baud;
                 if (elm.CloseWarning is not null)
                     Log("Adapter baud restore: " + elm.CloseWarning);
             }
-            if (link is J2534ReadTransport passThru && passThru.CloseWarning is not null)
+            if (device is J2534ReadTransport passThru && passThru.CloseWarning is not null)
                 Log("J2534 cleanup: " + passThru.CloseWarning);
             if (serial?.CleanupWarning is not null)
                 Log("Adapter driver cleanup: " + serial.CleanupWarning);
@@ -340,7 +348,7 @@ public partial class MainWindow : Window
     private void About_Click(object sender, RoutedEventArgs e) => MessageBox.Show(this, Resource("SpeedLink.About.txt").Replace("{version}", Version), "About SpeedLink");
     private Window HelpWindow()
     {
-        var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Adapters / testing"] = "SpeedLink.AdapterHelp.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["Editor"] = "SpeedLink.EditorHelp.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
+        var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Adapters / testing"] = "SpeedLink.AdapterHelp.md", ["Report a problem"] = "SpeedLink.SupportHelp.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["Editor"] = "SpeedLink.EditorHelp.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
         foreach (var name in Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith("SpeedLink.Notices.", StringComparison.Ordinal)))
             documents["Notices / " + name[18..]] = name;
         var panel = new DockPanel { Margin = new Thickness(16) };
@@ -360,7 +368,7 @@ public partial class MainWindow : Window
         if (!closeApproved && !EditorPane.MayClose()) { e.Cancel = true; return; }
         closeApproved = true;
         EditorPane.PrepareHostClose();
-        if (transport is null && !busy)
+        if (transport is null && !busy && diagnosticSession is null)
             return;
         e.Cancel = true;
         closing = true;
@@ -379,7 +387,11 @@ public partial class MainWindow : Window
             await Disconnect();
         }
         catch (Exception error) { Log(error.Message); }
-        finally { closing = false; stop?.Dispose(); Close(); }
+        finally
+        {
+            if (diagnosticSession is not null) { await diagnosticSession.DisposeAsync(); diagnosticSession = null; }
+            closing = false; stop?.Dispose(); Close();
+        }
     }
     public void RunSmoke(string[] args)
     {

@@ -21,6 +21,7 @@ jobs:
       - run: dotnet restore SpeedLink.slnx --locked-mode
       - run: dotnet test SpeedLink.slnx -c Release --no-restore --logger "trx;LogFileName=CSharp.trx" --results-directory TestResults
       - run: ./tools/Verify-Regression.ps1 -Results TestResults/CSharp.trx
+      - run: ./tools/Test-SupportUi.ps1 -Output TestResults/SupportUi
       - run: ./tools/Test-MenuUi.ps1 -Output TestResults/MenuUi
       - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
       - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi
@@ -35,6 +36,7 @@ jobs:
           & ./tools/SpeedLink.Bench/bin/Release/net10.0/win-x86/SpeedLink.Bench.exe --mode peer-parser-self-test --report TestResults/PeerParser.json
           if ($LASTEXITCODE -ne 0) { throw 'Peer parser regression checks failed.' }
       - run: ./tools/Publish-Windows.ps1 -Output publish
+      - run: ./tools/Test-SupportUi.ps1 -Output TestResults/Standalone_Support -Executable ./publish/SpeedLink.exe
       - name: Check standalone editor menus
         run: |
           $folder = Join-Path (Get-Location) 'TestResults/Standalone_Menus'

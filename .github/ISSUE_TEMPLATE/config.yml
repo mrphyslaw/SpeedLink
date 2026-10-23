@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Report a problem — export diagnostics
+    url: https://github.com/mrphyslaw/SpeedLink/blob/main/docs/TROUBLESHOOTING.md
+    about: Capture a support ZIP for connection, ROM reading, logging or editor problems.
   - name: Start here — dump a ROM
     url: https://github.com/mrphyslaw/SpeedLink/blob/main/docs/DUMP_A_ROM.md
     about: Step-by-step adapter setup, verified reading, ZIP preparation and ROM contribution.

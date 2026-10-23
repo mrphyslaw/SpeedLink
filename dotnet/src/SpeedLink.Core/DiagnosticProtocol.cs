@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace SpeedLink.Core;
 
-public class TransportException(string message) : IOException(message);
+public class TransportException(string message, Exception? inner = null) : IOException(message, inner);
 public sealed class NegativeResponseException(byte service, byte code)
     : TransportException($"ECU rejected service {service:X2}: NRC {code:X2}.")
 {
@@ -127,6 +127,7 @@ public static partial class DiagnosticProtocol
 
 public interface IReadTransport : IDisposable
 {
+    IDiagnosticSink? Diagnostics => null;
     string Mode
     {
         get;

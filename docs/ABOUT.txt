@@ -15,7 +15,9 @@ Distinct axis header bands and borders separate inputs from editable values.
 Tuner-focused map help with visible units, arithmetic and correction examples.
 Map info beside the tabs and F1 open help for the active map.
 Import editor/logger definition updates and restore bundled copies.
-Getting started, Editor and Logger guides included under Help.
+Automatic adapter diagnostics and support ZIP export, including failed connections.
+Factory seed/key exchanges retained; ROM payloads excluded; personal data redacted.
+Getting started, Editor, Logger and Report a problem guides included under Help.
 Every editor save corrects and verifies its checksum. Originals are preserved.
 A definition is not required to dump a ROM.
 

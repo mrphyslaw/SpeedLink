@@ -137,8 +137,9 @@ and reconnect/identify before attempting a fresh read. If the adapter was
 unplugged, reconnect its USB connection and start with the normal settings.
 Use [General usage](USAGE.md) for the vLinker baud-recovery case.
 
-Report the step that failed, exact error, adapter, version, and whether any
-bytes were read. You can open the same guided request without an attachment.
+Use **Connection → Export support report…** to save the failed session. Attach
+its ZIP and report the step that failed, exact error, adapter, version, and
+whether any bytes were read. You can open the same guided request without an attachment.
 We cannot diagnose an incomplete dump as if it were complete firmware.
 
 ## What happens after submission
@@ -158,3 +159,14 @@ Maintainer intake checklist:
 - Verify logger identifiers/decoding separately from map compatibility.
 - Run offline encoding/export/guard checks and track pending ECU acceptance.
 - Link the resulting support change back to the request.
+
+## Reporting a problem
+
+Diagnostic capture starts automatically with **Connect & identify**, including
+failed driver opens. On **Connection**, choose **Export support report…**, select
+the session with the problem and save its ZIP. This also works after restarting
+without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
+the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+The report includes requests, timing, errors and factory security access; personal
+information is redacted and ROM bytes remain in your backup files. Review the ZIP
+before sharing.

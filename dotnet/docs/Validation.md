@@ -1,5 +1,27 @@
 # C# validation
 
+## Diagnostic support reports — 0.5.5-alpha.1
+
+- 310 unit cases pass, including 18 added cases for security-access retention,
+  privacy, ROM-byte exclusion, restart persistence, rotation/retention, storage
+  failure, damaged journals, driver-open failures and unchanged request counts.
+- J2534 diagnostics retain receive/pending/notification counts and driver status.
+  A regression case preserves the existing ECU response deadline after a slow
+  driver write; request timing is recorded separately.
+- Native UI checks open Export support report through its actual button, verify
+  connection controls are locked while exporting, select a saved failed session
+  offline, save the ZIP and restore controls. The standalone EXE runs the same check.
+- Existing menu, seven-profile layout/editor/workbench/import, logger and replay
+  suites remain required. The reporting guide is bundled under Help.
+- The isolated, powered two-adapter bench on 2026-10-23 passed full two-pass
+  1 MiB reads, boundary lengths, short/missing/pending replies, all-38-parameter
+  logging and native logger workflows with both vLinker FS and Tactrix as readers.
+  Reports retained the failing address and factory seed/key exchange, excluded
+  ROM bytes/personal identifiers and matched the independent peer request trace.
+  Failed reads issued the affected memory request once and created no verified backup.
+- These are simulated ECU replies over physical adapters. No Mazda ECU was used;
+  Mongoose hardware and real-ECU acceptance remain pending.
+
 ## Compact maps and preview resizing — 0.5.4-alpha.9
 
 - Native editor checks exercise the value field, units, explanation, full stored

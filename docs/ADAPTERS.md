@@ -47,7 +47,9 @@ requests are not automatically resent.
 
 ### Report a test result
 
-Open a GitHub issue with the SpeedLink version, Windows version, exact adapter
+Use **Connection → Export support report…** and attach the ZIP to the
+[problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+Include the SpeedLink version, Windows version, exact adapter
 model/connection type, registered driver name, firmware and driver/API versions.
 State which steps passed: identification, both full reads, backup verification,
 then logging duration, channel count and measured scan rate. Include the exact
@@ -75,3 +77,14 @@ option does not enable ECU programming or qualify other Mongoose variants.
 
 Manufacturer references: [driver downloads](https://opusivs-au.com/support/downloads/)
 and [J2534 driver discovery](https://opusivs-au.com/support/oem-customer-support/how-to-program-with-opus-ivss-passthru-sae-j2534-dll/discovery-of-the-dll/).
+
+## Reporting a problem
+
+Diagnostic capture starts automatically with **Connect & identify**, including
+failed driver opens. On **Connection**, choose **Export support report…**, select
+the session with the problem and save its ZIP. This also works after restarting
+without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
+the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+The report includes requests, timing, errors and factory security access; personal
+information is redacted and ROM bytes remain in your backup files. Review the ZIP
+before sharing.
