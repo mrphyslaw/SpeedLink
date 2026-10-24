@@ -22,6 +22,34 @@ public class MultiRomLoggerTests
         root.GetProperty("calibration").GetProperty("map_gain_kpa_per_v").GetDouble(),
         root.GetProperty("calibration").GetProperty("map_offset_kpa").GetDouble());
 
+    [Theory, MemberData(nameof(Profiles))]
+    public void CompleteEcuIdentitySelectsOnlyItsKnownLogger(string id, int channels, int queries, int vectors)
+    {
+        var definition = LoggerDefinition.ForCalibration(id)!;
+        string complete = RomInspector.KnownProfiles.Single(p => p.Calibration == id).Identity;
+        foreach (string reported in new[] { id, complete, "SW-" + id + ".HEX", "SW-" + complete + ".HEX" })
+        {
+            Assert.True(definition.MatchesCalibrationId(reported));
+            Assert.Same(definition, LoggerDefinition.ForCalibration(reported));
+        }
+        foreach (string invalid in new[] { id + "1", id + "L3T9999", complete[..^1], complete + "1", "X" + complete,
+            complete[..^1] + (complete[^1] == '0' ? "1" : "0") })
+        {
+            Assert.False(definition.MatchesCalibrationId(invalid));
+            Assert.Null(LoggerDefinition.ForCalibration(invalid));
+        }
+        string other = RomInspector.KnownProfiles.First(p => p.Calibration != id).Identity;
+        Assert.False(definition.MatchesCalibrationId(other));
+        Assert.Null(LoggerDefinition.ForCalibration(complete + " " + other));
+        using var data = Vectors(id); using var peer = new Peer(definition, data.RootElement);
+        var logger = new LiveLogger(definition, Calibration(data.RootElement), peer,
+            new EcuIdentity("test", "fixture", null, complete), definition.ChannelIds);
+        var frame = logger.ReadFrame();
+        Assert.Equal(channels, frame.Readings.Count); Assert.Equal(queries, peer.Requests.Count);
+        Assert.Equal(vectors, data.RootElement.GetProperty("vectors").GetArrayLength());
+        Assert.All(frame.Readings.Values, reading => Assert.Equal("OK", reading.Status));
+    }
+
     [Fact]
     public void CatalogCoversExactlyEveryBundledReaderDefinition()
     {

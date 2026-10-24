@@ -91,8 +91,13 @@ public sealed class LoggerDefinition
             units.EnumerateArray().Select(x => Text(x, "unit")) : []).ToArray())).ToArray();
     private static string[] CommonUnits(string unit) => unit switch { "kPa" => ["psi", "bar"], "degC" => ["degF"], "km/h" => ["mph"], _ => [] };
     public bool MatchesCalibrationId(string? calibration) => calibration is not null && SoftwareIds.Any(id =>
+        MatchesIdentityToken(calibration, id) || RomInspector.KnownProfiles.Any(profile =>
+            profile.Calibration == id && MatchesIdentityToken(calibration, profile.Identity)));
+    private static bool MatchesIdentityToken(string calibration, string identity) =>
+        // ECUs can report the complete ROM identity, including its adjacent build ID.
+        // Accept only known complete identities; an arbitrary suffix is not a match.
         System.Text.RegularExpressions.Regex.IsMatch(calibration, "(?<![A-Z0-9])" +
-            System.Text.RegularExpressions.Regex.Escape(id) + "(?![A-Z0-9])", System.Text.RegularExpressions.RegexOptions.CultureInvariant));
+            System.Text.RegularExpressions.Regex.Escape(identity) + "(?![A-Z0-9])", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 
     private LoggerDefinition(JsonElement element)
     {

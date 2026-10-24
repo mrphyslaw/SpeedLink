@@ -131,7 +131,8 @@ internal static class Program
                     var calibration = SpeedLink.Core.LoggerCalibration.ExplicitMap(values.GetProperty("map_gain_kpa_per_v").GetDouble(), values.GetProperty("map_offset_kpa").GetDouble());
                     using var peer = new LoggerPeer(profile, Get("--vectors"), fault);
                     loggerWindow = new MainWindow(Get("--vault")); loggerApp.MainWindow = loggerWindow;
-                    var result = await loggerWindow.ExerciseLoggerOffline(peer, Get("--screenshot"), fault, profile, calibration, peer.AllowTraffic);
+                    string? romPath = args.Contains("--logger-rom", StringComparer.Ordinal) ? Get("--logger-rom") : null;
+                    var result = await loggerWindow.ExerciseLoggerOffline(peer, Get("--screenshot"), fault, profile, calibration, peer.AllowTraffic, romPath);
                     result["requests"] = peer.Requests; result["faultRequests"] = peer.FaultRequests;
                     if (fault && peer.FaultRequests != 1) throw new InvalidOperationException("Faulted request was retried.");
                     File.WriteAllText(Get("--report"), JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true })); resultCode = 0;

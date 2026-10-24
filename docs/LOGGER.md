@@ -47,7 +47,10 @@ Logging can run with the engine running. **ROM backup reads require the engine
 stopped**. They use a different diagnostic session. A connection used for a ROM
 read must be disconnected before logging. SpeedLink never flashes the ECU.
 
-The live calibration identifier must match the logger profile. Unknown ROMs can
+The live calibration identifier must match the logger profile. SpeedLink accepts
+the short calibration ID and its known complete ECU identity, such as
+`L3P4EM000` and `L3P4EM000L3T6051`. The ROM filename does not affect matching.
+Unknown ROMs can
 still be read and saved; their logging layout is not guessed. Switching profiles
 clears the previous ROM calibration. The loaded image's software marker and its
 profile's code fingerprints are checked.
@@ -129,6 +132,8 @@ transport behavior and its remaining validation limits.
   ECU ROM and select at least one parameter.
 - **A ROM/profile mismatch appears:** check that the file is the current full
   backup from the connected ECU and that its calibration is listed in the coverage.
+  The message shows the selected ROM profile and the ECU's reported calibration.
+  Renaming the file will not change the match; include both IDs in a support report.
 - **Updates are slow:** select fewer parameters and watch the measured **Hz**
   column. Increasing **Target scans/s** does not make the ECU or adapter reply faster.
 - **A timeout or USB disconnect stops logging:** reconnect manually, then start a
