@@ -40,7 +40,7 @@ This screenshot uses a synthetic timeout; it does not show a vehicle test.
   and negative replies are retained to investigate different ECU behavior.
 - J2534 receive-poll, empty-poll, notification, pending and completed-reply
   counts, plus driver return/status and message-size details where available.
-  Source builds after v0.5.5-alpha.1 also record the returned message count,
+  From v0.5.5-alpha.2, reports also record the returned message count,
   messages accompanying timeout-like statuses, native receive-call duration and
   inconsistent extra-data indexes. Receive metadata contains no ROM payload.
 - Exception details, capture warnings and a sanitized read-journal copy when
@@ -51,9 +51,9 @@ These are host/driver diagnostics, not a raw CAN wire capture. Recording adds
 no ECU requests and does not enable retries or change the read-only allowlist.
 A report helps locate a failure; it does not establish the cause by itself.
 
-A J2534 driver can return message data along with a timeout-like status. Current
-source builds validate any reported messages before treating the result as an
-empty poll. This does not resend the request, extend the overall response deadline
+A J2534 driver can return message data along with a timeout-like status. From
+v0.5.5-alpha.2, SpeedLink validates any reported messages before treating the
+result as an empty poll. This does not resend the request, extend the response deadline
 or hide a fatal driver error. ISO15765 replies use their complete reported message
 length; inconsistent extra-data indexes are retained in diagnostics.
 

@@ -1,5 +1,20 @@
 # C# validation
 
+## J2534 receive compatibility — 0.5.5-alpha.2
+
+- All 340 unit cases pass. Thirty native-receive cases exercise messages returned
+  with timeout-like statuses, fatal errors, message counts and bounds, complete
+  ISO15765 lengths, receive metadata, response deadlines and no request resends.
+- The isolated two-adapter bench passed three cases with Tactrix reading from a
+  vLinker FS ECU peer: boundary lengths, a full two-pass 1 MiB backup and ten logger
+  scans. All 901 exchanges matched the independent peer trace. Support exports
+  retained receive metadata and excluded ROM payloads.
+- The receive code is unchanged from the tested fix; this release adds its own
+  version and updates the download links and bundled reporting guide.
+- These tests use simulated ECU replies. Mongoose hardware and real-ECU
+  acceptance remain pending; the reported Mongoose timeout needs a new-version
+  retest and support report to establish whether it is resolved.
+
 ## Diagnostic support reports — 0.5.5-alpha.1
 
 - 310 unit cases pass, including 18 added cases for security-access retention,

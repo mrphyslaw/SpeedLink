@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — J2534 receive compatibility
+## v0.5.5-alpha.2 — J2534 receive compatibility
 
 - Preserve validated messages returned with timeout-like J2534 statuses instead
   of treating every such return as empty. Keep fatal errors and malformed replies
