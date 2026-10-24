@@ -22,6 +22,7 @@ jobs:
       - run: dotnet test SpeedLink.slnx -c Release --no-restore --logger "trx;LogFileName=CSharp.trx" --results-directory TestResults
       - run: ./tools/Verify-Regression.ps1 -Results TestResults/CSharp.trx
       - run: ./tools/Test-SupportUi.ps1 -Output TestResults/SupportUi
+      - run: ./tools/Test-ReadProgressUi.ps1 -Output TestResults/ReadProgressUi
       - run: ./tools/Test-MenuUi.ps1 -Output TestResults/MenuUi
       - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
       - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi

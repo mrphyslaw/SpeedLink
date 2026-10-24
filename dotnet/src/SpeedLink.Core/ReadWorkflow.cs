@@ -22,7 +22,13 @@ public static class SecurityAccess
         return [(byte)((state >> 4) & 255), (byte)(((state >> 8) & 240) | ((state >> 20) & 15)), (byte)(((state << 4) & 240) | ((state >> 16) & 15))];
     }
 }
-public sealed record ReadProgress(double Fraction, string Message);
+public enum BackupReadStage { Preparing, Reading, Verifying, Complete }
+public sealed record ReadProgress(double Fraction, string Message)
+{
+    public BackupReadStage Stage { get; init; } = BackupReadStage.Reading;
+    public int Pass { get; init; }
+    public int BytesInPass { get; init; }
+}
 public sealed record BackupResult(string Path, RomInspection Inspection);
 
 public sealed class ReadWorkflow
@@ -81,11 +87,13 @@ public sealed class ReadWorkflow
         var (folder, journal) = store.CreateOperation(vault, transport.Mode, "read_backup");
         transport.Diagnostics?.AttachJournal(journal.Path);
         transport.Diagnostics?.Record("read.started", new { chunkBytes = transport.ReadChunkSize });
+        BackupResult result;
         using (journal)
         {
             try
             {
                 cancellation.ThrowIfCancellationRequested();
+                progress?.Report(new(0, "Preparing backup · checking ECU and read access…") { Stage = BackupReadStage.Preparing });
                 var identity = Identify(transport);
                 if (identity.Vin != expected.Vin || identity.Calibration != expected.Calibration)
                     throw new TransportException("ECU identity changed. Reconnect and identify again.");
@@ -118,6 +126,7 @@ public sealed class ReadWorkflow
                 for (int pass = 1; pass <= 2; pass++)
                 {
                     transport.Diagnostics?.Record("read.pass_started", new { pass });
+                    progress?.Report(new((pass - 1) / 2.0, $"Reading pass {pass} of 2") { Pass = pass });
                     data = new byte[RomInspector.RomSize];
                     using var file = store.FileSystem.CreateNew(System.IO.Path.Combine(folder, $"pass{pass}.read"));
                     for (int address = 0; address < data.Length; address += chunk)
@@ -147,7 +156,7 @@ public sealed class ReadWorkflow
                             ["bytes"] = count,
                             ["sha256"] = RomInspector.Hash(block)
                         });
-                        progress?.Report(new(((pass - 1) * RomInspector.RomSize + address + count) / (2.0 * RomInspector.RomSize), $"Reading pass {pass}/2 · 0x{address + count:X6}"));
+                        progress?.Report(new(((pass - 1) * RomInspector.RomSize + address + count) / (2.0 * RomInspector.RomSize), $"Reading pass {pass} of 2") { Pass = pass, BytesInPass = address + count });
                     }
                     hashes.Add(RomInspector.Hash(data));
                     journal.Append("read_pass_complete", new()
@@ -156,6 +165,8 @@ public sealed class ReadWorkflow
                         ["sha256"] = hashes[^1]
                     });
                 }
+                cancellation.ThrowIfCancellationRequested();
+                progress?.Report(new(1, "Verifying and saving backup…") { Stage = BackupReadStage.Verifying, Pass = 2, BytesInPass = RomInspector.RomSize });
                 if (hashes[0] != hashes[1])
                     throw new TransportException("The two ROM reads differ. Both captures were retained; no verified backup was created.");
                 var inspection = inspector.Inspect(data);
@@ -166,8 +177,7 @@ public sealed class ReadWorkflow
                     ["sha256"] = hashes[0],
                     ["profileValid"] = inspection.ProfileValid
                 });
-                progress?.Report(new(1, "Backup verified · two matching reads"));
-                return new(path, inspection);
+                result = new(path, inspection);
             }
             catch (Exception error)
             {
@@ -179,5 +189,7 @@ public sealed class ReadWorkflow
                 throw;
             }
         }
+        progress?.Report(new(1, "Backup verified · two matching reads") { Stage = BackupReadStage.Complete, Pass = 2, BytesInPass = RomInspector.RomSize });
+        return result;
     }
 }

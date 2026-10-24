@@ -12,6 +12,26 @@ internal static class Program
             int at = Array.IndexOf(args, key);
             return at >= 0 && at + 1 < args.Length ? args[at + 1] : throw new ArgumentException("Missing " + key);
         }
+        if (args.Contains("--read-progress-offline", StringComparer.Ordinal))
+        {
+            var readApp = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int resultCode = 1;
+            readApp.Startup += async (_, _) =>
+            {
+                MainWindow? window = null;
+                try
+                {
+                    string output = Get("--output"); Directory.CreateDirectory(output);
+                    using var peer = new ReadProgressPeer(Get("--scenario"));
+                    window = new MainWindow(Path.Combine(output, "data")); readApp.MainWindow = window;
+                    var report = await window.ExerciseReadProgressOffline(peer, output, Get("--scenario"));
+                    report["memoryRequests"] = peer.MemoryRequests;
+                    File.WriteAllText(Get("--report"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true })); resultCode = 0;
+                }
+                catch (Exception error) { File.WriteAllText(Get("--report"), JsonSerializer.Serialize(new { passed = false, error = error.ToString() })); }
+                finally { window?.CloseWorkbenchTest(); readApp.Shutdown(resultCode); }
+            };
+            readApp.Run(); return resultCode;
+        }
         if (args.Contains("--menus-offline", StringComparer.Ordinal) || args.Contains("--support-offline", StringComparer.Ordinal))
         {
             var menuApp = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int resultCode = 1;
@@ -182,4 +202,46 @@ internal sealed class LoggerPeer : SpeedLink.Core.IReadTransport
         return replies[key];
     }
     public void Dispose() => ready.Dispose();
+}
+
+internal sealed class ReadProgressPeer(string scenario) : SpeedLink.Core.IReadTransport
+{
+    private readonly byte[] memory = CreateMemory();
+    private static byte[] CreateMemory()
+    {
+        var data = new byte[SpeedLink.Core.RomInspector.RomSize];
+        for (int i = 0; i < data.Length; i++) data[i] = (byte)(i * 17);
+        "SYNTHETIC UI TEST - NOT ECU FIRMWARE"u8.CopyTo(data.AsSpan(0x100));
+        return data;
+    }
+    public string Mode => "simulator";
+    public string Adapter => "Offline read-progress fixture";
+    public int ReadChunkSize => 3968;
+    public bool ReadAttempted { get; set; }
+    public int MemoryRequests { get; private set; }
+    public byte[] Exchange(byte[] request)
+    {
+        SpeedLink.Core.DiagnosticProtocol.CheckReadOnly(request, ReadChunkSize);
+        switch (Convert.ToHexString(request))
+        {
+            case "0902": return [0x49, 0x02, 1, .. "JM1GG12L061000001"u8.ToArray()];
+            case "0904": return [0x49, 0x04, 1, .. "UNKNOWN01"u8.ToArray()];
+            case "010C": return [0x41, 0x0C, 0, 0];
+            case "1087":
+                if (scenario == "preflight") throw new SpeedLink.Core.TransportException("Synthetic session-entry failure");
+                return [0x50, 0x87];
+            case "2701": return [0x67, 1, 0, 0, 0];
+        }
+        if (request[0] != 0x23 || request.Length != 7) throw new InvalidOperationException("Unexpected offline request.");
+        MemoryRequests++;
+        if (scenario == "timeout" && MemoryRequests == 15) throw new SpeedLink.Core.TransportException("Synthetic receive timeout; no retry");
+        int address = System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(request.AsSpan(1, 4));
+        int count = System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(request.AsSpan(5, 2));
+        byte[] response = [0x63, .. memory.AsSpan(address, count).ToArray()];
+        if (scenario == "short" && MemoryRequests == 15) return response[..^1];
+        if (scenario == "mismatch" && MemoryRequests == 266) response[^1] ^= 1;
+        System.Threading.Thread.Sleep(5);
+        return response;
+    }
+    public void Dispose() { }
 }
