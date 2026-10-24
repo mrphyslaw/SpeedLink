@@ -341,7 +341,7 @@ public partial class MainWindow
     }
     private void VerifyLoggerSmoke(string[] args)
     {
-        if (loggerRows.Count != 38 || LoggerDefinition.Known.Count != 7 || LoggerStartButton.IsEnabled || LoggerStopButton.IsEnabled || loggerCalibration is not null)
+        if (loggerRows.Count != 38 || LoggerDefinition.Known.Count != RomInspector.KnownProfiles.Count || LoggerStartButton.IsEnabled || LoggerStopButton.IsEnabled || loggerCalibration is not null)
             throw new InvalidOperationException("Unexpected logger startup state.");
         if (!Resource("SpeedLink.LoggerHelp.md").Contains("Start logging", StringComparison.Ordinal)) throw new InvalidDataException("Logger help missing.");
         Pages.SelectedIndex = 2; LoggerSearchBox.Text = "fuel";
