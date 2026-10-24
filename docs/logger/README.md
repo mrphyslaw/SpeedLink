@@ -1,7 +1,7 @@
 # SpeedLink logger
 
 Choose engine parameters, watch live values and record a CSV for later review.
-The logger supports seven stock ROM profiles with 35–38 parameters per profile,
+The logger supports eight stock ROM profiles with 35–38 parameters per profile,
 using a Vgate vLinker FS USB or Tactrix Openport 2.0. No logging patch is required.
 
 ## Live data and recording
@@ -49,3 +49,8 @@ before connecting an ECU. Unknown ROMs can still be dumped, but logging requires
 a supported profile.
 
 [Documentation index](../README.md) · [ROM editor](../editor/README.md) · [Download SpeedLink](https://github.com/mrphyslaw/SpeedLink/releases)
+
+L3P4EM000 adds 35 parameters checked against its own ROM handlers and MAP
+calibration bindings. Its live ECU logging, rates and adapter acceptance still
+need testing. Desired fuel rail pressure, fuel injection amount and ambient air
+temperature are excluded from this profile.

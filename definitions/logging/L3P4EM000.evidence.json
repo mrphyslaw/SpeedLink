@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "calibration": "L3P4EM000",
+  "romSha256": "ef5e35796c813f85526727aefcc21a05c87749e89b7812168c715ba1842486fe",
+  "channels": 35,
+  "distinctRequests": 31,
+  "nativeVectors": 277,
+  "independentScalarChecks": 217,
+  "instructionSteps": 346894,
+  "executedInstructionWords": 1850,
+  "realEcuTested": false,
+  "loggerAdapterBenchTested": false,
+  "excludedChannels": [
+    {
+      "id": "desired_fuel_rail_pressure",
+      "name": "Desired fuel rail pressure",
+      "reason": "Identifier absent from this ROM",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "fuel_injection_amount",
+      "name": "Fuel injection amount",
+      "reason": "Identifier absent from this ROM",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "ambient_air_temperature",
+      "name": "Ambient air temperature",
+      "reason": "Inactive native lookup; no active encoder established",
+      "ecu": "not_offered_by_this_profile"
+    }
+  ],
+  "sourceRomUnchanged": true,
+  "scope": "Original bounded encoders and descriptor copy paths with synthetic RAM; bitmap refresh and unrelated capture/status paths held out. No peripheral, scheduler or physical ECU validation."
+}

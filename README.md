@@ -4,10 +4,10 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.5-alpha.3](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.3)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.5-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.4)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
-log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
+log stock-ECU data, review recordings and edit the eight supported stock ROM layouts.
 ECU access remains read-only: **flashing is disabled**. ROM files and adapter drivers
 are not bundled. Real Mazda ECU validation remains pending.
 
@@ -78,7 +78,7 @@ directly on their frame, aligned with the surface as it rotates.
    creates and verifies a new file; the original and existing copies are preserved.
 
 Editing needs no adapter. Supported tuning profiles are **L33XEH000, L35HEH000,
-L38KEH000, L39SED000, L39SEE000, L39SEF000 and L3M7EF000**. A matching calibration,
+L38KEH000, L39SED000, L39SEE000, L39SEF000, L3M7EF000 and L3P4EM000**. A matching calibration,
 boot and program area are required. Patched/extended ROM layouts are unsupported.
 Static axes are read-only. See the [editor guide](docs/EDITOR.md) for details.
 
@@ -132,7 +132,7 @@ folder, including its captures, manifest and journal.
 
 You need a full backup of the ROM currently installed in the ECU. SpeedLink uses
 it to choose the logging profile and read the MAP sensor calibration. The current
-logger supports [seven defined ROMs](definitions/logging/All_ROM_Coverage.md).
+logger supports [eight defined ROMs](definitions/logging/All_ROM_Coverage.md).
 
 1. Connect the adapter and select **Connect & identify**. If you just read a ROM,
    disconnect and reconnect before logging.
@@ -175,23 +175,23 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.5-alpha.3](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.3), a Windows Workbench alpha.**
+**Current release: [v0.5.5-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.4), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
   and saved-log viewing; offline ROM editing, comparison, 2D/3D views and undo/redo.
   The reader covers the 1 MiB MZR DISI ECU family.
-- **Logger coverage:** seven ROM profiles with 35–38 stock-ROM parameters each.
+- **Logger coverage:** eight ROM profiles with 35–38 stock-ROM parameters each.
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
-- **Checked:** 292 C# tests, 2,030 native-derived logger vectors and 174,741
-  independently decoded editor values/switches. Seven-profile editor desktop
+- **Checked:** 361 C# tests and 2,307 native-derived logger vectors. The L3P4EM000
+  profile adds 895 editor maps/controls and 35 logger parameters. Eight-profile editor desktop
   checks cover direct cell entry, comparison, undo/redo and byte-identical no-edit
   exports. See [validation](dotnet/docs/Validation.md). Physical
   logger tests passed with vLinker FS and Tactrix across all seven profiles,
   including fault handling, sustained requests, desktop controls and USB recovery.
   Saved-log viewing and standalone EXE checks also passed.
 - **Still pending:** real Mazda ECU read/logging acceptance, sensor readings and
-  achievable vehicle logging rates. All 258 channel/profile ECU checks remain pending.
+  achievable vehicle logging rates. All 293 channel/profile ECU checks remain pending.
 - **Planned:** ECU flashing. Live programming is disabled in this release.
 
 Bench testing uses simulated ECU replies over real adapters. A matching pair of

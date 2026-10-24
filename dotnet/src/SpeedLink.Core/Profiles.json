@@ -219,5 +219,39 @@
     "LoopAddress": 758060,
     "LoopSize": 64,
     "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  },
+  {
+    "Calibration": "L3P4EM000",
+    "Model": "Mazda 6 MPS (2006 Australia)",
+    "IdentityOffset": 173684,
+    "Identity": "L3P4EM000L3T6051",
+    "BootSha256": "7af38a744aa3775677f838aa4ac4672fc77ea38ab4a7ad3360148d3c885320ce",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [
+      {
+        "Address": 759416,
+        "Value": 294912
+      },
+      {
+        "Address": 759404,
+        "Value": 1048576
+      },
+      {
+        "Address": 759352,
+        "Value": 1520786085
+      },
+      {
+        "Address": 294916,
+        "Value": 4294967295
+      },
+      {
+        "Address": 294920,
+        "Value": 2147241762
+      }
+    ],
+    "LoopAddress": 758584,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
   }
 ]

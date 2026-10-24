@@ -1,5 +1,16 @@
 # C# validation
 
+## L3P4EM000 support — 0.5.5-alpha.4
+
+- Eight bundled editor/logger profiles. L3P4EM000 adds 895 maps and controls,
+  35 logger parameters, its identity/boot/program guards and checksum layout.
+- Its original bounded logger encoders and response-copy routine passed
+  277 vectors and 217 independent scalar checks with synthetic RAM.
+- The complete suite has 361 unit cases; all eight profiles are included
+  in editor, layout, Workbench, import and logger UI checks.
+- Existing physical bench results below cover the original seven profiles.
+  No new adapter traffic or ECU logging is claimed for L3P4EM000.
+
 ## Backup progress — 0.5.5-alpha.3
 
 - All 346 unit cases pass. Added progress cases cover pass byte counts, monotonic

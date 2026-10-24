@@ -182,7 +182,7 @@ Layout shortcuts apply when you are not typing in a text field.
 ## Compatible files and definition updates
 
 Supported stock layouts: **L33XEH000, L35HEH000, L38KEH000, L39SED000,
-L39SEE000, L39SEF000 and L3M7EF000**. Opening requires a complete 1 MiB image
+L39SEE000, L39SEF000, L3M7EF000 and L3P4EM000**. Opening requires a complete 1 MiB image
 with matching calibration, boot, checksum layout and program-area signature.
 The program check allows defined tuning controls and checksum changes while
 rejecting other program changes. Patched/extended layouts are unsupported.

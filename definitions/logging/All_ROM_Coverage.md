@@ -1,6 +1,6 @@
 # Logger ROM coverage
 
-All seven ROMs with local tuning definitions have a logger profile. Each profile uses its own identifier records, MAP calibration locations and code guards. The existing 38-channel baseline was checked separately in every image.
+All eight ROMs with local tuning definitions have a logger profile. Each profile uses its own identifier records, MAP calibration locations and code guards. The existing 38-channel baseline was checked separately in every image.
 
 | ROM | Parameters | Requests per full scan | Excluded baseline parameters | Native vectors |
 | --- | ---: | ---: | ---: | ---: |
@@ -11,8 +11,9 @@ All seven ROMs with local tuning definitions have a logger profile. Each profile
 | L3M7EF000 | 35 | 31 | 3 | 277 |
 | L35HEH000 | 36 | 32 | 2 | 284 |
 | L33XEH000 | 35 | 31 | 3 | 277 |
+| L3P4EM000 | 35 | 31 | 3 | 277 |
 
-The checks execute bounded original ROM routines with synthetic RAM. They do not establish real-ECU session acceptance, physical values or rates. All 258 included ROM/channel combinations still need ECU testing. No ROM image is included.
+The checks execute bounded original ROM routines with synthetic RAM. They do not establish real-ECU session acceptance, physical values or rates. All 293 included ROM/channel combinations still need ECU testing. No ROM image is included.
 
 ## Parameters excluded from the current profiles
 
@@ -24,7 +25,9 @@ L35HEH000: Desired fuel rail pressure, Ambient air temperature.
 
 L33XEH000: Desired fuel rail pressure, Ambient air temperature, Catalyst temperature.
 
-L3M7EF000 exports pulsewidth directly from a different internal producer. Its wire scale remains 0.008 ms/count; its profile does not substitute pulsewidth for fuel injection amount. Older revisions also use a direct percentage source for primary fuel trim. Those paths were checked independently.
+L3P4EM000: Desired fuel rail pressure, Fuel injection amount, Ambient air temperature.
+
+L3M7EF000 and L3P4EM000 export pulsewidth directly from a different internal producer. Its wire scale remains 0.008 ms/count; its profile does not substitute pulsewidth for fuel injection amount. Older revisions also use a direct percentage source for primary fuel trim. Those paths were checked independently.
 
 The selected ROM must match the live ECU calibration ID. Load the vehicle's current full backup so MAP/boost readings use the correct calibration. Unknown ROMs remain readable; their logger layout is not guessed.
 

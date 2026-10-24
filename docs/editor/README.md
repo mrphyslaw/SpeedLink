@@ -1,6 +1,6 @@
 # SpeedLink ROM editor
 
-An offline editor for the seven bundled Mazdaspeed/MPS stock ROM layouts, built
+An offline editor for the eight bundled Mazdaspeed/MPS stock ROM layouts, built
 into the same Windows app as the reader and logger. No adapter is needed to edit
 a file. ECU programming remains disabled in this alpha.
 
@@ -128,7 +128,7 @@ See the [full editing guide](../EDITOR.md) for shortcuts and exact behavior.
 ## Compatibility and current limits
 
 Supported profiles: **L33XEH000, L35HEH000, L38KEH000, L39SED000, L39SEE000,
-L39SEF000 and L3M7EF000**.
+L39SEF000, L3M7EF000 and L3P4EM000**.
 
 The editor checks the calibration, boot, checksum layout and reference program
 signature. Changes to defined tuning controls remain editable; other program
