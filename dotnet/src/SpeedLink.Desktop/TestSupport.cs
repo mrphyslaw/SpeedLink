@@ -43,7 +43,7 @@ public partial class MainWindow
             ["adapter"] = tactrix ? "Tactrix" : "vLinker", ["channels"] = 6, ["scans"] = loaded.Rows,
             ["actualButtons"] = true, ["connectionReleased"] = true, ["recording"] = recordings[0], ["replayLoaded"] = true, ["screenshot"] = screenshot };
     }
-    internal async Task<Dictionary<string, object?>> ExerciseLoggerOffline(IReadTransport peer, string screenshot, bool faultExpected, LoggerDefinition profile, LoggerCalibration calibration, Action allowFixtureTraffic)
+    internal async Task<Dictionary<string, object?>> ExerciseLoggerOffline(IReadTransport peer, string screenshot, bool faultExpected, LoggerDefinition profile, LoggerCalibration calibration, Action allowFixtureTraffic, string? romPath = null)
     {
         void Capture()
         {
@@ -57,9 +57,21 @@ public partial class MainWindow
         loggerCalibration = LoggerCalibration.ExplicitMap(99, 9); // Previous profile must never supply the next calibration.
         ConfigureLoggerProfile(profile);
         if (loggerCalibration is not null || loggerRows.Count != profile.ChannelIds.Count) throw new InvalidOperationException("Profile selection retained an old calibration or channel set.");
-        transport = peer; identity = new("test", peer.Adapter, null, profile.SoftwareIds.Single());
-        loggerCalibration = calibration;
-        LoggerRomText.Text = profile.SoftwareIds.Single() + " · offline fixture calibration";
+        string completeIdentity = RomInspector.KnownProfiles.Single(p => p.Calibration == profile.SoftwareIds.Single()).Identity;
+        transport = peer; identity = new("test", peer.Adapter, null, completeIdentity);
+        LoggerIdentityChanged();
+        if (loggerDefinition.Id != profile.Id) throw new InvalidOperationException("Complete ECU identity selected the wrong logger.");
+        if (romPath is null)
+        {
+            loggerCalibration = calibration;
+            LoggerRomText.Text = profile.SoftwareIds.Single() + " · offline fixture calibration";
+        }
+        else
+        {
+            BindLoggerRom(romPath);
+            if (loggerCalibration?.SourceRomSha256 != RomInspector.Hash(System.IO.File.ReadAllBytes(romPath)))
+                throw new InvalidOperationException("Matching ECU backup was not bound to the logger.");
+        }
         foreach (var row in loggerRows) { row.Selected = true; row.Plotted = false; }
         foreach (var row in loggerRows.Take(7)) row.Plotted = true;
         if (loggerRows.Count(r => r.Plotted) != 6) throw new InvalidOperationException("Live plot limit was not enforced.");
@@ -123,6 +135,7 @@ public partial class MainWindow
             ["connectionReleased"] = true, ["settingsSaved"] = true, ["faultExpected"] = faultExpected,
             ["minimumWindowLayoutVerified"] = true, ["sixPlotLimitVerified"] = true,
             ["calibration"] = profile.SoftwareIds.Single(), ["profile"] = profile.Id,
+            ["ecuCalibration"] = completeIdentity, ["matchingRomBound"] = romPath is not null,
             ["profileSwitchClearedCalibration"] = true,
             ["realEcuTested"] = false, ["screenshot"] = screenshot
         };

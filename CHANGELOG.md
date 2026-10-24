@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.5-alpha.5 — logger calibration matching
+
+- Recognize known complete ECU calibration identities as well as short software
+  IDs, including L3P4EM000L3T6051. Fix the false ROM mismatch when loading a
+  matching ECU backup for logging. The ROM filename does not affect matching.
+- Keep unknown build suffixes, different profiles and ambiguous IDs rejected.
+  Show the selected ROM profile and reported ECU calibration when they differ.
+- Add full-identity regression checks across all eight profiles and exercise
+  complete IDs in the desktop logger checks. Logger parameters and ROM editing
+  definitions are unchanged; live ECU logging validation remains pending.
+
 ## v0.5.5-alpha.4 — L3P4EM000 editor and logger
 
 - Add the 2006 Australian Mazda 6 MPS L3P4EM000 stock-ROM definition: 895 maps

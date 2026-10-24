@@ -1,5 +1,17 @@
 # Alpha validation scope
 
+## Complete ECU calibration identities — 0.5.5-alpha.5
+
+- Regression cases reproduce the former rejection of complete ECU identities
+  for all eight profiles, including `L3P4EM000L3T6051`.
+- Known short and complete IDs now select the same logger. Unknown build
+  suffixes, truncated IDs, different profiles and ambiguous IDs remain rejected.
+- The complete suite passes 369 unit cases. Sixteen offline desktop workflows
+  bind the actual profile ROM with its complete ECU identity and exercise
+  recording/stop and connection-failure handling. Source ROMs remain unchanged.
+- These checks use simulated live replies. Real ECU logger values and rates
+  remain pending; no new physical adapter or ECU test is claimed.
+
 ## L3P4EM000 support — 0.5.5-alpha.4
 
 - Eight bundled editor/logger profiles. L3P4EM000 adds 895 maps and controls,

@@ -141,7 +141,7 @@ public partial class MainWindow
         if (new FileInfo(path).Length != RomInspector.RomSize) throw new InvalidDataException("Load a full 1 MiB ECU image.");
         var binding = definitionSnapshot.BindLoggerRom(File.ReadAllBytes(path));
         if (identity is not null && (definitionSnapshot.LoggerFor(identity.Calibration) is null || !binding.Definition.MatchesCalibrationId(identity.Calibration)))
-            throw new InvalidDataException("The selected ROM does not match the connected ECU calibration.");
+            throw new InvalidDataException($"The selected ROM ({string.Join(", ", binding.Definition.SoftwareIds)}) does not match the connected ECU calibration ({identity.Calibration ?? "not reported"}).");
         ConfigureLoggerProfile(binding.Definition); loggerCalibration = binding.Calibration;
         LoggerRomText.Text = $"{string.Join(", ", binding.Definition.SoftwareIds)} · {System.IO.Path.GetFileName(path)} · MAP calibration loaded";
         Log("Logger ROM: " + binding.Calibration.SourceRomSha256);
