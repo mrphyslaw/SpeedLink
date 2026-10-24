@@ -21,6 +21,9 @@ public partial class MainWindow
         string failed = ReadProgressStage.Text;
         ShowReadProgress(new(1, "late callback") { Stage = BackupReadStage.Complete });
         if (ReadProgressStage.Text != failed || ReadBackupBar.Value == 100) throw new InvalidOperationException("Late callback replaced a failure.");
+        ClearReadProgress();
+        if (ReadProgressPanel.Visibility != Visibility.Collapsed || ReadBackupBar.Value != 0 || ProgressBar.Value != 0)
+            throw new InvalidOperationException("A new connection retained the previous ECU's backup result.");
         transport = peer; identity = ReadWorkflow.Identify(peer);
         IdentityText.Text = "Synthetic progress test · no adapter or vehicle connected";
         Controls();
@@ -77,7 +80,7 @@ public partial class MainWindow
         Capture("Result");
         return new() { ["passed"] = true, ["scenario"] = scenario, ["hardwareAccessed"] = false, ["actualReadButton"] = true,
             ["firstPassObserved"] = firstPass, ["secondPassObserved"] = secondPass, ["estimatedTimeObserved"] = estimate,
-            ["progressReset"] = reset, ["controlsLocked"] = locked, ["unverifiedTransferCapped"] = true, ["lateCallbacksIgnored"] = true,
+            ["progressReset"] = reset, ["newConnectionClearsResult"] = true, ["controlsLocked"] = locked, ["unverifiedTransferCapped"] = true, ["lateCallbacksIgnored"] = true,
             ["minimumWindowVerified"] = true, ["progress"] = resultValue, ["stage"] = resultStage, ["backupComplete"] = entries[0].Complete };
     }
 }

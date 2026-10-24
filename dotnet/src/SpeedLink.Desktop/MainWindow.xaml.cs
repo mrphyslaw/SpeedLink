@@ -136,6 +136,7 @@ public partial class MainWindow : Window
         StatusText.Text = "Connecting and identifying…";
         await Run(async () =>
         {
+            ClearReadProgress();
             await BeginDiagnostics();
             diagnosticSession?.Record("connection.opening", new { adapter = AdapterBox.Text, port = passThruAdapter ? null : name, baud = passThruAdapter ? 0 : baud });
             var connected = await Task.Run(() =>

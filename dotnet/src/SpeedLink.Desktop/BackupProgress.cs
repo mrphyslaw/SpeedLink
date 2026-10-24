@@ -12,6 +12,15 @@ public partial class MainWindow
     private ReadProgress? currentReadProgress;
     private bool readProgressActive;
 
+    private void ClearReadProgress()
+    {
+        readProgressActive = false;
+        readProgressTimer?.Stop();
+        readElapsed.Reset(); readTransferElapsed.Reset(); currentReadProgress = null;
+        ReadProgressPanel.Visibility = Visibility.Collapsed;
+        ReadBackupBar.Value = ProgressBar.Value = 0;
+    }
+
     private void BeginReadProgress()
     {
         readProgressTimer?.Stop();
