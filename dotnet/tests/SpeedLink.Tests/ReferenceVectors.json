@@ -34,6 +34,11 @@
       "calibration": "L33XEH000",
       "sha256": "b1592ff29f1606212afac0fef5abc830b8cf825a347f2ff7f3cd07eccf592f44",
       "correctedSHA256": "851ed66e1b40217b6cf10054617b17e75306d2914732e40f8baac9ce1b775fbf"
+    },
+    {
+      "calibration": "L3P4EM000",
+      "sha256": "32237ba0f73deb1820b73bf21c1d380c3c794cd498cb6373ff01afa534e88cd4",
+      "correctedSHA256": "ebdafbb8373dff218cd372994224d362b9201a1f442570244ed766d5ba2f5e45"
     }
   ],
   "keys": [

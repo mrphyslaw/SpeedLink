@@ -4,7 +4,7 @@ Mazdaspeed ECU tools
 Workbench alpha
 ROM reading, verified backups, offline ROM editing and live logging.
 One workspace for editing, live logging and recorded logs.
-Seven tuning definitions, Fit map, floating panels, changes and undo/redo.
+Eight tuning definitions, Fit map, floating panels, changes and undo/redo.
 Compact navigation, saved layouts and zoomable long MAF curves.
 Single-value cards with units, Apply/Cancel, baseline and change.
 Proportional small maps and a draggable, remembered table/preview divider.
@@ -23,7 +23,7 @@ A definition is not required to dump a ROM.
 
 Adapters: Vgate vLinker FS (USB), Tactrix Openport 2.0
 Experimental: Mongoose-Plus ISO/CAN3 reader/logger; hardware testing pending.
-Stock-ROM logger: seven defined Mazdaspeed/MPS ROMs, 35–38 parameters.
+Stock-ROM logger: eight defined Mazdaspeed/MPS ROMs, 35–38 parameters.
 Parameter selection, up to six synchronized charts, CSV and recorded-log viewer.
 ROM/offline checked; real-ECU logging validation pending.
 ECU flashing is planned.

@@ -85,6 +85,18 @@
       "romSha256": "6110a26bcdafaa2f739153a1a098c7f6928fe613cae5888a02d798a76a44042d",
       "definitionSha256": "abbda7bb130fddde14d5e8af26bdbfddfc8c32c44dc0bab0d1ed2d1019e3ee98",
       "realEcuTested": false
+    },
+    {
+      "calibration": "L3P4EM000",
+      "vehicle": "Mazda 6 MPS (2006 Australia)",
+      "profileFile": "L3P4EM000.logger.json",
+      "channels": 35,
+      "queries": 31,
+      "unavailable": 3,
+      "vectors": 277,
+      "romSha256": "ef5e35796c813f85526727aefcc21a05c87749e89b7812168c715ba1842486fe",
+      "definitionSha256": "cd96391036e61f6e52e1ebefaab43ef3491689048c85bd3cf4f90eedfc8823cd",
+      "realEcuTested": false
     }
   ]
 }

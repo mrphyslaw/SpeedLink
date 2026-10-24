@@ -23,7 +23,7 @@ live data, **Recordings** to review logs, **ROM checks** to inspect a file, or
    verifies its checksum. The original and existing files are preserved.
 
 Drag the table/preview divider to resize it. **Fit map** restores automatic
-sizing; Ctrl+B hides or restores the browser. Editing requires one of the seven
+sizing; Ctrl+B hides or restores the browser. Editing requires one of the eight
 supported stock program layouts. Static axes are read-only; extended/patched
 layouts are unsupported.
 
@@ -70,7 +70,7 @@ then choose **Start logging**. **Stop** ends the recording and disconnects;
 reconnect before another session. Disconnect and reconnect after a ROM read
 before logging.
 
-The logger supports seven stock profiles with 35–38 parameters each. Logging
+The logger supports eight stock profiles with 35–38 parameters each. Logging
 can run with the engine running; ROM reads require it stopped. The **Hz** column
 shows measured host sample rates. Real-ECU acceptance, readings and achievable
 rates remain untested. See the [logger guide](LOGGER.md) for units, plots and

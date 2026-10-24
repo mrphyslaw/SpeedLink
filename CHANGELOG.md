@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.5-alpha.4 — L3P4EM000 editor and logger
+
+- Add the 2006 Australian Mazda 6 MPS L3P4EM000 stock-ROM definition: 895 maps
+  and controls, ROM identity/boot/program checks and mandatory checksum correction
+  on export. Existing definitions remain available.
+- Add 35 stock logger parameters with matching ROM code guards, MAP calibration
+  bindings and 277 native-derived vectors. Three unavailable baseline parameters
+  are excluded. Live ECU logging and rate validation remain pending.
+- Extend the editor/logger/import checks and coverage checklist to eight profiles.
+
 ## v0.5.5-alpha.3 — backup progress
 
 - Show prominent backup progress on Connection, including the current pass,

@@ -2,7 +2,7 @@
 
 For a visual tour, see the [logger overview and screenshots](logger/README.md).
 
-The logger draft covers all seven ROMs with tuning definitions, with 35–38
+The logger draft covers all eight ROMs with tuning definitions, with 35–38
 parameters per profile. It uses the
 factory application's read-identifier interface; a logging patch is not required.
 The ROM encoders and offline conversions have been checked. Real-ECU acceptance,
@@ -147,3 +147,8 @@ the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issu
 The report includes requests, timing, errors and factory security access; personal
 information is redacted and ROM bytes remain in your backup files. Review the ZIP
 before sharing.
+
+L3P4EM000 adds 35 parameters checked against its own ROM handlers and MAP
+calibration bindings. Its live ECU logging, rates and adapter acceptance still
+need testing. Desired fuel rail pressure, fuel injection amount and ambient air
+temperature are excluded from this profile.
