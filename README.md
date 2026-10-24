@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.5-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.4)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.5-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.5)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the eight supported stock ROM layouts.
@@ -175,7 +175,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.5-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.4), a Windows Workbench alpha.**
+**Current release: [v0.5.5-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.5), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
@@ -183,7 +183,9 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   The reader covers the 1 MiB MZR DISI ECU family.
 - **Logger coverage:** eight ROM profiles with 35–38 stock-ROM parameters each.
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
-- **Checked:** 361 C# tests and 2,307 native-derived logger vectors. The L3P4EM000
+- **Fixed:** logger matching accepts known complete ECU calibration IDs, including
+  `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
+- **Checked:** 369 C# tests and 2,307 native-derived logger vectors. The L3P4EM000
   profile adds 895 editor maps/controls and 35 logger parameters. Eight-profile editor desktop
   checks cover direct cell entry, comparison, undo/redo and byte-identical no-edit
   exports. See [validation](dotnet/docs/Validation.md). Physical

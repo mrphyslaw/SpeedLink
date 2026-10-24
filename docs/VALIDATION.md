@@ -1,6 +1,6 @@
 # Alpha validation scope
 
-## Complete ECU calibration identities
+## Complete ECU calibration identities — 0.5.5-alpha.5
 
 - Regression cases reproduce the former rejection of complete ECU identities
   for all eight profiles, including `L3P4EM000L3T6051`.
