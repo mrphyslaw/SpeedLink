@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.5-alpha.3 — backup progress
+
+- Show prominent backup progress on Connection, including the current pass,
+  bytes read, overall percentage, elapsed time and estimated time remaining.
+- Estimate from measured transfer speed across both passes. Keep verification
+  below 100% until the backup and its completion records have been saved.
+- Retain the last progress on Stop or failure, clearly marked not verified.
+
 ## v0.5.5-alpha.2 — J2534 receive compatibility
 
 - Preserve validated messages returned with timeout-like J2534 statuses instead

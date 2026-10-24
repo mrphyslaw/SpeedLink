@@ -166,5 +166,23 @@
   },
   {
     "test": "SpeedLink.Tests.NativeJ2534ReceiveTests.receive_diagnostics_include_metadata_and_reset_between_exchanges"
+  },
+  {
+    "test": "SpeedLink.Tests.ReadProgressTests.test_mismatch_or_storage_failure_never_reports_backup_complete(failure: \"journal-complete\")"
+  },
+  {
+    "test": "SpeedLink.Tests.ReadProgressTests.test_stop_after_last_block_prevents_sealing_and_complete_progress"
+  },
+  {
+    "test": "SpeedLink.Tests.ReadProgressTests.test_mismatch_or_storage_failure_never_reports_backup_complete(failure: \"rom-save\")"
+  },
+  {
+    "test": "SpeedLink.Tests.ReadProgressTests.test_mismatch_or_storage_failure_never_reports_backup_complete(failure: \"mismatch\")"
+  },
+  {
+    "test": "SpeedLink.Tests.ReadProgressTests.test_failed_block_does_not_advance_or_complete_progress"
+  },
+  {
+    "test": "SpeedLink.Tests.ReadProgressTests.test_progress_tracks_both_passes_and_completes_after_sealing"
   }
 ]

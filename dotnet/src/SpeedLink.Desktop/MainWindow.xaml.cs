@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.5.5-alpha.2";
+    public const string Version = "0.5.5-alpha.3";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -48,7 +48,7 @@ public partial class MainWindow : Window
         Width = Math.Min(Width, Math.Max(MinWidth, SystemParameters.WorkArea.Width));
         Height = Math.Min(Height, Math.Max(MinHeight, SystemParameters.WorkArea.Height));
         Navigate(0);
-        Closed += (_, _) => RecordingsPane.CancelLoading();
+        Closed += (_, _) => { RecordingsPane.CancelLoading(); readProgressTimer?.Stop(); };
         Title = $"SpeedLink · Alpha {Version}";
         VersionLabel.Text = $"ALPHA {Version}";
         BaudBox.ItemsSource = new[] { 115200, 38400, 57600, 230400, 500000, 1000000, 2000000 };
@@ -208,11 +208,18 @@ public partial class MainWindow : Window
             return;
         var link = transport;
         var expected = identity;
-        ProgressBar.Value = 0;
         await Run(async () =>
         {
-            var progress = new Progress<ReadProgress>(value => { ProgressBar.Value = value.Fraction * 100; StatusText.Text = value.Message; });
-            var result = await Task.Run(() => new ReadWorkflow(store, inspector).ReadBackup(link, expected, vault, progress, stop!.Token));
+            BeginReadProgress();
+            BackupResult result;
+            try
+            {
+                var progress = new Progress<ReadProgress>(ShowReadProgress);
+                result = await Task.Run(() => new ReadWorkflow(store, inspector).ReadBackup(link, expected, vault, progress, stop!.Token));
+                FinishReadProgress(true);
+            }
+            catch (OperationCanceledException) { FinishReadProgress(false, stopped: true); throw; }
+            catch { FinishReadProgress(false); throw; }
             BackupText.Text = "Verified backup: " + result.Path;
             Log("Verified backup saved: " + result.Path);
             if (!result.Inspection.ProfileRecognized)
@@ -226,6 +233,7 @@ public partial class MainWindow : Window
     private void Stop_Click(object sender, RoutedEventArgs e)
     {
         stop?.Cancel();
+        if (readProgressActive) ReadProgressStage.Text = "Stopping after the current exchange…";
         StatusText.Text = "Stopping after the current exchange…";
     }
     private void RefreshPorts()

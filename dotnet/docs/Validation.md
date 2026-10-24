@@ -1,5 +1,19 @@
 # C# validation
 
+## Backup progress — 0.5.5-alpha.3
+
+- All 346 unit cases pass. Added progress cases cover pass byte counts, monotonic
+  transfer progress, successful completion after storage closes, failed blocks,
+  mismatched captures, failed ROM saving, failed journal completion and stopping
+  after the final block. Progress adds no ECU requests or retries.
+- Six native UI cases use the actual Read and Stop buttons with an offline peer:
+  success, cancellation, timeout, short reply, mismatch and preflight failure.
+  Checks cover both passes, measured remaining time, resetting a new operation,
+  locked controls, late callbacks, completion state and minimum-window layout.
+- Documentation screenshots are rendered by these UI cases. Their synthetic
+  transfer times are not real-ECU throughput measurements. Transport and adapter
+  setup code are unchanged; real-ECU and Mongoose acceptance remain pending.
+
 ## J2534 receive compatibility — 0.5.5-alpha.2
 
 - All 340 unit cases pass. Thirty native-receive cases exercise messages returned

@@ -43,6 +43,12 @@ Use **File → Editor guide** for the complete included guide, or see the
 5. Wait for **Backup verified · two matching reads**. Find the operation under
    **Backups → Open backup folder** and keep the entire folder.
 
+During the backup, Connection shows the current pass, bytes read, overall
+progress across both reads and elapsed time. Remaining time is estimated from
+the measured transfer speed and can change during a read. Verification stays
+below 100% until the backup and its completion records have been saved. Stop
+or a failure leaves the last progress visible and marked **not verified**.
+
 The reader covers the compatible Mazda MZR DISI 1 MiB family. A definition,
 recognized calibration or valid checksum is not required to dump an unknown
 ROM. Engine RPM must be confirmed as zero. Two complete reads must match before

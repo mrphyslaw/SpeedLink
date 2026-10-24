@@ -55,6 +55,26 @@ Select **Read & verify backup** once. Leave the ignition on, engine stopped,
 and both ends of the adapter connected while SpeedLink completes **pass 1/2**
 and **pass 2/2**. Do not run a second diagnostic application during the read.
 
+The progress panel shows the current pass, bytes read in that pass and the
+overall percentage across both reads. Elapsed time continues during each reply;
+the remaining-time estimate appears after transfer speed can be measured and
+can change as the read proceeds. Verification stays below 100% until the backup
+and completion records are saved. A stopped or failed read remains marked
+**not verified**, even if both passes reached their final byte.
+
+![Reading pass two with overall progress, bytes, elapsed time and estimated time remaining](reading/images/progress.png)
+
+Success says **Backup verified · two matching reads** and shows 100%:
+
+![Verified backup result after two complete matching reads](reading/images/verified.png)
+
+A stopped or failed read keeps its last progress and clearly says **not verified**:
+
+![Two reads that differ are marked interrupted and not verified, below 100%](reading/images/interrupted.png)
+
+These are screenshots of the actual app using synthetic offline test data.
+They do not show a vehicle test or measured ECU read times.
+
 Success says **Backup verified · two matching reads**. The connection log also
 shows **Verified backup saved:** followed by the path to `rom.bin`.
 

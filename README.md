@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.5-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.2)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.5.5-alpha.3](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.3)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the seven supported stock ROM layouts.
@@ -118,6 +118,13 @@ driver setup and reporting results.
 4. Turn the ignition on with the engine stopped, then select **Connect & identify**.
 5. Select **Read & verify backup**. SpeedLink saves a verified backup after two complete reads match.
 
+![Backup progress showing the second read pass, overall percentage, bytes and estimated time remaining](docs/reading/images/progress.png)
+
+The progress panel shows both passes, elapsed time and an estimate based on
+measured read speed. It reaches 100% after verification and saving finish.
+This screenshot uses a synthetic offline test; its timing is not a vehicle
+read-speed measurement. [Progress and result screenshots →](docs/DUMP_A_ROM.md#3-read-and-verify)
+
 Backups are saved in the `data` folder beside the EXE. Keep the whole backup
 folder, including its captures, manifest and journal.
 
@@ -168,7 +175,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.5-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.2), a Windows Workbench alpha.**
+**Current release: [v0.5.5-alpha.3](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.3), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
