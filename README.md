@@ -192,7 +192,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
 - **Fixed:** logger matching accepts known complete ECU calibration IDs, including
   `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
-- **Checked:** 407 C# tests and 2,384 native-derived logger vectors. Nine-profile
+- **Checked:** 426 C# tests and 2,384 native-derived logger vectors. Nine-profile
   editor checks cover direct cell entry, comparison, undo/redo and byte-identical
   no-edit exports. L3CGEE000 adds 379 native logger instruction checks and complete
   reference-ROM cell/axis comparisons. See [validation](docs/VALIDATION.md).

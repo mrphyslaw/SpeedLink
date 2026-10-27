@@ -4,8 +4,12 @@
 
 - SDK 10.0.403 and bundled runtime 10.0.14 are pinned together. Dependency locks
   are refreshed with that SDK; locked restore stays enabled.
-- Release checks cover all 407 unit cases and 62 baseline regressions, the full
+- Release checks cover all 426 unit cases and 62 baseline regressions, the full
   offline desktop suite, and standalone startup, menus, support export and replay.
+- Mandatory ROM-save tests cover every supported definition using independent
+  checksum sums: edits, repeated saves, no-edit correction and native rejection.
+  CI fails if either required save test is missing for any bundled ROM. Private
+  checks also exercise all nine actual ROM files without modifying their sources.
 - The standalone startup report must show the pinned runtime in a 32-bit process.
   About also displays the actual running runtime. All nine ROM profiles remain
   bundled; definitions, protocol logic and integrity rules are unchanged.

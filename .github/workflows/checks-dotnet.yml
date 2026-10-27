@@ -21,6 +21,7 @@ jobs:
       - run: dotnet restore SpeedLink.slnx --locked-mode
       - run: dotnet test SpeedLink.slnx -c Release --no-restore --logger "trx;LogFileName=CSharp.trx" --results-directory TestResults
       - run: ./tools/Verify-Regression.ps1 -Results TestResults/CSharp.trx
+      - run: ./tools/Verify-RomSaveIntegrity.ps1 -Results TestResults/CSharp.trx -Report TestResults/RomSaveIntegrity.json
       - run: ./tools/Test-SupportUi.ps1 -Output TestResults/SupportUi
       - run: ./tools/Test-ReadProgressUi.ps1 -Output TestResults/ReadProgressUi
       - run: ./tools/Test-MenuUi.ps1 -Output TestResults/MenuUi
