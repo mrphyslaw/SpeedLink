@@ -54,16 +54,18 @@ The **Runtime maintenance** workflow checks Microsoft's official release metadat
 weekly, or on demand. It considers stable patches in the current .NET runtime
 line and SDK feature band. Major upgrades and feature-band changes need an
 explicit decision. It updates SDK and runtime pins together, refreshes lockfiles,
-runs unit/integrity checks, and opens a maintenance PR. It dispatches the full
-checks explicitly because PRs created with `GITHUB_TOKEN` do not trigger them.
-An existing update branch is left alone to preserve review edits.
+runs unit/integrity checks, and uploads a tested patch with its base commit and
+test results. Only after upload succeeds does it create or refresh an issue for
+review. Apply the patch on a branch, review notices/documentation and open a PR;
+the full desktop and standalone checks must pass before merging. Closed proposals
+are respected. Open proposals are refreshed by successful weekly checks so their
+14-day artifact links stay useful.
 
-GitHub must allow Actions to create PRs in repository **Settings → Actions →
-General → Workflow permissions**. GitHub labels the shared control "Allow GitHub
-Actions to create and approve pull requests"; this workflow only creates update
-PRs and never approves reviews. Jobs receive only the write permissions they
-need; pull-request checks receive read access. Failed metadata downloads, restore
-or tests stop maintenance instead of opening an unchecked PR.
+This workflow needs only source read access and permission to write review issues.
+It cannot push branches, create PRs, approve reviews or publish releases. GitHub's
+combined Actions PR-creation/review-approval setting stays disabled. Failed
+metadata downloads, restore, tests or artifact uploads stop maintenance instead
+of publishing an unchecked proposal.
 
 Review the proposed runtime's notices, About information and documentation before
 merging. Self-contained EXEs require a new release to deliver runtime fixes.

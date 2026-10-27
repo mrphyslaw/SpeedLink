@@ -6,7 +6,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 **[Download v0.6.0-alpha.3](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.3)** — a single Windows EXE, with no installer or .NET installation required.
 
-This release adds local crash reports, retained test evidence and a tested GitHub release pipeline with source, hashes and build provenance. Reviewed dependency updates run weekly. Replace the EXE and keep your existing `data` folder. See [maintenance](docs/MAINTENANCE.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+This release adds local crash reports, retained test evidence and a tested GitHub release pipeline with source, hashes and build provenance. Reviewed dependency PRs and tested runtime-update proposals run weekly. Replace the EXE and keep your existing `data` folder. See [maintenance](docs/MAINTENANCE.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the nine supported stock ROM layouts.

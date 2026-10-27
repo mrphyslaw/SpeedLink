@@ -29,6 +29,16 @@ async function api(path, method = 'GET', body) {
   return response.status === 204 ? null : response.json();
 }
 
+export async function publishProposal(plan, call, runUrl, baseCommit) {
+  if (![plan.sdk, plan.runtime].every(numeric) || !/^[a-f0-9]{40}$/.test(baseCommit) || !/^https:\/\/github\.com\/mrphyslaw\/SpeedLink\/actions\/runs\/\d+$/.test(runUrl)) throw Error('Invalid update proposal identity');
+  const marker = `<!-- runtime-update:${plan.sdk}:${plan.runtime} -->`;
+  const issues = await call('/issues?state=all&per_page=100');
+  const existing = issues.find(issue => !issue.pull_request && issue.user?.login === 'github-actions[bot]' && issue.body?.includes(marker));
+  if (existing?.state === 'closed') return; // Preserve a maintainer's decision to decline an update.
+  const body = `${marker}\nA tested runtime update is ready for review.\n\n- SDK: ${plan.oldSdk} → ${plan.sdk}\n- Bundled runtime: ${plan.oldRuntime} → ${plan.runtime}\n- Base source commit: ${baseCommit}\n\n[Download the runtime-update artifact and view the checks](${runUrl}). It contains the coupled SDK/runtime patch, refreshed dependency locks and test evidence. Artifacts expire after 14 days; an open proposal is refreshed by the next successful weekly run.\n\nReview the patch, runtime notices and documentation. Apply runtime-update.patch on a branch based on the source commit above, then open a PR. The full desktop and standalone checks must pass before merge. Build a new release to deliver the runtime patch to users.\n\nNo branches, reviews, merges or releases were changed automatically.`;
+  await call(existing ? `/issues/${existing.number}` : '/issues', existing ? 'PATCH' : 'POST', { title: `Runtime update ready: SDK ${plan.sdk} / .NET ${plan.runtime}`, body });
+}
+
 async function main() {
   if (process.argv[2] === 'prepare') {
     const global = JSON.parse(readFileSync('dotnet/global.json', 'utf8'));
@@ -39,33 +49,18 @@ async function main() {
     if (!response.ok) throw Error('Official runtime metadata is unavailable');
     const plan = planUpdate(global, props, await response.json());
     if (!plan) { appendFileSync(process.env.GITHUB_OUTPUT, 'changed=false\n'); console.log('No new runtime patch required.'); return; }
-    if (await api(`/git/ref/heads/${plan.branch}`)) {
-      const pulls = await api(`/pulls?state=open&head=${encodeURIComponent('mrphyslaw:' + plan.branch)}`);
-      if (!pulls.length) throw Error('An update branch exists without an open PR; inspect it before rerunning. Existing work was preserved.');
-      appendFileSync(process.env.GITHUB_OUTPUT, 'changed=false\n'); console.log('Existing runtime PR preserved for review.'); return;
-    }
     global.sdk.version = plan.sdk;
     writeFileSync('dotnet/global.json', JSON.stringify(global, null, 2) + '\n');
     writeFileSync('dotnet/Directory.Build.props', props.replace(`<RuntimeFrameworkVersion>${plan.oldRuntime}</RuntimeFrameworkVersion>`, `<RuntimeFrameworkVersion>${plan.runtime}</RuntimeFrameworkVersion>`));
     writeFileSync('runtime-update.json', JSON.stringify(plan));
-    appendFileSync(process.env.GITHUB_OUTPUT, `changed=true\nbranch=${plan.branch}\n`);
-  } else if (process.argv[2] === 'pull') {
+    appendFileSync(process.env.GITHUB_OUTPUT, `changed=true\n`);
+  } else if (process.argv[2] === 'patch') {
+    const files = ['dotnet/global.json', 'dotnet/Directory.Build.props', ...execFileSync('git', ['ls-files', 'dotnet/**/packages.lock.json'], { encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean)];
+    writeFileSync('runtime-update.patch', execFileSync('git', ['diff', '--binary', '--', ...files]));
+  } else if (process.argv[2] === 'proposal') {
     const plan = JSON.parse(readFileSync('runtime-update.json', 'utf8'));
-    if (!/^maintenance\/dotnet-\d+\.\d+\.\d+-\d+\.\d+\.\d+$/.test(plan.branch)) throw Error('Invalid maintenance branch');
-    execFileSync('git', ['config', 'user.name', 'github-actions[bot]']);
-    execFileSync('git', ['config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com']);
-    execFileSync('git', ['switch', '-c', plan.branch]);
-    // Explicit file inventory: never stage reports, credentials or generated executable files.
-    execFileSync('git', ['add', 'dotnet/global.json', 'dotnet/Directory.Build.props', ...execFileSync('git', ['ls-files', 'dotnet/**/packages.lock.json'], { encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean)]);
-    execFileSync('git', ['commit', '-m', `Update bundled runtime to ${plan.runtime} and SDK to ${plan.sdk}`]);
-    const sha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-    // Push without a credential helper or token-bearing URL; the short-lived extra header is never printed or persisted.
-    const auth = Buffer.from(`x-access-token:${process.env.GH_TOKEN}`).toString('base64');
-    execFileSync('git', ['push', 'origin', `HEAD:refs/heads/${plan.branch}`], { stdio: 'pipe', env: { ...process.env, GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'http.https://github.com/.extraheader', GIT_CONFIG_VALUE_0: `AUTHORIZATION: basic ${auth}` } });
-    await api('/pulls', 'POST', { head: plan.branch, base: 'main', title: `Update .NET SDK ${plan.sdk} and bundled runtime ${plan.runtime}`, body: `Updates the pinned SDK and bundled runtime together using Microsoft's published metadata; refreshes dependency locks.\n\nOffline unit and mandatory ROM-save integrity checks passed before opening this PR. The full desktop/release checks are dispatched separately. Review version-dependent notices and documentation before merging. No automatic merge or release is enabled.\n\nSource commit: ${sha}` });
-    // GITHUB_TOKEN-created PRs do not trigger pull_request workflows. Dispatch checks explicitly on this branch.
-    await api('/actions/workflows/checks-dotnet.yml/dispatches', 'POST', { ref: plan.branch });
-    console.log('Runtime maintenance PR opened; full checks dispatched. Human review is required.');
-  } else throw Error('Unknown maintenance mode');
+    const base = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+    await publishProposal(plan, api, `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`, base);
+    console.log('Tested runtime patch proposed for review. No branches, reviews, merges or releases were changed.');  } else throw Error('Unknown maintenance mode');
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
