@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0-alpha.3
+
+- Capture unexpected application errors locally, offer reports on restart and export a crash support ZIP. Keep existing drafts and backups intact; no automatic uploads or memory/ROM dumps.
+- Retain synthetic CI reports and screenshots for 14 days, bound check duration and cancel superseded branch runs.
+- Build, test and publish the same standalone EXE through GitHub, with matching source, SHA-256 checksums, release identity and build provenance. Windows code signing remains pending.
+- Propose reviewed weekly NuGet, pinned-action and coupled SDK/runtime patch updates. No automatic merge or release.
+- ECU programming remains disabled. No new physical adapter or real ECU acceptance is claimed.
+
 ## 0.6.0-alpha.2
 
 - Rebuild the standalone EXE with the .NET 10.0.14 security update and SDK

@@ -1,0 +1,47 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  checks:
+    uses: ./.github/workflows/checks-dotnet.yml
+    with:
+      release: true
+  publish:
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require a release commit from main
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+          node --input-type=module -e 'import {verifyPackage} from "./.github/scripts/release.mjs"; if(!process.env.RELEASE_TAG.startsWith("v")) process.exit(1);'
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: release-package
+          path: release
+      - name: Verify the package before attestation
+        run: node --input-type=module -e 'import {verifyPackage} from "./.github/scripts/release.mjs"; verifyPackage("release", process.env.GITHUB_REF_NAME, process.env.GITHUB_SHA);'
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: release/*
+      - name: Publish the tested package without rebuilding
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_FOLDER: release
+        run: node .github/scripts/release.mjs

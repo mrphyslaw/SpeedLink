@@ -91,3 +91,26 @@ and a backup matching the ROM currently installed in the ECU.
 
 For adapter status see [Adapters](ADAPTERS.md). Experimental adapter support and
 real-ECU validation remain separate from passing simulator-bench tests.
+## Unexpected application errors
+
+If SpeedLink closes unexpectedly, restart it. A saved crash report is offered
+after the main window opens. Review it, choose **Save crash ZIP…**, and attach the
+ZIP to the [problem form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+You can reopen reports with **Crash reports** in the top bar, without an adapter.
+Closing the review acknowledges the displayed reports; it does not delete them.
+Reports contain the application/runtime version, time, error and stack, and a
+broad activity such as logging. Nothing is uploaded automatically.
+
+Crash reports exclude ROM images, recordings, process memory, exception object
+graphs and source-file paths. Personal paths and known identity values are
+redacted. They are limited to 32 KiB and the newest ten per storage location.
+The normal location is `data/crashes` beside the EXE, with a per-user Local AppData
+fallback if that location is not writable. Replacing the EXE preserves reports.
+
+Unexpected fatal errors stop the app rather than continuing in an unknown state.
+Existing backups, saved projects and recovery drafts are retained; actions since
+the last saved draft may be missing. Use the editor's recovery command after
+restarting. A crash report is not a replacement for a project backup.
+Power loss, forced process termination, native driver crashes, stack overflow,
+exhausted memory or unavailable storage can prevent a report from being written.
+For connection failures, also export the normal adapter support ZIP described below.

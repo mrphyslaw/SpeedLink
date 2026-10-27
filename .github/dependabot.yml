@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /dotnet
+    schedule:
+      interval: weekly
+      day: tuesday
+    open-pull-requests-limit: 3
+    groups:
+      test-dependencies:
+        patterns: ['*']
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: tuesday
+    open-pull-requests-limit: 3
+    groups:
+      pinned-actions:
+        patterns: ['*']

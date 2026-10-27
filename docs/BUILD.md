@@ -1,5 +1,9 @@
 # Building SpeedLink for Windows
 
+Use the [release and maintenance workflow](MAINTENANCE.md) for public releases.
+The tagged source is tested in GitHub, and that same EXE is packaged and published
+with source, hashes and build provenance. Local builds are for development.
+
 The current app uses C#/.NET 10 and WPF. Build on 64-bit Windows using the SDK
 pinned in `dotnet/global.json`. From the repository root:
 

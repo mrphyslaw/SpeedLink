@@ -1,5 +1,9 @@
 # Contributing
 
+Release packaging, failure artifacts and reviewed dependency updates are described
+in [maintenance](docs/MAINTENANCE.md). Unexpected crashes must be captured locally
+without uploading data, copying firmware or silently continuing after a fatal error.
+
 SpeedLink supports ROM reading, logging and offline editing. ECU programming
 remains disabled. Keep that scope explicit when proposing changes.
 

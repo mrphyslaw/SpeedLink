@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.6.0-alpha.2";
+    public const string Version = "0.6.0-alpha.3";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -73,6 +73,7 @@ public partial class MainWindow : Window
     {
         bool idle = !busy && !closing && !exportingReport;
         DefinitionsButton.IsEnabled = idle && transport is null;
+        CrashReportsButton.IsEnabled = idle;
         SessionText.Text = transport is null ? "Offline" : identity?.Calibration ?? "Adapter connected";
         ConnectButton.IsEnabled = idle && transport is null;
         DisconnectButton.IsEnabled = idle && transport is not null;

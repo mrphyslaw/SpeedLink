@@ -6,6 +6,8 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        InstallCrashReporting();
+        if (await RunCrashChecks(e.Args)) return;
         if (e.Args.Contains("--menus-smoke", StringComparer.Ordinal) || e.Args.Contains("--support-smoke", StringComparer.Ordinal))
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
@@ -62,7 +64,7 @@ public partial class App : Application
         }
         if (e.Args.Contains("--editor", StringComparer.Ordinal))
         {
-            var editor = new MainWindow(); MainWindow = editor; editor.Show(); editor.OpenEditorFile();
+            var editor = new MainWindow(); crashWindow = editor; MainWindow = editor; editor.Show(); OfferCrashReports(editor); editor.OpenEditorFile();
             int at = Array.IndexOf(e.Args, "--file");
             if (at >= 0 && at + 1 < e.Args.Length)
                 try { editor.OpenEditorFile(e.Args[at + 1]); } catch (Exception error) { MessageBox.Show(editor, error.Message, "SpeedLink ROM editor"); }
@@ -95,6 +97,7 @@ public partial class App : Application
             return;
         }
         var window = new MainWindow();
+        crashWindow = window;
         MainWindow = window;
         if (e.Args.Contains("--smoke-test", StringComparer.Ordinal))
         {
@@ -116,6 +119,9 @@ public partial class App : Application
             }
         }
         else
+        {
             window.Show();
+            OfferCrashReports(window);
+        }
     }
 }
