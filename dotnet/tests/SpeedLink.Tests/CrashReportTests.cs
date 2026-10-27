@@ -17,10 +17,10 @@ public sealed class CrashReportTests : IDisposable
     }
     [Fact] public void personal_data_and_exception_object_graphs_are_excluded()
     {
-        var error = new InvalidOperationException("Failure C:\\Users\\PrivateOwner\\rom.bin\nSN:SECRET123 TESTVIN1234567890");
+        var error = new InvalidOperationException("Failure C:\\Users\\PrivateOwner\\rom.bin\nSN:SECRET123 AAAAAAAAAAAAAAAAA");
         error.Data["ROM"] = "PRIVATE_IMAGE_PAYLOAD";
         string path = Store.Capture(error, "test", "Runtime", true, "Idle")!; string text = File.ReadAllText(path);
-        Assert.DoesNotContain("PrivateOwner", text); Assert.DoesNotContain("SECRET123", text); Assert.DoesNotContain("TESTVIN1234567890", text); Assert.DoesNotContain("PRIVATE_IMAGE_PAYLOAD", text);
+        Assert.DoesNotContain("PrivateOwner", text); Assert.DoesNotContain("SECRET123", text); Assert.DoesNotContain("AAAAAAAAAAAAAAAAA", text); Assert.DoesNotContain("PRIVATE_IMAGE_PAYLOAD", text);
     }
     [Fact] public void registered_identity_secrets_are_redacted()
     {
