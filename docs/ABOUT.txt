@@ -17,6 +17,8 @@ Tuner-focused map help with visible units, arithmetic and correction examples.
 Map info beside the tabs and F1 open help for the active map.
 Import editor/logger definition updates and restore bundled copies.
 Automatic adapter diagnostics and support ZIP export, including failed connections.
+Local crash reports with next-launch review and support ZIP export; nothing sent automatically.
+Tested GitHub release packages with matching source, hashes and build provenance.
 Factory seed/key exchanges retained; ROM payloads excluded; personal data redacted.
 Getting started, Editor, Logger and Report a problem guides included under Help.
 Every editor save applies mandatory ROM-specific integrity checks. Originals preserved.

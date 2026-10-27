@@ -1,5 +1,16 @@
 # SpeedLink requirements
 
+## Reliability and releases
+
+- Keep crash reports local and bounded; never include memory dumps or ROM payloads.
+  Fatal UI errors must stop the app rather than resume in an unknown state.
+- Release the same standalone executable that passed the release checks. Bind it
+  to its exact source commit, version and hashes; never replace a published asset.
+- Preserve mandatory integrity gates and retained synthetic CI failure evidence.
+  Do not upload generated ROM fixtures or private/customer files as CI artifacts.
+- Keep dependency/runtime updates reviewable. Maintain exact SDK/runtime pins,
+  refreshed locks and protected checks; no automatic merge or publication.
+
 ## Mandatory ROM-save integrity
 
 - Every ROM exported from the editor must have a valid checksum before its final filename is

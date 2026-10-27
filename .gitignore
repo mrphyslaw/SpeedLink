@@ -20,3 +20,7 @@ data/
 dotnet/publish/
 .vs/
 *.user
+
+dotnet/release/
+runtime-update.json
+runtime-update.patch

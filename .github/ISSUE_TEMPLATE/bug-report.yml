@@ -7,7 +7,7 @@ body:
       value: |
         Follow the [problem-report guide](https://github.com/mrphyslaw/SpeedLink/blob/main/docs/TROUBLESHOOTING.md).
         In SpeedLink, choose **Connection → Export support report…**, select the failed session and save the ZIP.
-        You can export after restarting without reconnecting. Review attachments: this issue is public.
+        You can export after restarting without reconnecting. For an unexpected app crash, use **Crash reports → Save crash ZIP…** in the top bar. Review attachments: this issue is public.
         The ZIP retains factory security access; ROM payloads and recordings are excluded.
   - type: dropdown
     id: operation
@@ -60,7 +60,7 @@ body:
     id: support
     attributes:
       label: Support report
-      description: Drag your SpeedLink-support ZIP here, wait for the upload to finish, then submit. If export was unavailable, explain why. Do not attach your whole data/backup folder.
+      description: Drag your SpeedLink support or crash ZIP here, wait for the upload to finish, then submit. If export was unavailable, explain why. Do not attach your whole data/backup folder.
     validations:
       required: true
   - type: checkboxes

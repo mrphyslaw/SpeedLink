@@ -1,5 +1,19 @@
 # C# validation
 
+## Reliability and release maintenance — 0.6.0-alpha.3
+
+- 436 C# cases, including durable crash storage, personal-data redaction, fallback,
+  size/retention limits, acknowledgment, safe export and malformed-report rejection.
+- Standalone crash check exercises the actual UI exception boundary in a disposable
+  process, then verifies next-process review, acknowledgment and ZIP export.
+- The full offline desktop suite and every-profile mandatory ROM-save gate remain
+  required. No adapter transmissions or real ECU results are added by this release.
+- Release package tests reject changed bytes, wrong source/tag, missing hashes and
+  extra files. Runtime-update tests exclude preview, downgrade, major and feature-
+  band migrations while coupling SDK/runtime versions from one release record.
+- GitHub retains only synthetic reports/screenshots, not generated ROM images.
+  Release workflow validation tests the same EXE that publishing uploads.
+
 ## .NET security maintenance — 0.6.0-alpha.2
 
 - SDK 10.0.403 and bundled runtime 10.0.14 are pinned together. Dependency locks

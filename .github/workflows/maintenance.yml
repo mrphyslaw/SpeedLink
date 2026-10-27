@@ -1,0 +1,69 @@
+name: Runtime maintenance
+on:
+  schedule:
+    - cron: '41 9 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: runtime-maintenance
+  cancel-in-progress: false
+jobs:
+  propose:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          persist-credentials: false
+      - run: node --test .github/scripts/*.test.mjs
+      - name: Check official SDK and runtime patch metadata
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/runtime-update.mjs prepare
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+        if: steps.plan.outputs.changed == 'true'
+        with:
+          global-json-file: dotnet/global.json
+      - name: Refresh locks and validate the coupled update
+        if: steps.plan.outputs.changed == 'true'
+        working-directory: dotnet
+        run: |
+          dotnet restore SpeedLink.slnx --force-evaluate
+          if ($LASTEXITCODE -ne 0) { throw 'Lock refresh failed.' }
+          dotnet restore SpeedLink.slnx --locked-mode
+          if ($LASTEXITCODE -ne 0) { throw 'Locked restore failed.' }
+          dotnet test SpeedLink.slnx -c Release --no-restore --logger "trx;LogFileName=CSharp.trx" --results-directory TestResults
+          if ($LASTEXITCODE -ne 0) { throw 'Runtime regression tests failed.' }
+          ./tools/Verify-Regression.ps1 -Results TestResults/CSharp.trx
+          ./tools/Verify-RomSaveIntegrity.ps1 -Results TestResults/CSharp.trx
+      - name: Prepare a tested update patch
+        if: steps.plan.outputs.changed == 'true'
+        run: node .github/scripts/runtime-update.mjs patch
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: steps.plan.outputs.changed == 'true'
+        with:
+          name: runtime-update-${{ github.run_id }}
+          path: |
+            runtime-update.patch
+            runtime-update.json
+            dotnet/TestResults/**/*.trx
+          if-no-files-found: error
+          retention-days: 14
+      - name: Publish the review proposal after the patch is available
+        if: steps.plan.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/runtime-update.mjs proposal
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: runtime-maintenance-${{ github.run_id }}
+          path: dotnet/TestResults/**/*.trx
+          if-no-files-found: ignore
+          retention-days: 14
