@@ -23,7 +23,9 @@ canceled by another release.
 3. Create a version tag, for example `v0.6.0-alpha.3`, on that main-branch commit
    and push it. The **Release** workflow runs the full checks again.
 4. The Windows job tests the standalone EXE, including crash capture and restart,
-   then packages that exact file. It archives only tracked source at that commit.
+   then packages that exact file. It archives all tracked source from the
+   repository root, verifies the complete path inventory, and independently
+   checks every archived file against its Git blob hash at that commit.
 5. The publishing job verifies that the commit belongs to `main`, checks the tag,
    version, exact file inventory and hashes, and generates GitHub build provenance.
    It creates a draft, uploads and verifies every asset, then publishes it.

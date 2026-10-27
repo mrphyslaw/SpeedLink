@@ -94,7 +94,6 @@ jobs:
           if ($result.passed -ne $true -or $result.hardwareAccessed -ne $false -or $result.rows -ne 300 -or $before -ne (Get-FileHash -LiteralPath $fixture -Algorithm SHA256).Hash) { throw 'Unexpected standalone viewer result.' }
 
       - name: Package the tested executable and exact source
-        if: ${{ inputs.release == true }}
         run: ./tools/Package-Release.ps1 -Executable publish/SpeedLink.exe -Output release
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: ${{ inputs.release == true }}

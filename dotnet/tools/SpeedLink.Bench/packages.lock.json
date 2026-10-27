@@ -8,13 +8,13 @@
       "speedlink.j2534": {
         "type": "Project",
         "dependencies": {
-          "SpeedLink.Core": "[0.6.0-alpha.3, )"
+          "SpeedLink.Core": "[0.6.0-alpha.4, )"
         }
       },
       "speedlink.serial": {
         "type": "Project",
         "dependencies": {
-          "SpeedLink.Core": "[0.6.0-alpha.3, )"
+          "SpeedLink.Core": "[0.6.0-alpha.4, )"
         }
       }
     },

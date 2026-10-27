@@ -1,5 +1,13 @@
 # C# validation
 
+## Complete source packaging — 0.6.0-alpha.4
+
+- Source packaging runs for PR/main checks as well as release tags. Git archives
+  run from the repository root, regardless of the invoking directory.
+- The archive verifier compares every file path and Git blob hash with the exact
+  source commit. An incomplete subdirectory archive is explicitly rejected.
+- Downloaded release source is independently compared with the merged Git tree.
+
 ## Reliability and release maintenance — 0.6.0-alpha.3
 
 - 436 C# cases, including durable crash storage, personal-data redaction, fallback,
