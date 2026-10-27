@@ -20,7 +20,8 @@ public partial class EditorWorkspace
         var doc = document!; var previous = table; int mode = ViewMode; bool fitted = fitTable;
         var originalTabs = MapTabs.Items.Cast<TabItem>().ToHashSet();
         byte[] before = doc.Snapshot();
-        var scalar = doc.Definition.Tables.First(t => t.Name.StartsWith("Absolute Rev Limiter", StringComparison.Ordinal) && t.Count == 1);
+        var scalar = doc.Definition.Tables.FirstOrDefault(t => t.Name.StartsWith("Absolute Rev Limiter", StringComparison.Ordinal) && t.Count == 1) ??
+            doc.Definition.Tables.First(t => t.Count == 1 && !t.IsChoice && t.Storage == "float");
         OpenTable(scalar); SetViewMode(4); await Settle();
         if (!ScalarInput.IsVisible || !ScalarPanel.IsVisible || TablePanel.IsVisible || GraphPanel.IsVisible || DataSplitter.IsVisible || EditBar.IsVisible ||
             ScalarUnits.Text != scalar.Units || ScalarDescription.Text != scalar.Description || ScalarInput.FontSize < 28)
@@ -64,11 +65,14 @@ public partial class EditorWorkspace
         ScalarChoice.SelectedItem = ScalarChoice.Items.Cast<TuningState>().First(s => s.Value != state);
         if (doc.Read(choice, 0) == state) throw new InvalidOperationException("Scalar state selection did not edit.");
         doc.Undo(); Capture(Path.Combine(folder, "StateEditor.png"));
-        var multi = doc.Definition.Tables.First(t => t.IsChoice && t.Count > 1);
-        OpenTable(multi); await Settle();
-        if (!TablePanel.IsVisible || GraphPanel.IsVisible || ScalarPanel.IsVisible || TablePanel.ActualHeight > 300)
-            throw new InvalidOperationException("Small multi-state controls waste grid or graph space.");
-        Capture(Path.Combine(folder, "SmallStates.png"));
+        var multi = doc.Definition.Tables.FirstOrDefault(t => t.IsChoice && t.Count > 1);
+        if (multi is not null)
+        {
+            OpenTable(multi); await Settle();
+            if (!TablePanel.IsVisible || GraphPanel.IsVisible || ScalarPanel.IsVisible || TablePanel.ActualHeight > 300)
+                throw new InvalidOperationException("Small multi-state controls waste grid or graph space.");
+            Capture(Path.Combine(folder, "SmallStates.png"));
+        }
         OpenTable(curve); FitMap_Click(this, new()); await Settle();
         if (!TablePanel.IsVisible || !GraphPanel.IsVisible || GraphTitle.Text != "Curve preview" || TablePanel.ActualHeight > 100 || MapGrid.RowHeight < 28)
             throw new InvalidOperationException("Short curves do not use a proportional grid and curve.");

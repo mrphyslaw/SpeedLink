@@ -17,10 +17,11 @@ public sealed class DiagnosticTransport(IReadTransport inner, DiagnosticSession 
         if (request.SequenceEqual(new byte[] { 9, 2 })) return "Read VIN";
         if (request.SequenceEqual(new byte[] { 9, 4 })) return "Read calibration";
         if (request.SequenceEqual(new byte[] { 1, 12 })) return "Check engine speed";
-        if (request.SequenceEqual(new byte[] { 0x10, 0x87 })) return "Enter ROM read session";
-        if (request.SequenceEqual(new byte[] { 0x27, 1 })) return "Request security seed";
-        if (request.Length >= 2 && request[0] == 0x27 && request[1] == 2) return "Submit security key";
+        if (request.SequenceEqual(new byte[] { 0x10, 0x87 }) || request.SequenceEqual(new byte[] { 0x10, 3 })) return "Enter ROM read session";
+        if (request.SequenceEqual(new byte[] { 0x27, 1 }) || request.SequenceEqual(new byte[] { 0x27, 3 })) return "Request security seed";
+        if (request.Length >= 2 && request[0] == 0x27 && request[1] is 2 or 4) return "Submit security key";
         if (request.Length == 7 && request[0] == 0x23) return $"Read ROM at 0x{BinaryPrimitives.ReadUInt32BigEndian(request[1..]):X6} ({BinaryPrimitives.ReadUInt16BigEndian(request[5..])} bytes)";
+        if (request.Length == 8 && request[0] == 0x23 && request[1] == 0x24) return $"Read Gen 2 ROM at 0x{BinaryPrimitives.ReadUInt32BigEndian(request[2..]):X6} ({BinaryPrimitives.ReadUInt16BigEndian(request[6..])} bytes)";
         return request.Length == 3 && request[0] == 0x22 ? "Read logger identifier " + Convert.ToHexString(request[1..]) : "Diagnostic service " + (request.IsEmpty ? "empty" : request[0].ToString("X2"));
     }
     public byte[] Exchange(byte[] request)

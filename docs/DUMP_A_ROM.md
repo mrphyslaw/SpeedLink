@@ -8,7 +8,7 @@ Editing and logging support are separate from reading support.
 → connect → identify → read twice → verify →
 [open a ROM support request](https://github.com/mrphyslaw/SpeedLink/issues/new?template=rom-support.yml).
 
-This workflow is for Mazda MZR DISI ECUs using the supported 1 MiB read protocol.
+This workflow is for Mazda MZR DISI ECUs using a compatible Gen 1 or Gen 2 1 MiB read protocol.
 An unknown calibration is welcome; a different ECU family or ROM size may need
 a different reader. SpeedLink is an alpha, and real Mazda ECU validation is
 still pending. ECU programming is disabled.
@@ -50,6 +50,10 @@ read. Leave the app's normal settings in place; you do not need to experiment
 with baud rates. See [connection troubleshooting](USAGE.md) if reconnecting fails.
 
 ## 3. Read and verify
+
+Known ROMs select their protocol automatically. For an unknown Gen 2 ECU, choose
+**Gen 2 read protocol (experimental)** in the adapter settings. Other unknown ROMs default
+to Gen 1; confirm the ECU family before reading. See the [Gen 2 guide](GEN2.md).
 
 Select **Read & verify backup** once. Leave the ignition on, engine stopped,
 and both ends of the adapter connected while SpeedLink completes **pass 1/2**

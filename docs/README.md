@@ -18,7 +18,7 @@ Start with the workflow you need. ECU programming remains disabled.
 | [Supported ROMs](SUPPORTED_ROMS.md) | Known inspection layouts and compatibility limits |
 | [Adapter status and testing candidates](ADAPTERS.md) | Qualified adapter paths, planned hardware and the test checklist |
 | [Definition import](DEFINITIONS.md) | Import editor/logger updates, persistence and bundled fallback |
-| [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all eight profiles |
+| [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all nine profiles |
 
 The app includes Getting started, Editor, Logger and Report a problem guides under **Help**.
 **File → Editor guide** opens the editing guide; **Map info** / F1 explains
@@ -39,3 +39,5 @@ and logging each have stricter profile requirements, described in their guides.
 
 Use the [problem-report workflow](TROUBLESHOOTING.md) to export a diagnostic ZIP
 and open a guided GitHub report.
+
+- [Experimental Gen 2 reading, editing, logging and validation limits](GEN2.md)

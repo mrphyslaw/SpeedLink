@@ -19,8 +19,8 @@ live data, **Recordings** to review logs, **ROM checks** to inspect a file, or
    **Cancel** or Escape discards typing. For a table, double-click a cell, enter
    a value and press Enter. Switches use named choices.
 4. Compare with the original or last save and use Undo/Redo as needed.
-5. Choose **Save copy…** and pick a new filename. Every export corrects and
-   verifies its checksum. The original and existing files are preserved.
+5. Choose **Save copy…** and pick a new filename. Every export applies its mandatory
+   ROM-specific checksum/integrity checks. The original and existing files are preserved.
 
 Drag the table/preview divider to resize it. **Fit map** restores automatic
 sizing; Ctrl+B hides or restores the browser. Editing requires one of the eight
@@ -129,3 +129,12 @@ the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issu
 The report includes requests, timing, errors and factory security access; personal
 information is redacted and ROM bytes remain in your backup files. Review the ZIP
 before sharing.
+
+## Experimental Gen 2
+
+L3CGEE000 adds a 442-control editor and 20-parameter stock logger. Known ROMs
+choose their reader automatically. For an unknown compatible Gen 2 ECU, select
+**Gen 2 read protocol (experimental)** in Connection. Both read passes must match.
+Gen 2 saves validate native code and markers without repairing code; additional
+calibration-integrity rules are unestablished. Choose **Help → Gen 2 (experimental)**
+for scope, exclusions and pending real ECU validation.

@@ -117,7 +117,7 @@ or use the [full editor guide](../EDITOR.md).
    controls use named choices.
 3. Review the original/last-save/comparison values and the curve or surface.
    Use Undo/Redo to restore complete operations.
-4. Select **Save copy…**. Every save corrects and verifies the checksum, uses
+4. Select **Save copy…**. Every save applies its mandatory checksum/integrity policy, uses
    a new filename and verifies the written bytes.
 
 For a rectangular selection, the toolbar supports Set, Add, Multiply, copy/paste

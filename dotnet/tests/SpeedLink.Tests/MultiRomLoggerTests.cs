@@ -14,7 +14,7 @@ public class MultiRomLoggerTests
         { "L38KEH000", 38, 34, 298 }, { "L39SED000", 38, 34, 298 },
         { "L39SEE000", 38, 34, 298 }, { "L39SEF000", 38, 34, 298 },
         { "L3M7EF000", 35, 31, 277 }, { "L35HEH000", 36, 32, 284 },
-        { "L33XEH000", 35, 31, 277 }, { "L3P4EM000", 35, 31, 277 }
+        { "L33XEH000", 35, 31, 277 }, { "L3P4EM000", 35, 31, 277 }, { "L3CGEE000", 20, 19, 77 }
     };
     private static string Data(string id, string kind) => Path.Combine(AppContext.BaseDirectory, "LoggerDefinitions", $"{id}.{kind}.json");
     private static JsonDocument Vectors(string id) => JsonDocument.Parse(File.ReadAllBytes(Data(id, "vectors")));
@@ -57,9 +57,9 @@ public class MultiRomLoggerTests
         var expected = Profiles.Select(row => (string)row[0]).Order().ToArray();
         Assert.Equal(expected, LoggerDefinition.Known.SelectMany(p => p.SoftwareIds).Order().ToArray());
         Assert.Equal(expected, RomInspector.KnownProfiles.Select(p => p.Calibration).Order().ToArray());
-        Assert.Equal(2307, Profiles.Sum(row => (int)row[3]));
-        Assert.Equal(293, LoggerDefinition.Known.Sum(p => p.ChannelIds.Count));
-        Assert.Equal(11, LoggerDefinition.Known.Sum(p => p.UnavailableChannels.Count));
+        Assert.Equal(2384, Profiles.Sum(row => (int)row[3]));
+        Assert.Equal(313, LoggerDefinition.Known.Sum(p => p.ChannelIds.Count));
+        Assert.Equal(33, LoggerDefinition.Known.Sum(p => p.UnavailableChannels.Count));
         foreach (var profile in document.RootElement.GetProperty("profiles").EnumerateArray())
         {
             string path = Path.Combine(AppContext.BaseDirectory, "LoggerDefinitions", profile.GetProperty("profileFile").GetString()!);
@@ -138,6 +138,8 @@ public class MultiRomLoggerTests
         var node = JsonNode.Parse(File.ReadAllText(Data(id, "logger")))!;
         byte[] image = Enumerable.Repeat((byte)0xA5, 1_048_576).ToArray();
         Encoding.ASCII.GetBytes("SW-" + id + ".HEX").CopyTo(image, 0x100);
+        var romProfile = RomInspector.KnownProfiles.Single(p => p.Calibration == id);
+        if (romProfile.Family == "Gen2") Encoding.ASCII.GetBytes(romProfile.Identity).CopyTo(image, romProfile.IdentityOffset);
         var bindings = node["calibration"]!["bindings"]!;
         int Offset(JsonNode source) => Convert.ToInt32(source["offset"]!.GetValue<string>()[2..], 16);
         var gainSources = bindings["map_gain_kpa_per_v"]!["sources"]!.AsArray();
@@ -167,7 +169,7 @@ public class MultiRomLoggerTests
             int start = Convert.ToInt32(fingerprint!["ranges"]![0]!["start"]!.GetValue<string>()[2..], 16);
             image[start] ^= 1; Assert.Throws<InvalidDataException>(() => profile.BindRom(image)); image[start] ^= 1;
         }
-        image[0x103] = (byte)'X'; Assert.Throws<InvalidDataException>(() => profile.BindRom(image));
+        image[romProfile.Family == "Gen2" ? romProfile.IdentityOffset : 0x103] = (byte)'X'; Assert.Throws<InvalidDataException>(() => profile.BindRom(image));
     }
 
     [Fact]

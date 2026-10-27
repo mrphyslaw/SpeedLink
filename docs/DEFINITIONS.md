@@ -1,6 +1,6 @@
 # Importing definitions
 
-SpeedLink includes editor and logger definitions for all eight supported ROMs.
+SpeedLink includes editor and logger definitions for all nine supported ROMs.
 You can install definition updates without replacing the EXE.
 
 1. Disconnect the adapter and finish any active operation.
@@ -31,7 +31,7 @@ SpeedLink uses its bundled copy and reports the problem in Definitions.
 The importer accepts the standalone, one-ROM editor XML format used by this
 project and the SpeedLink logger JSON format. ROM identity must match a supported
 layout. It checks storage bounds, protected ROM metadata, supported scaling and
-static axes. Every editor export still corrects and verifies the checksum.
+static axes. Every editor export still applies its mandatory ROM-specific integrity policy.
 
 Program compatibility checks and logger request limits remain controlled by the
 application. Imported editor maps can use calibration storage and the program-area

@@ -1,0 +1,553 @@
+{
+  "schemaVersion": 1,
+  "source": "Synthetic payloads checked through the original native response callbacks; physical encoder slices verified separately.",
+  "romSHA256": "9cde1caebbf1335053dfa8229ab682e82d3d6d4ddadb6027a8e01bab9f6c26bc",
+  "calibration": {
+    "map_gain_kpa_per_v": 54.117647260427475,
+    "map_offset_kpa": 1.6469999551773071
+  },
+  "vectors": [
+    {
+      "type": "decode",
+      "case": "F40C_0",
+      "channel": "engine_rpm",
+      "responseHex": "62F40C0000",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F40C_1",
+      "channel": "engine_rpm",
+      "responseHex": "62F40C0001",
+      "expected": 0.25
+    },
+    {
+      "type": "decode",
+      "case": "F40C_32768",
+      "channel": "engine_rpm",
+      "responseHex": "62F40C8000",
+      "expected": 8192.0
+    },
+    {
+      "type": "decode",
+      "case": "F40C_65535",
+      "channel": "engine_rpm",
+      "responseHex": "62F40CFFFF",
+      "expected": 16383.75
+    },
+    {
+      "type": "decode",
+      "case": "F40D_0",
+      "channel": "vehicle_speed",
+      "responseHex": "62F40D00",
+      "expected": 0
+    },
+    {
+      "type": "decode",
+      "case": "F40D_1",
+      "channel": "vehicle_speed",
+      "responseHex": "62F40D01",
+      "expected": 1
+    },
+    {
+      "type": "decode",
+      "case": "F40D_128",
+      "channel": "vehicle_speed",
+      "responseHex": "62F40D80",
+      "expected": 128
+    },
+    {
+      "type": "decode",
+      "case": "F40D_255",
+      "channel": "vehicle_speed",
+      "responseHex": "62F40DFF",
+      "expected": 255
+    },
+    {
+      "type": "decode",
+      "case": "F40E_0",
+      "channel": "ignition_timing",
+      "responseHex": "62F40E00",
+      "expected": -64.0
+    },
+    {
+      "type": "decode",
+      "case": "F40E_1",
+      "channel": "ignition_timing",
+      "responseHex": "62F40E01",
+      "expected": -63.5
+    },
+    {
+      "type": "decode",
+      "case": "F40E_128",
+      "channel": "ignition_timing",
+      "responseHex": "62F40E80",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F40E_255",
+      "channel": "ignition_timing",
+      "responseHex": "62F40EFF",
+      "expected": 63.5
+    },
+    {
+      "type": "decode",
+      "case": "F40F_0",
+      "channel": "intake_air_temperature",
+      "responseHex": "62F40F00",
+      "expected": -40
+    },
+    {
+      "type": "decode",
+      "case": "F40F_1",
+      "channel": "intake_air_temperature",
+      "responseHex": "62F40F01",
+      "expected": -39
+    },
+    {
+      "type": "decode",
+      "case": "F40F_128",
+      "channel": "intake_air_temperature",
+      "responseHex": "62F40F80",
+      "expected": 88
+    },
+    {
+      "type": "decode",
+      "case": "F40F_255",
+      "channel": "intake_air_temperature",
+      "responseHex": "62F40FFF",
+      "expected": 215
+    },
+    {
+      "type": "decode",
+      "case": "F410_0",
+      "channel": "mass_airflow",
+      "responseHex": "62F4100000",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F410_1",
+      "channel": "mass_airflow",
+      "responseHex": "62F4100001",
+      "expected": 0.01
+    },
+    {
+      "type": "decode",
+      "case": "F410_32768",
+      "channel": "mass_airflow",
+      "responseHex": "62F4108000",
+      "expected": 327.68
+    },
+    {
+      "type": "decode",
+      "case": "F410_65535",
+      "channel": "mass_airflow",
+      "responseHex": "62F410FFFF",
+      "expected": 655.35
+    },
+    {
+      "type": "decode",
+      "case": "F411_0",
+      "channel": "absolute_throttle_position",
+      "responseHex": "62F41100",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F411_1",
+      "channel": "absolute_throttle_position",
+      "responseHex": "62F41101",
+      "expected": 0.39215686274509803
+    },
+    {
+      "type": "decode",
+      "case": "F411_128",
+      "channel": "absolute_throttle_position",
+      "responseHex": "62F41180",
+      "expected": 50.19607843137255
+    },
+    {
+      "type": "decode",
+      "case": "F411_255",
+      "channel": "absolute_throttle_position",
+      "responseHex": "62F411FF",
+      "expected": 100.0
+    },
+    {
+      "type": "decode",
+      "case": "F405_0",
+      "channel": "coolant_temperature",
+      "responseHex": "62F40500",
+      "expected": -40
+    },
+    {
+      "type": "decode",
+      "case": "F405_1",
+      "channel": "coolant_temperature",
+      "responseHex": "62F40501",
+      "expected": -39
+    },
+    {
+      "type": "decode",
+      "case": "F405_128",
+      "channel": "coolant_temperature",
+      "responseHex": "62F40580",
+      "expected": 88
+    },
+    {
+      "type": "decode",
+      "case": "F405_255",
+      "channel": "coolant_temperature",
+      "responseHex": "62F405FF",
+      "expected": 215
+    },
+    {
+      "type": "decode",
+      "case": "F406_0",
+      "channel": "short_term_fuel_trim",
+      "responseHex": "62F40600",
+      "expected": -100.0
+    },
+    {
+      "type": "decode",
+      "case": "F406_1",
+      "channel": "short_term_fuel_trim",
+      "responseHex": "62F40601",
+      "expected": -99.21875
+    },
+    {
+      "type": "decode",
+      "case": "F406_128",
+      "channel": "short_term_fuel_trim",
+      "responseHex": "62F40680",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F406_255",
+      "channel": "short_term_fuel_trim",
+      "responseHex": "62F406FF",
+      "expected": 99.21875
+    },
+    {
+      "type": "decode",
+      "case": "F407_0",
+      "channel": "long_term_fuel_trim",
+      "responseHex": "62F40700",
+      "expected": -100.0
+    },
+    {
+      "type": "decode",
+      "case": "F407_1",
+      "channel": "long_term_fuel_trim",
+      "responseHex": "62F40701",
+      "expected": -99.21875
+    },
+    {
+      "type": "decode",
+      "case": "F407_128",
+      "channel": "long_term_fuel_trim",
+      "responseHex": "62F40780",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F407_255",
+      "channel": "long_term_fuel_trim",
+      "responseHex": "62F407FF",
+      "expected": 99.21875
+    },
+    {
+      "type": "decode",
+      "case": "F40B_0",
+      "channel": "manifold_absolute_pressure",
+      "responseHex": "62F40B00",
+      "expected": 0
+    },
+    {
+      "type": "decode",
+      "case": "F40B_1",
+      "channel": "manifold_absolute_pressure",
+      "responseHex": "62F40B01",
+      "expected": 1
+    },
+    {
+      "type": "decode",
+      "case": "F40B_128",
+      "channel": "manifold_absolute_pressure",
+      "responseHex": "62F40B80",
+      "expected": 128
+    },
+    {
+      "type": "decode",
+      "case": "F40B_255",
+      "channel": "manifold_absolute_pressure",
+      "responseHex": "62F40BFF",
+      "expected": 255
+    },
+    {
+      "type": "decode",
+      "case": "F433_0",
+      "channel": "barometric_pressure",
+      "responseHex": "62F43300",
+      "expected": 0
+    },
+    {
+      "type": "decode",
+      "case": "F433_1",
+      "channel": "barometric_pressure",
+      "responseHex": "62F43301",
+      "expected": 1
+    },
+    {
+      "type": "decode",
+      "case": "F433_128",
+      "channel": "barometric_pressure",
+      "responseHex": "62F43380",
+      "expected": 128
+    },
+    {
+      "type": "decode",
+      "case": "F433_255",
+      "channel": "barometric_pressure",
+      "responseHex": "62F433FF",
+      "expected": 255
+    },
+    {
+      "type": "decode",
+      "case": "F423_0",
+      "channel": "fuel_rail_pressure",
+      "responseHex": "62F4230000",
+      "expected": 0
+    },
+    {
+      "type": "decode",
+      "case": "F423_1",
+      "channel": "fuel_rail_pressure",
+      "responseHex": "62F4230001",
+      "expected": 10
+    },
+    {
+      "type": "decode",
+      "case": "F423_32768",
+      "channel": "fuel_rail_pressure",
+      "responseHex": "62F4238000",
+      "expected": 327680
+    },
+    {
+      "type": "decode",
+      "case": "F423_65535",
+      "channel": "fuel_rail_pressure",
+      "responseHex": "62F423FFFF",
+      "expected": 655350
+    },
+    {
+      "type": "decode",
+      "case": "F434_0",
+      "channel": "actual_lambda",
+      "responseHex": "62F43400000000",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F434_1",
+      "channel": "actual_lambda",
+      "responseHex": "62F43400010000",
+      "expected": 3.0517578125e-05
+    },
+    {
+      "type": "decode",
+      "case": "F434_32768",
+      "channel": "actual_lambda",
+      "responseHex": "62F43480000000",
+      "expected": 1.0
+    },
+    {
+      "type": "decode",
+      "case": "F434_65535",
+      "channel": "actual_lambda",
+      "responseHex": "62F434FFFF0000",
+      "expected": 1.999969482421875
+    },
+    {
+      "type": "decode",
+      "case": "F444_0",
+      "channel": "desired_lambda",
+      "responseHex": "62F4440000",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F444_1",
+      "channel": "desired_lambda",
+      "responseHex": "62F4440001",
+      "expected": 3.0517578125e-05
+    },
+    {
+      "type": "decode",
+      "case": "F444_32768",
+      "channel": "desired_lambda",
+      "responseHex": "62F4448000",
+      "expected": 1.0
+    },
+    {
+      "type": "decode",
+      "case": "F444_65535",
+      "channel": "desired_lambda",
+      "responseHex": "62F444FFFF",
+      "expected": 1.999969482421875
+    },
+    {
+      "type": "decode",
+      "case": "F443_0",
+      "channel": "absolute_load",
+      "responseHex": "62F4430000",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F443_1",
+      "channel": "absolute_load",
+      "responseHex": "62F4430001",
+      "expected": 0.00392156862745098
+    },
+    {
+      "type": "decode",
+      "case": "F443_32768",
+      "channel": "absolute_load",
+      "responseHex": "62F4438000",
+      "expected": 128.50196078431372
+    },
+    {
+      "type": "decode",
+      "case": "F443_65535",
+      "channel": "absolute_load",
+      "responseHex": "62F443FFFF",
+      "expected": 257.0
+    },
+    {
+      "type": "decode",
+      "case": "F442_0",
+      "channel": "battery_voltage",
+      "responseHex": "62F4420000",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F442_1",
+      "channel": "battery_voltage",
+      "responseHex": "62F4420001",
+      "expected": 0.001
+    },
+    {
+      "type": "decode",
+      "case": "F442_32768",
+      "channel": "battery_voltage",
+      "responseHex": "62F4428000",
+      "expected": 32.768
+    },
+    {
+      "type": "decode",
+      "case": "F442_65535",
+      "channel": "battery_voltage",
+      "responseHex": "62F442FFFF",
+      "expected": 65.535
+    },
+    {
+      "type": "decode",
+      "case": "F404_0",
+      "channel": "calculated_load",
+      "responseHex": "62F40400",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F404_1",
+      "channel": "calculated_load",
+      "responseHex": "62F40401",
+      "expected": 0.39215686274509803
+    },
+    {
+      "type": "decode",
+      "case": "F404_128",
+      "channel": "calculated_load",
+      "responseHex": "62F40480",
+      "expected": 50.19607843137255
+    },
+    {
+      "type": "decode",
+      "case": "F404_255",
+      "channel": "calculated_load",
+      "responseHex": "62F404FF",
+      "expected": 100.0
+    },
+    {
+      "type": "decode",
+      "case": "F445_0",
+      "channel": "relative_throttle_position",
+      "responseHex": "62F44500",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F445_1",
+      "channel": "relative_throttle_position",
+      "responseHex": "62F44501",
+      "expected": 0.39215686274509803
+    },
+    {
+      "type": "decode",
+      "case": "F445_128",
+      "channel": "relative_throttle_position",
+      "responseHex": "62F44580",
+      "expected": 50.19607843137255
+    },
+    {
+      "type": "decode",
+      "case": "F445_255",
+      "channel": "relative_throttle_position",
+      "responseHex": "62F445FF",
+      "expected": 100.0
+    },
+    {
+      "type": "decode",
+      "case": "F449_0",
+      "channel": "accelerator_pedal_position",
+      "responseHex": "62F44900",
+      "expected": 0.0
+    },
+    {
+      "type": "decode",
+      "case": "F449_1",
+      "channel": "accelerator_pedal_position",
+      "responseHex": "62F44901",
+      "expected": 0.39215686274509803
+    },
+    {
+      "type": "decode",
+      "case": "F449_128",
+      "channel": "accelerator_pedal_position",
+      "responseHex": "62F44980",
+      "expected": 50.19607843137255
+    },
+    {
+      "type": "decode",
+      "case": "F449_255",
+      "channel": "accelerator_pedal_position",
+      "responseHex": "62F449FF",
+      "expected": 100.0
+    },
+    {
+      "type": "calculate",
+      "case": "pressure_difference",
+      "channel": "boost_pressure",
+      "inputs": {
+        "manifold_absolute_pressure": 200,
+        "barometric_pressure": 100
+      },
+      "expected": 100
+    }
+  ]
+}

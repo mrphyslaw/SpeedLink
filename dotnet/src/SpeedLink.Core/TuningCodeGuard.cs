@@ -44,7 +44,7 @@ public sealed class TuningCodeGuard
                 if (to > from) program.AsSpan(from - start, to - from).Clear();
             }
         }
-        program.AsSpan(profile.CorrectionAddress - start, 4).Clear();
+        if (profile.CorrectionAddress >= start) program.AsSpan(profile.CorrectionAddress - start, 4).Clear();
         return Convert.ToHexStringLower(SHA256.HashData(program));
     }
 }

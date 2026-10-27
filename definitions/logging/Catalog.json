@@ -97,6 +97,18 @@
       "romSha256": "ef5e35796c813f85526727aefcc21a05c87749e89b7812168c715ba1842486fe",
       "definitionSha256": "6651d985d7f86aadcab316e8751bb4edd737da9a06ea16f680e9fd034908f95e",
       "realEcuTested": false
+    },
+    {
+      "calibration": "L3CGEE000",
+      "vehicle": "Mazdaspeed3 / Mazda3 MPS (Gen2)",
+      "profileFile": "L3CGEE000.logger.json",
+      "channels": 20,
+      "queries": 19,
+      "unavailable": 22,
+      "vectors": 77,
+      "romSha256": "9cde1caebbf1335053dfa8229ab682e82d3d6d4ddadb6027a8e01bab9f6c26bc",
+      "definitionSha256": "7c23fd17340c3288c914543e0ce0c3e820be27da9a9550dd3f77e57a999d2ddd",
+      "realEcuTested": false
     }
   ]
 }

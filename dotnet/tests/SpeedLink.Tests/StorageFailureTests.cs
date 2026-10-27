@@ -37,7 +37,10 @@ public class StorageFailureTests
         }
     }
     [Fact]
-    public void test_read_and_backup_fault_matrix()
+    public void test_read_and_backup_fault_matrix() => CheckReadFaults("L38KEH000", 530);
+    [Fact]
+    public void gen2_read_and_backup_fault_matrix() => CheckReadFaults("L3CGEE000", 2052);
+    private static void CheckReadFaults(string calibration, int fullReadRequests)
     {
         var cases = new (string Name, Func<string, byte[], bool> Predicate, string Fault, int Reads)[] {
             ("read_issued_fsync",TestFileSystem.EventIs("read_issued"),"fsync",0),
@@ -51,11 +54,11 @@ public class StorageFailureTests
         foreach (var row in cases)
         {
             using var temp = new TempFolder();
-            using var ecu = new TestEcu(Fixture.Rom);
+            using var ecu = new TestEcu(Fixture.Image(Fixture.Profiles.Single(p => p.Calibration == calibration)));
             var files = new TestFileSystem { Predicate = row.Predicate, Fault = row.Fault };
             Assert.Throws<IOException>(() => Fixture.Reader(files).ReadBackup(ecu, ReadWorkflow.Identify(ecu), temp.Path));
             Assert.True(files.Fired, row.Name);
-            Assert.Equal(row.Reads, ecu.Requests.Count(x => x[0] == 0x23));
+            Assert.Equal(row.Reads == 530 ? fullReadRequests : row.Reads, ecu.Requests.Count(x => x[0] == 0x23));
             Assert.All(Fixture.Store(files).Scan(temp.Path), entry => Assert.False(entry.Complete));
             foreach (var file in Directory.GetFiles(temp.Path, "rom.bin", SearchOption.AllDirectories))
                 Assert.True(Record.Exception(() => Fixture.Store(files).Load(file)) is IOException or InvalidDataException);

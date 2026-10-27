@@ -1,7 +1,7 @@
 # SpeedLink ROM editor guide
 
 Edit a supported ROM without an adapter. SpeedLink keeps the original file and
-exports each revision as a new file with a corrected, verified checksum.
+exports each revision as a new file with mandatory ROM-specific checksum/integrity checks.
 ECU programming remains disabled.
 
 This guide is also included in the app: choose **File → Editor guide**, or
@@ -16,7 +16,7 @@ choose **Help** and select **Editor**. **Map info** beside the map tabs, or
 3. Edit the control using the instructions below for its shape. Compare with
    the baseline and use Undo/Redo to review or reverse an operation.
 4. Choose **Save copy…** or press Ctrl+S. Pick a new filename. Every export
-   corrects the checksum and verifies the written bytes.
+   applies its mandatory checksum/integrity policy and verifies the written bytes.
 
 ### Single values, such as rev limits
 
@@ -156,7 +156,7 @@ for examples of interpreting corrections and coefficients.
 
 **Save copy…** writes a new binary, flushes it and verifies its bytes. It refuses
 to overwrite the original or any existing file. Pick a new filename for every
-revision. Every export corrects and verifies the checksum; there is no opt-out.
+revision. Every export applies mandatory ROM-specific checksum/integrity checks; there is no opt-out.
 Checksum correction is undoable if it changes bytes. The Original ROM baseline
 always remains the image first opened in this session.
 
@@ -198,3 +198,10 @@ Axis editing, patch installation, smoothing, tune-project history and log-to-map
 overlays are not included. Offline checks do not validate engine behavior.
 
 [Editor screenshots](editor/README.md) · [Documentation index](README.md)
+
+## Gen 2 integrity checks
+
+L3CGEE000 uses mandatory native code-sum and marker validation on every export.
+Calibration edits are outside the code sum. Invalid code is rejected without
+repair; additional calibration-integrity rules are not established. See the
+[Gen 2 guide](GEN2.md). Its 155 DTC controls govern reporting, not readiness.

@@ -4,7 +4,7 @@ Mazdaspeed ECU tools
 Workbench alpha
 ROM reading, verified backups, offline ROM editing and live logging.
 One workspace for editing, live logging and recorded logs.
-Eight tuning definitions, Fit map, floating panels, changes and undo/redo.
+Nine tuning definitions, Fit map, floating panels, changes and undo/redo.
 Compact navigation, saved layouts and zoomable long MAF curves.
 Single-value cards with units, Apply/Cancel, baseline and change.
 Proportional small maps and a draggable, remembered table/preview divider.
@@ -18,12 +18,15 @@ Import editor/logger definition updates and restore bundled copies.
 Automatic adapter diagnostics and support ZIP export, including failed connections.
 Factory seed/key exchanges retained; ROM payloads excluded; personal data redacted.
 Getting started, Editor, Logger and Report a problem guides included under Help.
-Every editor save corrects and verifies its checksum. Originals are preserved.
+Every editor save applies mandatory ROM-specific integrity checks. Originals preserved.
+Gen 2 code and markers are validated; no arbitrary checksum repair is offered.
 A definition is not required to dump a ROM.
 
 Adapters: Vgate vLinker FS (USB), Tactrix Openport 2.0
 Experimental: Mongoose-Plus ISO/CAN3 reader/logger; hardware testing pending.
-Stock-ROM logger: eight defined Mazdaspeed/MPS ROMs, 35–38 parameters.
+Stock-ROM logger: eight Gen 1 profiles with 35–38 parameters; Gen 2 with 20.
+Experimental Gen 2 L3CGEE000: 287 tuning entries and 155 DTC reporting controls.
+Compatible unknown Gen 2 dumping uses a separate, bounded read protocol.
 Known short and complete ECU calibration IDs recognized for logging.
 Parameter selection, up to six synchronized charts, CSV and recorded-log viewer.
 ROM/offline checked; real-ECU logging validation pending.

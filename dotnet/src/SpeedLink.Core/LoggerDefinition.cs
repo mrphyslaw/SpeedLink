@@ -301,8 +301,15 @@ public sealed class LoggerDefinition
 
     private bool HasSoftwareMarker(ReadOnlySpan<byte> image)
     {
+        // Gen2 has an address-bound complete identity, not a Gen1 SW filename marker.
+        foreach (var profile in RomInspector.KnownProfiles.Where(p => p.Family == "Gen2" && SoftwareIds.Contains(p.Calibration)))
+            if (image.Length >= profile.IdentityOffset + profile.Identity.Length &&
+                image.Slice(profile.IdentityOffset, profile.Identity.Length).SequenceEqual(Encoding.ASCII.GetBytes(profile.Identity))) return true;
         foreach (string id in SoftwareIds)
+        {
+            if (RomInspector.KnownProfiles.Any(p => p.Family == "Gen2" && p.Calibration == id)) continue;
             if (image.IndexOf(Encoding.ASCII.GetBytes("SW-" + id + ".HEX")) >= 0) return true;
+        }
         return false;
     }
     public LoggerCalibration BindRom(ReadOnlySpan<byte> image)

@@ -21,9 +21,9 @@ internal static class Program
                 try
                 {
                     string output = Get("--output"); Directory.CreateDirectory(output);
-                    using var peer = new ReadProgressPeer(Get("--scenario"));
+                    using var peer = new ReadProgressPeer(Get("--scenario"), args.Contains("--gen2", StringComparer.Ordinal), args.Contains("--unknown-cal", StringComparer.Ordinal));
                     window = new MainWindow(Path.Combine(output, "data")); readApp.MainWindow = window;
-                    var report = await window.ExerciseReadProgressOffline(peer, output, Get("--scenario"));
+                    var report = await window.ExerciseReadProgressOffline(peer, output, Get("--scenario"), args.Contains("--unknown-cal", StringComparer.Ordinal));
                     report["memoryRequests"] = peer.MemoryRequests;
                     File.WriteAllText(Get("--report"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true })); resultCode = 0;
                 }
@@ -82,8 +82,10 @@ internal static class Program
                     System.Text.Encoding.ASCII.GetBytes(profile.Identity).CopyTo(image, profile.IdentityOffset);
                     image[0x8002] = 0x5A; image[0x8003] = 0xA5; image[^2] = 0xA5; image[^1] = 0x5A;
                     foreach (var word in profile.LayoutWords) System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.AsSpan(word.Address, 4), word.Value);
-                    System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.AsSpan(profile.CorrectionAddress, 4), unchecked(SpeedLink.Core.RomInspector.ChecksumTarget - SpeedLink.Core.RomInspector.Sum(image, profile)));
-                    profile = profile with { BootSha256 = SpeedLink.Core.RomInspector.Hash(image.AsSpan(0, 0x8000)), LoopSha256 = profile.LoopAddress is int at ? SpeedLink.Core.RomInspector.Hash(image.AsSpan(at, profile.LoopSize!.Value)) : null };
+                    foreach (var marker in profile.Markers ?? []) System.Buffers.Binary.BinaryPrimitives.WriteUInt16BigEndian(image.AsSpan(marker.Address, 2), marker.Value);
+                    int fixtureBalance = profile.CorrectionAddress >= 0 ? profile.CorrectionAddress : 0xBFFF0;
+                    System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(image.AsSpan(fixtureBalance, 4), unchecked(SpeedLink.Core.RomInspector.ChecksumTarget - SpeedLink.Core.RomInspector.Sum(image, profile)));
+                    profile = profile with { BootSha256 = SpeedLink.Core.RomInspector.Hash(image.AsSpan(0, profile.BootLength)), LoopSha256 = profile.RoutineRanges is not null ? SpeedLink.Core.RomInspector.Hash(profile.RoutineRanges.SelectMany(r => image.Skip(r.Address).Take(r.Length)).ToArray()) : profile.LoopAddress is int at ? SpeedLink.Core.RomInspector.Hash(image.AsSpan(at, profile.LoopSize!.Value)) : null };
                     var guard = new SpeedLink.Core.TuningCodeGuard([new(profile.Calibration, profile.ChecksumStart, SpeedLink.Core.TuningCodeGuard.Hash(image, definition, profile))]);
                     string output = Get("--output"); Directory.CreateDirectory(output);
                     string path = Path.Combine(output, "SYNTHETIC_NOT_ECU_FIRMWARE_" + profile.Calibration + ".bin"); File.WriteAllBytes(path, image);
@@ -205,7 +207,7 @@ internal sealed class LoggerPeer : SpeedLink.Core.IReadTransport
     public void Dispose() => ready.Dispose();
 }
 
-internal sealed class ReadProgressPeer(string scenario) : SpeedLink.Core.IReadTransport
+internal sealed class ReadProgressPeer(string scenario, bool gen2 = false, bool unknown = false) : SpeedLink.Core.IReadTransport
 {
     private readonly byte[] memory = CreateMemory();
     private static byte[] CreateMemory()
@@ -226,21 +228,29 @@ internal sealed class ReadProgressPeer(string scenario) : SpeedLink.Core.IReadTr
         switch (Convert.ToHexString(request))
         {
             case "0902": return [0x49, 0x02, 1, .. "JM1GG12L061000001"u8.ToArray()];
-            case "0904": return [0x49, 0x04, 1, .. "UNKNOWN01"u8.ToArray()];
+            case "0904": return [0x49, 0x04, 1, .. (gen2 && !unknown ? "L3CGEE000L3T6060"u8.ToArray() : "UNKNOWN01"u8.ToArray())];
             case "010C": return [0x41, 0x0C, 0, 0];
             case "1087":
+                if (gen2) throw new InvalidOperationException("Gen 1 session used for Gen 2.");
                 if (scenario == "preflight") throw new SpeedLink.Core.TransportException("Synthetic session-entry failure");
                 return [0x50, 0x87];
             case "2701": return [0x67, 1, 0, 0, 0];
+            case "1003":
+                if (!gen2) throw new InvalidOperationException("Gen 2 session used for Gen 1.");
+                if (scenario == "preflight") throw new SpeedLink.Core.TransportException("Synthetic session-entry failure");
+                return [0x50, 3, 0, 50, 1, 244];
+            case "2703": return [0x67, 3, 0x12, 0x34, 0x56];
+            case "270486CA06": return [0x67, 4];
         }
-        if (request[0] != 0x23 || request.Length != 7) throw new InvalidOperationException("Unexpected offline request.");
+        if (request[0] != 0x23 || request.Length != (gen2 ? 8 : 7) || gen2 && request[1] != 0x24) throw new InvalidOperationException("Unexpected offline request.");
         MemoryRequests++;
         if (scenario == "timeout" && MemoryRequests == 15) throw new SpeedLink.Core.TransportException("Synthetic receive timeout; no retry");
-        int address = System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(request.AsSpan(1, 4));
-        int count = System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(request.AsSpan(5, 2));
+        int start = gen2 ? 2 : 1;
+        int address = System.Buffers.Binary.BinaryPrimitives.ReadInt32BigEndian(request.AsSpan(start, 4));
+        int count = System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(request.AsSpan(start + 4, 2));
         byte[] response = [0x63, .. memory.AsSpan(address, count).ToArray()];
         if (scenario == "short" && MemoryRequests == 15) return response[..^1];
-        if (scenario == "mismatch" && MemoryRequests == 266) response[^1] ^= 1;
+        if (scenario == "mismatch" && MemoryRequests == (gen2 ? 1027 : 266)) response[^1] ^= 1;
         System.Threading.Thread.Sleep(5);
         return response;
     }

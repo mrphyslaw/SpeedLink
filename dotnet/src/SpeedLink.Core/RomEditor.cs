@@ -38,13 +38,13 @@ public sealed class RomEditor
         if (definitions is not null) DefinitionPolicy.ValidateEditor(Definition);
         codeDefinition = TuningDefinition.Known.Single(d => d.Calibration == Definition.Calibration);
         tables = new(Definition.Tables);
-        if (!inspection.CanCorrectChecksum) throw new InvalidDataException("ROM boot or layout does not match this stock definition. Editing is unavailable for this image.");
+        if (!inspection.CanExport) throw new InvalidDataException("ROM boot, integrity or layout does not match this stock definition. Editing is unavailable for this image.");
         if (!this.codeGuard.Matches(image, codeDefinition, this.inspector.ProfileFor(image)!))
             throw new InvalidDataException("The ROM program area differs from this stock definition. Patched or extended layouts are not supported by this editor.");
         SourcePath = Path.GetFullPath(sourcePath);
         original = (byte[])image.Clone(); current = (byte[])image.Clone(); lastSave = (byte[])image.Clone();
         foreach (var table in Definition.Tables)
-            if (Overlaps(table.Address, table.End, inspection.CorrectionAddress!.Value, inspection.CorrectionAddress.Value + 4) ||
+            if (inspection.CorrectionAddress is int correction && Overlaps(table.Address, table.End, correction, correction + 4) ||
                 Overlaps(table.Address, table.End, Definition.IdentityAddress, Definition.IdentityAddress + Definition.Identity.Length))
                 throw new InvalidDataException("Definition overlaps protected ROM metadata.");
     }
@@ -55,7 +55,7 @@ public sealed class RomEditor
     public bool HasComparison => comparison is not null;
     public void LoadComparison(byte[] image, string path)
     {
-        if (!Definition.Matches(image) || !inspector.Inspect(image).CanCorrectChecksum) throw new InvalidDataException("Comparison requires the same calibration and compatible stock layout.");
+        if (!Definition.Matches(image) || !inspector.Inspect(image).CanExport) throw new InvalidDataException("Comparison requires the same calibration and compatible stock layout.");
         if (!codeGuard.Matches(image, codeDefinition, inspector.ProfileFor(image)!)) throw new InvalidDataException("Comparison ROM has an unsupported program modification.");
         comparison = (byte[])image.Clone(); ComparisonPath = Path.GetFullPath(path); Changed?.Invoke(this, EventArgs.Empty);
     }
