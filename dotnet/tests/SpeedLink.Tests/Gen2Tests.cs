@@ -56,6 +56,11 @@ public sealed class Gen2Tests
         var loaded = Fixture.Store().Load(result.Path);
         Assert.Equal(input, loaded.Data); Assert.Equal("Gen2", loaded.Manifest["identity"]!["readProtocol"]!.GetValue<string>());
         Assert.Equal(!unknown, result.Inspection.ProfileRecognized);
+        if (unknown)
+        {
+            Assert.Equal("unavailable", result.Inspection.IntegrityPolicy);
+            Assert.False(result.Inspection.CanExport); Assert.False(result.Inspection.MarkersValid);
+        }
         Assert.Contains(peer.Requests, r => r.AsSpan().SequenceEqual(Convert.FromHexString("270486CA06")));
         Assert.DoesNotContain(peer.Requests, r => r.AsSpan().SequenceEqual(Convert.FromHexString("1087")));
         int total = 0; int cursor = 0; int pass = 1;

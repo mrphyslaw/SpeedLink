@@ -98,9 +98,9 @@ public sealed class RomInspector
             throw new InvalidDataException($"Expected {RomSize:N0} bytes; this file has {data.Length:N0}.");
         var profile = ProfileFor(data);
         var boot = Hash(data[..(profile?.BootLength ?? BootSize)]);
-        var markers = data[0x8002] == 0x5A && data[0x8003] == 0xA5 && data[^2] == 0xA5 && data[^1] == 0x5A;
         if (profile is null)
-            return new(data.Length, null, null, Hash(data), boot, false, false, false, markers, false, null, null, null, null, null, false, false);
+            return new(data.Length, null, null, Hash(data), boot, false, false, false, false, false, null, null, null, null, null, false, false, "unavailable");
+        var markers = data[0x8002] == 0x5A && data[0x8003] == 0xA5 && data[^2] == 0xA5 && data[^1] == 0x5A;
         if (profile.Markers is not null)
         {
             markers = true;
