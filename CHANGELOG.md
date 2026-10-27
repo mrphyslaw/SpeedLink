@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0-alpha.4
+
+- Correct release source packaging to archive the complete repository from its root, including definitions, documentation and build resources.
+- Verify every archive path and file against the exact source commit's Git blob hashes before release packaging can complete.
+- Includes all alpha.3 crash reporting, CI evidence, automated releases and reviewed-maintenance improvements. Its source archive supersedes the incomplete dotnet-only archive in alpha.3.
+
 ## 0.6.0-alpha.3
 
 - Capture unexpected application errors locally, offer reports on restart and export a crash support ZIP. Keep existing drafts and backups intact; no automatic uploads or memory/ROM dumps.
