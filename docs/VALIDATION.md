@@ -1,5 +1,19 @@
 # Alpha validation scope
 
+## .NET security maintenance — 0.6.0-alpha.2
+
+- SDK 10.0.403 and bundled runtime 10.0.14 are pinned together. Dependency locks
+  are refreshed with that SDK; locked restore stays enabled.
+- Release checks cover all 407 unit cases and 62 baseline regressions, the full
+  offline desktop suite, and standalone startup, menus, support export and replay.
+- The standalone startup report must show the pinned runtime in a 32-bit process.
+  About also displays the actual running runtime. All nine ROM profiles remain
+  bundled; definitions, protocol logic and integrity rules are unchanged.
+- This is a self-contained runtime rebuild. Installing a system runtime does not
+  patch an older SpeedLink EXE. Keep the existing data folder when replacing it.
+- No new physical adapter or ECU result is claimed. Gen 2 real ECU acceptance,
+  sensor values and rates remain pending. ECU programming remains disabled.
+
 ## Experimental Gen 2 support — 0.6.0-alpha.1
 
 - Nine editor/logger profiles. L3CGEE000 adds 287 tuning entries and 155 DTC

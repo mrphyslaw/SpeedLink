@@ -9,6 +9,12 @@ its dependency locks together, then rerun the checks. See
 [SDK selection](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json)
 and the [setup action](https://github.com/actions/setup-dotnet).
 
+The bundled runtime is also pinned with `RuntimeFrameworkVersion` in
+`dotnet/Directory.Build.props`. Update it with the SDK and dependency locks.
+The standalone startup check reports its actual runtime and requires that exact
+version in an x86 process. Self-contained releases need a rebuilt EXE to deliver
+runtime patches; installing .NET separately does not update an existing EXE.
+
 ```powershell
 Set-Location dotnet
 dotnet restore SpeedLink.slnx --locked-mode

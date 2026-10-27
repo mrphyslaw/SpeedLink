@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0-alpha.2
+
+- Rebuild the standalone EXE with the .NET 10.0.14 security update and SDK
+  10.0.403. Refresh dependency locks with the pinned SDK.
+- Pin the bundled runtime explicitly and require its exact version in the
+  standalone startup check. Keep the Windows x86 build and installed-driver paths.
+- Show the running .NET version in About. Replace the EXE to receive this update;
+  preserve the existing `data` folder.
+- ROM definitions, read/logging protocols and integrity policies are unchanged.
+  ECU programming remains disabled; real ECU validation remains pending.
+
 ## 0.6.0-alpha.1
 
 - Add experimental Gen 2 application reading, automatic known-family selection

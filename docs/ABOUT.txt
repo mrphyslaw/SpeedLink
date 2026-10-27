@@ -1,5 +1,6 @@
 SpeedLink {version}
 Mazdaspeed ECU tools
+Bundled .NET runtime: {runtime}
 
 Workbench alpha
 ROM reading, verified backups, offline ROM editing and live logging.
