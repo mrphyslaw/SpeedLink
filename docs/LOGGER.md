@@ -2,8 +2,8 @@
 
 For a visual tour, see the [logger overview and screenshots](logger/README.md).
 
-The logger draft covers all eight ROMs with tuning definitions, with 35–38
-parameters per profile. It uses the
+The logger draft covers eight Gen 1 ROMs with 35–38 parameters, plus experimental Gen 2
+L3CGEE000 with 20. It uses the
 factory application's read-identifier interface; a logging patch is not required.
 The ROM encoders and offline conversions have been checked. Real-ECU acceptance,
 sensor readings and achievable logging rates still need testing.
@@ -157,3 +157,11 @@ L3P4EM000 adds 35 parameters checked against its own ROM handlers and MAP
 calibration bindings. Its live ECU logging, rates and adapter acceptance still
 need testing. Desired fuel rail pressure, fuel injection amount and ambient air
 temperature are excluded from this profile.
+
+## Experimental Gen 2 logger
+
+L3CGEE000 offers 20 native parameters with its own identifier mapping and full
+identity binding. Load its matching ECU backup. Pressure has a 1 kPa resolution
+and 255 kPa diagnostic ceiling. Other baseline channels remain unavailable until
+established for this ROM. See [Gen 2 support](GEN2.md) for coverage and limits.
+Real ECU sensor values and rates are pending.

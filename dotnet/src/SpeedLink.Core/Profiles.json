@@ -253,5 +253,62 @@
     "LoopAddress": 758584,
     "LoopSize": 64,
     "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
+  },
+  {
+    "Calibration": "L3CGEE000",
+    "Model": "Mazdaspeed3 / Mazda3 MPS (Gen2)",
+    "IdentityOffset": 18284,
+    "Identity": "L3CGEE000L3T6060",
+    "BootSha256": "4e9e15de7e24f733a34fe0fbd0b555f089fb323c672945ba2a20cebf7e76a166",
+    "ChecksumStart": 16384,
+    "CorrectionAddress": -1,
+    "LayoutWords": [],
+    "LoopAddress": null,
+    "LoopSize": null,
+    "LoopSha256": "50c315ff06eeba97dc9278cf5ef5a3b6214d54d16a7eae470dc85910eb3e8e2a",
+    "Family": "Gen2",
+    "BootLength": 16384,
+    "SumRanges": [
+      {
+        "Address": 16384,
+        "Length": 98304
+      },
+      {
+        "Address": 131072,
+        "Length": 655360
+      }
+    ],
+    "RoutineRanges": [
+      {
+        "Address": 77160,
+        "Length": 72
+      },
+      {
+        "Address": 77232,
+        "Length": 26
+      },
+      {
+        "Address": 77536,
+        "Length": 168
+      }
+    ],
+    "Markers": [
+      {
+        "Address": 16384,
+        "Value": 23205
+      },
+      {
+        "Address": 114686,
+        "Value": 42330
+      },
+      {
+        "Address": 131072,
+        "Value": 23205
+      },
+      {
+        "Address": 1048574,
+        "Value": 42330
+      }
+    ]
   }
 ]

@@ -3,6 +3,12 @@
 The current app uses C#/.NET 10 and WPF. Build on 64-bit Windows using the SDK
 pinned in `dotnet/global.json`. From the repository root:
 
+The SDK is pinned exactly, with roll-forward disabled. An implicit SDK dependency
+can change between patches and invalidate locked restore. Upgrade the SDK and
+its dependency locks together, then rerun the checks. See
+[SDK selection](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json)
+and the [setup action](https://github.com/actions/setup-dotnet).
+
 ```powershell
 Set-Location dotnet
 dotnet restore SpeedLink.slnx --locked-mode

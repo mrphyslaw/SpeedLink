@@ -6,16 +6,26 @@ using System.Text.Json;
 namespace SpeedLink.Core;
 
 public sealed record WordGuard(int Address, uint Value);
+public sealed record RomRange(int Address, int Length);
+public sealed record MarkerGuard(int Address, ushort Value);
 public sealed record RomProfile(string Calibration, string Model, int IdentityOffset, string Identity,
     string BootSha256, int ChecksumStart, int CorrectionAddress, WordGuard[] LayoutWords,
-    int? LoopAddress, int? LoopSize, string? LoopSha256);
+    int? LoopAddress, int? LoopSize, string? LoopSha256)
+{
+    public string Family { get; init; } = "Gen1";
+    public int BootLength { get; init; } = 0x8000;
+    public RomRange[]? SumRanges { get; init; }
+    public RomRange[]? RoutineRanges { get; init; }
+    public MarkerGuard[]? Markers { get; init; }
+}
 
 public sealed record RomInspection(int Size, string? Calibration, string? Model, string Sha256,
     string BootSha256, bool ProfileRecognized, bool IdentityValid, bool BootRecognized,
     bool MarkersValid, bool ChecksumLayoutRecognized, string? Checksum, string? ExpectedChecksum,
     bool? ChecksumValid, int? ChecksumStart, int? CorrectionAddress, bool CanCorrectChecksum,
-    bool ProfileValid)
+    bool ProfileValid, string IntegrityPolicy = "additive_correction")
 {
+    public bool CanExport => CanCorrectChecksum || IntegrityPolicy == "native_code_validation" && ProfileValid;
     public object ToManifest() => new Dictionary<string, object?>
     {
         ["size"] = Size,
@@ -34,6 +44,8 @@ public sealed record RomInspection(int Size, string? Calibration, string? Model,
         ["checksumStart"] = ChecksumStart,
         ["correctionAddress"] = CorrectionAddress,
         ["canCorrectChecksum"] = CanCorrectChecksum,
+        ["canExport"] = CanExport,
+        ["integrityPolicy"] = IntegrityPolicy,
         ["profileValid"] = ProfileValid,
         ["vehicleMatchVerified"] = false
     };
@@ -54,6 +66,10 @@ public sealed class RomInspector
         return Array.AsReadOnly(JsonSerializer.Deserialize<RomProfile[]>(stream) ?? throw new InvalidDataException("Invalid ROM metadata."));
     }
     public static string Hash(ReadOnlySpan<byte> data) => Convert.ToHexStringLower(SHA256.HashData(data));
+    public static bool MatchesCalibrationId(RomProfile profile, string? calibration) => calibration is not null &&
+        new[] { profile.Calibration, profile.Identity }.Any(id => System.Text.RegularExpressions.Regex.IsMatch(calibration,
+            "(?<![A-Z0-9])" + System.Text.RegularExpressions.Regex.Escape(id) + "(?![A-Z0-9])",
+            System.Text.RegularExpressions.RegexOptions.CultureInvariant));
     public RomProfile? ProfileFor(ReadOnlySpan<byte> data)
     {
         RomProfile? found = null;
@@ -71,8 +87,9 @@ public sealed class RomInspector
         if (data.Length != RomSize)
             throw new InvalidDataException("A complete 1 MiB ROM is required.");
         uint sum = 0;
-        for (var at = profile.ChecksumStart; at < data.Length; at += 4)
-            sum = unchecked(sum + BinaryPrimitives.ReadUInt32BigEndian(data.Slice(at, 4)));
+        foreach (var range in profile.SumRanges ?? [new(profile.ChecksumStart, data.Length - profile.ChecksumStart)])
+            for (var at = range.Address; at < range.Address + range.Length; at += 4)
+                sum = unchecked(sum + BinaryPrimitives.ReadUInt32BigEndian(data.Slice(at, 4)));
         return sum;
     }
     public RomInspection Inspect(ReadOnlySpan<byte> data)
@@ -80,10 +97,16 @@ public sealed class RomInspector
         if (data.Length != RomSize)
             throw new InvalidDataException($"Expected {RomSize:N0} bytes; this file has {data.Length:N0}.");
         var profile = ProfileFor(data);
-        var boot = Hash(data[..BootSize]);
-        var markers = data[0x8002] == 0x5A && data[0x8003] == 0xA5 && data[^2] == 0xA5 && data[^1] == 0x5A;
+        var boot = Hash(data[..(profile?.BootLength ?? BootSize)]);
         if (profile is null)
-            return new(data.Length, null, null, Hash(data), boot, false, false, false, markers, false, null, null, null, null, null, false, false);
+            return new(data.Length, null, null, Hash(data), boot, false, false, false, false, false, null, null, null, null, null, false, false, "unavailable");
+        var markers = data[0x8002] == 0x5A && data[0x8003] == 0xA5 && data[^2] == 0xA5 && data[^1] == 0x5A;
+        if (profile.Markers is not null)
+        {
+            markers = true;
+            foreach (var guard in profile.Markers)
+                markers &= BinaryPrimitives.ReadUInt16BigEndian(data.Slice(guard.Address, 2)) == guard.Value;
+        }
         var identity = data.Slice(profile.IdentityOffset, profile.Identity.Length).SequenceEqual(Encoding.ASCII.GetBytes(profile.Identity));
         var bootKnown = boot == profile.BootSha256;
         var layout = identity;
@@ -91,6 +114,12 @@ public sealed class RomInspector
             layout &= BinaryPrimitives.ReadUInt32BigEndian(data.Slice(guard.Address, 4)) == guard.Value;
         if (profile.LoopAddress is int at && profile.LoopSize is int size)
             layout &= Hash(data.Slice(at, size)) == profile.LoopSha256;
+        if (profile.RoutineRanges is not null)
+        {
+            using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            foreach (var range in profile.RoutineRanges) hash.AppendData(data.Slice(range.Address, range.Length));
+            layout &= Convert.ToHexStringLower(hash.GetHashAndReset()) == profile.LoopSha256;
+        }
         if (profile.Calibration == "L38KEH000")
             layout &= bootKnown;
         uint? sum = layout ? Sum(data, profile) : null;
@@ -98,11 +127,18 @@ public sealed class RomInspector
         var correct = identity && bootKnown && markers && layout;
         return new(data.Length, profile.Calibration, profile.Model, Hash(data), boot, true, identity, bootKnown,
             markers, layout, sum?.ToString("X8"), layout ? ChecksumTarget.ToString("X8") : null, valid,
-            profile.ChecksumStart, profile.CorrectionAddress, correct, correct && valid == true);
+            profile.ChecksumStart, profile.CorrectionAddress >= 0 ? profile.CorrectionAddress : null,
+            correct && profile.CorrectionAddress >= 0, correct && valid == true,
+            profile.CorrectionAddress < 0 ? "native_code_validation" : "additive_correction");
     }
     public byte[] CorrectedCopy(ReadOnlySpan<byte> data)
     {
         var info = Inspect(data);
+        if (info.IntegrityPolicy == "native_code_validation")
+        {
+            if (!info.CanExport) throw new InvalidDataException("Native code checksum, markers or layout are invalid. Automatic code repair is unavailable.");
+            return data.ToArray();
+        }
         if (!info.CanCorrectChecksum)
             throw new InvalidDataException("Checksum correction requires a recognized identity, boot and checksum layout.");
         var profile = ProfileFor(data)!;

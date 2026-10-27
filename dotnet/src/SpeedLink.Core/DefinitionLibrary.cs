@@ -174,7 +174,9 @@ internal static class DefinitionPolicy
         {
             if (string.IsNullOrWhiteSpace(table.Name) || string.IsNullOrWhiteSpace(table.Category) ||
                 Overlaps(table, 0x8000, 4) ||
-                Overlaps(table, profile.IdentityOffset, profile.Identity.Length) || Overlaps(table, profile.CorrectionAddress, 4) ||
+                Overlaps(table, profile.IdentityOffset, profile.Identity.Length) || profile.CorrectionAddress >= 0 && Overlaps(table, profile.CorrectionAddress, 4) ||
+                (profile.Markers?.Any(m => Overlaps(table, m.Address, 2)) ?? false) ||
+                (profile.RoutineRanges?.Any(r => Overlaps(table, r.Address, r.Length)) ?? false) ||
                 profile.LayoutWords.Any(w => Overlaps(table, w.Address, 4)) ||
                 profile.LoopAddress is int loop && Overlaps(table, loop, profile.LoopSize!.Value))
                 throw new InvalidDataException("Definition overlaps protected ROM metadata or has an empty table name/category.");

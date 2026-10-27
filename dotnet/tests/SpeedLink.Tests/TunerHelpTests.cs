@@ -18,6 +18,16 @@ public class TunerHelpTests
             Assert.DoesNotContain("UI label", t.Units);
         });
         TuningTable Map(string name) => definition.Tables.Single(t => t.Name == name);
+        if (calibration == "L3CGEE000")
+        {
+            Assert.Equal("ECU knock-signal units", Map("Knock Retard Additive").Units);
+            Assert.Contains("does not directly remove degrees", Map("Knock Retard Additive").Description);
+            Assert.Contains("halves this offset", Map("Knock Retard Additive").Description);
+            Assert.Contains("not accumulated spark retard", Map("Knock Retard Multiplier").Description);
+            Assert.All(definition.Tables.Where(t => t.Name.StartsWith("Injector Base Pulsewidth", StringComparison.Ordinal)), t => Assert.Equal("encoded pulse coefficient", t.Units));
+            Assert.Equal(155, definition.Tables.Count(t => t.Category == "DTC Controls"));
+            return;
+        }
         var offset = Map("Knock Retard Additive");
         Assert.Equal("ECU knock-signal units", offset.Units);
         Assert.Contains("does not directly remove degrees", offset.Description);

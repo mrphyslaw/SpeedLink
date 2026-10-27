@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.5.5-alpha.5";
+    public const string Version = "0.6.0-alpha.1";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -55,6 +55,8 @@ public partial class MainWindow : Window
         BaudBox.SelectedItem = 115200;
         AdapterBox.ItemsSource = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0", "Mongoose-Plus ISO/CAN3 (experimental)" };
         AdapterBox.SelectedIndex = 0;
+        ReadFamilyBox.ItemsSource = new[] { "Gen 1 read protocol", "Gen 2 read protocol (experimental)" };
+        ReadFamilyBox.SelectedIndex = 0;
         InitializeLogger();
         RefreshPorts();
         RefreshHistory();
@@ -75,6 +77,9 @@ public partial class MainWindow : Window
         ConnectButton.IsEnabled = idle && transport is null;
         DisconnectButton.IsEnabled = idle && transport is not null;
         ReadButton.IsEnabled = idle && transport is not null && identity is not null && !transport.ReadAttempted;
+        var readProfiles = RomInspector.KnownProfiles.Where(p => RomInspector.MatchesCalibrationId(p, identity?.Calibration)).ToArray();
+        if (readProfiles.Length == 1) ReadFamilyBox.SelectedIndex = readProfiles[0].Family == "Gen2" ? 1 : 0;
+        ReadFamilyBox.IsEnabled = idle && readProfiles.Length == 0;
         StopButton.IsEnabled = busy;
         OpenRomButton.IsEnabled = idle;
         CorrectButton.IsEnabled = idle && inspection?.CanCorrectChecksum == true;
@@ -209,6 +214,7 @@ public partial class MainWindow : Window
             return;
         var link = transport;
         var expected = identity;
+        var family = ReadFamilyBox.SelectedIndex == 1 ? ReadFamily.Gen2 : ReadFamily.Gen1;
         await Run(async () =>
         {
             BeginReadProgress();
@@ -216,7 +222,7 @@ public partial class MainWindow : Window
             try
             {
                 var progress = new Progress<ReadProgress>(ShowReadProgress);
-                result = await Task.Run(() => new ReadWorkflow(store, inspector).ReadBackup(link, expected, vault, progress, stop!.Token));
+                result = await Task.Run(() => new ReadWorkflow(store, inspector).ReadBackup(link, expected, vault, progress, stop!.Token, family));
                 FinishReadProgress(true);
             }
             catch (OperationCanceledException) { FinishReadProgress(false, stopped: true); throw; }
@@ -297,7 +303,12 @@ public partial class MainWindow : Window
         {
             text.AppendLine($"Software identity: {Show(info.IdentityValid)}\nRecognized boot code: {Show(info.BootRecognized)}\nChecksum layout: {Show(info.ChecksumLayoutRecognized)}");
             if (info.ChecksumLayoutRecognized)
-                text.AppendLine($"Checksum: {info.Checksum} / expected {info.ExpectedChecksum} [{Show(info.ChecksumValid)}]\nChecksum region: 0x{info.ChecksumStart:X6}–0x0FFFFF\nCorrection word: 0x{info.CorrectionAddress:X6}\n");
+            {
+                text.AppendLine($"Checksum: {info.Checksum} / expected {info.ExpectedChecksum} [{Show(info.ChecksumValid)}]");
+                if (info.IntegrityPolicy == "native_code_validation")
+                    text.AppendLine("Code sum: 0x004000–0x0BFFFF, excluding 0x01C000–0x01FFFF. Four application markers are also checked.\nCalibration edits lie outside this sum. Invalid code is rejected; automatic repair is unavailable. Additional calibration integrity is not established.\n");
+                else text.AppendLine($"Checksum region: 0x{info.ChecksumStart:X6}–0x0FFFFF\nCorrection word: 0x{info.CorrectionAddress:X6}\n");
+            }
             else
                 text.AppendLine("Checksum validation: unavailable for this layout.\n");
         }
@@ -357,7 +368,7 @@ public partial class MainWindow : Window
     private void About_Click(object sender, RoutedEventArgs e) => MessageBox.Show(this, Resource("SpeedLink.About.txt").Replace("{version}", Version), "About SpeedLink");
     private Window HelpWindow()
     {
-        var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Adapters / testing"] = "SpeedLink.AdapterHelp.md", ["Report a problem"] = "SpeedLink.SupportHelp.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["Editor"] = "SpeedLink.EditorHelp.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
+        var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Adapters / testing"] = "SpeedLink.AdapterHelp.md", ["Report a problem"] = "SpeedLink.SupportHelp.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["Editor"] = "SpeedLink.EditorHelp.md", ["Gen 2 (experimental)"] = "SpeedLink.Gen2Help.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
         foreach (var name in Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith("SpeedLink.Notices.", StringComparison.Ordinal)))
             documents["Notices / " + name[18..]] = name;
         var panel = new DockPanel { Margin = new Thickness(16) };

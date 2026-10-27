@@ -10,7 +10,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow
 {
-    internal async Task<Dictionary<string, object?>> ExerciseReadProgressOffline(IReadTransport peer, string output, string scenario)
+    internal async Task<Dictionary<string, object?>> ExerciseReadProgressOffline(IReadTransport peer, string output, string scenario, bool unknownGen2 = false)
     {
         Show(); UpdateLayout();
         if (ReadProgressPanel.Visibility != Visibility.Collapsed) throw new InvalidOperationException("Idle progress takes up space.");
@@ -27,6 +27,11 @@ public partial class MainWindow
         transport = peer; identity = ReadWorkflow.Identify(peer);
         IdentityText.Text = "Synthetic progress test · no adapter or vehicle connected";
         Controls();
+        if (unknownGen2)
+        {
+            if (!ReadFamilyBox.IsEnabled) throw new InvalidOperationException("Unknown ROM protocol cannot be selected.");
+            ReadFamilyBox.SelectedIndex = 1;
+        }
         bool firstPass = false, secondPass = false, locked = false, estimate = false, reset = false;
         void Capture(string name)
         {

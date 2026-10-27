@@ -169,10 +169,13 @@ public sealed class NativeJ2534ReceiveTests
     }
 
     [Fact]
-    public void full_two_pass_backup_accepts_timeout_data_without_duplicate_requests()
+    public void full_two_pass_backup_accepts_timeout_data_without_duplicate_requests() => CheckFullBackup("L38KEH000", 530);
+    [Fact]
+    public void gen2_full_two_pass_backup_accepts_timeout_data_without_duplicate_requests() => CheckFullBackup("L3CGEE000", 2052);
+    private static void CheckFullBackup(string calibration, int requests)
     {
         using var temp = new TempFolder();
-        byte[] image = Fixture.Rom;
+        byte[] image = Fixture.Image(Fixture.Profiles.Single(p => p.Calibration == calibration));
         using var ecu = new TestEcu(image);
         using var driver = new Driver();
         int sequence = 0;
@@ -185,7 +188,7 @@ public sealed class NativeJ2534ReceiveTests
         using var link = Link(driver);
         var result = Fixture.Reader().ReadBackup(link, ReadWorkflow.Identify(link), temp.Path);
         Assert.Equal(image, Fixture.Store().Load(result.Path, "hardware").Data);
-        Assert.Equal(530, ecu.Requests.Count(request => request[0] == 0x23));
+        Assert.Equal(requests, ecu.Requests.Count(request => request[0] == 0x23));
         Assert.Equal(ecu.Requests.Count, driver.Writes.Count);
     }
 

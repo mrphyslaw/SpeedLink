@@ -147,6 +147,18 @@ public sealed class DiagnosticsTests : IDisposable
         Assert.DoesNotContain(Convert.ToHexString(Peer.Payload), report); Assert.Equal(2, channel.Requests.Count);
     }
     [Fact]
+    public async Task gen2_support_report_preserves_read_context_without_rom_payloads()
+    {
+        await using var session = Session(); using var peer = new Peer(); using var link = new DiagnosticTransport(peer, session);
+        link.Exchange(Convert.FromHexString("270486CA06"));
+        link.Exchange(Convert.FromHexString("2324000FFFF00010"));
+        await session.FlushAsync(); string report = Export(session);
+        Assert.Contains("270486CA06", report); Assert.Contains("Submit security key", report);
+        Assert.Contains("Read Gen 2 ROM at 0x0FFFF0 (16 bytes)", report);
+        Assert.Contains("payload omitted", report); Assert.DoesNotContain(Convert.ToHexString(Peer.Payload), report);
+        Assert.Equal(2, peer.Requests.Count);
+    }
+    [Fact]
     public async Task damaged_journal_line_does_not_prevent_support_export()
     {
         await using var session = Session(); var (_, journal) = new BackupStore().CreateOperation(vault, "hardware", "read_backup");

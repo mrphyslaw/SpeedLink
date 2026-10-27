@@ -1,8 +1,9 @@
 # SpeedLink ROM editor
 
-An offline editor for the eight bundled Mazdaspeed/MPS stock ROM layouts, built
+An offline editor for the nine bundled Mazdaspeed/MPS stock ROM layouts, built
 into the same Windows app as the reader and logger. No adapter is needed to edit
-a file. ECU programming remains disabled in this alpha.
+a file. ECU programming remains disabled in this alpha. The experimental Gen 2
+L3CGEE000 profile has separate [integrity checks and validation limits](../GEN2.md).
 
 ## Room for the map
 
@@ -117,7 +118,7 @@ or use the [full editor guide](../EDITOR.md).
    controls use named choices.
 3. Review the original/last-save/comparison values and the curve or surface.
    Use Undo/Redo to restore complete operations.
-4. Select **Save copy…**. Every save corrects and verifies the checksum, uses
+4. Select **Save copy…**. Every save applies its mandatory checksum/integrity policy, uses
    a new filename and verifies the written bytes.
 
 For a rectangular selection, the toolbar supports Set, Add, Multiply, copy/paste

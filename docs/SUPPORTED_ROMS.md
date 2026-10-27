@@ -1,7 +1,7 @@
 # ROM checks and compatibility
 
 Definitions are optional for ECU reading. The reader can dump unknown calibration
-IDs using the shared Mazda MZR DISI read protocol and the current 1 MiB range.
+IDs using the selected compatible Gen 1 or Gen 2 application read protocol and the current 1 MiB range.
 This list controls **optional file inspection and checksum correction**, not read
 permission. Unknown images can be backed up and reopened normally.
 
@@ -17,6 +17,7 @@ permission. Unknown images can be backed up and reopened normally.
 | L3M7EF000 | Mazdaspeed6 / Mazda 6 MPS | 0x03F000 | 0x0FFFF4 |
 | L35HEH000 | Mazda3 MPS | 0x048000 | 0x048000 |
 | L33XEH000 | Mazdaspeed3 / Axela | 0x048000 | 0x048000 |
+| L3CGEE000 | Mazdaspeed3 / Mazda3 MPS (Gen 2) | Native code sum; see below | Validation only; no repair |
 
 These layouts correspond to the published or locally prepared MazdaSpeedDefs
 definitions. File checks use each ROM's identity, boot fingerprint and checksum
@@ -25,8 +26,10 @@ checksum is not guessed. Read success does not require a passing known-ROM check
 
 ## Stock-ROM logging
 
-All eight layouts above also have a logger profile. L38KEH000 and the three
+All nine layouts above also have a logger profile. L38KEH000 and the three
 L39S variants have 38 parameters; L3M7EF000, L33XEH000 and L3P4EM000 have 35; L35HEH000 has 36.
+L3CGEE000 offers 20 parameters; see [Gen 2 coverage and integrity limits](GEN2.md).
+Its native sum covers code only; editable calibration bytes are excluded and invalid code is rejected without repair.
 Each profile has independent ROM evidence and its own MAP calibration bindings.
 Some older ROMs do not expose every baseline identifier through the checked path.
 See [coverage and exclusions](../definitions/logging/All_ROM_Coverage.md).

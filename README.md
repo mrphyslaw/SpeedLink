@@ -4,12 +4,16 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.5.5-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.5)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.6.0-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
-log stock-ECU data, review recordings and edit the eight supported stock ROM layouts.
+log stock-ECU data, review recordings and edit the nine supported stock ROM layouts.
 ECU access remains read-only: **flashing is disabled**. ROM files and adapter drivers
 are not bundled. Real Mazda ECU validation remains pending.
+
+**Experimental Gen 2:** L3CGEE000 adds 442 editor controls and a 20-parameter
+stock-ROM logger. Compatible unknown Gen 2 ROMs can be dumped by selecting the
+Gen 2 read protocol. Real ECU validation is pending; see the [Gen 2 guide](docs/GEN2.md).
 
 ## A look inside
 
@@ -74,11 +78,11 @@ directly on their frame, aligned with the surface as it rotates.
    arithmetic, paste or interpolation to a selection. State controls use named
    choices. Compare with the original, last save or another compatible ROM;
    Undo/Redo restores operations. Review a curve or surface when available.
-4. Choose **Save copy…**. Every save corrects and verifies the checksum, then
+4. Choose **Save copy…**. Every save applies the ROM-specific checksum/integrity checks, then
    creates and verifies a new file; the original and existing copies are preserved.
 
 Editing needs no adapter. Supported tuning profiles are **L33XEH000, L35HEH000,
-L38KEH000, L39SED000, L39SEE000, L39SEF000, L3M7EF000 and L3P4EM000**. A matching calibration,
+L38KEH000, L39SED000, L39SEE000, L39SEF000, L3M7EF000, L3P4EM000 and L3CGEE000**. A matching calibration,
 boot and program area are required. Patched/extended ROM layouts are unsupported.
 Static axes are read-only. See the [editor guide](docs/EDITOR.md) for details.
 
@@ -116,7 +120,7 @@ driver setup and reporting results.
 2. Save it in a writable folder and double-click it. No installer or .NET installation is needed.
 3. Connect a **Vgate vLinker FS USB** or **Tactrix Openport 2.0** with its manufacturer's driver installed. Select the adapter in SpeedLink; vLinker also needs its COM port.
 4. Turn the ignition on with the engine stopped, then select **Connect & identify**.
-5. Select **Read & verify backup**. SpeedLink saves a verified backup after two complete reads match.
+5. For an unknown Gen 2 ECU, select **Gen 2 read protocol (experimental)**; known ROMs choose automatically. Select **Read & verify backup**. SpeedLink saves a verified backup after two complete reads match.
 
 ![Backup progress showing the second read pass, overall percentage, bytes and estimated time remaining](docs/reading/images/progress.png)
 
@@ -132,7 +136,7 @@ folder, including its captures, manifest and journal.
 
 You need a full backup of the ROM currently installed in the ECU. SpeedLink uses
 it to choose the logging profile and read the MAP sensor calibration. The current
-logger supports [eight defined ROMs](definitions/logging/All_ROM_Coverage.md).
+logger supports [nine defined ROMs](definitions/logging/All_ROM_Coverage.md).
 
 1. Connect the adapter and select **Connect & identify**. If you just read a ROM,
    disconnect and reconnect before logging.
@@ -175,25 +179,27 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.5.5-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.5.5-alpha.5), a Windows Workbench alpha.**
+**Current release: [v0.6.0-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.1), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
   and saved-log viewing; offline ROM editing, comparison, 2D/3D views and undo/redo.
   The reader covers the 1 MiB MZR DISI ECU family.
-- **Logger coverage:** eight ROM profiles with 35–38 stock-ROM parameters each.
+- **Logger coverage:** eight Gen 1 profiles with 35–38 stock-ROM parameters each,
+  plus experimental L3CGEE000 Gen 2 logging with 20 parameters.
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
 - **Fixed:** logger matching accepts known complete ECU calibration IDs, including
   `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
-- **Checked:** 369 C# tests and 2,307 native-derived logger vectors. The L3P4EM000
-  profile adds 895 editor maps/controls and 35 logger parameters. Eight-profile editor desktop
-  checks cover direct cell entry, comparison, undo/redo and byte-identical no-edit
-  exports. See [validation](dotnet/docs/Validation.md). Physical
-  logger tests passed with vLinker FS and Tactrix across all seven profiles,
-  including fault handling, sustained requests, desktop controls and USB recovery.
-  Saved-log viewing and standalone EXE checks also passed.
+- **Checked:** 407 C# tests and 2,384 native-derived logger vectors. Nine-profile
+  editor checks cover direct cell entry, comparison, undo/redo and byte-identical
+  no-edit exports. L3CGEE000 adds 379 native logger instruction checks and complete
+  reference-ROM cell/axis comparisons. See [validation](docs/VALIDATION.md).
+  Earlier physical logger tests passed with vLinker FS and Tactrix across the
+  original seven Gen 1 profiles, including fault handling, sustained requests
+  and USB recovery. Gen 2 adapter tests remain pending. Saved-log viewing and
+  standalone EXE checks also passed.
 - **Still pending:** real Mazda ECU read/logging acceptance, sensor readings and
-  achievable vehicle logging rates. All 293 channel/profile ECU checks remain pending.
+  achievable vehicle logging rates. All 313 channel/profile ECU checks remain pending.
 - **Planned:** ECU flashing. Live programming is disabled in this release.
 
 Bench testing uses simulated ECU replies over real adapters. A matching pair of

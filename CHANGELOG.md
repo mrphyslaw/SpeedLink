@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.0-alpha.1
+
+- Add experimental Gen 2 application reading, automatic known-family selection
+  and an explicit protocol choice for compatible unknown Gen 2 ROMs.
+- Add L3CGEE000 editing with 442 controls and mandatory native code/marker
+  validation on save, without arbitrary code repair.
+- Add a 20-parameter L3CGEE000 stock-ROM logger with exact reply checks,
+  calibration binding and explicit unavailable channels.
+- Record the read protocol in verified backup manifests and support diagnostics.
+- Publish diagnostic storage failure state before flush callers resume.
+- Update bundled Help, README, About and the Gen 2 validation guide.
+- Native/offline and desktop checked; real ECU acceptance and logging values/rates
+  remain pending. Production ECU programming stays disabled.
+
 ## v0.5.5-alpha.5 — logger calibration matching
 
 - Recognize known complete ECU calibration identities as well as short software

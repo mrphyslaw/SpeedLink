@@ -38,5 +38,10 @@
     "Calibration": "L3P4EM000",
     "CodeStart": 294912,
     "Sha256": "877bd3c3537a80662b7cf256c61783fea5f28a1c9f589e3d0d697f595b7023ff"
+  },
+  {
+    "Calibration": "L3CGEE000",
+    "CodeStart": 16384,
+    "Sha256": "17c849da2d689874581bfcdf8aaa9a544e7db2a70e60478058f5fbe586edcaa2"
   }
 ]

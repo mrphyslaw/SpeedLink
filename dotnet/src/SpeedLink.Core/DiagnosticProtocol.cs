@@ -113,12 +113,20 @@ public static partial class DiagnosticProtocol
     {
         bool allowed = request.SequenceEqual(new byte[] { 0x09, 0x02 }) || request.SequenceEqual(new byte[] { 0x09, 0x04 }) || request.SequenceEqual(new byte[] { 0x01, 0x0C })
             || request.SequenceEqual(new byte[] { 0x10, 0x87 }) || request.SequenceEqual(new byte[] { 0x27, 0x01 }) || (request.Length == 5 && request[0] == 0x27 && request[1] == 0x02);
+        allowed |= request.SequenceEqual(new byte[] { 0x10, 0x03 }) || request.SequenceEqual(new byte[] { 0x27, 0x03 }) ||
+            (request.Length == 5 && request[0] == 0x27 && request[1] == 0x04);
         allowed |= request.Length == 3 && request[0] == 0x22 && LoggerDefinition.AllowsKnownReadRequest(request);
         if (request.Length == 7 && request[0] == 0x23)
         {
             var address = System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(request.Slice(1, 4));
             var count = System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(request.Slice(5, 2));
             allowed |= count > 0 && count <= maxRead && (ulong)address + count <= RomInspector.RomSize;
+        }
+        if (request.Length == 8 && request[0] == 0x23 && request[1] == 0x24)
+        {
+            var address = System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(request.Slice(2, 4));
+            var count = System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(request.Slice(6, 2));
+            allowed |= count > 0 && count <= Math.Min(maxRead, 1023) && (ulong)address + count <= RomInspector.RomSize;
         }
         if (!allowed)
             throw new TransportException("Live programming is disabled. Request blocked before serial I/O.");
@@ -148,7 +156,7 @@ public interface IReadTransport : IDisposable
 }
 
 public sealed record EcuIdentity(string Mode, string Adapter, string? Vin, string? Calibration,
-    string? VinStatus = null, string? CalibrationStatus = null)
+    string? VinStatus = null, string? CalibrationStatus = null, string? ReadProtocolName = null)
 {
     public object ToManifest() => new Dictionary<string, object?>
     {
@@ -158,6 +166,7 @@ public sealed record EcuIdentity(string Mode, string Adapter, string? Vin, strin
         ["calibration"] = Calibration,
         ["vinStatus"] = VinStatus,
         ["calibrationStatus"] = CalibrationStatus,
+        ["readProtocol"] = ReadProtocolName,
         ["requestID"] = "7E0",
         ["responseID"] = "7E8",
         ["bitrate"] = 500000,

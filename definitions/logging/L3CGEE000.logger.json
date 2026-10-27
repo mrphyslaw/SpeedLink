@@ -1,0 +1,927 @@
+{
+  "$schema": "logger-definition.schema.json",
+  "schemaVersion": 1,
+  "definitionVersion": "0.1.0",
+  "id": "mzr-disi-l3cgee000",
+  "vehicle": "Mazdaspeed3 / Mazda3 MPS (Gen2)",
+  "softwareIds": [
+    "L3CGEE000"
+  ],
+  "referenceRomSha256": "9cde1caebbf1335053dfa8229ab682e82d3d6d4ddadb6027a8e01bab9f6c26bc",
+  "status": "Native ROM verified; real ECU acceptance and sensor validation pending",
+  "referenceRomProvenance": "Reference image; donor vehicle, market and modification history unconfirmed.",
+  "protocol": {
+    "transport": "ISO15765",
+    "canBitrate": 500000,
+    "requestCanId": "0x7E0",
+    "responseCanId": "0x7E8",
+    "service": "0x22",
+    "positiveService": "0x62",
+    "identifierBytes": 2,
+    "byteOrder": "big",
+    "sessionPolicy": "normal_application_logging",
+    "sessionChanges": [],
+    "sessionAndSecurityAcceptance": "pending_ecu_test",
+    "negativeResponseValue": "unavailable",
+    "requireExactResponseLength": true,
+    "requireIdentifierEcho": true
+  },
+  "calibration": {
+    "sourcePolicy": "Bind the matching backup. These coefficients describe the stock diagnostic MAP encoder; its transmitted pressure is already in kPa.",
+    "referenceDefaultsAreNotVehicleConfirmation": true,
+    "parameters": {
+      "map_gain_kpa_per_v": 54.117647260427475,
+      "map_offset_kpa": 1.6469999551773071,
+      "stoichiometric_afr": null
+    },
+    "bindings": {
+      "map_gain_kpa_per_v": {
+        "operation": "product",
+        "sources": [
+          {
+            "offset": "0x044358",
+            "storage": "float32",
+            "byteOrder": "big"
+          },
+          {
+            "offset": "0x044354",
+            "storage": "float32",
+            "byteOrder": "big"
+          }
+        ]
+      },
+      "map_offset_kpa": {
+        "operation": "read",
+        "sources": [
+          {
+            "offset": "0x044350",
+            "storage": "float32",
+            "byteOrder": "big"
+          }
+        ]
+      }
+    },
+    "requiredForChannels": []
+  },
+  "queries": {
+    "F40C": {
+      "requestHex": "22F40C",
+      "positiveHeaderHex": "62F40C",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x0219F4",
+      "nativePayloadRam": "0x40007DD0",
+      "descriptorSha256": "2f3ce7a56b0cc599099c7c520709479968a1ef953b0f824536079f947c335ff2"
+    },
+    "F40D": {
+      "requestHex": "22F40D",
+      "positiveHeaderHex": "62F40D",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x021A04",
+      "nativePayloadRam": "0x40007DD3",
+      "descriptorSha256": "c9a8c9091cdacf5c8a0fced47909a81bafc03ee29d43800ef3d30dbc97a3caf2"
+    },
+    "F40E": {
+      "requestHex": "22F40E",
+      "positiveHeaderHex": "62F40E",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x021A14",
+      "nativePayloadRam": "0x40007DD5",
+      "descriptorSha256": "ca37db4043f4b7173e9b002c5c08fac292bdf731287dc216a2952ab4d4700c63"
+    },
+    "F40F": {
+      "requestHex": "22F40F",
+      "positiveHeaderHex": "62F40F",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x021A24",
+      "nativePayloadRam": "0x40007DD7",
+      "descriptorSha256": "b523b5217bea31a9a809b8490292a429288f32244da19f7255727e94e9c50ddd"
+    },
+    "F410": {
+      "requestHex": "22F410",
+      "positiveHeaderHex": "62F410",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x021A34",
+      "nativePayloadRam": "0x40007DDA",
+      "descriptorSha256": "2be19a66a58d842253ee9fea69d5bcf98c0e4b69be21cd2ffedb50f6803b4379"
+    },
+    "F411": {
+      "requestHex": "22F411",
+      "positiveHeaderHex": "62F411",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x021A44",
+      "nativePayloadRam": "0x40007DDD",
+      "descriptorSha256": "82fb8270bbded886df53271a7ebf2baa5baa6c7e147c15f2ff866fc360716102"
+    },
+    "F405": {
+      "requestHex": "22F405",
+      "positiveHeaderHex": "62F405",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x0219B4",
+      "nativePayloadRam": "0x40007DC6",
+      "descriptorSha256": "425243c889206a3547f6658e55d63b6d3d8367e13f050b6477c85b72762056ce"
+    },
+    "F406": {
+      "requestHex": "22F406",
+      "positiveHeaderHex": "62F406",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x0219C4",
+      "nativePayloadRam": "0x40007DC8",
+      "descriptorSha256": "fe2e0802e01cf7011759719c46944685a6f7e08321192d68ae269f4fcef40b08"
+    },
+    "F407": {
+      "requestHex": "22F407",
+      "positiveHeaderHex": "62F407",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x0219D4",
+      "nativePayloadRam": "0x40007DCA",
+      "descriptorSha256": "9ff6cf6105f47778a83ad9ee363a88748175a592719d94017e56fcd58e1f550c"
+    },
+    "F40B": {
+      "requestHex": "22F40B",
+      "positiveHeaderHex": "62F40B",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x0219E4",
+      "nativePayloadRam": "0x40007DCC",
+      "descriptorSha256": "b0a7f4060297397b868f97b3fafc311fb758fee238b5c15529e1de3e93361539"
+    },
+    "F433": {
+      "requestHex": "22F433",
+      "positiveHeaderHex": "62F433",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x021B24",
+      "nativePayloadRam": "0x40007E13",
+      "descriptorSha256": "74fab45c1380b7b3fa186bbbd4da51082e8df0f420d8238179205d696bbddf5b"
+    },
+    "F423": {
+      "requestHex": "22F423",
+      "positiveHeaderHex": "62F423",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x021AB4",
+      "nativePayloadRam": "0x40007E00",
+      "descriptorSha256": "42d8369bfe6a0dfe3e21f3285f14f45b4dc1b0038f8627e17b6095196aabd0c0"
+    },
+    "F434": {
+      "requestHex": "22F434",
+      "positiveHeaderHex": "62F434",
+      "dataBytes": 4,
+      "nativeDescriptorOffset": "0x021B34",
+      "nativePayloadRam": "0x40007E1C",
+      "descriptorSha256": "02d4d7e4811d18fbbe95dc13ca4223e390f3a3f98870c2496acabf63425c1931"
+    },
+    "F444": {
+      "requestHex": "22F444",
+      "positiveHeaderHex": "62F444",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x021B94",
+      "nativePayloadRam": "0x40007E42",
+      "descriptorSha256": "34fc1f1feb15e8310dc9b7b6c4c62c35ae5cc5f73d8d996e80397d77a6c096cf"
+    },
+    "F443": {
+      "requestHex": "22F443",
+      "positiveHeaderHex": "62F443",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x021B84",
+      "nativePayloadRam": "0x40007E3E",
+      "descriptorSha256": "e2051a3c48ababeb5e530c085e8c9438a32a96d5d78372b91ad12a6ccdf71c7c"
+    },
+    "F442": {
+      "requestHex": "22F442",
+      "positiveHeaderHex": "62F442",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x021B74",
+      "nativePayloadRam": "0x40007E3A",
+      "descriptorSha256": "58928557c854db303b97d6b15d52015751f8cdec258d7eb74ec7586792f0b0a7"
+    },
+    "F404": {
+      "requestHex": "22F404",
+      "positiveHeaderHex": "62F404",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x0219A4",
+      "nativePayloadRam": "0x40007DC4",
+      "descriptorSha256": "c5ca0629a2b88dc479061006436bb4e87e00817b38a6f4ce079d0a3c19a59b22"
+    },
+    "F445": {
+      "requestHex": "22F445",
+      "positiveHeaderHex": "62F445",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x021BA4",
+      "nativePayloadRam": "0x40007E45",
+      "descriptorSha256": "026b9fc791b93827bf48fa3db888fcba0e1be13b7fb9ce35f8ad0dcb6c78bbc4"
+    },
+    "F449": {
+      "requestHex": "22F449",
+      "positiveHeaderHex": "62F449",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x021BD4",
+      "nativePayloadRam": "0x40007E4B",
+      "descriptorSha256": "f92caadc29ea42ac47f9e68b0dccc5c65dfad0d1b4e9b5c5a383fe56835df042"
+    }
+  },
+  "channels": [
+    {
+      "id": "engine_rpm",
+      "name": "Engine speed",
+      "group": "General",
+      "kind": "query",
+      "unit": "RPM",
+      "help": "Engine speed, displayed in RPM. Real ECU values and update rate need validation.",
+      "query": "F40C",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.25,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DD0"
+      ]
+    },
+    {
+      "id": "vehicle_speed",
+      "name": "Vehicle speed",
+      "group": "General",
+      "kind": "query",
+      "unit": "km/h",
+      "help": "Vehicle speed, displayed in km/h. Real ECU values and update rate need validation.",
+      "query": "F40D",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DD3"
+      ]
+    },
+    {
+      "id": "ignition_timing",
+      "name": "Ignition timing",
+      "group": "Ignition",
+      "kind": "query",
+      "unit": "deg advance",
+      "help": "Ignition timing, displayed in deg advance. Positive values are advance before top dead center; negative values are retard. Real ECU values and update rate need validation.",
+      "query": "F40E",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.5,
+        "offset": -64
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DD5"
+      ]
+    },
+    {
+      "id": "intake_air_temperature",
+      "name": "Intake air temperature",
+      "group": "Boost",
+      "kind": "query",
+      "unit": "degC",
+      "help": "Intake air temperature, displayed in degC. Real ECU values and update rate need validation.",
+      "query": "F40F",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": -40
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DD7"
+      ]
+    },
+    {
+      "id": "mass_airflow",
+      "name": "Mass airflow",
+      "group": "Boost",
+      "kind": "query",
+      "unit": "g/s",
+      "help": "Mass airflow, displayed in g/s. Real ECU values and update rate need validation.",
+      "query": "F410",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.01,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DDA"
+      ]
+    },
+    {
+      "id": "absolute_throttle_position",
+      "name": "Absolute throttle position",
+      "group": "Boost",
+      "kind": "query",
+      "unit": "%",
+      "help": "Absolute throttle position, displayed in %. Real ECU values and update rate need validation.",
+      "query": "F411",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.39215686274509803,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DDD"
+      ]
+    },
+    {
+      "id": "coolant_temperature",
+      "name": "Coolant temperature",
+      "group": "General",
+      "kind": "query",
+      "unit": "degC",
+      "help": "Coolant temperature, displayed in degC. Real ECU values and update rate need validation.",
+      "query": "F405",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": -40
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DC6"
+      ]
+    },
+    {
+      "id": "short_term_fuel_trim",
+      "name": "Short-term fuel trim",
+      "group": "Fuel",
+      "kind": "query",
+      "unit": "%",
+      "help": "Short-term fuel trim, displayed in %. Real ECU values and update rate need validation.",
+      "query": "F406",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.78125,
+        "offset": -100
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DC8"
+      ]
+    },
+    {
+      "id": "long_term_fuel_trim",
+      "name": "Long-term fuel trim",
+      "group": "Fuel",
+      "kind": "query",
+      "unit": "%",
+      "help": "Long-term fuel trim, displayed in %. Real ECU values and update rate need validation.",
+      "query": "F407",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.78125,
+        "offset": -100
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DCA"
+      ]
+    },
+    {
+      "id": "manifold_absolute_pressure",
+      "name": "Manifold absolute pressure",
+      "group": "Boost",
+      "kind": "query",
+      "unit": "kPa",
+      "help": "Manifold absolute pressure, displayed in kPa. Stock diagnostic pressure has 1 kPa resolution and saturates at 255 kPa. Real ECU values and update rate need validation.",
+      "query": "F40B",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DCC"
+      ]
+    },
+    {
+      "id": "barometric_pressure",
+      "name": "Barometric pressure",
+      "group": "Boost",
+      "kind": "query",
+      "unit": "kPa",
+      "help": "Barometric pressure, displayed in kPa. Real ECU values and update rate need validation.",
+      "query": "F433",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E13"
+      ]
+    },
+    {
+      "id": "fuel_rail_pressure",
+      "name": "Fuel rail pressure",
+      "group": "Fuel",
+      "kind": "query",
+      "unit": "kPa",
+      "help": "Fuel rail pressure, displayed in kPa. Real ECU values and update rate need validation.",
+      "query": "F423",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 10,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E00"
+      ]
+    },
+    {
+      "id": "actual_lambda",
+      "name": "Measured lambda",
+      "group": "Fuel",
+      "kind": "query",
+      "unit": "lambda",
+      "help": "Measured lambda, displayed in lambda. Uses the first two bytes of the native four-byte sensor response. Real ECU values and update rate need validation.",
+      "query": "F434",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 3.0517578125e-05,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E1C"
+      ]
+    },
+    {
+      "id": "desired_lambda",
+      "name": "Requested lambda",
+      "group": "Fuel",
+      "kind": "query",
+      "unit": "lambda",
+      "help": "Requested lambda, displayed in lambda. Real ECU values and update rate need validation.",
+      "query": "F444",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 3.0517578125e-05,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E42"
+      ]
+    },
+    {
+      "id": "absolute_load",
+      "name": "Absolute engine load",
+      "group": "General",
+      "kind": "query",
+      "unit": "load",
+      "help": "Absolute engine load, displayed in load. A value of 1.0 represents 100% absolute load. Real ECU values and update rate need validation.",
+      "query": "F443",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.00392156862745098,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E3E"
+      ]
+    },
+    {
+      "id": "battery_voltage",
+      "name": "Control module voltage",
+      "group": "General",
+      "kind": "query",
+      "unit": "V",
+      "help": "Control module voltage, displayed in V. Real ECU values and update rate need validation.",
+      "query": "F442",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.001,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E3A"
+      ]
+    },
+    {
+      "id": "calculated_load",
+      "name": "Calculated engine load",
+      "group": "General",
+      "kind": "query",
+      "unit": "%",
+      "help": "Calculated engine load, displayed in %. Real ECU values and update rate need validation.",
+      "query": "F404",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.39215686274509803,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DC4"
+      ]
+    },
+    {
+      "id": "relative_throttle_position",
+      "name": "Relative throttle position",
+      "group": "Boost",
+      "kind": "query",
+      "unit": "%",
+      "help": "Relative throttle position, displayed in %. Real ECU values and update rate need validation.",
+      "query": "F445",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.39215686274509803,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E45"
+      ]
+    },
+    {
+      "id": "accelerator_pedal_position",
+      "name": "Accelerator pedal position",
+      "group": "General",
+      "kind": "query",
+      "unit": "%",
+      "help": "Accelerator pedal position, displayed in %. Real ECU values and update rate need validation.",
+      "query": "F449",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.39215686274509803,
+        "offset": 0
+      },
+      "verification": {
+        "nativeEncoder": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007E4B"
+      ]
+    },
+    {
+      "id": "boost_pressure",
+      "name": "Boost pressure",
+      "group": "Boost",
+      "kind": "calculated",
+      "unit": "kPa",
+      "help": "Manifold pressure minus barometric pressure. Negative values indicate vacuum. Calculated only from fresh matching samples.",
+      "calculation": {
+        "operation": "subtract",
+        "inputs": [
+          "manifold_absolute_pressure",
+          "barometric_pressure"
+        ],
+        "requireValidFreshInputs": true
+      },
+      "verification": {
+        "nativeEncoderApplicable": false,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true,
+        "ecu": "pending"
+      },
+      "nativeSourceRam": [
+        "0x40007DCC",
+        "0x40007E13"
+      ]
+    }
+  ],
+  "codeFingerprints": [
+    {
+      "name": "native_logger",
+      "ranges": [
+        {
+          "start": "0x021074",
+          "length": 3056
+        },
+        {
+          "start": "0x028B4C",
+          "length": 246
+        },
+        {
+          "start": "0x02B0A8",
+          "length": 7428
+        },
+        {
+          "start": "0x02CDAC",
+          "length": 4244
+        },
+        {
+          "start": "0x087E82",
+          "length": 2372
+        },
+        {
+          "start": "0x06D736",
+          "length": 200
+        },
+        {
+          "start": "0x044320",
+          "length": 48
+        },
+        {
+          "start": "0x04435C",
+          "length": 172
+        }
+      ],
+      "sha256": "607026e941e36c32a982ab035a30fe8a82f8b84c0aaee4589966ab4ae3fa9e3a"
+    }
+  ],
+  "unavailableChannels": [
+    {
+      "id": "boost_air_temperature",
+      "name": "Boost air temperature",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "map_sensor_voltage",
+      "name": "MAP sensor voltage",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "wastegate_duty_cycle",
+      "name": "Wastegate control solenoid duty cycle",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "desired_fuel_rail_pressure",
+      "name": "Desired fuel rail pressure",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "fuel_injection_amount",
+      "name": "Fuel injection amount",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "injection_pulsewidth",
+      "name": "Fuel injection pulse width",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "fuel_pressure_sensor_voltage",
+      "name": "Fuel pressure sensor voltage",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "injector_duty_cycle",
+      "name": "Injector duty cycle",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "narrowband_oxygen_voltage",
+      "name": "Narrow band oxygen sensor voltage",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "short_term_fuel_trim_primary",
+      "name": "Short term fuel trim (primary sensor)",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "short_term_fuel_trim_secondary",
+      "name": "Short term fuel trim (secondary sensor)",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "actual_valve_timing",
+      "name": "Actual valve timing",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "ambient_air_temperature",
+      "name": "Ambient air temperature",
+      "reason": "Factory support flag disables this identifier in the native lookup.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "catalyst_temperature",
+      "name": "Catalyst temperature",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "clutch_switch",
+      "name": "Clutch pedal position",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "module_voltage",
+      "name": "Control module voltage",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "desired_engine_rpm",
+      "name": "Desired engine RPM",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "desired_throttle_position",
+      "name": "Desired throttle position",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "fan_duty_cycle",
+      "name": "Fan duty cycle",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "maf_sensor_voltage",
+      "name": "Mass airflow sensor voltage",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "neutral_switch",
+      "name": "Neutral gear status",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "knock_retard",
+      "name": "Knock retard",
+      "reason": "Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+      "ecu": "not_offered_by_this_profile"
+    }
+  ],
+  "validation": {
+    "romVerified": true,
+    "readOnlyBenchTested": false,
+    "loggerAdapterBenchTested": false,
+    "realEcuTested": false,
+    "nativeQueryChannelsChecked": 19,
+    "calculatedChannelsChecked": 1,
+    "distinctNativeRequests": 19,
+    "nativeVectorsPassed": 77,
+    "nativeInstructionChecks": 379
+  }
+}

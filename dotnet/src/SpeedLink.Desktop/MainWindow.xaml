@@ -14,6 +14,7 @@
      </StackPanel>
      <StackPanel x:Name="TactrixPanel" Orientation="Horizontal" Visibility="Collapsed"><TextBlock Text="Driver" Margin="0,8,8,0"/><ComboBox x:Name="DriverBox" Width="360" VerticalContentAlignment="Center"/></StackPanel>
      <Button x:Name="RefreshPortsButton" Content="Refresh devices" Click="RefreshPorts_Click" Margin="12,0,0,0"/>
+     <ComboBox x:Name="ReadFamilyBox" Width="215" Margin="12,0,0,0" VerticalContentAlignment="Center" ToolTip="Known ROMs select their protocol automatically. For an unknown ROM, choose its ECU generation before reading."/>
     </WrapPanel>
     <DockPanel Grid.Row="2" LastChildFill="False"><Button x:Name="ConnectButton" Content="Connect &amp; identify" Click="Connect_Click" Style="{DynamicResource PrimaryButton}"/>
      <Button x:Name="DisconnectButton" Content="Disconnect" Click="Disconnect_Click"/><Button x:Name="ReadButton" Content="Read &amp; verify backup" Click="Read_Click"/>

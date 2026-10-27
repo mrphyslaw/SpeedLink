@@ -150,7 +150,13 @@ public sealed class DiagnosticSession : IDiagnosticSink, IAsyncDisposable
                 if (item.Barrier is not null)
                 {
                     try { if (output is not null) await output.FlushAsync(); SaveMetadata(); item.Barrier.TrySetResult(); }
-                    catch (Exception error) { item.Barrier.TrySetException(new IOException("Diagnostic storage failed.", error)); throw; }
+                    catch (Exception error)
+                    {
+                        // Publish failure state before waking a caller that may export diagnostics immediately.
+                        StorageError = Redactor.Text(error.Message);
+                        item.Barrier.TrySetException(new IOException("Diagnostic storage failed: " + StorageError, error));
+                        throw;
+                    }
                     continue;
                 }
                 int size = Encoding.UTF8.GetByteCount(item.Line!) + 1;

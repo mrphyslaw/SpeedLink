@@ -19,8 +19,11 @@ internal static class Fixture
         Encoding.ASCII.GetBytes(profile.Identity).CopyTo(data, profile.IdentityOffset);
         foreach (var guard in profile.LayoutWords)
             BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(guard.Address, 4), guard.Value);
-        data.AsSpan(profile.CorrectionAddress, 4).Clear();
-        BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(profile.CorrectionAddress, 4), unchecked(RomInspector.ChecksumTarget - RomInspector.Sum(data, profile)));
+        foreach (var marker in profile.Markers ?? []) BinaryPrimitives.WriteUInt16BigEndian(data.AsSpan(marker.Address, 2), marker.Value);
+        // Synthetic images need a balanced sum; this fixture location is never used by production code.
+        int correction = profile.CorrectionAddress >= 0 ? profile.CorrectionAddress : 0xBFFF0;
+        data.AsSpan(correction, 4).Clear();
+        BinaryPrimitives.WriteUInt32BigEndian(data.AsSpan(correction, 4), unchecked(RomInspector.ChecksumTarget - RomInspector.Sum(data, profile)));
         return data;
     }
     public static IReadOnlyList<RomProfile> Profiles
@@ -31,8 +34,9 @@ internal static class Fixture
         var data = Image(p);
         return p with
         {
-            BootSha256 = RomInspector.Hash(data.AsSpan(0, 0x8000)),
-            LoopSha256 = p.LoopAddress is int at ? RomInspector.Hash(data.AsSpan(at, p.LoopSize!.Value)) : null
+            BootSha256 = RomInspector.Hash(data.AsSpan(0, p.BootLength)),
+            LoopSha256 = p.RoutineRanges is not null ? RomInspector.Hash(p.RoutineRanges.SelectMany(r => data.Skip(r.Address).Take(r.Length)).ToArray()) :
+                p.LoopAddress is int at ? RomInspector.Hash(data.AsSpan(at, p.LoopSize!.Value)) : null
         };
     }).ToArray();
     public static RomInspector Inspector() => new(Profiles);
@@ -163,6 +167,9 @@ internal sealed class TestFileSystem : IBackupFileSystem
 
 internal class TestEcu(byte[] rom) : IReadTransport
 {
+    public ReadFamily? FamilyOverride { get; set; }
+    public string? ReportedCalibration { get; set; }
+    private ReadProtocol Protocol => ReadProtocol.For(new(Mode, Adapter, null, ReportedCalibration ?? new RomInspector().ProfileFor(Memory)?.Calibration), FamilyOverride ?? ReadFamily.Gen1);
     public byte[] Memory { get; } = rom.ToArray();
     public string Mode => "simulator";
     public string Adapter => "OFFLINE TEST MODEL — no device I/O";
@@ -202,30 +209,31 @@ internal class TestEcu(byte[] rom) : IReadTransport
         if (hex == "0902")
             response = [0x49, 0x02, 0x01, .. "JM1GG12L061000001"u8.ToArray()];
         else if (hex == "0904")
-            response = [0x49, 0x04, 0x01, .. Encoding.ASCII.GetBytes(Fixture.Inspector().Inspect(Memory).Calibration ?? "UNKNOWN")];
+            response = [0x49, 0x04, 0x01, .. Encoding.ASCII.GetBytes(ReportedCalibration ?? new RomInspector().ProfileFor(Memory)?.Calibration ?? "UNKNOWN")];
         else if (hex == "010C")
             response = [0x41, 0x0C, 0, 0];
-        else if (hex == "1087")
+        else if (request.AsSpan().SequenceEqual(new byte[] { 0x10, Protocol.Session }))
         {
             ReadSession = true;
             ReadUnlocked = false;
-            response = [0x50, 0x87];
+            response = Protocol.Family == ReadFamily.Gen2 ? [0x50, 3, 0, 50, 1, 244] : [0x50, Protocol.Session];
         }
-        else if (hex == "2701")
-            response = [0x67, 0x01, .. Seed];
-        else if (request.AsSpan().SequenceEqual(new byte[] { 0x27, 0x02 }.Concat(SecurityAccess.SeedKey(Seed)).ToArray()))
+        else if (request.AsSpan().SequenceEqual(new byte[] { 0x27, Protocol.SeedLevel }))
+            response = [0x67, Protocol.SeedLevel, .. Seed];
+        else if (request.AsSpan().SequenceEqual(new byte[] { 0x27, Protocol.KeyLevel }.Concat(SecurityAccess.SeedKey(Seed)).ToArray()))
         {
             if (!ReadSession)
                 throw new TransportException("Read session required.");
             ReadUnlocked = true;
-            response = [0x67, 0x02];
+            response = [0x67, Protocol.KeyLevel];
         }
-        else if (request.Length == 7 && request[0] == 0x23)
+        else if (request.Length == (Protocol.Family == ReadFamily.Gen2 ? 8 : 7) && request[0] == 0x23)
         {
             if (!ReadUnlocked && Seed.Any(x => x != 0))
                 throw new NegativeResponseException(0x23, 0x33);
-            int at = BinaryPrimitives.ReadInt32BigEndian(request.AsSpan(1, 4));
-            int count = BinaryPrimitives.ReadUInt16BigEndian(request.AsSpan(5, 2));
+            int start = Protocol.Family == ReadFamily.Gen2 ? 2 : 1;
+            int at = BinaryPrimitives.ReadInt32BigEndian(request.AsSpan(start, 4));
+            int count = BinaryPrimitives.ReadUInt16BigEndian(request.AsSpan(start + 4, 2));
             response = [0x63, .. Memory.AsSpan(at, count).ToArray()];
         }
         else

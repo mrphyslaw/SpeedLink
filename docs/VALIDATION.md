@@ -1,5 +1,32 @@
 # Alpha validation scope
 
+## Experimental Gen 2 support — 0.6.0-alpha.1
+
+- Nine editor/logger profiles. L3CGEE000 adds 287 tuning entries and 155 DTC
+  reporting controls, while 20 reviewed reference controls remain excluded.
+- Reference-ROM verification checks all 24,028 table cells and 4,334 axis labels,
+  568 numeric edit/save/restore operations and 626 switch-state operations.
+  A no-edit save is identical and the source ROM remains unchanged.
+- The Gen 2 reader uses its own session/security level and ALFID memory-read
+  format. Native bounds limit blocks to 1,023 bytes in an exact 1 MiB range.
+  Offline tests check both passes, tail bounds, response lengths, cancellation,
+  mismatches, storage failures, native J2534 receive handling and support export.
+- The 20-parameter logger uses 19 native identifiers. Original identifier lookup,
+  payload callbacks and physical encoder slices pass 379 instruction checks;
+  77 decoding/calculation vectors cover all offered channels. Ambient temperature
+  is factory disabled in the checked lookup. Other unestablished baseline
+  channels remain unavailable, without assuming their signals are absent.
+- The suite passes 407 unit cases, including all 62 baseline regressions. Nine
+  editor, nine Workbench, nine definition-import, 18 logger and 13 read-progress
+  desktop cases cover the integrated catalog. Two extra logger desktop cases
+  bind the actual Gen 2 reference ROM and test recording and failure handling.
+- Every Gen 2 export validates native code and markers without guessed repair.
+  Editable calibration bytes are outside the code sum. Additional calibration
+  integrity rules and flashing compatibility are not established.
+- This update has no new physical Gen 2 adapter or ECU test. Real ECU acceptance,
+  measured sensor values and rates remain pending. Earlier adapter results below
+  retain their original scope. ECU programming remains disabled.
+
 ## Complete ECU calibration identities — 0.5.5-alpha.5
 
 - Regression cases reproduce the former rejection of complete ECU identities

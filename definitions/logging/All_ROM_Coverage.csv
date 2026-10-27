@@ -303,3 +303,45 @@ L3P4EM000,knock_retard,Knock retard,deg,1746,True,True,pending,,Ignition timing 
 L3P4EM000,desired_fuel_rail_pressure,Desired fuel rail pressure,,,False,True,not_offered_by_this_profile,Identifier absent from this ROM,
 L3P4EM000,fuel_injection_amount,Fuel injection amount,,,False,True,not_offered_by_this_profile,Identifier absent from this ROM,
 L3P4EM000,ambient_air_temperature,Ambient air temperature,,,False,True,not_offered_by_this_profile,Inactive native lookup; no active encoder established,
+L3CGEE000,engine_rpm,Engine speed,RPM,F40C,True,True,pending,,"Engine speed, displayed in RPM. Real ECU values and update rate need validation."
+L3CGEE000,vehicle_speed,Vehicle speed,km/h,F40D,True,True,pending,,"Vehicle speed, displayed in km/h. Real ECU values and update rate need validation."
+L3CGEE000,ignition_timing,Ignition timing,deg advance,F40E,True,True,pending,,"Ignition timing, displayed in deg advance. Positive values are advance before top dead center; negative values are retard. Real ECU values and update rate need validation."
+L3CGEE000,intake_air_temperature,Intake air temperature,degC,F40F,True,True,pending,,"Intake air temperature, displayed in degC. Real ECU values and update rate need validation."
+L3CGEE000,mass_airflow,Mass airflow,g/s,F410,True,True,pending,,"Mass airflow, displayed in g/s. Real ECU values and update rate need validation."
+L3CGEE000,absolute_throttle_position,Absolute throttle position,%,F411,True,True,pending,,"Absolute throttle position, displayed in %. Real ECU values and update rate need validation."
+L3CGEE000,coolant_temperature,Coolant temperature,degC,F405,True,True,pending,,"Coolant temperature, displayed in degC. Real ECU values and update rate need validation."
+L3CGEE000,short_term_fuel_trim,Short-term fuel trim,%,F406,True,True,pending,,"Short-term fuel trim, displayed in %. Real ECU values and update rate need validation."
+L3CGEE000,long_term_fuel_trim,Long-term fuel trim,%,F407,True,True,pending,,"Long-term fuel trim, displayed in %. Real ECU values and update rate need validation."
+L3CGEE000,manifold_absolute_pressure,Manifold absolute pressure,kPa,F40B,True,True,pending,,"Manifold absolute pressure, displayed in kPa. Stock diagnostic pressure has 1 kPa resolution and saturates at 255 kPa. Real ECU values and update rate need validation."
+L3CGEE000,barometric_pressure,Barometric pressure,kPa,F433,True,True,pending,,"Barometric pressure, displayed in kPa. Real ECU values and update rate need validation."
+L3CGEE000,fuel_rail_pressure,Fuel rail pressure,kPa,F423,True,True,pending,,"Fuel rail pressure, displayed in kPa. Real ECU values and update rate need validation."
+L3CGEE000,actual_lambda,Measured lambda,lambda,F434,True,True,pending,,"Measured lambda, displayed in lambda. Uses the first two bytes of the native four-byte sensor response. Real ECU values and update rate need validation."
+L3CGEE000,desired_lambda,Requested lambda,lambda,F444,True,True,pending,,"Requested lambda, displayed in lambda. Real ECU values and update rate need validation."
+L3CGEE000,absolute_load,Absolute engine load,load,F443,True,True,pending,,"Absolute engine load, displayed in load. A value of 1.0 represents 100% absolute load. Real ECU values and update rate need validation."
+L3CGEE000,battery_voltage,Control module voltage,V,F442,True,True,pending,,"Control module voltage, displayed in V. Real ECU values and update rate need validation."
+L3CGEE000,calculated_load,Calculated engine load,%,F404,True,True,pending,,"Calculated engine load, displayed in %. Real ECU values and update rate need validation."
+L3CGEE000,relative_throttle_position,Relative throttle position,%,F445,True,True,pending,,"Relative throttle position, displayed in %. Real ECU values and update rate need validation."
+L3CGEE000,accelerator_pedal_position,Accelerator pedal position,%,F449,True,True,pending,,"Accelerator pedal position, displayed in %. Real ECU values and update rate need validation."
+L3CGEE000,boost_pressure,Boost pressure,kPa,calculated,True,True,pending,,Manifold pressure minus barometric pressure. Negative values indicate vacuum. Calculated only from fresh matching samples.
+L3CGEE000,boost_air_temperature,Boost air temperature,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,map_sensor_voltage,MAP sensor voltage,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,wastegate_duty_cycle,Wastegate control solenoid duty cycle,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,desired_fuel_rail_pressure,Desired fuel rail pressure,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,fuel_injection_amount,Fuel injection amount,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,injection_pulsewidth,Fuel injection pulse width,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,fuel_pressure_sensor_voltage,Fuel pressure sensor voltage,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,injector_duty_cycle,Injector duty cycle,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,narrowband_oxygen_voltage,Narrow band oxygen sensor voltage,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,short_term_fuel_trim_primary,Short term fuel trim (primary sensor),,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,short_term_fuel_trim_secondary,Short term fuel trim (secondary sensor),,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,actual_valve_timing,Actual valve timing,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,ambient_air_temperature,Ambient air temperature,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,catalyst_temperature,Catalyst temperature,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,clutch_switch,Clutch pedal position,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,module_voltage,Control module voltage,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,desired_engine_rpm,Desired engine RPM,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,desired_throttle_position,Desired throttle position,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,fan_duty_cycle,Fan duty cycle,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,maf_sensor_voltage,Mass airflow sensor voltage,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,neutral_switch,Neutral gear status,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",
+L3CGEE000,knock_retard,Knock retard,,,False,False,not_offered_by_this_profile,"Gen2 identifier, conversion or producer not established in this release; not inferred from other ROMs.",

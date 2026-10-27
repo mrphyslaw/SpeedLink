@@ -6,7 +6,7 @@ namespace SpeedLink.Tests;
 
 public sealed class RomEditorTests
 {
-    public static IEnumerable<object[]> Profiles => Fixture.Profiles.Select(p => new object[] { p.Calibration });
+    public static IEnumerable<object[]> Profiles => Fixture.Profiles.Where(p => p.Family == "Gen1").Select(p => new object[] { p.Calibration });
     private static RomEditor Open(string calibration)
     {
         var profile = Fixture.Profiles.Single(p => p.Calibration == calibration);
@@ -15,11 +15,11 @@ public sealed class RomEditorTests
     [Fact]
     public void DefinitionsAreCompleteAndNaturallySorted()
     {
-        Assert.Equal(8, TuningDefinition.Known.Count);
-        Assert.Equal(7080, TuningDefinition.Known.Sum(d => d.Tables.Count));
+        Assert.Equal(9, TuningDefinition.Known.Count);
+        Assert.Equal(7522, TuningDefinition.Known.Sum(d => d.Tables.Count));
         foreach (var d in TuningDefinition.Known)
         {
-            Assert.Equal(d.Calibration switch { "L3M7EF000" => 863, "L3P4EM000" => 895, _ => 887 }, d.Tables.Count);
+            Assert.Equal(d.Calibration switch { "L3CGEE000" => 442, "L3M7EF000" => 863, "L3P4EM000" => 895, _ => 887 }, d.Tables.Count);
             Assert.All(d.Tables, t => { Assert.Equal(t.Columns, t.X.Values.Length); Assert.Equal(t.Rows, t.Y.Values.Length); Assert.InRange(t.End, 0x8000, RomInspector.RomSize - 2); });
             foreach (var group in d.Tables.GroupBy(t => t.Category)) Assert.Equal(group.OrderBy(t => t.Name, NaturalOrder.Instance), group);
         }

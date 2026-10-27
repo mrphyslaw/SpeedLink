@@ -8,7 +8,7 @@ public static class SecurityAccess
     public static byte[] SeedKey(ReadOnlySpan<byte> seed)
     {
         if (seed.Length != 3)
-            throw new InvalidDataException("The boot seed must contain exactly three bytes.");
+            throw new InvalidDataException("The read-access seed must contain exactly three bytes.");
         uint state = 0xC541A9;
         foreach (var value in seed.ToArray().Concat("MazdA"u8.ToArray()))
         {
@@ -76,7 +76,7 @@ public sealed class ReadWorkflow
         if (rpm != 0)
             throw new TransportException($"Engine is running ({rpm:g} RPM). Switch it off before reading.");
     }
-    public BackupResult ReadBackup(IReadTransport transport, EcuIdentity expected, string vault, IProgress<ReadProgress>? progress = null, CancellationToken cancellation = default)
+    public BackupResult ReadBackup(IReadTransport transport, EcuIdentity expected, string vault, IProgress<ReadProgress>? progress = null, CancellationToken cancellation = default, ReadFamily unknownFamily = ReadFamily.Gen1)
     {
         if (transport.Mode == "hardware")
         {
@@ -103,18 +103,21 @@ public sealed class ReadWorkflow
                     ["identity"] = identity.ToManifest()
                 });
                 cancellation.ThrowIfCancellationRequested();
-                var session = transport.Exchange([0x10, 0x87]);
-                if (session.Length < 2 || session[0] != 0x50 || session[1] != 0x87)
-                    throw new TransportException("ECU did not enter read session 87.");
+                var protocol = ReadProtocol.For(identity, unknownFamily);
+                journal.Append("read_protocol", new() { ["family"] = protocol.Family.ToString(), ["session"] = protocol.Session, ["securityLevel"] = protocol.SeedLevel, ["maximumBlock"] = protocol.MaximumBlock });
+                transport.Diagnostics?.Record("read.protocol", new { family = protocol.Family.ToString(), protocol.Session, protocol.SeedLevel, protocol.MaximumBlock });
+                var session = transport.Exchange([0x10, protocol.Session]);
+                if ((protocol.Family == ReadFamily.Gen2 ? session.Length != 6 : session.Length < 2) || session[0] != 0x50 || session[1] != protocol.Session)
+                    throw new TransportException($"ECU did not acknowledge read session {protocol.Session:X2}.");
                 cancellation.ThrowIfCancellationRequested();
-                var seed = transport.Exchange([0x27, 0x01]);
-                if (seed.Length != 5 || seed[0] != 0x67 || seed[1] != 0x01)
+                var seed = transport.Exchange([0x27, protocol.SeedLevel]);
+                if (seed.Length != 5 || seed[0] != 0x67 || seed[1] != protocol.SeedLevel)
                     throw new TransportException("Unexpected security seed format.");
                 if (!seed.AsSpan(2).SequenceEqual(new byte[3]))
                 {
                     cancellation.ThrowIfCancellationRequested();
-                    var response = transport.Exchange([0x27, 0x02, .. SecurityAccess.SeedKey(seed.AsSpan(2))]);
-                    if (!response.AsSpan().SequenceEqual(new byte[] { 0x67, 0x02 }))
+                    var response = transport.Exchange([0x27, protocol.KeyLevel, .. SecurityAccess.SeedKey(seed.AsSpan(2))]);
+                    if (!response.AsSpan().SequenceEqual(new byte[] { 0x67, protocol.KeyLevel }))
                         throw new TransportException("Read-session key was not acknowledged. No retry was attempted.");
                 }
                 journal.Append("read_session_ready");
@@ -123,6 +126,7 @@ public sealed class ReadWorkflow
                 int chunk = transport.ReadChunkSize;
                 if (chunk is < 1 or > 3968)
                     throw new TransportException("Unsupported read chunk size.");
+                chunk = Math.Min(chunk, protocol.MaximumBlock);
                 for (int pass = 1; pass <= 2; pass++)
                 {
                     transport.Diagnostics?.Record("read.pass_started", new { pass });
@@ -133,10 +137,7 @@ public sealed class ReadWorkflow
                     {
                         cancellation.ThrowIfCancellationRequested();
                         int count = Math.Min(chunk, data.Length - address);
-                        byte[] request = new byte[7];
-                        request[0] = 0x23;
-                        BinaryPrimitives.WriteInt32BigEndian(request.AsSpan(1, 4), address);
-                        BinaryPrimitives.WriteUInt16BigEndian(request.AsSpan(5, 2), (ushort)count);
+                        byte[] request = protocol.ReadRequest(address, count);
                         journal.Append("read_issued", new()
                         {
                             ["passNumber"] = pass,
@@ -170,7 +171,7 @@ public sealed class ReadWorkflow
                 if (hashes[0] != hashes[1])
                     throw new TransportException("The two ROM reads differ. Both captures were retained; no verified backup was created.");
                 var inspection = inspector.Inspect(data);
-                var path = store.Seal(folder, data, identity, inspection, hashes[0], hashes[1], transport.Mode);
+                var path = store.Seal(folder, data, identity with { ReadProtocolName = protocol.Family.ToString() }, inspection, hashes[0], hashes[1], transport.Mode);
                 journal.Append("completed", new()
                 {
                     ["rom"] = path,

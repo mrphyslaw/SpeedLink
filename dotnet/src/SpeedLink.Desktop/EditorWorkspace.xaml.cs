@@ -365,7 +365,9 @@ public partial class EditorWorkspace : UserControl
         Undo_Click(this, new()); if (doc.IsDirty) throw new InvalidOperationException("UI undo failed."); Redo_Click(this, new());
         var curve = doc.Definition.Tables.First(t => t.Kind == "2D"); OpenTable(curve); SelectCell(1); UpdateLayout(); Capture(Path.Combine(folder, "curve.png"));
         var surface = doc.Definition.Tables.First(t => t.Kind == "3D"); OpenTable(surface); SelectCell(surface.Columns + 2); UpdateLayout(); Capture(Path.Combine(folder, "surface.png"));
-        var bit = doc.Definition.Tables.First(t => t.Bit is not null); OpenTable(bit); double before = doc.Read(bit, 0); ChoiceBox.SelectedItem = ChoiceBox.Items.Cast<TuningState>().Single(s => s.Value != before); if (doc.Read(bit, 0) == before) throw new InvalidOperationException("Bit selector did not edit.");
+        var bit = doc.Definition.Tables.FirstOrDefault(t => t.Bit is not null) ?? doc.Definition.Tables.First(t => t.IsChoice); OpenTable(bit); double before = doc.Read(bit, 0);
+        var selector = bit.Count == 1 ? ScalarChoice : ChoiceBox;
+        selector.SelectedItem = selector.Items.Cast<TuningState>().First(s => s.Value != before); if (doc.Read(bit, 0) == before) throw new InvalidOperationException("State selector did not edit.");
         doc.Undo(); doc.Undo(); if (doc.IsDirty) throw new InvalidOperationException("Undo failed to restore original bytes.");
         doc.LoadComparison(doc.Snapshot(), path); BaselineBox.SelectedIndex = 2; ChangedOnly.IsChecked = true; if (MapTree.Items.Count != 0) throw new InvalidOperationException("Changed filter failed.");
         ChangedOnly.IsChecked = false; BaselineBox.SelectedIndex = 0; OpenTable(surface); SelectCell(surface.Columns + 2);
