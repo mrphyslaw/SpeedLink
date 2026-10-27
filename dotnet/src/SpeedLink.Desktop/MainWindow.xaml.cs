@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.6.0-alpha.1";
+    public const string Version = "0.6.0-alpha.2";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -365,7 +365,8 @@ public partial class MainWindow : Window
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
-    private void About_Click(object sender, RoutedEventArgs e) => MessageBox.Show(this, Resource("SpeedLink.About.txt").Replace("{version}", Version), "About SpeedLink");
+    private void About_Click(object sender, RoutedEventArgs e) => MessageBox.Show(this,
+        Resource("SpeedLink.About.txt").Replace("{version}", Version).Replace("{runtime}", Environment.Version.ToString()), "About SpeedLink");
     private Window HelpWindow()
     {
         var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Adapters / testing"] = "SpeedLink.AdapterHelp.md", ["Report a problem"] = "SpeedLink.SupportHelp.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["Editor"] = "SpeedLink.EditorHelp.md", ["Gen 2 (experimental)"] = "SpeedLink.Gen2Help.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
@@ -484,6 +485,7 @@ public partial class MainWindow : Window
             {
                 passed = true,
                 version = Version,
+                runtimeVersion = Environment.Version.ToString(),
                 framework = "WPF / .NET 10",
                 pages = 6,
                 loggerChannels = loggerRows.Count,

@@ -2,7 +2,11 @@
 
 Definitions are optional for ECU reading. The reader can dump unknown calibration
 IDs using the selected compatible Gen 1 or Gen 2 application read protocol and the current 1 MiB range.
-This list controls **optional file inspection and checksum correction**, not read
+Editor exports always apply the profile's mandatory checksum/integrity policy;
+checksum correction and verification cannot be disabled when saving an edited ROM.
+See the [editor save requirement](EDITOR.md).
+
+This list also controls **optional file inspection and checksum correction**, not read
 permission. Unknown images can be backed up and reopened normally.
 
 ## Known inspection layouts

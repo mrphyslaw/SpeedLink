@@ -4,7 +4,9 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.6.0-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.6.0-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.2)** — a single Windows EXE, with no installer or .NET installation required.
+
+This maintenance release bundles the [.NET 10.0.14 security update](https://github.com/dotnet/core/blob/main/release-notes/10.0/10.0.14/10.0.14.md). Replace the EXE and keep your existing `data` folder.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the nine supported stock ROM layouts.
@@ -179,7 +181,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.6.0-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.1), a Windows Workbench alpha.**
+**Current release: [v0.6.0-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.2), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
@@ -190,7 +192,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
 - **Fixed:** logger matching accepts known complete ECU calibration IDs, including
   `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
-- **Checked:** 407 C# tests and 2,384 native-derived logger vectors. Nine-profile
+- **Checked:** 426 C# tests and 2,384 native-derived logger vectors. Nine-profile
   editor checks cover direct cell entry, comparison, undo/redo and byte-identical
   no-edit exports. L3CGEE000 adds 379 native logger instruction checks and complete
   reference-ROM cell/axis comparisons. See [validation](docs/VALIDATION.md).

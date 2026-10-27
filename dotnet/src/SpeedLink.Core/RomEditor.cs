@@ -234,17 +234,26 @@ public sealed class RomEditor
         if (row < 0 || col < 0 || row + values.Length > table.Rows || col + values[0].Length > table.Columns) throw new ArgumentException("Clipboard does not fit in this table.");
         Apply(values.SelectMany((r, y) => r.Select((v, x) => new CellEdit(table, (row + y) * table.Columns + col + x, v))), "Paste " + table.Name);
     }
+    /// <summary>
+    /// Always applies the ROM's verified checksum policy before publishing a new file.
+    /// Correction and durable readback verification are mandatory, including no-edit saves.
+    /// Native validation-only profiles reject invalid code without guessed repair.
+    /// </summary>
     public void SaveNew(string path)
     {
         path = Path.GetFullPath(path);
         if (string.Equals(path, SourcePath, StringComparison.OrdinalIgnoreCase)) throw new IOException("Save to a new file; the original ROM is preserved.");
         byte[] output = inspector.CorrectedCopy(current);
+        var prepared = inspector.Inspect(output);
+        if (!prepared.ProfileValid || prepared.ChecksumValid != true)
+            throw new InvalidDataException("ROM export requires a verified checksum, identity, boot and integrity layout.");
         string temp = path + "." + Guid.NewGuid().ToString("N") + ".partial";
         try
         {
             using (var stream = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(output); stream.Flush(true); }
             var written = File.ReadAllBytes(temp);
-            if (!written.AsSpan().SequenceEqual(output) || inspector.Inspect(written).ChecksumValid != true) throw new IOException("Saved copy failed byte or checksum verification.");
+            var verified = inspector.Inspect(written);
+            if (!written.AsSpan().SequenceEqual(output) || !verified.ProfileValid || verified.ChecksumValid != true) throw new IOException("Saved copy failed byte or integrity verification.");
             File.Move(temp, path, overwrite: false);
         }
         finally { if (File.Exists(temp)) File.Delete(temp); }

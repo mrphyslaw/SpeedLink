@@ -4,6 +4,13 @@ Edit a supported ROM without an adapter. SpeedLink keeps the original file and
 exports each revision as a new file with mandatory ROM-specific checksum/integrity checks.
 ECU programming remains disabled.
 
+**Checksum correction is automatic and mandatory on every ROM export, including
+saves without table edits. There is no setting to disable it.** Gen 1 saves always
+recalculate the established correction word. L3CGEE000 saves verify its native
+code checksum and markers; calibration edits do not change that code sum. Invalid
+Gen 2 code is rejected without guessed repair. Every export is read back and
+verified before its final filename is published. Originals are preserved.
+
 This guide is also included in the app: choose **File → Editor guide**, or
 choose **Help** and select **Editor**. **Map info** beside the map tabs, or
 **F1**, opens help for the selected map instead.
