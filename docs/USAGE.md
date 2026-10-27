@@ -23,7 +23,7 @@ live data, **Recordings** to review logs, **ROM checks** to inspect a file, or
    ROM-specific checksum/integrity checks. The original and existing files are preserved.
 
 Drag the table/preview divider to resize it. **Fit map** restores automatic
-sizing; Ctrl+B hides or restores the browser. Editing requires one of the eight
+sizing; Ctrl+B hides or restores the browser. Editing requires one of the nine
 supported stock program layouts. Static axes are read-only; extended/patched
 layouts are unsupported.
 
@@ -38,8 +38,10 @@ Use **File → Editor guide** for the complete included guide, or see the
    engine stopped, then open **Connection**.
 3. Select **Vgate vLinker FS** and its COM port, or **Tactrix Openport 2.0**
    and its installed J2534 driver. See the adapter notes below.
-4. Choose **Connect & identify**, then **Read & verify backup**. Leave the
-   ignition on and adapter connected through both passes.
+4. Choose **Connect & identify**. Known ROMs select their read protocol automatically.
+   For an unknown Gen 2 calibration, select **Gen 2 read protocol (experimental)**
+   in the adapter settings. Choose **Read & verify backup** and leave the ignition
+   on and adapter connected through both passes.
 5. Wait for **Backup verified · two matching reads**. Find the operation under
    **Backups → Open backup folder** and keep the entire folder.
 
@@ -70,8 +72,9 @@ then choose **Start logging**. **Stop** ends the recording and disconnects;
 reconnect before another session. Disconnect and reconnect after a ROM read
 before logging.
 
-The logger supports eight stock profiles with 35–38 parameters each. Logging
-can run with the engine running; ROM reads require it stopped. The **Hz** column
+The logger supports eight Gen 1 profiles with 35–38 parameters each, plus the
+experimental L3CGEE000 Gen 2 profile with 20. Logging can run with the engine
+running; ROM reads require it stopped. The **Hz** column
 shows measured host sample rates. Real-ECU acceptance, readings and achievable
 rates remain untested. See the [logger guide](LOGGER.md) for units, plots and
 unavailable data.

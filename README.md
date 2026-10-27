@@ -136,7 +136,7 @@ folder, including its captures, manifest and journal.
 
 You need a full backup of the ROM currently installed in the ECU. SpeedLink uses
 it to choose the logging profile and read the MAP sensor calibration. The current
-logger supports [eight defined ROMs](definitions/logging/All_ROM_Coverage.md).
+logger supports [nine defined ROMs](definitions/logging/All_ROM_Coverage.md).
 
 1. Connect the adapter and select **Connect & identify**. If you just read a ROM,
    disconnect and reconnect before logging.
@@ -185,19 +185,21 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   checksum correction to a separate file; live logging, charts, CSV recording
   and saved-log viewing; offline ROM editing, comparison, 2D/3D views and undo/redo.
   The reader covers the 1 MiB MZR DISI ECU family.
-- **Logger coverage:** eight ROM profiles with 35–38 stock-ROM parameters each.
+- **Logger coverage:** eight Gen 1 profiles with 35–38 stock-ROM parameters each,
+  plus experimental L3CGEE000 Gen 2 logging with 20 parameters.
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
 - **Fixed:** logger matching accepts known complete ECU calibration IDs, including
   `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
-- **Checked:** 369 C# tests and 2,307 native-derived logger vectors. The L3P4EM000
-  profile adds 895 editor maps/controls and 35 logger parameters. Eight-profile editor desktop
-  checks cover direct cell entry, comparison, undo/redo and byte-identical no-edit
-  exports. See [validation](dotnet/docs/Validation.md). Physical
-  logger tests passed with vLinker FS and Tactrix across all seven profiles,
-  including fault handling, sustained requests, desktop controls and USB recovery.
-  Saved-log viewing and standalone EXE checks also passed.
+- **Checked:** 407 C# tests and 2,384 native-derived logger vectors. Nine-profile
+  editor checks cover direct cell entry, comparison, undo/redo and byte-identical
+  no-edit exports. L3CGEE000 adds 379 native logger instruction checks and complete
+  reference-ROM cell/axis comparisons. See [validation](docs/VALIDATION.md).
+  Earlier physical logger tests passed with vLinker FS and Tactrix across the
+  original seven Gen 1 profiles, including fault handling, sustained requests
+  and USB recovery. Gen 2 adapter tests remain pending. Saved-log viewing and
+  standalone EXE checks also passed.
 - **Still pending:** real Mazda ECU read/logging acceptance, sensor readings and
-  achievable vehicle logging rates. All 293 channel/profile ECU checks remain pending.
+  achievable vehicle logging rates. All 313 channel/profile ECU checks remain pending.
 - **Planned:** ECU flashing. Live programming is disabled in this release.
 
 Bench testing uses simulated ECU replies over real adapters. A matching pair of
