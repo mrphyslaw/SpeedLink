@@ -16,6 +16,20 @@ public partial class EditorWorkspace
     private double browserWidth = 200, curveWidth = 300, tableFraction = .6;
     private double? previewWidth;
     private bool fitTable, restoringLayout, layoutClosing, resizingData;
+    private bool workspaceActive = true;
+    internal void SetWorkspaceActive(bool active) { workspaceActive = active; UpdateFloatingVisibility(); }
+    private void UpdateFloatingVisibility()
+    {
+        if (layoutClosing) return;
+        SetVisible(browserWindow, workspaceActive && !FocusButton.IsChecked);
+        SetVisible(graphWindow, workspaceActive && table is { Count: > 1, IsChoice: false });
+        SetVisible(infoWindow, workspaceActive && table is not null && DetailsButton.IsChecked);
+        static void SetVisible(Window? window, bool visible)
+        {
+            if (window is null || window.IsVisible == visible) return;
+            if (visible) window.Show(); else window.Hide();
+        }
+    }
     internal int ViewMode { get; private set; }
     internal bool CurveList => table is { Rows: 1, Columns: > 16, IsChoice: false };
     internal bool BrowserFloating => browserWindow is not null;
@@ -92,7 +106,6 @@ public partial class EditorWorkspace
         BrowserDivider.Width = new(hidden || browserWindow is not null ? 0 : 5);
         BrowserPanel.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
         BrowserSplitter.Visibility = hidden || browserWindow is not null ? Visibility.Collapsed : Visibility.Visible;
-        if (browserWindow is not null) { if (hidden) browserWindow.Hide(); else if (!browserWindow.IsVisible) browserWindow.Show(); }
         bool changes = ChangesButton.IsChecked; ChangesColumn.Width = new(changes ? 220 : 0); ChangesDivider.Width = new(changes ? 5 : 0);
         ChangesPanel.Visibility = ChangesSplitter.Visibility = changes ? Visibility.Visible : Visibility.Collapsed;
         if (DetailsButton.IsChecked && infoWindow is null)
@@ -100,7 +113,7 @@ public partial class EditorWorkspace
             var window = Floating("SpeedLink · Map information", 540, 400); infoWindow = window;
             EditorLayout.Children.Remove(DetailsPanel); DetailsPanel.Visibility = Visibility.Visible; window.Content = DetailsPanel;
             window.Closed += (_, _) => { window.Content = null; EditorLayout.Children.Add(DetailsPanel); DetailsPanel.Visibility = Visibility.Collapsed; infoWindow = null; DetailsButton.IsChecked = false; };
-            window.Show();
+            UpdateFloatingVisibility();
         }
         else if (!DetailsButton.IsChecked && infoWindow is not null) infoWindow.Close();
         ApplyView();
@@ -154,7 +167,7 @@ public partial class EditorWorkspace
         EditBar.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
         MapWorkspace.RowDefinitions[1].Height = new(ScalarMap ? 0 : 29);
         GraphPanel.Visibility = graphable && (floating || ViewMode != 2) ? Visibility.Visible : Visibility.Collapsed;
-        if (graphWindow is not null) { if (table is not null && !graphable) graphWindow.Hide(); else if (!graphWindow.IsVisible) graphWindow.Show(); }
+        UpdateFloatingVisibility();
         Grid.SetRow(DataSplitter, vertical ? 0 : 1); Grid.SetColumn(DataSplitter, vertical ? 1 : 0);
         DataSplitter.Width = vertical ? 7 : double.NaN; DataSplitter.Height = vertical ? double.NaN : 5;
         DataSplitter.HorizontalAlignment = vertical ? HorizontalAlignment.Center : HorizontalAlignment.Stretch;
@@ -205,7 +218,7 @@ public partial class EditorWorkspace
             preferences = preferences with { BrowserBounds = Bounds(window, preferences.BrowserBounds) };
             window.Content = null; EditorLayout.Children.Add(BrowserPanel); browserWindow = null; FocusButton.IsChecked = false; ApplyLayout(); SaveLayout();
         };
-        FocusButton.IsChecked = false; ApplyLayout(); window.Show(); SaveLayout();
+        FocusButton.IsChecked = false; ApplyLayout(); SaveLayout();
     }
     private void DockBrowser_Click(object sender, RoutedEventArgs e) { browserWindow?.Close(); FocusButton.IsChecked = false; }
     private void PopGraph_Click(object sender, RoutedEventArgs e)
@@ -220,7 +233,7 @@ public partial class EditorWorkspace
             window.Content = null; DataLayout.Children.Add(GraphPanel); graphWindow = null;
             if (ViewMode == 2) SetViewMode(table?.Rows > 1 ? 4 : 0); ApplyLayout(); SaveLayout();
         };
-        ApplyView(); window.Show(); SaveLayout();
+        ApplyView(); SaveLayout();
     }
     private void DockGraph_Click(object sender, RoutedEventArgs e) => graphWindow?.Close();
     private void LayoutSplitter_Completed(object sender, DragCompletedEventArgs e)

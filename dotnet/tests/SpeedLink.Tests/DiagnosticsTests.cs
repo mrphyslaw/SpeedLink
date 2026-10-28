@@ -8,6 +8,22 @@ namespace SpeedLink.Tests;
 
 public sealed class DiagnosticsTests : IDisposable
 {
+    [Fact]
+    public async Task Full_default_segments_stay_within_encoded_byte_limit_and_export()
+    {
+        await using var session = Session();
+        for (int i = 0; i < 20000; i++)
+        {
+            session.Record("test.short", new { counter = i });
+            if (i % 250 == 0) await session.FlushAsync();
+        }
+        await session.FlushAsync();
+        var files = Directory.GetFiles(session.Folder, "events-*.jsonl");
+        Assert.True(files.Length >= 2); Assert.Equal(0, session.DroppedEvents); Assert.Null(session.StorageError);
+        Assert.All(files, p => { using var input = new FileStream(p, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); Assert.InRange(input.Length, 1, 2 * 1024 * 1024); });
+        Assert.Contains("test.short", Export(session));
+    }
+
     private readonly string vault = Path.Combine(Path.GetTempPath(), "speedlink-diagnostics-test-" + Guid.NewGuid().ToString("N"));
     private string Root => Path.Combine(vault, "diagnostics");
     private DiagnosticSession Session(DiagnosticLimits? limits = null) => new(Root, "test-alpha", "test-build", limits);

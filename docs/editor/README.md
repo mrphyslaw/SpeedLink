@@ -79,6 +79,8 @@ The preview and floating graph use the same controls. Click a point on the
 graph to select its grid cell. Resizable panes let you give the grid or graph
 more room. **Fit view** frames the entire surface. Pop the graph into a separate
 window to use another monitor; closing that window restores the preview.
+Floating map, graph and information windows hide when you leave Editor and return
+when you come back. The graph stays hidden until a graphable map is selected.
 
 ## Map information and changes
 
@@ -129,11 +131,14 @@ See the [full editing guide](../EDITOR.md) for shortcuts and exact behavior.
 ## Compatibility and current limits
 
 Supported profiles: **L33XEH000, L35HEH000, L38KEH000, L39SED000, L39SEE000,
-L39SEF000, L3M7EF000 and L3P4EM000**.
+L39SEF000, L3M7EF000, L3P4EM000 and L3CGEE000**.
 
 The editor checks the calibration, boot, checksum layout and reference program
 signature. Changes to defined tuning controls remain editable; other program
 modifications are rejected. Extended/patched ROM layouts are unsupported.
+Every export applies its established integrity policy and verifies the saved
+bytes. Gen 2 L3CGEE000 validates its native code sum and markers; it rejects
+invalid code instead of inventing a checksum repair. See [Gen 2 limits](../GEN2.md).
 
 Static axes are read-only. This version has no patch installer, smoothing,
 tune-project history or log-to-map overlay. Offline software checks do not

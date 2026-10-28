@@ -46,6 +46,8 @@ jobs:
       - run: ./tools/Test-EditorUi.ps1 -Output TestResults/EditorUi
       - run: ./tools/Test-WorkbenchUi.ps1 -Output TestResults/WorkbenchUi
       - run: ./tools/Test-DefinitionImportUi.ps1 -Output TestResults/DefinitionImportUi
+      - run: ./tools/Test-ReliabilityUi.ps1 -Output TestResults/ReliabilityUi
+      - run: ./tools/Test-BenchDiagnostics.ps1 -Output TestResults/BenchDiagnostics
       - name: Check developer ECU peer parser
         run: |
           dotnet build tools/SpeedLink.Bench -c Release --no-restore

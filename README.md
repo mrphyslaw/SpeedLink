@@ -4,9 +4,9 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.6.0-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.5)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.6.0-alpha.6](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.6)** — a single Windows EXE, with no installer or .NET installation required.
 
-This release fixes the blank editor caused by a hidden map browser. Opening a ROM now shows its maps, a permanent **Maps** button restores the browser, and a clear selection prompt replaces the empty grid. Replace the EXE and keep your existing `data` folder. See [maintenance](docs/MAINTENANCE.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+This release fixes editor and logger lifecycle problems found during broader QA: floating panels follow the Editor workspace, logger choices survive closing for every profile, stopped/pending values show their actual state, and long diagnostic sessions export correctly. Invalid AFR input and recording-open errors leave a usable workspace. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), [maintenance](docs/MAINTENANCE.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the nine supported stock ROM layouts.
@@ -181,7 +181,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.6.0-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.5), a Windows Workbench alpha.**
+**Current release: [v0.6.0-alpha.6](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.6), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
@@ -192,13 +192,14 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
 - **Fixed:** logger matching accepts known complete ECU calibration IDs, including
   `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
-- **Checked:** 426 C# tests and 2,384 native-derived logger vectors. Nine-profile
+- **Checked:** 443 C# tests and 2,384 native-derived logger vectors. Nine-profile
   editor checks cover direct cell entry, comparison, undo/redo and byte-identical
   no-edit exports. L3CGEE000 adds 379 native logger instruction checks and complete
   reference-ROM cell/axis comparisons. See [validation](docs/VALIDATION.md).
   Earlier physical logger tests passed with vLinker FS and Tactrix across the
   original seven Gen 1 profiles, including fault handling, sustained requests
-  and USB recovery. Gen 2 adapter tests remain pending. Saved-log viewing and
+  and USB recovery. Isolated Gen 2 simulated-peer reads and logging have also
+  passed using vLinker FS and Tactrix; this does not establish real ECU acceptance. Saved-log viewing and
   standalone EXE checks also passed.
 - **Still pending:** real Mazda ECU read/logging acceptance, sensor readings and
   achievable vehicle logging rates. All 313 channel/profile ECU checks remain pending.

@@ -17,7 +17,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow : Window
 {
-    public const string Version = "0.6.0-alpha.5";
+    public const string Version = "0.6.0-alpha.6";
     private void Editor_Click(object sender, RoutedEventArgs e) => Navigate(1);
     private readonly string vault;
     private readonly RomInspector inspector = new();
@@ -388,6 +388,7 @@ public partial class MainWindow : Window
     private async void Window_Closing(object? sender, CancelEventArgs e)
     {
         if (!closeApproved && !EditorPane.MayClose()) { e.Cancel = true; return; }
+        if (!closeApproved) SaveLoggerSettings();
         closeApproved = true;
         EditorPane.PrepareHostClose();
         if (transport is null && !busy && diagnosticSession is null)

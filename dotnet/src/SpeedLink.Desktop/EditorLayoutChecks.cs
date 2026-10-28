@@ -123,7 +123,7 @@ public partial class EditorWorkspace
     }
     internal void CheckRestoredLayout()
     {
-        if (browserWindow is null || graphWindow is null || !browserWindow.IsVisible || !graphWindow.IsVisible || browserWidth != 230 || curveWidth != 325 || previewWidth != 365 || !fitTable)
+        if (browserWindow is null || graphWindow is null || !browserWindow.IsVisible || graphWindow.IsVisible || browserWidth != 230 || curveWidth != 325 || previewWidth != 365 || !fitTable)
             throw new InvalidOperationException("Saved popout layout did not restore in a fresh workspace.");
     }
     private static IEnumerable<DependencyObject> Descendants(DependencyObject root)
@@ -148,8 +148,17 @@ public partial class MainWindow
         NavigationToggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); UpdateLayout();
         if (NavigationColumn.ActualWidth > 60) throw new InvalidOperationException("Navigation did not collapse.");
         var result = await EditorPane.ExerciseLayoutAcceptance(folder, (width, height) => { Width = width; Height = height; UpdateLayout(); });
-        var restored = new MainWindow(vault);
-        try { restored.Show(); restored.Navigate(1); restored.UpdateLayout(); await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); restored.EditorPane.CheckRestoredLayout(); }
+        var restored = new MainWindow(vault, EditorPane.TestInspector, EditorPane.TestGuard);
+        try
+        {
+            restored.Show(); restored.Navigate(1); restored.UpdateLayout();
+            await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+            restored.EditorPane.CheckRestoredLayout();
+            restored.OpenEditorFile(path);
+            restored.EditorPane.OpenTable(restored.EditorPane.Document!.Definition.Tables.First(t => t.Rows > 1 && t.Columns > 1 && !t.IsChoice));
+            await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+            if (!restored.EditorPane.GraphFloating || !restored.EditorPane.FloatingVisibilityForTest()[1]) throw new InvalidOperationException("Remembered graph did not return after opening a map.");
+        }
         finally { restored.CloseWorkbenchTest(); }
         return new { acceptance = result, freshWorkspaceRestored = true };
     }
