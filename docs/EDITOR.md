@@ -18,6 +18,7 @@ choose **Help** and select **Editor**. **Map info** beside the map tabs, or
 ## Make your first edit
 
 1. Choose **Editor** in the left navigation, then **File → Open ROM…**.
+   Opening a ROM shows the map browser, even if it was hidden in your saved layout.
 2. Find a map in the category list or search by name, description or category.
    Click **Map info** to check its units, purpose and correction direction.
 3. Edit the control using the instructions below for its shape. Compare with
@@ -108,6 +109,10 @@ the tab strip to reach other tabs. Closing a tab with × keeps the ROM's edits.
 Use the app's **☰** button to collapse navigation to icons. **View → Hide map
 browser** (Ctrl+B) hides or restores the map list. Drag its edge to change its
 width, or pop it into a separate window.
+
+The **Maps** button in the editor toolbar always brings the map browser back.
+When no map is selected, **Browse maps** opens the list instead of leaving an
+empty grid. Closing the last map tab keeps the ROM and its edits loaded.
 
 **Fit map** (Ctrl+0) restores automatic sizing and hides the browser, Changes
 drawer and map-information window. With navigation collapsed, a full 16×16 map,

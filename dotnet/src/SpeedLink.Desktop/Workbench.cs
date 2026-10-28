@@ -9,6 +9,7 @@ public partial class MainWindow
     internal async Task<object> ExerciseWorkbenchOffline(string path, string folder, string? recording = null)
     {
         Show(); Navigate(1); UpdateLayout();
+        await CheckMapBrowserRestart(path, folder);
         var report = await EditorPane.ExerciseOffline(path, folder, () => { Navigate(2); Navigate(3); Navigate(1); });
         if (transport is not null || busy) throw new InvalidOperationException("Offline workbench accessed a transport.");
         var document = EditorPane.Document;
@@ -34,7 +35,7 @@ public partial class MainWindow
         if (EditorPane.MapGrid.ActualWidth < 100 || EditorPane.GraphPanel.ActualWidth < 100 || EditorPane.SaveButton.TransformToAncestor(this).Transform(new Point(0, 0)).X > ActualWidth - 60)
             throw new InvalidOperationException("Minimum workbench layout is clipped.");
         CaptureWorkbench(System.IO.Path.Combine(folder, "MinimumWorkbench.png"));
-        return new { passed = true, editor = report, embedded = true, navigationPreservesEdits = true, minimumLayout = true, hardwareAccessed = false };
+        return new { passed = true, editor = report, embedded = true, savedHiddenBrowserRecovered = true, savedFloatingBrowserRecovered = true, navigationPreservesEdits = true, minimumLayout = true, hardwareAccessed = false };
     }
     private void CaptureWorkbench(string path)
     {
