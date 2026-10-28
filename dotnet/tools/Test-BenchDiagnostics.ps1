@@ -20,7 +20,10 @@ foreach ($mode in @('normal', 'export-failure')) {
         $segments = Get-ChildItem -LiteralPath $root -Recurse -Filter 'events-*.jsonl'
         if ($segments.Count -lt 2 -or ($segments | Where-Object Length -GT (2MB))) { throw 'Diagnostic rotation byte boundary failed.' }
     } else {
-        if ($exitCode -eq 0 -or $result.passed -or !$result.supportReportError -or [IO.File]::ReadAllText($report + '.support.zip') -ne 'existing file must survive') { throw 'Secondary export failure lost the result or overwrote a file.' }
+        if ($exitCode -ne 1 -or $result.passed -or !$result.supportReportError -or [IO.File]::ReadAllText($report + '.support.zip') -ne 'existing file must survive') { throw 'Secondary export failure lost the result or overwrote a file.' }
     }
 }
 Write-Output ('Bench diagnostics checks passed: ' + $runRoot)
+# The intentional negative native-process case was verified above. Do not leave
+# its exit code as the result of this successful test script in a CI wrapper.
+exit 0
