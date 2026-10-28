@@ -102,25 +102,43 @@ public partial class MainWindow
             var result = await RecordingsPane.ExerciseOffline(Path.Combine(file.Folder, "log.csv"), Path.Combine(folder, "gen2-replay.png"));
             Check((bool)result["passed"]!, "Gen 2 replay accepts five preferred defaults and six selectable plots");
         }
+        ConfigureLoggerProfile(profile);
+        for (int i = 0; i < loggerRows.Count; i++)
+        {
+            var row = loggerRows[i]; row.Selected = i % 3 != 0; row.Plotted = row.Selected && i % 5 == 0;
+            row.Unit = row.Units.FirstOrDefault(u => u != row.Channel.Unit) ?? row.Channel.Unit;
+        }
+        var expectedProfile = loggerRows.Select(r => new LoggerChannelPreference(r.Id, r.Selected, r.Unit, r.Plotted)).ToArray();
         ConfigureLoggerProfile(gen2);
         foreach (var row in loggerRows) { row.Selected = row.Id is "absolute_throttle_position" or "short_term_fuel_trim" or "battery_voltage" or "calculated_load"; row.Plotted = row.Id == "battery_voltage"; }
         LoggerRateBox.SelectedItem = 20; StoichBox.Text = "14.0"; RecordCsvBox.IsChecked = false;
-        var expected = loggerRows.Where(r => r.Selected).Select(r => r.Id).Order().ToArray();
+        var expected = loggerRows.Select(r => new LoggerChannelPreference(r.Id, r.Selected, r.Unit, r.Plotted)).ToArray();
         string settingsVault = vault;
         CloseWorkbenchTest(); // Uses the normal Window.Closing settings path without starting another log.
         var restored = new MainWindow(settingsVault, editor.TestInspector, editor.TestGuard);
         try
         {
             restored.Show();
-            Check(restored.loggerDefinition.Id == gen2.Id && restored.loggerRows.Where(r => r.Selected).Select(r => r.Id).Order().SequenceEqual(expected) && restored.loggerRows.Single(r => r.Id == "battery_voltage").Plotted, "Offline close and fresh launch retain Gen 2 choices");
+            Check(restored.loggerDefinition.Id == gen2.Id && Choices(restored).SequenceEqual(expected), "Offline close and fresh launch retain every Gen 2 selection, unit and plot");
             Check((int)restored.LoggerRateBox.SelectedItem == 20 && restored.StoichBox.Text == "14.0" && restored.RecordCsvBox.IsChecked == false && restored.loggerCalibration is null, "Global preferences restored without trusting old ROM binding");
             Check(!restored.EditorPane.FloatingVisibilityForTest()[1], "Startup without map hides remembered floating graph");
             restored.ConfigureLoggerProfile(profile);
+            Check(Choices(restored).SequenceEqual(profile.Id == gen2.Id ? expected : expectedProfile), "Fresh launch retains every selection, unit and plot for " + profile.SoftwareIds.Single());
             restored.ConfigureLoggerProfile(gen2);
-            Check(restored.loggerRows.Where(r => r.Selected).Select(r => r.Id).Order().SequenceEqual(expected), "Profile switching preserves independent selections");
+            Check(Choices(restored).SequenceEqual(expected), "Profile switching preserves independent selections, units and plots");
+            restored.ConfigureLoggerProfile(profile);
         }
         finally { restored.CloseWorkbenchTest(); }
+        var activeProfileRestart = new MainWindow(settingsVault, editor.TestInspector, editor.TestGuard);
+        try
+        {
+            activeProfileRestart.Show();
+            Check(activeProfileRestart.loggerDefinition.Id == profile.Id && Choices(activeProfileRestart).SequenceEqual(profile.Id == gen2.Id ? expected : expectedProfile), "Fresh launch automatically restores the active profile and all choices for " + profile.SoftwareIds.Single());
+            Check((int)activeProfileRestart.LoggerRateBox.SelectedItem == 20 && activeProfileRestart.StoichBox.Text == "14.0" && activeProfileRestart.RecordCsvBox.IsChecked == false && activeProfileRestart.loggerCalibration is null, "Active-profile restart preserves global choices without an ECU binding");
+        }
+        finally { activeProfileRestart.CloseWorkbenchTest(); }
         return new { passed = true, cases, hardwareAccessed = false };
+        static LoggerChannelPreference[] Choices(MainWindow host) => host.loggerRows.Select(r => new LoggerChannelPreference(r.Id, r.Selected, r.Unit, r.Plotted)).ToArray();
     }
     private sealed class CountingTestTransport(IReadTransport inner) : IReadTransport
     {

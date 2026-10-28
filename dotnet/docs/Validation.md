@@ -9,6 +9,9 @@
   the connection, post-read logger guidance, start/stop recording, immediately
   updated stopped charts, pending/stale/rejected display states, failed recording
   replacement, Gen 2 replay defaults and fresh-process preference restoration.
+- Fresh launches restore the active profile and every channel's selection, unit
+  and plot choice for all eight Gen 1 profiles and Gen 2, plus the global scan
+  rate, stoichiometric AFR and CSV choice. Restored choices never bind an ECU ROM.
 - Developer diagnostics tests export 20,000 events and separately force an export
   destination failure. Reports retain the primary result and current build identity.
 - Full existing desktop, standalone, all-profile ROM-save integrity and exact
