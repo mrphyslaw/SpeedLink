@@ -17,10 +17,15 @@ canceled by another release.
 
 ## Publish a release
 
-1. Review a PR, pass the required checks and merge to protected `main`.
-2. Update the application version, matching README download and changelog in that
-   reviewed change. Keep versioned lock metadata consistent.
-3. Create a version tag, for example `v0.6.0-alpha.3`, on that main-branch commit
+Publishing an application fix includes its standalone EXE unless source-only
+delivery was explicitly requested. A merge runs source checks; pushing a matching
+version tag starts automatic release publication. Complete both steps and verify
+the public download before calling a fix published.
+
+1. Update the application version, matching README download and changelog in the
+   release PR. Keep versioned lock metadata consistent.
+2. Review the PR, pass the required checks and merge to protected `main`.
+3. Create a version tag, for example `v0.6.0-alpha.5`, on that main-branch commit
    and push it. The **Release** workflow runs the full checks again.
 4. The Windows job tests the standalone EXE, including crash capture and restart,
    then packages that exact file. It archives all tracked source from the

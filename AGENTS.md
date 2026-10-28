@@ -2,6 +2,9 @@
 
 ## Reliability and releases
 
+- Publishing an application fix includes a matching standalone EXE release unless
+  source-only delivery is explicitly requested. Complete the version-tag workflow
+  and verify the public download before reporting publication complete.
 - Keep crash reports local and bounded; never include memory dumps or ROM payloads.
   Fatal UI errors must stop the app rather than resume in an unknown state.
 - Release the same standalone executable that passed the release checks. Bind it

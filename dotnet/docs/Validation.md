@@ -1,5 +1,14 @@
 # C# validation
 
+## Map browser access — 0.6.0-alpha.5
+
+- Desktop regression coverage opens all nine ROM profiles after restoring saved
+  hidden and floating browsers, including minimized floating windows.
+- The Maps button and no-map selection prompt restore browser access. Closing and
+  reopening the final map preserves unsaved ROM edits.
+- Required release checks retain the unit suite, every-ROM save-integrity gates,
+  the complete desktop suite and standalone EXE/source-package verification.
+
 ## Complete source packaging — 0.6.0-alpha.4
 
 - Source packaging runs for PR/main checks as well as release tags. Git archives
