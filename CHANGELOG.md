@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Show the map browser whenever a ROM opens, including after restoring a hidden layout. Keep a visible Maps button and a clear map-selection prompt when no table is selected.
+- Cover saved hidden layouts, closing the final map tab, and restoring minimized floating browsers in desktop regression checks for every supported ROM.
+
 ## 0.6.0-alpha.4
 
 - Correct release source packaging to archive the complete repository from its root, including definitions, documentation and build resources.

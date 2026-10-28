@@ -51,6 +51,7 @@ public partial class EditorWorkspace : UserControl
         MapTabs.Items.Clear(); BaselineBox.SelectedIndex = 0; SearchBox.Text = ""; ChangedOnly.IsChecked = false;
         FileText.Text = Path.GetFileName(path); FileText.ToolTip = path;
         RefreshBrowser(); RefreshTable(); RefreshControls();
+        ShowMapBrowser();
         EditorStatus.Text = "ROM loaded. Choose a map to edit. Static axes are read-only.";
     }
     private void Attempt(Action action)
@@ -94,6 +95,12 @@ public partial class EditorWorkspace : UserControl
         UndoButton.IsEnabled = document?.CanUndo == true; RedoButton.IsEnabled = document?.CanRedo == true;
         UndoButton.ToolTip = document?.UndoDescription; RedoButton.ToolTip = document?.RedoDescription;
         EditTools.IsEnabled = table is not null && !table.IsChoice;
+        FitMapButton.IsEnabled = table is not null;
+        NoMapPanel.Visibility = table is null ? Visibility.Visible : Visibility.Collapsed;
+        NoMapTitle.Text = document is null ? "Open a ROM to begin" : "Choose a map to edit";
+        NoMapText.Text = document is null ? "Choose a supported ROM to browse and edit its maps." :
+            $"{document.Definition.Calibration} is loaded with {document.Definition.Tables.Count:N0} controls. Choose a map from the list or search by name.";
+        NoMapAction.Content = document is null ? "Open ROM…" : "Browse maps";
         DetailsButton.IsEnabled = table is not null;
         if (table is null) DetailsButton.IsChecked = false;
         RefreshChanges();
@@ -158,6 +165,7 @@ public partial class EditorWorkspace : UserControl
         refreshing = true; MapGrid.SelectedCells.Clear(); refreshing = false;
         bool wasCurve = CurveList;
         table = (MapTabs.SelectedItem as TabItem)?.Tag as TuningTable;
+        if (table is null && MapTree.SelectedItem is TreeViewItem selectedMap) selectedMap.IsSelected = false;
         if (CurveList && !wasCurve) SetViewMode(1);
         else if (wasCurve && !CurveList) SetViewMode(table?.Rows > 1 ? 4 : 0);
         RefreshTable(); RefreshControls(); ApplyView();
@@ -343,7 +351,10 @@ public partial class EditorWorkspace : UserControl
     internal void CloseOfflineTest() => closingForTest = true;
     internal async Task<object> ExerciseOffline(string path, string folder, Action? switchWorkspaces = null)
     {
-        Directory.CreateDirectory(folder); OpenRom(path); await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        Directory.CreateDirectory(folder);
+        FocusButton.IsChecked = true; SaveLayout();
+        OpenRom(path); await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        await CheckMapBrowserAccess(path, folder);
         CheckNoMapHelp();
         var doc = document!; var scalar = doc.Definition.Tables.First(t => t.Kind == "1D" && t.Storage == "float");
         OpenTable(scalar); SelectCell(0); UpdateLayout();
@@ -398,7 +409,7 @@ public partial class EditorWorkspace : UserControl
         await CheckCompactEditors(folder);
         await CheckMapInformation(folder);
         await CheckStockScrolling(folder);
-        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, grid = true, directCellCommit = true, scalarEditor = true, compactMaps = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, axisFrameJoined = true, mapInfoDirectAccess = true, mapInfoF1 = true, themedScrollbars = true, scrollbarInputAndEdges = true, scrollbarLayoutScales = new[] { 1d, 1.25 }, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
+        return new { passed = true, calibration = doc.Definition.Calibration, controls = doc.Definition.Tables.Count, mapBrowserAccessibleOnOpen = true, emptyMapPrompt = true, mapsButtonRestoresBrowser = true, lastMapClosedRecovery = true, minimizedBrowserRestored = true, grid = true, directCellCommit = true, scalarEditor = true, compactMaps = true, curve = true, surface = true, surfaceFollowsDrag = true, surfaceAxesFollowCamera = true, mapInformationShowsUnits = true, axisFrameJoined = true, mapInfoDirectAccess = true, mapInfoF1 = true, themedScrollbars = true, scrollbarInputAndEdges = true, scrollbarLayoutScales = new[] { 1d, 1.25 }, bitSelector = true, undoRedo = true, comparison = true, changedFilter = true, noEditExportIdentical = true, focusedAndAllViews = true, changesDrawer = true, workspaceEditsPreserved = true };
     }
     private void Capture(string path) => CaptureElement(this, path);
     private static void CaptureElement(FrameworkElement element, string path)

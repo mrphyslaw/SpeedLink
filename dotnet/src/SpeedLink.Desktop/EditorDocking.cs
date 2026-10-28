@@ -149,7 +149,7 @@ public partial class EditorWorkspace
         Graph.SetCompactPreview(preview); FitViewButton.Content = preview ? "↺" : "Fit view";
         if (preview) GraphTitle.Text = surface ? "3D preview" : "Curve preview";
         else GraphTitle.Text = surface ? "3D · drag to rotate · wheel to zoom" : "Curve · wheel to zoom · Shift+drag to pan · click a point";
-        TablePanel.Visibility = graphOnly || ScalarMap ? Visibility.Collapsed : Visibility.Visible;
+        TablePanel.Visibility = table is null || graphOnly || ScalarMap ? Visibility.Collapsed : Visibility.Visible;
         ScalarPanel.Visibility = ScalarMap ? Visibility.Visible : Visibility.Collapsed;
         EditBar.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
         MapWorkspace.RowDefinitions[1].Height = new(ScalarMap ? 0 : 29);
@@ -173,11 +173,28 @@ public partial class EditorWorkspace
     private void ViewMenu_Click(object sender, RoutedEventArgs e) { if (sender is MenuItem { Tag: string mode }) { fitTable = false; SetViewMode(int.Parse(mode, System.Globalization.CultureInfo.InvariantCulture)); } }
     private void FitMap_Click(object sender, RoutedEventArgs e)
     {
+        if (table is null) { ShowMapBrowser(); return; }
         previewWidth = null; FocusButton.IsChecked = true; ChangesButton.IsChecked = false; DetailsButton.IsChecked = false; fitTable = true;
         SetViewMode(CurveList ? 1 : table is { Count: > 1, IsChoice: false } ? 4 : 2); Graph.ResetView();
         Dispatcher.BeginInvoke(new Action(() => { UpdateLayout(); UpdateTableSizing(); SaveLayout(); }));
     }
     private void HideBrowser_Click(object sender, RoutedEventArgs e) => FocusButton.IsChecked = true;
+    private void ShowBrowser_Click(object sender, RoutedEventArgs e) => ShowMapBrowser();
+    private void NoMapAction_Click(object sender, RoutedEventArgs e)
+    {
+        if (document is null) Open_Click(sender, e);
+        else ShowMapBrowser();
+    }
+    private void ShowMapBrowser()
+    {
+        FocusButton.IsChecked = false; ApplyLayout();
+        if (browserWindow is not null)
+        {
+            if (browserWindow.WindowState == WindowState.Minimized) browserWindow.WindowState = WindowState.Normal;
+            browserWindow.Activate();
+        }
+        SearchBox.Focus(); SaveLayout();
+    }
     private void PopBrowser_Click(object sender, RoutedEventArgs e)
     {
         if (browserWindow is not null) { FocusButton.IsChecked = false; browserWindow.Activate(); return; }

@@ -5,12 +5,13 @@
  </UserControl.Resources>
  <Grid Margin="8"><Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/><RowDefinition Height="24"/></Grid.RowDefinitions>
   <DockPanel x:Name="EditorToolbar">
-   <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button x:Name="SaveButton" Content="Save copy…" Click="Save_Click" Style="{DynamicResource PrimaryButton}" Padding="10,3" MinHeight="26"/><Button Content="Fit map" Click="FitMap_Click" ToolTip="Show the complete table · Ctrl+0"/></StackPanel>
+   <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button x:Name="SaveButton" Content="Save copy…" Click="Save_Click" Style="{DynamicResource PrimaryButton}" Padding="10,3" MinHeight="26"/><Button x:Name="FitMapButton" Content="Fit map" Click="FitMap_Click" ToolTip="Show the complete table · Ctrl+0"/></StackPanel>
    <Menu x:Name="EditorMenu" DockPanel.Dock="Left" Background="Transparent" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center">
     <MenuItem Header="_File"><MenuItem Header="Open ROM…" InputGestureText="Ctrl+O" Click="Open_Click"/><MenuItem Header="Save a new copy…" InputGestureText="Ctrl+S" IsEnabled="{Binding IsEnabled, ElementName=SaveButton}" Click="Save_Click"/><Separator/><MenuItem Header="Editor guide" Click="Guide_Click"/></MenuItem>
     <MenuItem Header="_Edit"><MenuItem Header="Copy" InputGestureText="Ctrl+C" Click="Copy_Click"/><MenuItem Header="Paste" InputGestureText="Ctrl+V" Click="Paste_Click"/><MenuItem Header="Reset selection to baseline" Click="Reset_Click"/><Separator/><MenuItem x:Name="CompareButton" Header="Compare ROM…" Click="Compare_Click"/></MenuItem>
     <MenuItem Header="_View"><MenuItem Header="Fit entire map" InputGestureText="Ctrl+0" Click="FitMap_Click"/><Separator/><MenuItem x:Name="PreviewItem" Header="Table with 3D preview" Tag="4" IsCheckable="True" Click="ViewMenu_Click"/><MenuItem x:Name="BelowItem" Header="Table above graph" Tag="0" IsCheckable="True" Click="ViewMenu_Click"/><MenuItem x:Name="BesideItem" Header="Table beside graph" Tag="1" IsCheckable="True" Click="ViewMenu_Click"/><MenuItem x:Name="TableItem" Header="Table only" Tag="2" IsCheckable="True" Click="ViewMenu_Click"/><MenuItem x:Name="GraphItem" Header="Graph only" Tag="3" IsCheckable="True" Click="ViewMenu_Click"/><Separator/><MenuItem x:Name="FocusButton" Header="Hide map browser" InputGestureText="Ctrl+B" IsCheckable="True" Checked="Layout_Changed" Unchecked="Layout_Changed"/><MenuItem Header="Pop out map browser" Click="PopBrowser_Click"/><MenuItem Header="Dock map browser" Click="DockBrowser_Click"/><MenuItem Header="Pop out graph" Click="PopGraph_Click"/><MenuItem Header="Dock graph" Click="DockGraph_Click"/><Separator/><MenuItem x:Name="DetailsButton" Header="Map information…" InputGestureText="F1" IsCheckable="True" Checked="Layout_Changed" Unchecked="Layout_Changed"/><MenuItem x:Name="ChangesButton" Header="Changes (0)" IsCheckable="True" Checked="Layout_Changed" Unchecked="Layout_Changed"/></MenuItem>
    </Menu>
+   <Button x:Name="MapsButton" DockPanel.Dock="Left" Content="Maps" Click="ShowBrowser_Click" ToolTip="Show the map browser · Ctrl+B toggles visibility" AutomationProperties.Name="Show map browser" Margin="6,0,0,0"/>
    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="6,0"><Button x:Name="UndoButton" Content="↶" Click="Undo_Click" ToolTip="Undo · Ctrl+Z" Width="28"/><Button x:Name="RedoButton" Content="↷" Click="Redo_Click" ToolTip="Redo · Ctrl+Y" Width="28"/></StackPanel>
    <TextBlock x:Name="ProfileText" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" Margin="5,0"/>
   </DockPanel>
@@ -65,6 +66,13 @@
       </Border>
      </ScrollViewer>
     </Grid>
+    <Border x:Name="NoMapPanel" Grid.RowSpan="3" Panel.ZIndex="5" Background="{DynamicResource ShellBrush}">
+     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="440" Margin="24">
+      <TextBlock x:Name="NoMapTitle" Text="Open a ROM to begin" FontSize="24" FontWeight="SemiBold" TextAlignment="Center" TextWrapping="Wrap"/>
+      <TextBlock x:Name="NoMapText" Text="Choose a supported ROM to browse and edit its maps." Foreground="{DynamicResource MutedBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="0,12,0,20"/>
+      <Button x:Name="NoMapAction" Content="Open ROM…" Click="NoMapAction_Click" Style="{DynamicResource PrimaryButton}" HorizontalAlignment="Center" Padding="18,8"/>
+     </StackPanel>
+    </Border>
    </Grid>
    <Border x:Name="DetailsPanel" Grid.Column="2" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="14"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel><TextBlock x:Name="MapTitle" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock x:Name="HelpUnitsText" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,10,0,0"/><TextBlock x:Name="HelpAxesText" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,4,0,0"/><TextBlock x:Name="HelpText" Text="Choose a map." TextWrapping="Wrap" Margin="0,12"/><Expander Header="Storage details"><TextBlock x:Name="StorageText" TextWrapping="Wrap" Margin="0,8,0,0"/></Expander></StackPanel></ScrollViewer></Border>
    <GridSplitter x:Name="ChangesSplitter" Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource ShellBrush}" Visibility="Collapsed"/>

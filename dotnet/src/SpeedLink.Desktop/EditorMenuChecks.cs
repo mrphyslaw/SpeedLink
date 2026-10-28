@@ -63,7 +63,8 @@ public partial class EditorWorkspace
                 throw new InvalidOperationException("Graph commands are enabled without an active numeric map.");
             TableItem.Focus(); SendMenuKey(TableItem, Key.Enter);
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-            if (ViewMode != 2 || !TableItem.IsChecked || !TablePanel.IsVisible || GraphPanel.IsVisible)
+            if (ViewMode != 2 || !TableItem.IsChecked || TablePanel.IsVisible || GraphPanel.IsVisible ||
+                !NoMapPanel.IsVisible || !NoMapAction.IsEnabled)
                 throw new InvalidOperationException("Keyboard menu activation did not run the selected action.");
             view.IsSubmenuOpen = true;
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
