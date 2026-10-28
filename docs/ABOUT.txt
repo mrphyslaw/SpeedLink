@@ -7,6 +7,7 @@ ROM reading, verified backups, offline ROM editing and live logging.
 One workspace for editing, live logging and recorded logs.
 Nine tuning definitions, Fit map, floating panels, changes and undo/redo.
 Compact navigation, saved layouts and zoomable long MAF curves.
+Opening a ROM shows its maps; the Maps button restores the browser at any time.
 Single-value cards with units, Apply/Cancel, baseline and change.
 Proportional small maps and a draggable, remembered table/preview divider.
 Compact 3D table preview beside the grid, with a larger floating graph.
