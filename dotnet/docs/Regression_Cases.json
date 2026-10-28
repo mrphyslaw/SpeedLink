@@ -1,5 +1,14 @@
 [
   {
+    "test": "SpeedLink.Tests.LoggerPreferencesTests.Migration_preserves_ids_absent_from_the_startup_profile"
+  },
+  {
+    "test": "SpeedLink.Tests.LoggerPreferencesTests.Profiles_and_global_choices_roundtrip_without_rom_paths_or_bytes"
+  },
+  {
+    "test": "SpeedLink.Tests.DiagnosticsTests.Full_default_segments_stay_within_encoded_byte_limit_and_export"
+  },
+  {
     "test": "SpeedLink.Tests.ParserTests.test_single_and_echo"
   },
   {

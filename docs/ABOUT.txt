@@ -5,6 +5,7 @@ Bundled .NET runtime: {runtime}
 Workbench alpha
 ROM reading, verified backups, offline ROM editing and live logging.
 One workspace for editing, live logging and recorded logs.
+Floating editor panels follow the active workspace; empty graphs stay hidden.
 Nine tuning definitions, Fit map, floating panels, changes and undo/redo.
 Compact navigation, saved layouts and zoomable long MAF curves.
 Opening a ROM shows its maps; the Maps button restores the browser at any time.
@@ -33,6 +34,8 @@ Experimental Gen 2 L3CGEE000: 287 tuning entries and 155 DTC reporting controls.
 Compatible unknown Gen 2 dumping uses a separate, bounded read protocol.
 Known short and complete ECU calibration IDs recognized for logging.
 Parameter selection, up to six synchronized charts, CSV and recorded-log viewer.
+Per-profile logger choices saved on close, with explicit pending and stopped states.
+Post-read reconnect guidance and recoverable display/recording input errors.
 ROM/offline checked; real-ECU logging validation pending.
 ECU flashing is planned.
 

@@ -55,10 +55,12 @@ public partial class EditorWorkspace : UserControl
         EditorStatus.Text = "ROM loaded. Choose a map to edit. Static axes are read-only.";
     }
     private void Attempt(Action action)
+        => ExecuteEditorAction(action, message => { EditorStatus.Text = message; MessageBox.Show(Window.GetWindow(this), message, "SpeedLink ROM editor", MessageBoxButton.OK, MessageBoxImage.Information); });
+    internal static void ExecuteEditorAction(Action action, Action<string> report)
     {
         try { action(); }
-        catch (Exception error) when (error is IOException or ArgumentException or InvalidOperationException or System.Xml.XmlException or FormatException or OverflowException)
-        { EditorStatus.Text = error.Message; MessageBox.Show(Window.GetWindow(this), error.Message, "SpeedLink ROM editor", MessageBoxButton.OK, MessageBoxImage.Information); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or System.Xml.XmlException or FormatException or OverflowException)
+        { report(error.Message); }
     }
     private bool FinishEdit() => CommitScalar() && MapGrid.CommitEdit(DataGridEditingUnit.Row, true);
     private bool MayReplace() => document?.IsDirty != true || MessageBox.Show(Window.GetWindow(this), "Discard unsaved changes? Saved copies and the original ROM are kept.", "Unsaved ROM edits", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
@@ -141,7 +143,7 @@ public partial class EditorWorkspace : UserControl
     {
         if (e.NewValue is TreeViewItem { Tag: TuningTable selected }) OpenTable(selected);
     }
-    private void OpenTable(TuningTable selected)
+    internal void OpenTable(TuningTable selected)
     {
         var tab = MapTabs.Items.OfType<TabItem>().FirstOrDefault(t => ReferenceEquals(t.Tag, selected));
         if (tab is null)

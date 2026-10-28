@@ -1,5 +1,23 @@
 # C# validation
 
+## Lifecycle reliability — 0.6.0-alpha.6
+
+- 443 Core cases, including version-one logger preference migration, independent
+  profile choices and full default-size Windows diagnostic rotation/export.
+- Nine synthetic desktop workflows exercise workspace-scoped floating panels,
+  empty/reopened maps, file access errors, invalid AFR correction without losing
+  the connection, post-read logger guidance, start/stop recording, immediately
+  updated stopped charts, pending/stale/rejected display states, failed recording
+  replacement, Gen 2 replay defaults and fresh-process preference restoration.
+- Fresh launches restore the active profile and every channel's selection, unit
+  and plot choice for all eight Gen 1 profiles and Gen 2, plus the global scan
+  rate, stoichiometric AFR and CSV choice. Restored choices never bind an ECU ROM.
+- Developer diagnostics tests export 20,000 events and separately force an export
+  destination failure. Reports retain the primary result and current build identity.
+- Full existing desktop, standalone, all-profile ROM-save integrity and exact
+  source-package checks remain required. These new checks use synthetic data and
+  do not establish real ECU acceptance, sensor accuracy or hardware logging rates.
+
 ## Map browser access — 0.6.0-alpha.5
 
 - Desktop regression coverage opens all nine ROM profiles after restoring saved

@@ -159,7 +159,7 @@ public sealed class DiagnosticSession : IDiagnosticSink, IAsyncDisposable
                     }
                     continue;
                 }
-                int size = Encoding.UTF8.GetByteCount(item.Line!) + 1;
+                int size = Encoding.UTF8.GetByteCount(item.Line!) + Encoding.UTF8.GetByteCount(Environment.NewLine);
                 if (output is null || bytes + size > limits.SegmentBytes)
                 {
                     if (output is not null) await output.DisposeAsync();

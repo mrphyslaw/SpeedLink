@@ -24,7 +24,9 @@ var reportPath = Get("--report");
 if (reportPath.Length == 0 || mode.Length == 0) throw new ArgumentException("Specify --mode and --report. Hardware modes also require --port and --isolated-bench.");
 reportPath = Path.GetFullPath(reportPath);
 Directory.CreateDirectory(Path.GetDirectoryName(reportPath)!);
-var report = new Dictionary<string, object?> { ["mode"] = mode, ["version"] = "0.3.0-alpha.2", ["started"] = DateTimeOffset.UtcNow, ["liveProgrammingEnabled"] = false };
+string build = typeof(TraceTransport).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+    .Cast<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion;
+var report = new Dictionary<string, object?> { ["mode"] = mode, ["version"] = build.Split('+')[0], ["build"] = build, ["tool"] = "SpeedLink.Bench", ["started"] = DateTimeOffset.UtcNow, ["liveProgrammingEnabled"] = false };
 VLinkerReadTransport? link = null;
 J2534ReadTransport? passThru = null;
 NativeJ2534Channel? native = null;
@@ -40,7 +42,18 @@ try
 {
     var inspector = new RomInspector();
     var store = new BackupStore();
-    if (mode == "peer-parser-self-test")
+    if (mode == "diagnostics-self-test")
+    {
+        diagnostics = new(Get("--diagnostics"), "bench", build);
+        for (int i = 0; i < 20000; i++)
+        {
+            diagnostics.Record("test.short", new { index = i });
+            if (i % 250 == 249) await diagnostics.FlushAsync();
+        }
+        report["hardwareAccessed"] = false;
+        report["diagnosticEvents"] = 20000;
+    }
+    else if (mode == "peer-parser-self-test")
     {
         byte[] current = [0x22, 9, 0], next = [0x22, 0, 0x33];
         foreach (var (raw, expected, echo) in new[] {
@@ -107,7 +120,7 @@ try
         var port = Get("--port");
         if (port.Length == 0)
             throw new ArgumentException("Explicit COM port is required.");
-        if (Get("--diagnostics").Length > 0) diagnostics = new(Get("--diagnostics"), "bench", typeof(ReadWorkflow).Assembly.GetName().Version?.ToString() ?? "unknown");
+        if (Get("--diagnostics").Length > 0) diagnostics = new(Get("--diagnostics"), "bench", build);
         if (Get("--adapter") == "tactrix")
         {
             var drivers = J2534Drivers.Discover();
@@ -354,8 +367,17 @@ finally
     if (diagnostics is not null)
     {
         await diagnostics.DisposeAsync();
-        SupportReport.Export(diagnostics.Folder, reportPath + ".support.zip");
-        report["supportReport"] = reportPath + ".support.zip";
+        report["operationPassed"] = report.GetValueOrDefault("passed");
+        try
+        {
+            SupportReport.Export(diagnostics.Folder, reportPath + ".support.zip");
+            report["supportReport"] = reportPath + ".support.zip";
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            report["supportReportError"] = error.Message;
+            report["passed"] = false; exit = 1;
+        }
         report["diagnosticStorageError"] = diagnostics.StorageError;
         report["diagnosticDroppedEvents"] = diagnostics.DroppedEvents;
     }

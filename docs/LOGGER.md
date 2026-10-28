@@ -97,7 +97,20 @@ A recording left marked `Recording or interrupted` did not close normally.
 Keep the whole folder. ECU identity includes the VIN when available; review it
 before sharing a log publicly.
 
-Selections and units are remembered in `data/logger-settings.json`. No ROM,
+Selections, units and plot choices are remembered separately for each profile in
+`data/logger-settings.json`, including changes made before closing without logging.
+Rate, stoichiometric AFR and CSV choices are also restored on launch. Load the
+current ECU ROM again to establish its calibration; preferences do not bind a ROM.
+Invalid AFR input leaves the connection available so you can correct it and retry.
+After a backup, the Logger explains the required reconnect and provides a
+**Go to Connection** button.
+
+During a partial scan, a still-fresh last-known display value is marked **Pending**
+with its age. Expired or rejected values are cleared. Recordings retain the actual
+per-channel sample statuses and timestamps. Stopped charts show stopped status
+immediately; their traces remain available as history.
+
+No ROM,
 commercial software or driver is bundled. ECU flashing and modified-ROM
 logging extensions remain outside this release.
 

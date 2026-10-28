@@ -27,6 +27,7 @@ public partial class LogViewerWorkspace : UserControl
     private readonly ObservableCollection<ReplayChannel> rows = [];
     private CancellationTokenSource? loading;
     private bool drawing;
+    private static readonly string[] PreferredChannels = ["engine_rpm", "boost_pressure", "actual_lambda", "fuel_rail_pressure", "knock_retard", "relative_throttle_position"];
     internal int PlottedChannels => rows.Count(r => r.Selected);
     internal RecordedLog? Recording => log;
     public LogViewerWorkspace()
@@ -45,16 +46,16 @@ public partial class LogViewerWorkspace : UserControl
     }
     internal async Task OpenAsync(string path)
     {
-        loading?.Cancel(); loading?.Dispose(); loading = new(); var token = loading.Token;
+        loading?.Cancel();
+        var operation = new CancellationTokenSource(); loading = operation; var token = operation.Token;
         OpenButton.IsEnabled = false; Summary.Text = "Opening recording…";
         try
         {
             var loaded = await Task.Run(() => RecordedLog.Load(path, token), token);
             token.ThrowIfCancellationRequested(); log = loaded; rows.Clear();
-            var preferred = new[] { "engine_rpm", "boost_pressure", "actual_lambda", "fuel_rail_pressure", "knock_retard", "relative_throttle_position" };
             foreach (var channel in log.Channels)
             {
-                var row = new ReplayChannel(channel) { Selected = preferred.Contains(channel.Id, StringComparer.Ordinal) };
+                var row = new ReplayChannel(channel) { Selected = PreferredChannels.Contains(channel.Id, StringComparer.Ordinal) };
                 row.PropertyChanged += (_, _) =>
                 {
                     if (rows.Count(r => r.Selected) > 6) { row.Selected = false; return; }
@@ -68,7 +69,20 @@ public partial class LogViewerWorkspace : UserControl
             TimeCursor.Maximum = Math.Max(.001, log.DurationSeconds); TimeCursor.Value = 0; Zoom.Value = 1;
             Warnings.Text = string.Join(" ", log.Warnings); Draw();
         }
-        finally { if (!token.IsCancellationRequested) OpenButton.IsEnabled = true; }
+        catch
+        {
+            if (ReferenceEquals(loading, operation))
+            {
+                if (log is not null) Draw();
+                else Summary.Text = token.IsCancellationRequested ? "Opening cancelled. Choose a recording." : "Recording could not be opened. Choose another file.";
+            }
+            throw;
+        }
+        finally
+        {
+            if (ReferenceEquals(loading, operation)) { loading = null; OpenButton.IsEnabled = true; }
+            operation.Dispose();
+        }
     }
     internal void CancelLoading() => loading?.Cancel();
     private void Position_Changed(object sender, RoutedPropertyChangedEventArgs<double> e) => Draw();
@@ -127,9 +141,10 @@ public partial class LogViewerWorkspace : UserControl
         SetView(log!.DurationSeconds * .55, 2); UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         Draw(); UpdateLayout();
-        if (PlottedChannels != Math.Min(6, log.Channels.Count) || Plots.Children.Count != PlottedChannels) throw new InvalidOperationException("Replay channel selection or plots failed.");
+        int expectedDefaults = Math.Max(1, log.Channels.Count(c => PreferredChannels.Contains(c.Id, StringComparer.Ordinal)));
+        if (PlottedChannels != expectedDefaults || Plots.Children.Count != PlottedChannels) throw new InvalidOperationException("Replay channel selection or plots failed.");
         foreach (var row in rows) row.Selected = true;
-        if (PlottedChannels > 6) throw new InvalidOperationException("Replay selection exceeded its plot limit.");
+        if (PlottedChannels != Math.Min(6, log.Channels.Count)) throw new InvalidOperationException("Replay selection failed its plot limit.");
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         UpdateLayout();
         if (Plots.Children.OfType<StackPanel>().Any(p => p.ActualHeight < 100 || p.ActualWidth < 100)) throw new InvalidOperationException("Replay plots were not laid out.");

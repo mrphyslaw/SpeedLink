@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0-alpha.6
+
+- Keep floating map panels inside the Editor workspace and hide an empty floating graph until a graphable map is selected. Handle file permission errors without terminating the editor.
+- Remember logger channels, units and plots separately for each ROM profile, including Gen 2 choices and changes made without starting a recording. Restore choices on launch without trusting an old ECU/ROM binding.
+- Validate display settings before logging starts so invalid AFR input leaves the connection available. Explain the reconnect required after a ROM read with a direct Connection action.
+- Refresh stopped chart statuses immediately. During a partial scan, retain fresh last-known values with an explicit pending age; clear expired or rejected data without changing recording or calculation freshness rules.
+- Restore the prior recording and usable status if a replacement cannot be opened. Correct Gen 2 replay default-selection checks while retaining the six-plot limit.
+- Correct diagnostic rotation byte accounting so full-size Windows logs export reliably. Developer reports use the current build identity and preserve primary results if support export fails.
+- Add synthetic desktop lifecycle regressions for all nine profiles and full-size diagnostic export/failure checks to the required release workflow. ECU programming remains disabled; real ECU acceptance remains pending.
+
 ## 0.6.0-alpha.5
 
 - Show the map browser whenever a ROM opens, including after restoring a hidden layout. Keep a visible Maps button and a clear map-selection prompt when no table is selected.
