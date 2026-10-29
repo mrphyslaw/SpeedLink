@@ -28,6 +28,9 @@ public sealed class MapWorkspaceTests
         var wide = ReadableTableFit.Calculate(2400, 1800, 16, 16, 64, 26, 80, 13, 1, false);
         Assert.Equal(narrow.ColumnWidth, wide.ColumnWidth); Assert.Equal(narrow.RowHeight, wide.RowHeight);
         Assert.True(narrow.ColumnWidth >= 94); Assert.False(narrow.Fits); Assert.True(wide.Fits);
+        var preview = TablePreviewSize.Calculate(1000, 700, 16, 64, minimumCellWidth: 45);
+        Assert.True(16 * 45 + 64 + 4 + 7 + preview.Width <= 1000);
+        Assert.True(preview.Width < TablePreviewSize.Calculate(1000, 700, 16, 64).Width);
         Assert.Throws<ArgumentOutOfRangeException>(() => ReadableTableFit.Calculate(double.NaN, 300, 16, 16, 64, 26, 30, 13, 1, true));
         Assert.Throws<ArgumentOutOfRangeException>(() => ReadableTableFit.Calculate(500, 300, 16, 16, 64, 26, 30, 9, 1, true));
     }

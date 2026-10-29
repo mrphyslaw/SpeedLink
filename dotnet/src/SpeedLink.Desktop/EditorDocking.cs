@@ -156,7 +156,8 @@ public partial class EditorWorkspace
         TableColumn.MinWidth = vertical ? Math.Min(200, Math.Max(80, DataLayout.ActualWidth * .45)) : 0; GraphColumn.MinWidth = vertical ? Math.Min(160, Math.Max(80, DataLayout.ActualWidth * .35)) : 0;
         GraphColumn.MaxWidth = preview ? 800 : double.PositiveInfinity;
         TableColumn.Width = beside && CurveList ? new(Math.Min(curveWidth, Math.Max(180, DataLayout.ActualWidth - 200))) : new(beside ? tableFraction : 1, GridUnitType.Star);
-        var thumbnail = TablePreviewSize.Calculate(DataLayout.ActualWidth, DataLayout.ActualHeight, table?.Columns ?? 1, MapGrid.RowHeaderWidth + AxisLabelColumn.Width.Value, previewWidth);
+        var thumbnail = TablePreviewSize.Calculate(DataLayout.ActualWidth, DataLayout.ActualHeight, table?.Columns ?? 1,
+            MapGrid.RowHeaderWidth + AxisLabelColumn.Width.Value + SystemParameters.VerticalScrollBarWidth, previewWidth, MinimumCellWidth());
         double previewSize = !surface && previewWidth is null ? Math.Min(360, Math.Max(260, DataLayout.ActualWidth * .32)) : thumbnail.Width;
         GraphColumn.Width = preview ? new(previewSize) : beside ? new(1 - tableFraction, GridUnitType.Star) : new(0);
         var compact = table is null ? null : CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, AxisLabelColumn.Width.Value, AxisTitleRow.Height.Value, table.IsChoice);
@@ -290,13 +291,7 @@ public partial class EditorWorkspace
     {
         if (table is null || MapGrid.ActualWidth < 10 || MapGrid.Columns.Count == 0) return;
         MapGrid.FontSize = 13 * cellZoom;
-        var typeface = new Typeface(MapGrid.FontFamily, MapGrid.FontStyle, MapGrid.FontWeight, MapGrid.FontStretch);
-        if (!double.IsFinite(measuredCellWidth))
-        {
-            var strings = MapGrid.Items.OfType<EditorRow>().SelectMany(r => r.Values).Concat(MapGrid.Columns.Select(c => c.Header?.ToString() ?? "")).Distinct();
-            measuredCellWidth = strings.Select(s => new FormattedText(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, MapGrid.FontSize, UiTheme.Text, VisualTreeHelper.GetDpi(this).PixelsPerDip).WidthIncludingTrailingWhitespace).DefaultIfEmpty(0).Max();
-        }
-        double minimum = Math.Ceiling(Math.Max(44 * cellZoom, measuredCellWidth + 14 * cellZoom));
+        double minimum = MinimumCellWidth();
         if (CurveList)
         {
             foreach (var column in MapGrid.Columns) { column.MinWidth = minimum; column.Width = autoFitCells ? new(1, DataGridLengthUnitType.Star) : new(Math.Max(minimum, 120 * cellZoom)); }
@@ -313,5 +308,15 @@ public partial class EditorWorkspace
         double compactCell = Math.Clamp(Math.Floor((MapGrid.ActualWidth - MapGrid.RowHeaderWidth - 4) / table.Columns), 64, previewWidth is not null && ViewMode == 4 ? 160 : table.Columns <= 4 ? 112 : 88);
         foreach (var column in MapGrid.Columns) { column.MinWidth = minimum; column.Width = new(Math.Max(minimum, compact && autoFitCells ? compactCell : size.ColumnWidth)); }
         MapGrid.RowHeight = compact ? Math.Max(size.RowHeight, 28 * cellZoom) : size.RowHeight;
+    }
+    private double MinimumCellWidth()
+    {
+        var typeface = new Typeface(MapGrid.FontFamily, MapGrid.FontStyle, MapGrid.FontWeight, MapGrid.FontStretch);
+        if (!double.IsFinite(measuredCellWidth))
+        {
+            var strings = MapGrid.Items.OfType<EditorRow>().SelectMany(r => r.Values).Concat(MapGrid.Columns.Select(c => c.Header?.ToString() ?? "")).Distinct();
+            measuredCellWidth = strings.Select(s => new FormattedText(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, MapGrid.FontSize, UiTheme.Text, VisualTreeHelper.GetDpi(this).PixelsPerDip).WidthIncludingTrailingWhitespace).DefaultIfEmpty(0).Max();
+        }
+        return Math.Ceiling(Math.Max(44 * cellZoom, measuredCellWidth + 14 * cellZoom));
     }
 }
