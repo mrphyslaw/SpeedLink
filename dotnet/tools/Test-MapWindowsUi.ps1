@@ -17,7 +17,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
         throw "Map window UI failed: $calibration; see $report"
     }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-    if (!$result.passed -or !$result.workflow.passed -or !$result.synthetic -or $result.hardwareAccessed -or $result.workflow.cases.Count -lt 55) { throw "Unexpected map windows result: $calibration" }
+    if (!$result.passed -or !$result.workflow.passed -or !$result.synthetic -or $result.hardwareAccessed -or $result.workflow.cases.Count -lt 57) { throw "Unexpected map windows result: $calibration" }
     $reports += $result
 }
 @{ passed = $true; hardwareAccessed = $false; reports = $reports } | ConvertTo-Json -Depth 14 | Set-Content -LiteralPath (Join-Path $runRoot 'summary.json') -Encoding utf8

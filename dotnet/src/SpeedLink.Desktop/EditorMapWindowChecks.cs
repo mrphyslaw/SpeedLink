@@ -173,6 +173,12 @@ public partial class EditorWorkspace
         Check(scalarSlot.Window == scalarWindow && scalarWindow.IsVisible, "Native window close preserves and blocks invalid input");
         floatingScalar.ScalarCancel_Click(floatingScalar, new()); scalarWindow.Close(); await Idle();
         Check(!mapSlots.Contains(scalarSlot) && ReferenceEquals(document, doc), "Native window close removes only the view");
+        ClearMapWindows(); MapTabs.Items.Clear(); OpenMap(maps[0]);
+        var remaining = OpenMap(maps[1]); remaining.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        var remainingWindow = mapSlots.Single(s => ReferenceEquals(s.Editor, remaining)).Window;
+        CloseMap(this); await Idle();
+        Check(remainingWindow is { IsVisible: true } && mapSlots.Any(s => ReferenceEquals(s.Editor, remaining) && s.Window == remainingWindow), "Closing the final docked map leaves detached maps in place");
+        Check(NoMapPanel.IsVisible && MapWorkspace.IsVisible && document == doc, "An empty dock keeps its browse prompt while maps float");
         if (calibration == "L38KEH000") await CaptureMapWindowGallery(folder);
         ClearMapWindows(); MapTabs.Items.Clear(); await Idle();
         Check(NoMapPanel.IsVisible && document == doc, "Closing all maps retains ROM and browse prompt");

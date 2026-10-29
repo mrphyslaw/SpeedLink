@@ -9,7 +9,7 @@
   dividers, expand/restore, native detachable windows, shared edits and undo,
   invalid pending input, grid/curve/state/scalar controls, close/dock cycles,
   workspace navigation and fresh-window restoration of maps, zoom and selection.
-  Each profile requires 55 assertions, including visible data at the native
+  Each profile requires 57 assertions, including visible data at the native
   window's minimum size and global commands following the active map.
 - The existing editor, logger, backup, recording, diagnostic, crash and standalone
   checks remain required. Every supported ROM also passes mandatory save-integrity

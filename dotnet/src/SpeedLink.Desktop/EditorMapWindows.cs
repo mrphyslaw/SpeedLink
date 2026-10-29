@@ -154,7 +154,8 @@ public partial class EditorWorkspace
             // keyboard focus and could discard an unfinished cell edit.
             foreach (var splitter in mapDock.Children.OfType<GridSplitter>().ToArray()) mapDock.Children.Remove(splitter);
             mapDock.ColumnDefinitions.Clear(); mapDock.RowDefinitions.Clear();
-            var docked = mapSlots.Where(s => s.Window is null && (s.Editor.table is not null || mapSlots.Count == 1)).ToArray();
+            bool emptyDock = !mapSlots.Any(s => s.Window is null && s.Editor.table is not null);
+            var docked = mapSlots.Where(s => s.Window is null && (s.Editor.table is not null || emptyDock && ReferenceEquals(s.Editor, this))).ToArray();
             var visible = expandedMap is not null ? docked.Where(s => ReferenceEquals(s, expandedMap)).ToArray() : docked;
             foreach (var slot in mapSlots.Where(s => s.Window is null)) slot.Frame.Visibility = visible.Contains(slot) ? Visibility.Visible : Visibility.Collapsed;
             int columns = visible.Length <= 1 || mapDockScroll.ActualWidth is > 0 and < 540 ? 1 : dockColumns;
@@ -290,7 +291,7 @@ public partial class EditorWorkspace
         var slot = mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor, editor)); if (slot is null) return true;
         if (ReferenceEquals(editor, this))
         {
-            var next = mapSlots.FirstOrDefault(s => !ReferenceEquals(s.Editor, this));
+            var next = mapSlots.FirstOrDefault(s => !ReferenceEquals(s.Editor, this) && s.Window is null);
             if (next is not null)
             {
                 if (!next.Editor.FinishEdit()) return false;
