@@ -7,16 +7,30 @@ L3CGEE000 profile has separate [integrity checks and validation limits](../GEN2.
 
 ## Room for the map
 
+![Two resizable map panes over one ROM](images/map-windows.png)
+
+Open related maps together, drag dividers to resize them, and use **Expand** to
+focus on one without closing the others. **Undock** gives a map its own Windows
+window, including editing controls, for another monitor. Each map retains its own
+selection, text zoom and graph view. All panes share the same ROM and undo history.
+The multi-map screenshot uses synthetic values, not vehicle tuning advice.
+
+![A detached resizable map with its editing controls](images/detached-map.png)
+
+Drag a map's title out of the workspace, or choose **Undock**. Drag it back over
+the editor or choose **Dock** to return it. The native window's close button
+closes that view while keeping its ROM edits.
+
 ![A complete synthetic 16×16 map with both axes visible](images/fit-map.png)
 
-**Fit map** (Ctrl+0) gives the table the available workspace. A full 16×16 map
-and both axes fit without table scrollbars at 1024×700 and 1280×720 logical
-window sizes with app navigation collapsed. Larger maps retain scrolling.
+**Fit map** (Ctrl+0) gives the active map the available workspace. Auto fit adjusts
+cell spacing without shrinking text. Measured cell minimums keep values readable;
+tables scroll when the whole map cannot fit. **− / +** sets a deliberate text size.
 The ☰ button expands or collapses navigation; Ctrl+B hides or restores the
 map browser. Use **View** for layout options and floating panels.
 
 Axis names sit directly above the column breakpoints and beside the row
-breakpoints, with value units beside the map tabs. The labels stay visible while
+breakpoints, with value units in each map pane. The labels stay visible while
 scrolling. Selecting cells highlights their row and column headers.
 
 The 16×16 and MAF examples use synthetic layout/curve fixtures. The 16×16
@@ -28,7 +42,7 @@ These are interface examples, not tuning advice.
 
 ![A 129-point MAF calibration with a voltage/value list beside its curve](images/curve-editor.png)
 
-Search or browse the map list, keep related maps in separate tabs, and edit
+Search or browse the map list, keep related maps in visible panes, and edit
 numeric cells directly. Curves use the definition's physical axis values.
 Long MAF curves use a voltage/value list beside the graph. Click any point to
 reach its value, use the wheel to zoom, and Shift+drag to pan. Static breakpoints
@@ -59,8 +73,8 @@ Multi-state controls retain their labeled rows without an empty graph.
 ![Intake cam advance table with a compact 3D preview at the upper-right](images/table-preview.png)
 
 **Table with 3D preview** places the surface at the upper-right of the grid,
-keeping the table's full height. **Fit map** retains this preview while a full
-16×16 grid fits at both tested sizes. The graph stays on the right, like the
+keeping the table's full height. Small panes temporarily omit the preview to
+prioritize the table; expanding restores it. The graph stays on the right, like the
 MAF editor. Its controls and linked cell selection work the same way.
 
 Drag the divider at the table's right edge to give the grid or preview more room.
@@ -86,9 +100,9 @@ when you come back. The graph stays hidden until a graphable map is selected.
 
 ![Map information in a separate window](images/details-editor.png)
 
-Click **Map info** beside the map tabs, or press **F1**, to open help without
-reducing the map's height. Reusing either control brings the same window forward;
-it follows the active map when you switch tabs. **View → Map information…**
+Click **Map info** inside a map pane, or press **F1**, to open help without
+reducing the map's height. Reusing the control brings that map's help forward.
+**View → Map information…**
 remains available too. Map info is disabled until a map is selected.
 Value units and input axes stay visible above the explanation. Help distinguishes
 targets and thresholds from multipliers and signed corrections, with simple
@@ -106,8 +120,8 @@ table-only and graph-only views. The browser can also pop into a separate
 window. Layout preferences are remembered. Open maps and unsaved edits remain
 in place when switching to Logger or Recordings.
 
-Tabs scroll horizontally and keep the active map visible. Use the mouse wheel
-over the tab strip to reach other open maps. Closing a tab keeps the ROM edits.
+Drag map dividers to change widths and heights. Close a pane with **×**, or close
+a detached window, to remove that view while keeping the shared ROM edits.
 For step-by-step controls and shortcuts, open **File → Editor guide** in the app
 or use the [full editor guide](../EDITOR.md).
 

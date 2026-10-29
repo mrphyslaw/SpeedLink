@@ -33,15 +33,20 @@ public partial class EditorWorkspace
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateTableSizing(); UpdateLayout();
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
             var scroll = Descendants(MapGrid).OfType<ScrollViewer>().First();
+            bool wholeMapVisible = scroll.ScrollableWidth <= .5 && scroll.ScrollableHeight <= .5;
+            // At narrow sizes, measured text wins over the old fixed 44px
+            // column assumption. Verify access rather than forcing smaller text.
+            MapGrid.ScrollIntoView(MapGrid.Items[15], MapGrid.Columns[15]);
+            await Settle();
             var last = MapGrid.Columns[15].GetCellContent(MapGrid.Items[15]) ?? throw new InvalidOperationException("Last table cell was virtualized.");
             var lastRect = last.TransformToAncestor(MapGrid).TransformBounds(new Rect(last.RenderSize));
-            if (scroll.ScrollableWidth > .5 || scroll.ScrollableHeight > .5 || lastRect.Right > MapGrid.ActualWidth + .5 || lastRect.Bottom > MapGrid.ActualHeight + .5 ||
-                MapGrid.FontSize < 12 || MapGrid.RowHeight < 22 || MapGrid.Columns.Any(c => c.ActualWidth < 44) || !XAxisText.IsVisible || !YAxisText.IsVisible || ViewMode != 4 || !GraphPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || GraphPanel.ActualHeight > 210 || GraphPanel.ActualWidth < 150)
+            if (lastRect.Right > MapGrid.ActualWidth + .5 || lastRect.Bottom > MapGrid.ActualHeight + .5 ||
+                MapGrid.FontSize != 13 || MapGrid.RowHeight < 23 || MapGrid.Columns.Any(c => c.ActualWidth < c.MinWidth - .5) || !XAxisText.IsVisible || !YAxisText.IsVisible || ViewMode != 4 || !GraphPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || GraphPanel.ActualHeight > 210 || GraphPanel.ActualWidth < 150 || size.Item1 >= 1280 && !wholeMapVisible)
                 throw new InvalidOperationException($"16×16 map does not fit at {size}: scroll {scroll.ScrollableWidth}/{scroll.ScrollableHeight}, grid {MapGrid.ActualWidth}/{MapGrid.ActualHeight}, last {lastRect}, columns {string.Join(',', MapGrid.Columns.Select(c => c.ActualWidth))}.");
             CheckMapHelpPlacement();
             CaptureHost(Path.Combine(folder, $"Fit16x16-{size.Item1:0}x{size.Item2:0}.png"));
             measurements.Add(new { windowWidth = size.Item1, windowHeight = size.Item2, actualWindowWidth = Window.GetWindow(this).ActualWidth, actualWindowHeight = Window.GetWindow(this).ActualHeight, gridWidth = MapGrid.ActualWidth, gridHeight = MapGrid.ActualHeight, rowHeight = MapGrid.RowHeight,
-                columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, lastCellVisible = true, previewWidth = GraphPanel.ActualWidth, previewHeight = GraphPanel.ActualHeight });
+                columnWidth = MapGrid.Columns[0].ActualWidth, horizontalScroll = scroll.ScrollableWidth, verticalScroll = scroll.ScrollableHeight, wholeMapVisible, lastCellVisible = true, previewWidth = GraphPanel.ActualWidth, previewHeight = GraphPanel.ActualHeight });
         }
         await CheckPreviewSplitter(folder, resize);
         await CheckTableAxes(sample);

@@ -26,7 +26,7 @@ public partial class EditorWorkspace : UserControl
     }
     private void Changes_Selected(object sender, SelectionChangedEventArgs e)
     {
-        if (ChangesList.SelectedItem is TuningTable changed) OpenTable(changed);
+        if (ChangesList.SelectedItem is TuningTable changed) Attempt(() => OpenMap(changed));
     }
     private readonly RomInspector inspector;
     private readonly TuningCodeGuard codeGuard;
@@ -38,20 +38,28 @@ public partial class EditorWorkspace : UserControl
     private bool refreshing, closingForTest;
     private TuningBaseline Baseline => (TuningBaseline)Math.Max(0, BaselineBox.SelectedIndex);
     public EditorWorkspace() : this(new(), new()) { }
-    internal EditorWorkspace(RomInspector inspector, TuningCodeGuard codeGuard)
+    internal EditorWorkspace(RomInspector inspector, TuningCodeGuard codeGuard, EditorWorkspace? mapOwner = null)
     {
         this.inspector = inspector; this.codeGuard = codeGuard;
-        UiTheme.Ensure(); InitializeComponent(); BaselineBox.ItemsSource = new[] { "Original ROM", "Last save", "Comparison ROM" }; BaselineBox.SelectedIndex = 0;
+        UiTheme.Ensure(); InitializeComponent(); InitializeMapWindows(mapOwner); BaselineBox.ItemsSource = new[] { "Original ROM", "Last save", "Comparison ROM" }; BaselineBox.SelectedIndex = 0;
         Graph.CellPicked += index => SelectCell(index); RefreshControls(); SetViewMode(4);
     }
     public void OpenRom(string path)
     {
         var opened = new RomEditor(File.ReadAllBytes(path), path, inspector, codeGuard, Definitions);
+        SaveMapWorkspace(); ClearMapWindows();
+        restoringMaps = true;
+        try
+        {
+        if (document is not null) document.Changed -= Document_Changed;
         document = opened; document.Changed += Document_Changed; table = null;
         MapTabs.Items.Clear(); BaselineBox.SelectedIndex = 0; SearchBox.Text = ""; ChangedOnly.IsChecked = false;
         FileText.Text = Path.GetFileName(path); FileText.ToolTip = path;
         RefreshBrowser(); RefreshTable(); RefreshControls();
         ShowMapBrowser();
+        }
+        finally { restoringMaps = false; }
+        RestoreMapWorkspace();
         EditorStatus.Text = "ROM loaded. Choose a map to edit. Static axes are read-only.";
     }
     private void Attempt(Action action)
@@ -66,13 +74,15 @@ public partial class EditorWorkspace : UserControl
     private bool MayReplace() => document?.IsDirty != true || MessageBox.Show(Window.GetWindow(this), "Discard unsaved changes? Saved copies and the original ROM are kept.", "Unsaved ROM edits", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
     private void Open_Click(object sender, RoutedEventArgs e)
     {
-        if (!FinishEdit() || !MayReplace()) return;
+        if (mapOwner is not null) { mapOwner.Open_Click(sender, e); return; }
+        if (!FinishAllMapEdits() || !MayReplace()) return;
         var dialog = new OpenFileDialog { Title = "Open ROM for editing", Filter = "ROM files|*.bin;*.rom|All files|*.*" };
         if (dialog.ShowDialog(Window.GetWindow(this)) == true) Attempt(() => OpenRom(dialog.FileName));
     }
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        if (document is null || !FinishEdit()) return;
+        if (mapOwner is not null) { mapOwner.Save_Click(sender, e); return; }
+        if (document is null || !FinishAllMapEdits()) return;
         string stem = Path.GetFileNameWithoutExtension(document.SourcePath) + "_edited";
         string folder = Path.GetDirectoryName(document.LastSavePath ?? document.SourcePath)!;
         string suggestion = stem + ".bin"; int revision = 2;
@@ -82,6 +92,7 @@ public partial class EditorWorkspace : UserControl
     }
     private void Compare_Click(object sender, RoutedEventArgs e)
     {
+        if (!ReferenceEquals(CommandMap, this)) { CommandMap.Compare_Click(sender, e); return; }
         if (document is null || !FinishEdit()) return;
         var dialog = new OpenFileDialog { Title = "Compare with the same ROM calibration", Filter = "ROM files|*.bin;*.rom|All files|*.*" };
         if (dialog.ShowDialog(Window.GetWindow(this)) == true) Attempt(() => { document.LoadComparison(File.ReadAllBytes(dialog.FileName), dialog.FileName); BaselineBox.SelectedIndex = 2; });
@@ -89,15 +100,20 @@ public partial class EditorWorkspace : UserControl
     private void Document_Changed(object? sender, EventArgs e)
     {
         if (refreshing) return;
-        RefreshControls(); RefreshTable(); RefreshBrowser();
+        string? draft = scalarDraft ? ScalarInput.Text : null;
+        RefreshControls();
+        if (!gridDraft) RefreshTable();
+        if (draft is not null) ScalarInput.Text = draft;
+        RefreshBrowser();
     }
     private void RefreshControls()
     {
         SaveButton.IsEnabled = document is not null; CompareButton.IsEnabled = document is not null;
         UndoButton.IsEnabled = document?.CanUndo == true; RedoButton.IsEnabled = document?.CanRedo == true;
         UndoButton.ToolTip = document?.UndoDescription; RedoButton.ToolTip = document?.RedoDescription;
-        EditTools.IsEnabled = table is not null && !table.IsChoice;
-        FitMapButton.IsEnabled = table is not null;
+        foreach (var control in new Control[] { OperandBox, SetMapButton, AddMapButton, MultiplyMapButton, InterpolationBox, InterpolateMapButton })
+            control.IsEnabled = table is not null && !table.IsChoice;
+        FitMapButton.IsEnabled = CommandMap.table is not null;
         NoMapPanel.Visibility = table is null ? Visibility.Visible : Visibility.Collapsed;
         NoMapTitle.Text = document is null ? "Open a ROM to begin" : "Choose a map to edit";
         NoMapText.Text = document is null ? "Choose a supported ROM to browse and edit its maps." :
@@ -106,6 +122,7 @@ public partial class EditorWorkspace : UserControl
         DetailsButton.IsEnabled = table is not null;
         if (table is null) DetailsButton.IsChecked = false;
         RefreshChanges();
+        RefreshMapControls();
         if (document is not null) ProfileText.Text = document.Definition.Calibration + " · " + document.Definition.Model + (document.IsDirty ? " · Unsaved changes" : " · Saved state");
     }
     private void RefreshBrowser()
@@ -129,7 +146,7 @@ public partial class EditorWorkspace : UserControl
     private void Baseline_Changed(object sender, SelectionChangedEventArgs e)
     {
         if (revertingBaseline) return;
-        if (scalarDraft && !CommitScalar())
+        if (!FinishEdit())
         {
             revertingBaseline = true;
             if (e.RemovedItems.Count > 0) BaselineBox.SelectedItem = e.RemovedItems[0];
@@ -141,7 +158,7 @@ public partial class EditorWorkspace : UserControl
     }
     private void Map_Selected(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        if (e.NewValue is TreeViewItem { Tag: TuningTable selected }) OpenTable(selected);
+        if (e.NewValue is TreeViewItem { Tag: TuningTable selected }) Attempt(() => OpenMap(selected));
     }
     internal void OpenTable(TuningTable selected)
     {
@@ -171,6 +188,7 @@ public partial class EditorWorkspace : UserControl
         if (CurveList && !wasCurve) SetViewMode(1);
         else if (wasCurve && !CurveList) SetViewMode(table?.Rows > 1 ? 4 : 0);
         RefreshTable(); RefreshControls(); ApplyView();
+        QueueMapSave();
         Dispatcher.BeginInvoke(new Action(() => { if (MapTabs.SelectedItem is TabItem active) { active.UpdateLayout(); active.BringIntoView(); } }));
     }
     private void MapTabs_Wheel(object sender, MouseWheelEventArgs e)
@@ -184,6 +202,7 @@ public partial class EditorWorkspace : UserControl
     private void RefreshTable()
     {
         if (MapGrid is null || refreshing) return;
+        measuredCellWidth = double.NaN;
         refreshing = true;
         try
         {
@@ -249,17 +268,19 @@ public partial class EditorWorkspace : UserControl
     }
     private void Grid_PreparingEdit(object sender, DataGridPreparingCellForEditEventArgs e)
     {
+        gridDraft = true;
         if (document is not null && table is not null && e.Row.Item is EditorRow row && e.EditingElement is TextBox input)
         { input.Text = document.Read(table, NativeIndex(row, e.Column.DisplayIndex)).ToString("R", CultureInfo.InvariantCulture); input.SelectAll(); }
     }
     private void Grid_EditEnding(object sender, DataGridCellEditEndingEventArgs e)
     {
+        if (e.EditAction == DataGridEditAction.Cancel) { gridDraft = false; return; }
         if (refreshing || document is null || table is null || e.EditAction != DataGridEditAction.Commit || e.EditingElement is not TextBox input) return;
         var row = (EditorRow)e.Row.Item; var selected = table; int index = NativeIndex(row, e.Column.DisplayIndex);
         if (!double.TryParse(input.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double value) || !double.IsFinite(value)) { e.Cancel = true; EditorStatus.Text = "Enter a finite numeric value using a decimal point."; return; }
         try { refreshing = true; document.Apply([new(selected, index, value)], "Edit " + selected.Name); }
         catch (ArgumentException error) { e.Cancel = true; EditorStatus.Text = error.Message; }
-        finally { refreshing = false; }
+        finally { refreshing = false; if (!e.Cancel) gridDraft = false; }
         Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ContextIdle, new Action(() => { RefreshTable(); RefreshBrowser(); RefreshControls(); }));
     }
     private void Choice_Changed(object sender, SelectionChangedEventArgs e)
@@ -269,6 +290,7 @@ public partial class EditorWorkspace : UserControl
     private void Grid_SelectionChanged(object sender, SelectedCellsChangedEventArgs e)
     {
         if (refreshing) return; UpdateSelectedAxes(); UpdateCellText(); Graph.Select(SelectedIndices().FirstOrDefault(-1));
+        QueueMapSave();
         if (table?.IsChoice == true && document is not null)
         {
             refreshing = true; double value = document.Read(table, SelectedIndices().FirstOrDefault(0)); ChoiceBox.SelectedItem = ChoiceBox.Items.Cast<TuningState>().FirstOrDefault(s => s.Value == value); refreshing = false;
@@ -298,7 +320,7 @@ public partial class EditorWorkspace : UserControl
     }
     private void Transform(TuningOperation operation)
     {
-        if (document is null || table is null) return;
+        if (document is null || table is null || !FinishEdit()) return;
         Attempt(() => { if (!double.TryParse(OperandBox.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out double operand)) throw new ArgumentException("Enter a numeric amount."); var selected = SelectedIndices(); if (selected.Length == 0) throw new InvalidOperationException("Select cells first."); document.Transform(table, selected, operation, operand); });
     }
     private void Set_Click(object sender, RoutedEventArgs e) => Transform(TuningOperation.Set);
@@ -306,6 +328,7 @@ public partial class EditorWorkspace : UserControl
     private void Multiply_Click(object sender, RoutedEventArgs e) => Transform(TuningOperation.Multiply);
     private void Copy_Click(object sender, RoutedEventArgs e)
     {
+        if (!ReferenceEquals(CommandMap, this)) { CommandMap.Copy_Click(sender, e); return; }
         if (document is null || table is null) return; Attempt(() =>
         {
             if (CurveList) Clipboard.SetText(string.Join('\n', SelectedIndices().Select(i => table.X.Values[i].ToString("R", CultureInfo.InvariantCulture) + "\t" + document.Read(table, i).ToString("R", CultureInfo.InvariantCulture))));
@@ -315,15 +338,16 @@ public partial class EditorWorkspace : UserControl
     }
     private void Paste_Click(object sender, RoutedEventArgs e)
     {
+        if (!ReferenceEquals(CommandMap, this)) { CommandMap.Paste_Click(sender, e); return; }
         if (document is null || table is null) return; Attempt(() => { var r = Rectangle(); if (CurveList) document.PasteCurve(table, r.Left, Clipboard.GetText()); else document.Paste(table, r.Top, r.Left, Clipboard.GetText()); });
     }
     private void Interpolate_Click(object sender, RoutedEventArgs e)
     {
         if (document is null || table is null) return; Attempt(() => { var r = Rectangle(); document.Interpolate(table, r.Left, r.Top, r.Right, r.Bottom, CurveList ? "Horizontal" : ((ComboBoxItem)InterpolationBox.SelectedItem).Content.ToString()!); });
     }
-    private void Reset_Click(object sender, RoutedEventArgs e) { if (document is not null && table is not null) { RefreshScalar(); Attempt(() => document.Reset(table, SelectedIndices(), Baseline)); } }
-    private void Undo_Click(object sender, RoutedEventArgs e) { MapGrid.CancelEdit(); RefreshScalar(); document?.Undo(); }
-    private void Redo_Click(object sender, RoutedEventArgs e) { MapGrid.CancelEdit(); RefreshScalar(); document?.Redo(); }
+    private void Reset_Click(object sender, RoutedEventArgs e) { if (!ReferenceEquals(CommandMap, this)) { CommandMap.Reset_Click(sender, e); return; } if (document is not null && table is not null) { RefreshScalar(); Attempt(() => document.Reset(table, SelectedIndices(), Baseline)); } }
+    private void Undo_Click(object sender, RoutedEventArgs e) { if (!ReferenceEquals(CommandMap, this)) { CommandMap.Undo_Click(sender, e); return; } MapGrid.CancelEdit(); RefreshScalar(); document?.Undo(); }
+    private void Redo_Click(object sender, RoutedEventArgs e) { if (!ReferenceEquals(CommandMap, this)) { CommandMap.Redo_Click(sender, e); return; } MapGrid.CancelEdit(); RefreshScalar(); document?.Redo(); }
     private void ResetView_Click(object sender, RoutedEventArgs e) => Graph.ResetView();
     private void Guide_Click(object sender, RoutedEventArgs e)
     {
@@ -332,6 +356,7 @@ public partial class EditorWorkspace : UserControl
     }
     private void Editor_KeyDown(object sender, KeyEventArgs e)
     {
+        if (!ReferenceEquals(CommandMap, this) && e.Key is not (Key.S or Key.O or Key.B)) { CommandMap.Editor_KeyDown(sender, e); return; }
         if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
         {
             if (table is not null) { ShowMapInformation(); e.Handled = true; }
@@ -341,7 +366,7 @@ public partial class EditorWorkspace : UserControl
         bool editingText = Keyboard.FocusedElement is TextBox;
         if (e.Key == Key.S) Save_Click(sender, e);
         else if (e.Key == Key.O) Open_Click(sender, e);
-        else if (!editingText && e.Key == Key.B) FocusButton.IsChecked = !FocusButton.IsChecked;
+        else if (!editingText && e.Key == Key.B) MapRoot.FocusButton.IsChecked = !MapRoot.FocusButton.IsChecked;
         else if (!editingText && e.Key is Key.D0 or Key.NumPad0) FitMap_Click(sender, e);
         else if (!editingText && e.Key == Key.Z) Undo_Click(sender, e);
         else if (!editingText && e.Key == Key.Y) Redo_Click(sender, e);
@@ -349,7 +374,7 @@ public partial class EditorWorkspace : UserControl
         else if (!editingText && e.Key == Key.V) Paste_Click(sender, e);
         else return; e.Handled = true;
     }
-    internal bool MayClose() => closingForTest || (FinishEdit() && MayReplace());
+    internal bool MayClose() => closingForTest || (FinishAllMapEdits() && MayReplace());
     internal void CloseOfflineTest() => closingForTest = true;
     internal async Task<object> ExerciseOffline(string path, string folder, Action? switchWorkspaces = null)
     {

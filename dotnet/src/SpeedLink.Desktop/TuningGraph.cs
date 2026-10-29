@@ -55,6 +55,12 @@ public sealed partial class TuningGraph : Grid
     internal void ZoomCurve(double factor) => curve.Zoom(curve.ActualWidth / 2, factor);
     internal void PickCurvePoint(int index) { int nearest = curve.Nearest(curve.PixelAt(index)); if (nearest >= 0) CellPicked?.Invoke(nearest); }
     public void ResetView() { yaw = 40; elevation = 32; distance = 5; curve.ResetView(); Render(); }
+    internal MapPanePreferences CaptureView(MapPanePreferences state) => state with { Yaw = yaw, Elevation = elevation, Distance = distance, CurveStart = curve.Start, CurveEnd = curve.End };
+    internal void RestoreView(MapPanePreferences state)
+    {
+        yaw = state.Yaw; elevation = state.Elevation; distance = state.Distance;
+        curve.RestoreRange(state.CurveStart, state.CurveEnd); Render();
+    }
     private void Camera()
     {
         if (surface?.Geometry is not MeshGeometry3D mesh || mesh.Positions.Count == 0) return;
@@ -177,6 +183,9 @@ internal sealed class CurvePlot : FrameworkElement
     public int Selected { get; set; } = -1;
     private double start, end = 1;
     internal double VisibleFraction => end - start;
+    internal double Start => start;
+    internal double End => end;
+    internal void RestoreRange(double left, double right) => Range(left, Math.Max(.02, right - left));
     public void ResetView() { start = 0; end = 1; InvalidateVisual(); }
     private void Range(double left, double width)
     { width = Math.Clamp(width, .02, 1); start = Math.Clamp(left, 0, 1 - width); end = start + width; InvalidateVisual(); }
