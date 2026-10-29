@@ -48,6 +48,20 @@ public sealed class MapWorkspaceTests
         var json = File.ReadAllText(path); Assert.DoesNotContain("SourcePath", json); Assert.DoesNotContain("ROM bytes", json);
     }
     [Fact]
+    public void Scalar_card_widths_are_bounded_and_restore_without_changing_legacy_layouts()
+    {
+        using var temp = new TempFolder(); string path = Path.Combine(temp.Path, "maps.json");
+        File.WriteAllText(path, "[{\"Calibration\":\"L38KEH000\",\"Columns\":2,\"ColumnFraction\":0.65}]");
+        var legacy = MapWorkspacePreferences.Load(path).Single();
+        Assert.Empty(legacy.ScalarColumnWidths); Assert.Equal(.65, legacy.ColumnFraction);
+        var settings = legacy with { ScalarColumnWidths = [250, 350, 300] };
+        MapWorkspacePreferences.Save(path, [settings]);
+        Assert.Equal(new[] { 250d, 350d, 300d }, MapWorkspacePreferences.Load(path).Single().ScalarColumnWidths);
+        var invalid = (settings with { ScalarColumnWidths = [double.NaN, double.PositiveInfinity, -1, 99999, 300, 300, 300] }).Validate();
+        Assert.Equal(new[] { 300d, 300d, 220d, 800d, 300d, 300d }, invalid.ScalarColumnWidths);
+        Assert.Empty((settings with { ScalarColumnWidths = null! }).Validate().ScalarColumnWidths);
+    }
+    [Fact]
     public void Invalid_and_oversized_workspace_settings_recover_and_are_bounded()
     {
         using var temp = new TempFolder(); string path = Path.Combine(temp.Path, "maps.json");

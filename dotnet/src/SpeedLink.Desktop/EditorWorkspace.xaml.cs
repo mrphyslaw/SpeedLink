@@ -48,6 +48,7 @@ public partial class EditorWorkspace : UserControl
     {
         var opened = new RomEditor(File.ReadAllBytes(path), path, inspector, codeGuard, Definitions);
         SaveMapWorkspace(); ClearMapWindows();
+        scalarColumnWidths = [];
         restoringMaps = true;
         try
         {

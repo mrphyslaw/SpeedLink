@@ -49,6 +49,7 @@ public sealed record MapWorkspacePreferences
     public double ColumnFraction { get; init; } = .5;
     public double RowFraction { get; init; } = .5;
     public double[] RowWeights { get; init; } = [];
+    public double[] ScalarColumnWidths { get; init; } = [];
     public MapWorkspacePreferences Validate() => this with
     {
         Calibration = Calibration is { Length: > 0 and <= 32 } && Calibration.All(char.IsAsciiLetterOrDigit) ? Calibration : "",
@@ -56,7 +57,8 @@ public sealed record MapWorkspacePreferences
         Active = Active is { Length: <= 320 } ? Active : "", Columns = Math.Clamp(Columns, 1, 2),
         ColumnFraction = double.IsFinite(ColumnFraction) ? Math.Clamp(ColumnFraction, .2, .8) : .5,
         RowFraction = double.IsFinite(RowFraction) ? Math.Clamp(RowFraction, .2, .8) : .5,
-        RowWeights = (RowWeights ?? []).Take(24).Select(v => double.IsFinite(v) ? Math.Clamp(v, .01, 1) : 1).ToArray()
+        RowWeights = (RowWeights ?? []).Take(24).Select(v => double.IsFinite(v) ? Math.Clamp(v, .01, 1) : 1).ToArray(),
+        ScalarColumnWidths = (ScalarColumnWidths ?? []).Take(6).Select(v => double.IsFinite(v) ? Math.Clamp(v, 220, 800) : 300).ToArray()
     };
     public static MapWorkspacePreferences[] Load(string path)
     {

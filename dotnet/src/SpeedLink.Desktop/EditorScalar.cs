@@ -23,17 +23,19 @@ public partial class EditorWorkspace
             ScalarInput.ToolTip = "Stored value: " + value.ToString("R", CultureInfo.InvariantCulture) + " " + table.Units;
             ScalarInput.Visibility = table.IsChoice ? Visibility.Collapsed : Visibility.Visible;
             ScalarChoice.Visibility = table.IsChoice ? Visibility.Visible : Visibility.Collapsed;
-            ScalarActions.Visibility = table.IsChoice ? Visibility.Collapsed : Visibility.Visible;
+            ScalarActions.Visibility = Visibility.Collapsed;
             ScalarChoice.ItemsSource = ChoiceBox.ItemsSource;
             ScalarChoice.SelectedItem = ChoiceBox.SelectedItem;
             string State(double number) => table.IsChoice && ScalarChoice.ItemsSource is IEnumerable<TuningState> states
                 ? states.FirstOrDefault(s => s.Value == number)?.Name ?? number.ToString("G10", CultureInfo.InvariantCulture)
                 : table.Compact(number) + " " + table.Units;
-            ScalarReference.Text = "Baseline: " + State(reference);
+            ScalarReference.Text = State(reference);
             ScalarReference.ToolTip = reference.ToString("R", CultureInfo.InvariantCulture) + " " + table.Units;
             bool changed = document.CellChanged(table, 0, Baseline);
-            ScalarDifference.Text = !changed ? "Unchanged from baseline" : table.IsChoice ? "Changed to " + State(value)
-                : "Change: " + (delta > 0 ? "+" : "") + table.Compact(delta) + " " + table.Units;
+            ScalarDifference.Text = !changed ? "Unchanged" : table.IsChoice ? "Changed"
+                : "Δ " + (delta > 0 ? "+" : "") + table.Compact(delta) + " " + table.Units;
+            ScalarDifference.ToolTip = "Difference from the selected baseline";
+            ScalarDifference.Visibility = Visibility.Visible;
             ScalarDifference.Foreground = changed ? UiTheme.Amber : UiTheme.Muted;
             ScalarError.Visibility = Visibility.Collapsed; scalarDraft = false;
             ScalarApply.IsEnabled = ScalarCancel.IsEnabled = false;
@@ -51,6 +53,7 @@ public partial class EditorWorkspace
     {
         if (updatingScalar || refreshing || !ScalarMap) return;
         scalarDraft = true; ScalarApply.IsEnabled = ScalarCancel.IsEnabled = true;
+        ScalarActions.Visibility = Visibility.Visible; ScalarDifference.Visibility = Visibility.Collapsed;
         ScalarError.Visibility = Visibility.Collapsed;
     }
     private bool CommitScalar()

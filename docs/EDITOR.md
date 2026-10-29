@@ -32,11 +32,15 @@ calibration name alone does not establish support for a changed program layout.
 
 ### Single values, such as rev limits
 
-The compact pane shows the name once, with its value, units, baseline and change.
+Single values use small cards, normally about 300 pixels wide, with standard-sized
+number fields. Cards wrap across the available width; opening the browser can
+reduce the number of columns. Drag dividers to resize them. The name appears
+once, with its value, units, baseline and change.
 Use the **ⓘ** button beside the pane title, or F1, for its full explanation.
 Click the numeric field, type the value in the displayed units, then choose
-**Apply** or press Enter. **Cancel** or Escape discards the typed value.
-**Reset** restores the selected reference value.
+**Apply** or press Enter. Apply/Cancel buttons appear only while typing.
+**Cancel** or Escape discards the typed value. The **↶** button beside the
+baseline restores that reference value.
 
 Focusing the field shows full stored precision. Accepting the value unchanged
 preserves its bytes. A valid pending value is applied when saving or switching

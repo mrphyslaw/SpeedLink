@@ -9,10 +9,13 @@
   undo, redo, save with mandatory integrity, open a supported calibration-only
   edited file, and reopen the original. Unexpected programming exceptions still
   propagate to fatal crash reporting.
-- Nine map-window workflows require all controls in five simultaneous scalar/state
-  panes to be visible without internal scrolling at 1280×850 and 1024×768. They
-  also exercise full Map info, Apply, Reset, invalid input, Cancel and named-state
-  undo. Small controls no longer repeat the title or full description.
+- Nine map-window workflows require five simultaneous value/state cards to fit
+  without internal scrolling at 1280×850 and 1024×768. Default cards are at most
+  302 pixels wide and rows at most 150 pixels high; inputs use standard 13-DIP
+  text. Tests exercise wrapping when the browser opens, row/column resizing,
+  calibration-bound size restoration, full Map info, conditional Apply/Cancel,
+  invalid input and named-state undo. Core coverage bounds saved card widths and
+  verifies compatibility with layouts saved before card support.
 - These checks use synthetic fixtures and no adapter or vehicle. Program-layout
   protections, mandatory ROM-save integrity and disabled ECU programming remain.
 

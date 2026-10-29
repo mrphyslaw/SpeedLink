@@ -53,10 +53,13 @@ and paste retain full precision. Axis names and units label the list's two colum
 
 ![Five compact value and state panes visible together](images/single-values.png)
 
-Single-value maps show their title once, a numeric field with units beside it,
-and compact baseline and change controls below. Full help is available from the
+Single-value maps use small wrapping cards, normally about 300 pixels wide,
+with standard-size number fields and a single baseline row. Resize the card
+columns or rows with their dividers; sizes are restored for that calibration.
+Full help is available from the
 **ⓘ** button beside the title or F1. Type a value and choose **Apply**
-or press Enter. Escape or **Cancel** discards the typed value. **Reset**
+or press Enter. Apply/Cancel appear only while typing. Escape or **Cancel**
+discards the typed value. The **↶** button beside the baseline
 restores the chosen Original ROM, Last save or Comparison ROM value. Undo/Redo
 work on applied changes. The field exposes full stored precision when focused.
 Invalid or unencodable input stays visible and blocks saving or switching maps

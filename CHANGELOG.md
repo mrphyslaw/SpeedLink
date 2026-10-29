@@ -3,8 +3,9 @@
 ## 0.7.0-alpha.2
 
 - Handle unsupported, unknown, incomplete and invalid ROM files as recoverable editor errors. Keep the current ROM, unsaved edits, undo history and docked/detached maps intact after rejection; supported files can still be opened afterward. Program-layout and checksum protections remain enforced.
-- Give single-value maps and named states a compact editor. Show the title once, keep full help behind the information button, and group the value, units, Apply/Cancel, baseline and Reset controls without a padded inner card. Scalar-only tile rows use a smaller minimum height.
-- Require nine-profile desktop regressions for file rejection and recovery, five simultaneous scalar panes at two window sizes, full help access, invalid input and shared edits. Retain all-profile save-integrity and existing editor regression checks.
+- Show single values and named states in small cards that wrap across the workspace, normally about 300 pixels wide. Use standard-size text and number fields, one baseline row, compact window commands, and Apply/Cancel only while typing. Keep full help behind the information button. Card widths, heights and popout sizes remain resizable and restorable.
+- Label boost correction modes as Engine load and Boost pressure, with help explaining the target-versus-actual difference. Stored mode values are unchanged.
+- Require nine-profile desktop regressions for file rejection and recovery, five simultaneous cards at two window sizes, browser-driven wrapping, width/height resizing, saved-size restoration, full help access, invalid input and shared edits. Retain all-profile save-integrity and existing editor regression checks.
 
 ## 0.7.0-alpha.1
 
