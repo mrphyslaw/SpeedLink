@@ -70,6 +70,12 @@ internal static class Program
         if (args.Contains("--map-windows-offline", StringComparer.Ordinal) || args.Contains("--editor-offline", StringComparer.Ordinal) || args.Contains("--workbench-offline", StringComparer.Ordinal) || args.Contains("--definitions-offline", StringComparer.Ordinal) || args.Contains("--layout-offline", StringComparer.Ordinal) || args.Contains("--reliability-offline", StringComparer.Ordinal))
         {
             var editorApp = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int resultCode = 1;
+            editorApp.DispatcherUnhandledException += (_, failure) =>
+            {
+                File.WriteAllText(Get("--report"), JsonSerializer.Serialize(new { passed = false, fatalUiException = true, error = failure.Exception.ToString() }));
+                failure.Handled = true;
+                editorApp.Shutdown(1);
+            };
             editorApp.Startup += async (_, _) =>
             {
                 EditorWindow? window = null; MainWindow? workbench = null;

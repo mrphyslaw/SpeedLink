@@ -40,6 +40,7 @@ jobs:
       - run: ./tools/Test-SupportUi.ps1 -Output TestResults/SupportUi
       - run: ./tools/Test-ReadProgressUi.ps1 -Output TestResults/ReadProgressUi
       - run: ./tools/Test-MenuUi.ps1 -Output TestResults/MenuUi
+      - run: ./tools/Test-MapWindowsUi.ps1 -Output TestResults/MapWindowsUi
       - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
       - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi
       - run: ./tools/Test-ReplayUi.ps1 -Output TestResults/ReplayUi
@@ -47,7 +48,6 @@ jobs:
       - run: ./tools/Test-WorkbenchUi.ps1 -Output TestResults/WorkbenchUi
       - run: ./tools/Test-DefinitionImportUi.ps1 -Output TestResults/DefinitionImportUi
       - run: ./tools/Test-ReliabilityUi.ps1 -Output TestResults/ReliabilityUi
-      - run: ./tools/Test-MapWindowsUi.ps1 -Output TestResults/MapWindowsUi
       - run: ./tools/Test-BenchDiagnostics.ps1 -Output TestResults/BenchDiagnostics
       - name: Check developer ECU peer parser
         run: |

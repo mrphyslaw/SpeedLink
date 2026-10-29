@@ -13,7 +13,12 @@ public partial class EditorWorkspace
     internal async Task<object> ExerciseMapWindows(string folder)
     {
         var cases = new List<string>();
-        void Check(bool condition, string name) { if (!condition) throw new InvalidOperationException(name); cases.Add(name); }
+        void Check(bool condition, string name)
+        {
+            if (!condition) throw new InvalidOperationException(name);
+            cases.Add(name);
+            File.WriteAllText(Path.Combine(folder, "MapWindowProgress.json"), System.Text.Json.JsonSerializer.Serialize(new { cases }));
+        }
         async Task Idle() { await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle); UpdateLayout(); }
         var doc = document!; byte[] original = doc.Snapshot();
         var maps = doc.Definition.Tables.Where(t => t.Rows > 1 && t.Columns > 1 && !t.IsChoice).Take(4).ToArray();

@@ -10,9 +10,12 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
     $folder = Join-Path $runRoot $calibration
     New-Item -ItemType Directory -Path $folder -Force | Out-Null
     $report = Join-Path $folder 'report.json'
-    $process = Start-Process -FilePath $harness -ArgumentList @('--map-windows-offline','--calibration',$calibration,'--output',('"' + $folder + '"'),'--report',('"' + $report + '"')) -WindowStyle Hidden -PassThru
+    $stderr = Join-Path $folder 'stderr.log'
+    $process = Start-Process -FilePath $harness -ArgumentList @('--map-windows-offline','--calibration',$calibration,'--output',('"' + $folder + '"'),'--report',('"' + $report + '"')) -WindowStyle Hidden -RedirectStandardError $stderr -PassThru
     if (-not $process.WaitForExit(60000)) { $process.Kill(); throw "Map window UI timed out: $calibration" }
     if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $report)) {
+        Write-Output ("Map window harness exit code: " + $process.ExitCode)
+        if (Test-Path -LiteralPath $stderr) { Get-Content -LiteralPath $stderr -Tail 80 | Write-Output }
         if (Test-Path -LiteralPath $report) { Get-Content -LiteralPath $report -Raw | Write-Output }
         throw "Map window UI failed: $calibration; see $report"
     }
