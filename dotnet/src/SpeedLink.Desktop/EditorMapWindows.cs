@@ -279,7 +279,15 @@ public partial class EditorWorkspace
             {
                 expandedMap = null;
                 if (!slot.DockOnClose) { RemoveMapSlot(slot); activeMap = mapSlots.Select(s => s.Editor).FirstOrDefault(p => p.table is not null) ?? this; activeMap.ActivateMap(); }
-                slot.DockOnClose = false; ArrangeMaps(); if (mapSlots.Contains(slot)) editor.ActivateMap(); QueueMapSave();
+                slot.DockOnClose = false;
+                // Leave the visuals disconnected until input teardown dismisses
+                // tooltip owners from the old native window. Reparenting inside
+                // Closed can leave a popup referring to its destroyed handle.
+                Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+                {
+                    if (layoutClosing || disposingMaps || !mapSlots.Contains(slot) || slot.Window is not null) return;
+                    ArrangeMaps(); editor.ActivateMap(); QueueMapSave();
+                }));
             }
         };
         expandedMap = null; ArrangeMaps(); editor.ActivateMap(); window.Show(); QueueMapSave();
