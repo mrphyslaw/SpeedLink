@@ -26,19 +26,24 @@ choose **Help** and select **Editor**. **Map info** inside a map pane, or
 4. Choose **Save copy…** or press Ctrl+S. Pick a new filename. Every export
    applies its mandatory checksum/integrity policy and verifies the written bytes.
 
+An unsupported, unknown, incomplete or invalid ROM shows an error and leaves the
+current workspace intact. Dismiss the message and choose another file. A matching
+calibration name alone does not establish support for a changed program layout.
+
 ### Single values, such as rev limits
 
-The value card groups the name, explanation, units, baseline and change.
+The compact pane shows the name once, with its value, units, baseline and change.
+Use the **ⓘ** button beside the pane title, or F1, for its full explanation.
 Click the numeric field, type the value in the displayed units, then choose
-**Apply value** or press Enter. **Cancel** or Escape discards the typed value.
-**Reset to baseline** restores the selected reference value.
+**Apply** or press Enter. **Cancel** or Escape discards the typed value.
+**Reset** restores the selected reference value.
 
 Focusing the field shows full stored precision. Accepting the value unchanged
 preserves its bytes. A valid pending value is applied when saving or switching
 maps. Invalid or unencodable input stays visible and prevents saving, switching
 maps or changing the baseline until corrected or canceled.
 
-Single-state controls use a named selector in the same card. Choosing a state
+Single-state controls use a named selector in the same compact layout. Choosing a state
 applies it immediately. These controls do not need a grid or graph.
 
 ### Tables and short curves

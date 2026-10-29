@@ -51,11 +51,12 @@ and paste retain full precision. Axis names and units label the list's two colum
 
 ## Single values and small maps
 
-![A rev-limit value with RPM units, explanation and baseline together](images/single-value.png)
+![Five compact value and state panes visible together](images/single-values.png)
 
-Single-value maps use a numeric field with units beside it, an explanation above,
-and the comparison value and change below. Type a value and choose **Apply value**
-or press Enter. Escape or **Cancel** discards the typed value. **Reset to baseline**
+Single-value maps show their title once, a numeric field with units beside it,
+and compact baseline and change controls below. Full help is available from the
+**ⓘ** button beside the title or F1. Type a value and choose **Apply**
+or press Enter. Escape or **Cancel** discards the typed value. **Reset**
 restores the chosen Original ROM, Last save or Comparison ROM value. Undo/Redo
 work on applied changes. The field exposes full stored precision when focused.
 Invalid or unencodable input stays visible and blocks saving or switching maps
@@ -129,7 +130,7 @@ or use the [full editor guide](../EDITOR.md).
 
 1. Open **Editor → File → Open ROM…**.
 2. Choose a map and check **Map info**. For a single value, type in the field
-   and choose **Apply value** or Enter; Cancel or Escape discards typing.
+   and choose **Apply** or Enter; Cancel or Escape discards typing.
    For a table, double-click a cell, enter a value and press Enter. State
    controls use named choices.
 3. Review the original/last-save/comparison values and the curve or surface.

@@ -75,7 +75,7 @@ directly on their frame, aligned with the surface as it rotates.
 1. Open **Editor**, then **File → Open ROM…**.
 2. Select a map from the categorized list or use search. Related numbered maps
    are kept together. Maps open together in resizable panes with their units and tuner help.
-3. For a single value, type in the field and choose **Apply value** or Enter;
+3. For a single value, type in the field and choose **Apply** or Enter;
    Cancel or Escape discards typing. For a table, double-click a cell or apply
    arithmetic, paste or interpolation to a selection. State controls use named
    choices. Compare with the original, last save or another compatible ROM;

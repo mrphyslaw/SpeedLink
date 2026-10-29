@@ -169,7 +169,10 @@ public partial class EditorWorkspace
             {
                 if (r > 0) mapDock.RowDefinitions.Add(new() { Height = new(7) });
                 double weight = dockRowWeights.Length == rows ? dockRowWeights[r] : rows == 2 ? r == 0 ? dockRowFraction : 1 - dockRowFraction : 1;
-                mapDock.RowDefinitions.Add(new() { Height = new(weight, GridUnitType.Star), MinHeight = 260 });
+                bool scalarOnly = visible.Skip(r * columns).Take(columns).All(s => s.Editor.ScalarMap);
+                // Values start at their content height. A deliberate divider resize
+                // still restores its saved proportions, including for scalar rows.
+                mapDock.RowDefinitions.Add(new() { Height = scalarOnly && dockRowWeights.Length != rows ? GridLength.Auto : new(weight, GridUnitType.Star), MinHeight = scalarOnly ? 168 : 260 });
             }
             for (int i = 0; i < visible.Length; i++)
             {
@@ -187,7 +190,7 @@ public partial class EditorWorkspace
     {
         int rows = Math.Max(1, (mapDock.RowDefinitions.Count + 1) / 2);
         if (mapDockScroll.ViewportWidth is > 0 and < 100000) mapDock.Width = mapDockScroll.ViewportWidth;
-        mapDock.Height = Math.Max(0, Math.Max(mapDockScroll.ActualHeight - 2, rows * 260 + (rows - 1) * 7));
+        mapDock.Height = Math.Max(0, Math.Max(mapDockScroll.ActualHeight - 2, mapDock.RowDefinitions.Sum(r => r.MinHeight) + (rows - 1) * 7));
         if (mapSlots.Count(s => s.Window is null && s.Editor.table is not null) > 1 && expandedMap is null && !rebuildingDock)
         {
             bool narrow = mapDockScroll.ActualWidth < 540;
@@ -351,6 +354,9 @@ public partial class EditorWorkspace
         PaneViewBox.SelectedIndex = ViewMode; CellZoomOut.IsEnabled = cellZoom > .85; CellZoomIn.IsEnabled = cellZoom < 1.5;
         var controls = table is { Count: > 1 } ? Visibility.Visible : Visibility.Collapsed;
         AutoFitBox.Visibility = CellZoomOut.Visibility = CellZoomIn.Visibility = CellZoomText.Visibility = PaneViewBox.Visibility = controls;
+        ScalarInfoButton.Visibility = ScalarMap ? Visibility.Visible : Visibility.Collapsed;
+        MapInfoButton.Visibility = ValueUnitsText.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
+        CellText.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
         PaneViewBox.IsEnabled = table is { IsChoice: false };
         updatingMapControls = false;
     }

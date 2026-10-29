@@ -18,14 +18,13 @@ public partial class EditorWorkspace
         try
         {
             double value = document.Read(table, 0), reference = document.Read(table, 0, Baseline), delta = value - reference;
-            ScalarTitle.Text = table.Name; ScalarDescription.Text = table.Description;
             ScalarUnits.Text = table.IsChoice ? "" : table.Units;
             ScalarInput.Text = ScalarInput.IsKeyboardFocused ? value.ToString("R", CultureInfo.InvariantCulture) : table.Compact(value);
             ScalarInput.ToolTip = "Stored value: " + value.ToString("R", CultureInfo.InvariantCulture) + " " + table.Units;
             ScalarInput.Visibility = table.IsChoice ? Visibility.Collapsed : Visibility.Visible;
             ScalarChoice.Visibility = table.IsChoice ? Visibility.Visible : Visibility.Collapsed;
             ScalarActions.Visibility = table.IsChoice ? Visibility.Collapsed : Visibility.Visible;
-            ScalarChoice.ItemsSource = ChoiceBox.ItemsSource; ScalarChoice.DisplayMemberPath = "Name";
+            ScalarChoice.ItemsSource = ChoiceBox.ItemsSource;
             ScalarChoice.SelectedItem = ChoiceBox.SelectedItem;
             string State(double number) => table.IsChoice && ScalarChoice.ItemsSource is IEnumerable<TuningState> states
                 ? states.FirstOrDefault(s => s.Value == number)?.Name ?? number.ToString("G10", CultureInfo.InvariantCulture)

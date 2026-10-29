@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0-alpha.2
+
+- Handle unsupported, unknown, incomplete and invalid ROM files as recoverable editor errors. Keep the current ROM, unsaved edits, undo history and docked/detached maps intact after rejection; supported files can still be opened afterward. Program-layout and checksum protections remain enforced.
+- Give single-value maps and named states a compact editor. Show the title once, keep full help behind the information button, and group the value, units, Apply/Cancel, baseline and Reset controls without a padded inner card. Scalar-only tile rows use a smaller minimum height.
+- Require nine-profile desktop regressions for file rejection and recovery, five simultaneous scalar panes at two window sizes, full help access, invalid input and shared edits. Retain all-profile save-integrity and existing editor regression checks.
+
 ## 0.7.0-alpha.1
 
 - Open several maps together in resizable panes, with independent native Windows popouts. Expand and restore a map without closing other views. Each pane keeps its own graph, baseline, selection and text zoom over one shared ROM and undo history.

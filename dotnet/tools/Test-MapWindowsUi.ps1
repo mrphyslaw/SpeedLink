@@ -21,6 +21,9 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
     }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
     if (!$result.passed -or !$result.workflow.passed -or !$result.synthetic -or $result.hardwareAccessed -or $result.workflow.cases.Count -lt 57) { throw "Unexpected map windows result: $calibration" }
+    foreach ($required in @('Five scalar panes fit together at 1280x850', 'Five scalar panes fit together at 1024x768', 'Scalar-only rows use compact content height at 1024x768', 'Compact scalar retains full help and units through Map info', 'Compact invalid input still blocks export without changing bytes', 'Compact state undo restores exact original bytes')) {
+        if ($result.workflow.cases -notcontains $required) { throw "Missing compact pane regression: $calibration; $required" }
+    }
     $reports += $result
 }
 @{ passed = $true; hardwareAccessed = $false; reports = $reports } | ConvertTo-Json -Depth 14 | Set-Content -LiteralPath (Join-Path $runRoot 'summary.json') -Encoding utf8
