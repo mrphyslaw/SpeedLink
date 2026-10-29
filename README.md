@@ -4,9 +4,9 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.6.0-alpha.6](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.6)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.7.0-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
 
-This release fixes editor and logger lifecycle problems found during broader QA: floating panels follow the Editor workspace, logger choices survive closing for every profile, stopped/pending values show their actual state, and long diagnostic sessions export correctly. Invalid AFR input and recording-open errors leave a usable workspace. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), [maintenance](docs/MAINTENANCE.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+Open several maps together in resizable panes, or detach a map into its own Windows window. Auto fit adjusts cell spacing while preserving text size and a measured readability minimum; scroll when more room is needed. Each map keeps its own zoom, selection and graph view. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the nine supported stock ROM layouts.
@@ -21,13 +21,13 @@ Gen 2 read protocol. Real ECU validation is pending; see the [Gen 2 guide](docs/
 
 ### ROM editor
 
-[![SpeedLink alpha.9 editor showing an intake cam advance table with labeled axes and a compact 3D preview](docs/editor/images/workspace-alpha9.png)](docs/editor/README.md)
+[![SpeedLink editor with two resizable map panes, readable axis headers and independent view controls](docs/editor/images/map-windows.png)](docs/editor/README.md)
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
 Axis headers have a distinct background and bright separators. **Map info**
-beside the tabs, or **F1**, shows units, correction direction and practical examples.
-The preview shows the v0.5.4-alpha.9 app with an L38KEH000 VVT map.
+inside each map pane, or **F1**, shows units, correction direction and practical examples.
+The map-window preview uses synthetic example values.
 
 Single values have a focused editor with units, help and baseline comparison.
 Small maps stay proportional to their contents, and the table/preview divider
@@ -69,12 +69,12 @@ keep a small surface preview at the upper-right of the grid; MAF curves keep
 their value list on the left and graph on the right.
 Axis names sit directly above the column breakpoints and beside the row
 breakpoints. Selected row and column headers highlight together; value units
-stay beside the map tabs. 3D maps carry labeled axis rulers and tick values
+stay inside the map's header. 3D maps carry labeled axis rulers and tick values
 directly on their frame, aligned with the surface as it rotates.
 
 1. Open **Editor**, then **File → Open ROM…**.
 2. Select a map from the categorized list or use search. Related numbered maps
-   are kept together. Each map opens in a tab with its units and tuner help.
+   are kept together. Maps open together in resizable panes with their units and tuner help.
 3. For a single value, type in the field and choose **Apply value** or Enter;
    Cancel or Escape discards typing. For a table, double-click a cell or apply
    arithmetic, paste or interpolation to a selection. State controls use named
@@ -181,7 +181,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.6.0-alpha.6](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.6.0-alpha.6), a Windows Workbench alpha.**
+**Current release: [v0.7.0-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.1), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
@@ -192,7 +192,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
 - **Fixed:** logger matching accepts known complete ECU calibration IDs, including
   `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
-- **Checked:** 443 C# tests and 2,384 native-derived logger vectors. Nine-profile
+- **Checked:** 450 C# tests and 2,384 native-derived logger vectors. Nine-profile
   editor checks cover direct cell entry, comparison, undo/redo and byte-identical
   no-edit exports. L3CGEE000 adds 379 native logger instruction checks and complete
   reference-ROM cell/axis comparisons. See [validation](docs/VALIDATION.md).

@@ -1,5 +1,14 @@
 [
   {
+    "test": "SpeedLink.Tests.MapWorkspaceTests.Fixed_spacing_ignores_window_size_but_honors_long_values_and_zoom"
+  },
+  {
+    "test": "SpeedLink.Tests.MapWorkspaceTests.Workspace_roundtrip_keeps_profiles_separate_without_rom_data"
+  },
+  {
+    "test": "SpeedLink.Tests.MapWorkspaceTests.Invalid_and_oversized_workspace_settings_recover_and_are_bounded"
+  },
+  {
     "test": "SpeedLink.Tests.LoggerPreferencesTests.Migration_preserves_ids_absent_from_the_startup_profile"
   },
   {

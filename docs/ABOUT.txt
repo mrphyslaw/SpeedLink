@@ -5,6 +5,10 @@ Bundled .NET runtime: {runtime}
 Workbench alpha
 ROM reading, verified backups, offline ROM editing and live logging.
 One workspace for editing, live logging and recorded logs.
+Multiple resizable map panes with native detachable map windows.
+Auto fit preserves text size and measured cell minimums; smaller panes scroll.
+Independent 85–150% map text zoom, selections and graph views.
+Per-calibration map layouts and detached-window positions restore on ROM open.
 Floating editor panels follow the active workspace; empty graphs stay hidden.
 Nine tuning definitions, Fit map, floating panels, changes and undo/redo.
 Compact navigation, saved layouts and zoomable long MAF curves.
@@ -16,7 +20,7 @@ Labeled 3D axes and tick values sit directly on the map and follow rotation.
 Axis labels beside their breakpoints and linked row/column highlighting.
 Distinct axis header bands and borders separate inputs from editable values.
 Tuner-focused map help with visible units, arithmetic and correction examples.
-Map info beside the tabs and F1 open help for the active map.
+Map info in each pane and F1 open help for that map.
 Import editor/logger definition updates and restore bundled copies.
 Automatic adapter diagnostics and support ZIP export, including failed connections.
 Local crash reports with next-launch review and support ZIP export; nothing sent automatically.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0-alpha.1
+
+- Open several maps together in resizable panes, with independent native Windows popouts. Expand and restore a map without closing other views. Each pane keeps its own graph, baseline, selection and text zoom over one shared ROM and undo history.
+- Auto fit changes cell spacing without shrinking text. Measured displayed values set the minimum width; small windows scroll instead of clipping values. Deliberate text zoom is bounded to 85–150%. Compact maps and long MAF curves retain their specialized editors.
+- Restore map layouts, split proportions, window bounds, selections, scrolling and graph views separately for each calibration when its ROM is opened. Pending invalid input blocks saving and closing its view; another pane cannot erase it.
+- Add required nine-profile map-window desktop checks and Core readability/persistence cases. Retain all existing editor, logger, backup, integrity and standalone release checks. Update the editor guide and screenshots. ECU programming remains disabled.
+
 ## 0.6.0-alpha.6
 
 - Keep floating map panels inside the Editor workspace and hide an empty floating graph until a graphable map is selected. Handle file permission errors without terminating the editor.

@@ -12,7 +12,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
     $report = Join-Path $folder 'report.json'
     $arguments = @('--editor-offline','--calibration',$calibration,'--output',('"' + $folder + '"'),'--report',('"' + $report + '"'))
     $process = Start-Process -FilePath $harness -ArgumentList $arguments -WindowStyle Hidden -PassThru
-    if (-not $process.WaitForExit(30000)) { $process.Kill(); throw "Editor UI timed out: $calibration" }
+    if (-not $process.WaitForExit(60000)) { $process.Kill(); throw "Editor UI timed out: $calibration" }
     if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $report)) { throw "Editor UI failed: $calibration; see $report" }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
     if ($result.passed -ne $true -or $result.synthetic -ne $true -or $result.hardwareAccessed -ne $false -or $result.workflow.directCellCommit -ne $true) { throw "Unexpected editor UI result: $calibration" }

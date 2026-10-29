@@ -50,6 +50,9 @@ public partial class EditorWorkspace
         PopBrowser_Click(this, new()); browserWindow!.WindowState = WindowState.Minimized;
         FocusButton.IsChecked = true; OpenRom(path);
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        // Restored map views are covered separately. Close them deliberately to
+        // verify that the empty-map prompt still recovers the floating browser.
+        ClearMapWindows(); MapTabs.Items.Clear(); ArrangeMaps();
         UpdateLayout(); CheckBrowserReady(true);
         if (browserWindow!.WindowState != WindowState.Normal || !browserWindow.IsVisible)
             throw new InvalidOperationException("Opening a ROM did not restore its minimized floating map browser.");

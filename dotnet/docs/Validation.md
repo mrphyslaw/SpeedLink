@@ -1,5 +1,22 @@
 # C# validation
 
+## Resizable map windows — 0.7.0-alpha.1
+
+- Required Core coverage exercises measured cell minimums across table shapes,
+  viewport sizes and zoom limits, fixed spacing, bounded preference parsing and
+  independent per-calibration layout persistence. Resizing never chooses a font.
+- Nine synthetic Windows workflows exercise multiple maps, real width/height
+  dividers, expand/restore, native detachable windows, shared edits and undo,
+  invalid pending input, grid/curve/state/scalar controls, close/dock cycles,
+  workspace navigation and fresh-window restoration of maps, zoom and selection.
+  Each profile requires 57 assertions, including visible data at the native
+  window's minimum size and global commands following the active map.
+- The existing editor, logger, backup, recording, diagnostic, crash and standalone
+  checks remain required. Every supported ROM also passes mandatory save-integrity
+  tests. Public CI artifacts contain synthetic reports and screenshots, not ROMs.
+- These are desktop and offline checks; no new adapter or real ECU validation is
+  claimed. ECU programming remains disabled.
+
 ## Lifecycle reliability — 0.6.0-alpha.6
 
 - 443 Core cases, including version-one logger preference migration, independent

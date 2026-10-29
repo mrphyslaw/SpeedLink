@@ -66,10 +66,10 @@ public readonly record struct TableFit(double ColumnWidth, double RowHeight, boo
 
 public readonly record struct TablePreviewSize(double Width, double Height)
 {
-    public static TablePreviewSize Calculate(double width, double height, int columns, double rowHeader = 64, double? requestedWidth = null)
+    public static TablePreviewSize Calculate(double width, double height, int columns, double rowHeader = 64, double? requestedWidth = null, double minimumCellWidth = 44)
     {
-        if (columns < 1) throw new ArgumentOutOfRangeException(nameof(columns));
-        double automatic = Math.Clamp(width - (columns * 44 + rowHeader + 4) - 7, 160, 224);
+        if (columns < 1 || !double.IsFinite(minimumCellWidth) || minimumCellWidth < 0) throw new ArgumentOutOfRangeException(nameof(columns));
+        double automatic = Math.Clamp(width - (columns * minimumCellWidth + rowHeader + 4) - 7, 160, 224);
         double previewWidth = requestedWidth is double requested && double.IsFinite(requested)
             ? Math.Clamp(requested, 160, Math.Max(160, Math.Min(800, width - 207))) : automatic;
         return new(previewWidth, Math.Max(0, Math.Min(height, Math.Clamp(previewWidth * .8 + 28, 156, requestedWidth is null ? 208 : 480))));

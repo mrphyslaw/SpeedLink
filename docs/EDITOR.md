@@ -12,7 +12,7 @@ Gen 2 code is rejected without guessed repair. Every export is read back and
 verified before its final filename is published. Originals are preserved.
 
 This guide is also included in the app: choose **File → Editor guide**, or
-choose **Help** and select **Editor**. **Map info** beside the map tabs, or
+choose **Help** and select **Editor**. **Map info** inside a map pane, or
 **F1**, opens help for the selected map instead.
 
 ## Make your first edit
@@ -101,10 +101,34 @@ not a record of the order in which edits were made.
 
 ## Arrange the workspace
 
-Open maps stay in tabs when you change maps or switch to Logger, Recordings or
-another workspace. Numbered maps are sorted naturally in the browser. Tabs
-scroll horizontally and keep the active map visible; use the mouse wheel over
-the tab strip to reach other tabs. Closing a tab with × keeps the ROM's edits.
+Maps open together in separate panes over the same ROM document. Opening an
+already open map brings its existing pane forward. Numbered maps remain sorted
+naturally in the browser. Each pane has its own selection, comparison baseline,
+text zoom and graph view; Undo/Redo and saved ROM bytes belong to the shared ROM.
+
+Drag the dividers to resize map widths or heights. **View → Tile maps side by
+side** and **Stack maps vertically** arrange the panes. More rows remain reachable
+by scrolling the workspace. **Expand** gives one map the workspace; **Restore**
+returns to the previous arrangement without closing the other maps.
+
+**Auto fit** is enabled by default. It adjusts cell spacing, never text size.
+Cell minimums include the measured displayed numbers and column headings plus
+padding. At the minimum, the grid scrolls instead of truncating numbers or
+reducing precision. Axis headings stay visible. **− / +** deliberately changes
+that map's text size between 85% and 150%, with matching cell minimums. Turning
+Auto fit off uses fixed spacing. Resizing and expanding preserve the chosen zoom.
+
+**Undock** moves a map and its editing controls into a separate resizable Windows
+window, which can move to another monitor. **Dock** returns it. Dragging a map's
+title also detaches it; dropping that window over the editor docks it. Closing
+a detached window or a pane's **×** closes that view and retains the ROM edits.
+Invalid pending input blocks closing that view and blocks saving the ROM until
+corrected or canceled. Opening another pane does not discard a pending entry.
+
+Map windows hide while using another workspace and return with Editor. Opening
+the same calibration restores its open maps, dock proportions, window bounds,
+text sizes, selections, scrolling and graph views. Different calibrations keep
+separate layouts. This restores presentation, not unsaved tuning edits.
 
 Use the app's **☰** button to collapse navigation to icons. **View → Hide map
 browser** (Ctrl+B) hides or restores the map list. Drag its edge to change its
@@ -112,13 +136,14 @@ width, or pop it into a separate window.
 
 The **Maps** button in the editor toolbar always brings the map browser back.
 When no map is selected, **Browse maps** opens the list instead of leaving an
-empty grid. Closing the last map tab keeps the ROM and its edits loaded.
+empty grid. Closing the last map pane keeps the ROM and its edits loaded.
 
 **Fit map** (Ctrl+0) restores automatic sizing and hides the browser, Changes
-drawer and map-information window. With navigation collapsed, a full 16×16 map,
-both axes and a compact preview fit at 1024×700 and 1280×720 logical window
-sizes. Larger maps scroll at readable cell sizes; long curves retain their
-list/graph layout. Windows display scaling affects the available logical size.
+drawer and map-information window. With several maps open, it expands the active
+map. Full tables fit when the measured cell minimums and selected text size allow;
+otherwise they scroll. Long curves retain their list/graph layout. Windows display
+scaling affects available logical space. Small panes temporarily omit the compact
+preview to give the table priority; the selected preview view returns with room.
 
 | View option | Use it for |
 | --- | --- |
@@ -154,7 +179,7 @@ Fit map changes the workspace layout.
 ## Understand the active map
 
 Click **Map info**, press F1, or choose **View → Map information…**. The same
-window comes forward and follows the active tab without reducing table height.
+window comes forward for that map without reducing table height.
 It is unavailable until a map is selected.
 
 Value units and input axes appear above the tuning explanation. Descriptions

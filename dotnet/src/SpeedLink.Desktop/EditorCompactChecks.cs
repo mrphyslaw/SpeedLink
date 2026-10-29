@@ -106,10 +106,9 @@ public partial class EditorWorkspace
             foreach (var map in shapes)
             {
                 OpenTable(map); SetViewMode(4); await Settle(); UpdateTableSizing(); await Settle();
-                var active = (TabItem)MapTabs.SelectedItem;
-                var header = active.TransformToAncestor(MapTabs).TransformBounds(new Rect(active.RenderSize));
-                if (header.Left < -1 || header.Right > MapTabs.ActualWidth + 1 || header.Top < -1 || header.Bottom > MapTabs.ActualHeight + 1)
-                    throw new InvalidOperationException("The active map tab is hidden by wrapping or horizontal overflow.");
+                var header = PaneCaption.TransformToAncestor(MapWorkspace).TransformBounds(new Rect(PaneCaption.RenderSize));
+                if (!PaneCaption.IsVisible || PaneCaption.Text != map.Name || header.Right > MapWorkspace.ActualWidth + 1 || header.Top < -1)
+                    throw new InvalidOperationException("The map pane title is hidden or clipped outside its window.");
                 scroll = Descendants(MapGrid).OfType<ScrollViewer>().First();
                 var bounds = TablePanel.TransformToAncestor(TableViewport).TransformBounds(new Rect(TablePanel.RenderSize));
                 if (bounds.Right > TableViewport.ActualWidth + 1 || bounds.Bottom > TableViewport.ActualHeight + 1 ||

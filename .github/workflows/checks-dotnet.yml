@@ -40,6 +40,7 @@ jobs:
       - run: ./tools/Test-SupportUi.ps1 -Output TestResults/SupportUi
       - run: ./tools/Test-ReadProgressUi.ps1 -Output TestResults/ReadProgressUi
       - run: ./tools/Test-MenuUi.ps1 -Output TestResults/MenuUi
+      - run: ./tools/Test-MapWindowsUi.ps1 -Output TestResults/MapWindowsUi
       - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
       - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi
       - run: ./tools/Test-ReplayUi.ps1 -Output TestResults/ReplayUi
