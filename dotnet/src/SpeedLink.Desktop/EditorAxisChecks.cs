@@ -50,7 +50,10 @@ public partial class EditorWorkspace
         var lastHeader = Descendants(MapGrid).OfType<DataGridColumnHeader>().Single(h => h.Column?.DisplayIndex == 15);
         if (!GetIsAxisSelected(lastRow) || lastHeader.Background is not SolidColorBrush lastBrush || lastBrush.Color != Color.FromRgb(93, 70, 36))
             throw new InvalidOperationException("Scrolled headers lost the current selection.");
-        scroll.ScrollToLeftEnd(); scroll.ScrollToTop(); FitMap_Click(this, new()); UpdateLayout();
+        scroll.ScrollToLeftEnd(); scroll.ScrollToTop(); FitMap_Click(this, new());
+        // Use the full pane for explicit scrollbar combinations: a compact
+        // preview can leave less width than the readable cell minimum permits.
+        SetViewMode(2); UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         foreach (var (horizontal, vertical) in new[] { (false, false), (true, false), (false, true) })
         {
@@ -60,7 +63,7 @@ public partial class EditorWorkspace
             await Settle(); await Settle(); UpdateAxisGeometry(); UpdateLayout();
             if ((scroll.ComputedHorizontalScrollBarVisibility == Visibility.Visible) != horizontal ||
                 (scroll.ComputedVerticalScrollBarVisibility == Visibility.Visible) != vertical)
-                throw new InvalidOperationException("Axis frame fixture did not reach the requested scrollbar combination.");
+                throw new InvalidOperationException($"Axis frame fixture did not reach scrollbar combination {horizontal}/{vertical}: grid {MapGrid.ActualWidth}/{MapGrid.ActualHeight}, fitting {fitting}, minimum {MapGrid.Columns[0].MinWidth}, scroll {scroll.ScrollableWidth}/{scroll.ScrollableHeight}.");
             CheckAxisFrame();
         }
         FitMap_Click(this, new()); await Settle();
