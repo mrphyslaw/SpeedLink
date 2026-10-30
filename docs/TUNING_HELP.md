@@ -1,7 +1,7 @@
 # Understanding map values
 
 In **Editor**, select a map and click **Map info** beside its tab, or press
-**F1**. **View → Map information…** opens the same window.
+**F1**. **View → Map layout and display → Map information…** opens the same window.
 Value units and input-axis names
 appear above the tuning explanation. Storage addresses and data types remain
 under **Storage details**. The window follows the selected map.

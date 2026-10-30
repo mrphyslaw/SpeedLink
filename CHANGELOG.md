@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0-alpha.4
+
+- Keep File, Edit, View, Tools and Help available in every workspace. Open a ROM or recording from File, find definition management in Tools, and use Help for guides, support export, crash reports and About.
+- Show sidebar icons with workspace names by default. The sidebar button and View menu toggle the same compact mode, with descriptive tooltips and saved preferences. Existing navigation choices remain respected.
+- Reuse the editor's commands and mandatory integrity checks from the application menus. Preserve ROM edits while changing workspaces, and disable commands whose required ROM or map is unavailable.
+- Keep compact tables readable at narrow window sizes by using their measured cell minimums instead of requiring unnecessary horizontal scrolling.
+- Add required nine-profile application-navigation checks for menu visibility, keyboard use, command states, Undo/Redo, saved preferences and edit preservation. Refresh the guides and screenshots. ECU programming remains disabled.
+
 ## 0.7.0-alpha.3
 
 - Resize any map from its own edges or corners without moving or resizing the other maps. A lone map can fill unused space beside it. Manual resizing and title dragging allow overlapping panes; the active map comes to the front, and choosing a covered map in the browser reveals it.

@@ -21,8 +21,9 @@ Start with the workflow you need. ECU programming remains disabled.
 | [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all nine profiles |
 
 The app includes Getting started, Editor, Logger and Report a problem guides under **Help**.
-**File → Editor guide** opens the editing guide; **Map info** / F1 explains
-the selected map. Expand the app navigation with **☰** to see workspace names.
+**Help → Editor guide** opens the editing guide; **Map info** / F1 explains
+the selected map. Navigation shows workspace names by default; **☰ Navigation**
+or **View → Navigation labels** toggles its compact form.
 
 ## Development and validation
 

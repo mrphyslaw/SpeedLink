@@ -80,9 +80,9 @@ public partial class EditorWorkspace
             app.Resources.Remove(SystemColors.MenuBrushKey); app.Resources.Remove(SystemColors.MenuTextBrushKey);
         }
     }
-    private static void SendMenuKey(MenuItem target, Key key) => target.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice,
+    internal static void SendMenuKey(MenuItem target, Key key) => target.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice,
         PresentationSource.FromVisual(target), Environment.TickCount, key) { RoutedEvent = Keyboard.KeyDownEvent });
-    private static double Contrast(Color text, Color background)
+    internal static double Contrast(Color text, Color background)
     {
         static double Light(Color c)
         {
@@ -91,20 +91,10 @@ public partial class EditorWorkspace
         }
         double a = Light(text), b = Light(background); return (Math.Max(a, b) + .05) / (Math.Min(a, b) + .05);
     }
-    private static void SaveMenuImage(FrameworkElement element, string path)
+    internal static void SaveMenuImage(FrameworkElement element, string path)
     {
         var bitmap = new RenderTargetBitmap((int)Math.Ceiling(element.ActualWidth), (int)Math.Ceiling(element.ActualHeight), 96, 96, PixelFormats.Pbgra32);
         bitmap.Render(element); var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
         using var stream = File.Create(path); encoder.Save(stream);
-    }
-}
-
-public partial class MainWindow
-{
-    internal async Task<object> ExerciseMenusOffline(string folder)
-    {
-        Show(); Activate(); Navigate(1); UpdateLayout();
-        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-        return await EditorPane.ExerciseMenusOffline(folder);
     }
 }

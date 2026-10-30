@@ -1,5 +1,23 @@
 # Alpha validation scope
 
+## Application navigation — 0.7.0-alpha.4
+
+- File, Edit, View, Tools and Help remain available in all six workspaces.
+  Menus retain readable popup surfaces, disabled states, shortcuts and keyboard
+  activation independently of Windows menu colors.
+- Navigation starts with icons and labels. The sidebar button and View menu
+  control the same setting; explicit compact and labeled preferences survive
+  restart. Existing stored preferences remain respected.
+- Nine synthetic navigation workflows verify loaded-ROM command states,
+  Undo/Redo, edit preservation across workspaces and minimum window sizes.
+  Nine embedded editor workflows and eight retained layout workflows pass.
+- The wider sidebar exposed unnecessary scrolling in an eight-column compact
+  table at 1,024 pixels. Compact auto-fit now uses measured readable minimums
+  instead of requiring 64 pixels per column when space is tighter.
+- All 465 unit cases, 68 baseline regressions and mandatory save-integrity
+  checks for all nine editor profiles pass. These are offline desktop results;
+  no new hardware or ECU acceptance is claimed. Programming remains disabled.
+
 ## .NET security maintenance — 0.6.0-alpha.2
 
 - SDK 10.0.403 and bundled runtime 10.0.14 are pinned together. Dependency locks

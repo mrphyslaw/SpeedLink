@@ -48,6 +48,7 @@ public partial class MainWindow
         Pages.SelectedIndex = page;
         EditorPane?.SetWorkspaceActive(page == 1);
         foreach (var button in Navigation.Children.OfType<RadioButton>()) button.IsChecked = (string)button.Tag == page.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        RefreshApplicationMenus();
     }
     private void Navigate_Checked(object sender, RoutedEventArgs e)
     {
