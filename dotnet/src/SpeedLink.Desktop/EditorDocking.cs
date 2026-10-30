@@ -290,6 +290,7 @@ public partial class EditorWorkspace
     private void UpdateTableSizing()
     {
         if (table is null || MapGrid.ActualWidth < 10 || MapGrid.Columns.Count == 0) return;
+        QueueAxisGeometry();
         MapGrid.FontSize = 13 * cellZoom;
         double minimum = MinimumCellWidth();
         if (CurveList)

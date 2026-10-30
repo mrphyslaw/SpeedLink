@@ -1,5 +1,23 @@
 # Alpha validation scope
 
+## Table-axis alignment — 0.7.0-alpha.5
+
+- Every bundled map/control is opened at two window sizes: 7,522 entries across
+  nine profiles, for 15,044 measured views. Numeric axis titles are checked
+  against rendered headers and rows; curves retain their direct column labels,
+  and single values and switches do not acquire irrelevant axis bands.
+- Another 2,216 table-shape/view/zoom combinations check both scroll ends.
+  Coverage includes all four table/graph layouts, graph-only restoration,
+  fitting column resizing, independent map resizing, detached windows and
+  100%, 125% and 150% layout scales. Empty space and clipped parts of edge
+  cells are excluded from title positioning. Full titles remain available on hover.
+- The axis matrix runs in the required C# workflow. It uses synthetic fixtures
+  and verifies that layout, scrolling and moving windows leave ROM bytes intact.
+  This is desktop presentation coverage; it makes no new hardware claim.
+- All 465 unit cases (including 68 baseline cases), mandatory save-integrity
+  checks for nine profiles, eight retained layout workflows, nine editor
+  workflows and nine map-window workflows (1,611 assertions) pass locally.
+
 ## Application navigation — 0.7.0-alpha.4
 
 - File, Edit, View, Tools and Help remain available in all six workspaces.

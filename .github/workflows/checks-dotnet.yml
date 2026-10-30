@@ -17,7 +17,7 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_NOLOGO: '1'
@@ -43,6 +43,7 @@ jobs:
       - run: ./tools/Test-NavigationUi.ps1 -Output TestResults/NavigationUi
       - run: ./tools/Test-MapWindowsUi.ps1 -Output TestResults/MapWindowsUi
       - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
+      - run: ./tools/Test-AxisUi.ps1 -Output TestResults/AxisUi
       - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi
       - run: ./tools/Test-ReplayUi.ps1 -Output TestResults/ReplayUi
       - run: ./tools/Test-EditorUi.ps1 -Output TestResults/EditorUi

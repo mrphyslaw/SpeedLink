@@ -21,6 +21,7 @@ Proportional small maps and a draggable, remembered table/preview divider.
 Compact 3D table preview beside the grid, with a larger floating graph.
 Labeled 3D axes and tick values sit directly on the map and follow rotation.
 Axis labels beside their breakpoints and linked row/column highlighting.
+Axis titles center on visible rows and columns, excluding unused table space.
 Distinct axis header bands and borders separate inputs from editable values.
 Tuner-focused map help with visible units, arithmetic and correction examples.
 Map info in each pane and F1 open help for that map.

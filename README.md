@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.7.0-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.4)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.7.0-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.5)** — a single Windows EXE, with no installer or .NET installation required.
 
 Use the permanent File, Edit, View, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. Open several maps in independently resizable panes or separate Windows windows. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
@@ -31,6 +31,8 @@ Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
 Axis headers have a distinct background and bright separators. **Map info**
 inside each map pane, or **F1**, shows units, correction direction and practical examples.
+Axis titles stay centered beside the visible rows and above the visible columns,
+including short tables with unused space. [See the alignment example →](docs/editor/README.md#axis-titles-follow-the-data)
 The map-window preview uses synthetic example values.
 
 Single values use compact cards that wrap across the workspace, with units,

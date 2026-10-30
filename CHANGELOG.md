@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0-alpha.5
+
+- Center vertical axis titles beside the visible data rows, including short tables with empty space below them. Center horizontal titles over the visible data columns, excluding row headers, scrollbars and unused space.
+- Keep titles aligned after switching maps, scrolling, zooming, resizing and detaching windows. Use the arranged cell geometry so pixel rounding and partially visible edge cells are handled correctly. Full titles remain available on hover.
+- Add required alignment checks for all 7,522 bundled maps and controls across nine ROM profiles at two window sizes, plus 2,216 table-shape/view/zoom combinations and independent pane checks. Retain editing, map-window and mandatory save-integrity regressions.
+- Update the editor guide, About and screenshot gallery. ECU programming remains disabled.
+
 ## 0.7.0-alpha.4
 
 - Keep File, Edit, View, Tools and Help available in every workspace. Open a ROM or recording from File, find definition management in Tools, and use Help for guides, support export, crash reports and About.
