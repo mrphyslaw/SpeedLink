@@ -4,9 +4,13 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.7.0-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.2)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.7.0-alpha.3](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.3)** — a single Windows EXE, with no installer or .NET installation required.
 
 Open several maps together in resizable panes, or detach a map into its own Windows window. Auto fit adjusts cell spacing while preserving text size and a measured readability minimum; scroll when more room is needed. Each map keeps its own zoom, selection and graph view. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+
+Drag a pane's own edge or corner to resize just that map, or drag its title to
+move it. Panes can overlap; click a map or select it in the browser to bring it
+forward. **View → Tile maps side by side** restores automatic arrangement.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the nine supported stock ROM layouts.

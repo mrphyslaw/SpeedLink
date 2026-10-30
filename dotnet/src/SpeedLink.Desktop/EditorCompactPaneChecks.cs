@@ -64,21 +64,15 @@ public partial class EditorWorkspace
         FocusButton.IsChecked = false; await Idle();
         Check(scalarDockColumns == 2 && mapSlots.Count == 5 && editors.All(e => e.ScalarPanel.ScrollableHeight <= 1), "Value cards wrap into fewer columns when the browser takes space");
         FocusButton.IsChecked = true; await Idle();
-        var columnDivider = mapDock.Children.OfType<GridSplitter>().First(s => s.ResizeDirection == GridResizeDirection.Columns);
-        double columnWidth = mapDock.ColumnDefinitions[0].ActualWidth;
-        columnDivider.RaiseEvent(new DragStartedEventArgs(0, 0) { RoutedEvent = Thumb.DragStartedEvent });
-        columnDivider.RaiseEvent(new DragDeltaEventArgs(25, 0) { RoutedEvent = Thumb.DragDeltaEvent }); await Idle();
-        columnDivider.RaiseEvent(new DragCompletedEventArgs(25, 0, false) { RoutedEvent = Thumb.DragCompletedEvent }); await Idle();
-        File.WriteAllText(Path.Combine(folder, "CardResize.json"), System.Text.Json.JsonSerializer.Serialize(new { before = columnWidth, after = mapDock.ColumnDefinitions[0].ActualWidth, saved = scalarColumnWidths, columns = scalarDockColumns }));
-        Check(mapDock.ColumnDefinitions[0].ActualWidth > columnWidth && scalarColumnWidths.Length == scalarDockColumns, "Compact card columns remain resizable");
-        var rowDivider = mapDock.Children.OfType<GridSplitter>().First(s => s.ResizeDirection == GridResizeDirection.Rows);
-        double rowHeight = mapDock.RowDefinitions[0].ActualHeight;
-        rowDivider.RaiseEvent(new DragStartedEventArgs(0, 0) { RoutedEvent = Thumb.DragStartedEvent });
-        rowDivider.RaiseEvent(new DragDeltaEventArgs(0, 30) { RoutedEvent = Thumb.DragDeltaEvent }); await Idle();
-        rowDivider.RaiseEvent(new DragCompletedEventArgs(0, 30, false) { RoutedEvent = Thumb.DragCompletedEvent }); await Idle();
-        Check(mapDock.RowDefinitions[0].ActualHeight > rowHeight && dockRowWeights.Length == 2, "Compact scalar rows still support deliberate divider resizing");
+        double cardWidth = DockedBounds(editors[^1]).Width;
+        var otherBounds = editors[..^1].ToDictionary(e => e, DockedBounds);
+        DragPaneEdge(editors[^1], MapResizeEdge.Right, 25, 0); await Idle();
+        Check(DockedBounds(editors[^1]).Width > cardWidth && otherBounds.All(p => SameBounds(p.Value, DockedBounds(p.Key))), "Compact cards resize without changing other cards");
+        double cardHeight = DockedBounds(editors[^1]).Height;
+        DragPaneEdge(editors[^1], MapResizeEdge.Bottom, 0, 30); await Idle();
+        Check(DockedBounds(editors[^1]).Height > cardHeight && otherBounds.All(p => SameBounds(p.Value, DockedBounds(p.Key))), "Compact card height changes independently");
         ArrangeMaps(); await Idle();
-        Check(mapDock.RowDefinitions.Where((_, i) => i % 2 == 0).All(r => r.Height.IsStar) && editors.All(e => e.ScalarInput.IsVisible || e.ScalarChoice.IsVisible), "Deliberate scalar row sizes survive layout recalculation");
+        Check(DockedBounds(editors[^1]).Height > cardHeight && editors.All(e => e.ScalarInput.IsVisible || e.ScalarChoice.IsVisible), "Deliberate scalar sizes survive layout recalculation");
         var first = editors[0]; var scalar = scalars[0]; first.ActivateMap();
         first.ScalarInfoButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
         Check(first.infoWindow is { IsVisible: true } && first.HelpText.Text == scalar.Description && first.HelpUnitsText.Text.Contains(scalar.Units, StringComparison.Ordinal), "Compact scalar retains full help and units through Map info");
@@ -101,12 +95,12 @@ public partial class EditorWorkspace
         Check(doc.Read(state, 0) != old, "Compact state selector applies the chosen state");
         doc.Undo();
         Check(before.AsSpan().SequenceEqual(doc.Snapshot()), "Compact state undo restores exact original bytes");
-        SaveMapWorkspace(); var savedWidths = (double[])scalarColumnWidths.Clone(); double savedActualWidth = mapDock.ColumnDefinitions[0].ActualWidth;
+        SaveMapWorkspace(); var savedBounds = mapSlots.ToDictionary(s => MapKey(s.Editor.table!), s => DockedBounds(s.Editor));
         OpenRom(doc.SourcePath); await Idle();
         // Opening a ROM intentionally shows the browser. Restore the same
         // available width before comparing the saved card dimensions.
         FocusButton.IsChecked = true; await Idle();
-        Check(mapSlots.Count == 5 && scalarColumnWidths.SequenceEqual(savedWidths) && Math.Abs(mapDock.ColumnDefinitions[0].ActualWidth - savedActualWidth) < 1, "Reopening the calibration restores compact card sizes and maps");
+        Check(mapSlots.Count == 5 && mapSlots.All(s => SameBounds(savedBounds[MapKey(s.Editor.table!)], DockedBounds(s.Editor))), "Reopening the calibration restores compact card sizes and maps");
         ClearMapWindows(); MapTabs.Items.Clear();
         EditorStatus.Text = previousStatus;
         host.Width = width; host.Height = height; FocusButton.IsChecked = hidden; await Idle();

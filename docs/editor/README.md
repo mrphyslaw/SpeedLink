@@ -9,11 +9,21 @@ L3CGEE000 profile has separate [integrity checks and validation limits](../GEN2.
 
 ![Two resizable map panes over one ROM](images/map-windows.png)
 
-Open related maps together, drag dividers to resize them, and use **Expand** to
+Open related maps together, drag a pane's own edge or corner to resize only it, and use **Expand** to
 focus on one without closing the others. **Undock** gives a map its own Windows
 window, including editing controls, for another monitor. Each map retains its own
 selection, text zoom and graph view. All panes share the same ROM and undo history.
+Drag titles to move panes inside the workspace. Manual resizing and movement
+allow overlap; clicking a map or selecting it in the browser brings it forward.
+Use **View → Tile maps side by side** to reset manual placement.
 The multi-map screenshot uses synthetic values, not vehicle tuning advice.
+
+![A lower curve widened independently below three scalar maps and another curve](images/independent-panes.png)
+
+Each pane owns its size and position. The lower curve fills the unused width
+without stretching either row above it; the third scalar is shortened independently.
+Manual resizing or title dragging can overlap other panes. Select a covered map
+in the browser to bring it forward. This screenshot uses synthetic test data.
 
 ![A detached resizable map with its editing controls](images/detached-map.png)
 
@@ -55,7 +65,7 @@ and paste retain full precision. Axis names and units label the list's two colum
 
 Single-value maps use small wrapping cards, normally about 300 pixels wide,
 with standard-size number fields and a single baseline row. Resize the card
-columns or rows with their dividers; sizes are restored for that calibration.
+individual cards from their edges or corners; positions and sizes are restored for that calibration.
 Full help is available from the
 **ⓘ** button beside the title or F1. Type a value and choose **Apply**
 or press Enter. Apply/Cancel appear only while typing. Escape or **Cancel**
@@ -124,7 +134,7 @@ table-only and graph-only views. The browser can also pop into a separate
 window. Layout preferences are remembered. Open maps and unsaved edits remain
 in place when switching to Logger or Recordings.
 
-Drag map dividers to change widths and heights. Close a pane with **×**, or close
+Drag a map's edges or corners to change only its width and height. Close a pane with **×**, or close
 a detached window, to remove that view while keeping the shared ROM edits.
 For step-by-step controls and shortcuts, open **File → Editor guide** in the app
 or use the [full editor guide](../EDITOR.md).
