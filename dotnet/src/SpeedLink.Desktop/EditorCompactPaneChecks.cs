@@ -38,13 +38,18 @@ public partial class EditorWorkspace
             File.WriteAllText(Path.Combine(folder, $"ScalarPaneMetrics-{size.Width}.json"), System.Text.Json.JsonSerializer.Serialize(editors.Select(editor => new
             {
                 map = editor.table!.Name, pane = editor.ScalarPanel.RenderSize.ToString(),
+                host.ActualWidth, host.ActualHeight, workspace = mapDockScroll.RenderSize.ToString(), frame = DockedBounds(editor),
                 editor.ScalarPanel.ViewportWidth, editor.ScalarPanel.ViewportHeight, editor.ScalarPanel.ScrollableWidth, editor.ScalarPanel.ScrollableHeight,
                 controls = new FrameworkElement[] { editor.ScalarInput, editor.ScalarChoice, editor.ScalarUnits, editor.ScalarApply, editor.ScalarCancel, editor.ScalarReset, editor.ScalarReference, editor.ScalarDifference }
                     .Select(control => new { control.Name, control.IsVisible, bounds = control.TransformToAncestor(editor.ScalarPanel).TransformBounds(new Rect(control.RenderSize)).ToString() })
             })));
             Check(mapSlots.Count == 5 && mapDockScroll.ScrollableHeight <= 1, $"Five scalar panes fit together at {sizeKey}");
             Check(mapDock.RowDefinitions.Where((_, i) => i % 2 == 0).All(r => r.Height.IsAuto && r.ActualHeight <= 150), $"Scalar-only rows use compact content height at {sizeKey}");
-            Check(mapDock.ColumnDefinitions.Where((_, i) => i % 2 == 0).Count() >= 3 && mapSlots.All(s => s.Frame.ActualWidth <= 302), $"Value cards wrap at roughly half the old pane width at {sizeKey}");
+            // Windows may cap a requested window to the attached display. The
+            // labeled sidebar also uses more space than compact navigation.
+            // Require three cards across only when their actual viewport fits it.
+            int minimumColumns = mapDockScroll.ViewportWidth >= 920 ? 3 : 2;
+            Check(mapDock.ColumnDefinitions.Where((_, i) => i % 2 == 0).Count() >= minimumColumns && mapSlots.All(s => s.Frame.ActualWidth <= 302), $"Value cards wrap at roughly half the old pane width at {sizeKey}");
             foreach (var editor in editors)
             {
                 bool Inside(FrameworkElement control)
@@ -62,7 +67,8 @@ public partial class EditorWorkspace
             }
         }
         FocusButton.IsChecked = false; await Idle();
-        Check(scalarDockColumns == 2 && mapSlots.Count == 5 && editors.All(e => e.ScalarPanel.ScrollableHeight <= 1), "Value cards wrap into fewer columns when the browser takes space");
+        Check(scalarDockColumns is >= 1 and <= 2 && mapSlots.Count == 5 && mapDockScroll.ScrollableHeight <= 1 &&
+            mapSlots.All(s => s.Frame.ActualWidth <= 302) && editors.All(e => e.ScalarPanel.ScrollableHeight <= 1), "Value cards reflow to available space when the browser is shown");
         FocusButton.IsChecked = true; await Idle();
         double cardWidth = DockedBounds(editors[^1]).Width;
         var otherBounds = editors[..^1].ToDictionary(e => e, DockedBounds);

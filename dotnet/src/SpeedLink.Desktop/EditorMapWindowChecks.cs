@@ -35,9 +35,10 @@ public partial class EditorWorkspace
         Check(!MapTabs.IsVisible && !second.MapTabs.IsVisible, "No mandatory map tabs");
         double font = first.MapGrid.FontSize;
         double width = first.MapGrid.ActualWidth;
+        double paneWidth = DockedBounds(first).Width;
         var secondBounds = DockedBounds(second);
         DragPaneEdge(first, MapResizeEdge.Right, -70, 0); await Idle();
-        Check(first.MapGrid.ActualWidth < width && first.MapGrid.FontSize == font && SameBounds(secondBounds, DockedBounds(second)), "Pane edge changes space without shrinking text or resizing other maps");
+        Check(DockedBounds(first).Width < paneWidth && first.MapGrid.FontSize == font && SameBounds(secondBounds, DockedBounds(second)), "Pane edge changes space without shrinking text or resizing other maps");
         DragPaneEdge(first, MapResizeEdge.Right, 70, 0); await Idle();
         Check(first.MapGrid.Columns.All(c => c.ActualWidth >= c.MinWidth - 1) && second.MapGrid.Columns.All(c => c.ActualWidth >= c.MinWidth - 1), "Both panes honor measured cell minimums");
         first.SelectCell(Math.Min(first.table!.Count - 1, first.table.Columns + 2));
