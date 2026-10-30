@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0-alpha.3
+
+- Resize any map from its own edges or corners without moving or resizing the other maps. A lone map can fill unused space beside it. Manual resizing and title dragging allow overlapping panes; the active map comes to the front, and choosing a covered map in the browser reveals it.
+- Preserve each pane's position and size when opening or closing other maps, docking back, resizing the workspace and reopening the same calibration. Scroll to reach panes in a smaller workspace. Tile and stack commands restore automatic arrangement. Native detachable windows remain available by dragging a title outside the workspace or choosing Undock.
+- Add required nine-profile desktop checks for independent resizing, overlap, movement, pointer hit testing, cancellation, mixed scalar/table layouts and saved geometry. Keep readable text minimums, shared edits and mandatory ROM-save integrity unchanged.
+
 ## 0.7.0-alpha.2
 
 - Handle unsupported, unknown, incomplete and invalid ROM files as recoverable editor errors. Keep the current ROM, unsaved edits, undo history and docked/detached maps intact after rejection; supported files can still be opened afterward. Program-layout and checksum protections remain enforced.

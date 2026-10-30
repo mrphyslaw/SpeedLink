@@ -6,6 +6,8 @@ Workbench alpha
 ROM reading, verified backups, offline ROM editing and live logging.
 One workspace for editing, live logging and recorded logs.
 Multiple resizable map panes with native detachable map windows.
+Independent edge/corner resizing and title dragging; overlapping panes stay put.
+Active maps come forward; tile or stack commands restore automatic arrangement.
 Auto fit preserves text size and measured cell minimums; smaller panes scroll.
 Independent 85–150% map text zoom, selections and graph views.
 Per-calibration map layouts and detached-window positions restore on ROM open.

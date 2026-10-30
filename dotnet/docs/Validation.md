@@ -1,5 +1,19 @@
 # C# validation
 
+## Independent map sizing — 0.7.0-alpha.3
+
+- Core tests cover bounded per-pane coordinates, all edge/corner calculations,
+  overlap, movement, readable minimums and legacy layout migration.
+- Required desktop workflows for all nine profiles grow a third map into empty
+  space without changing either upper map, resize every pane independently,
+  allow overlap, bring covered maps forward, and move a pane without changing
+  its neighbors. The visible corner grip is checked through WPF pointer hit testing.
+- Checks retain exact bounds through canceled drags, other maps opening/closing,
+  native undock/dock, smaller workspaces and calibration reopening. Mixed scalar
+  and table panes receive the same coverage. Presentation actions preserve ROM
+  bytes; all existing save-integrity and desktop regression gates remain required.
+- These are offline checks; no new vehicle or hardware validation is claimed.
+
 ## ROM-open recovery and compact values — 0.7.0-alpha.2
 
 - Each of the nine editor profiles exercises a program-modified file that passes

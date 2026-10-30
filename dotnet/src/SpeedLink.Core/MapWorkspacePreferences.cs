@@ -17,6 +17,8 @@ public sealed record MapPanePreferences
     public double TableFraction { get; init; } = .6;
     public bool Floating { get; init; }
     public PanelBounds Bounds { get; init; } = new(Width: 840, Height: 650);
+    public MapDockBounds? DockBounds { get; init; }
+    public int ZOrder { get; init; }
     public double Yaw { get; init; } = 40;
     public double Elevation { get; init; } = 32;
     public double Distance { get; init; } = 5;
@@ -32,6 +34,8 @@ public sealed record MapPanePreferences
         PreviewWidth = PreviewWidth is double width && double.IsFinite(width) ? Math.Clamp(width, 160, 800) : null,
         TableFraction = double.IsFinite(TableFraction) ? Math.Clamp(TableFraction, .2, .8) : .6,
         Bounds = new EditorLayoutPreferences { GraphBounds = Bounds }.Validate().GraphBounds,
+        DockBounds = DockBounds?.Validate(),
+        ZOrder = Math.Clamp(ZOrder, 0, 23),
         Yaw = double.IsFinite(Yaw) ? Yaw % 360 : 40,
         Elevation = Finite(Elevation, 10, 80, 32), Distance = Finite(Distance, 2.6, 12, 5),
         CurveStart = Finite(CurveStart, 0, .98, 0), CurveEnd = Finite(CurveEnd, .02, 1, 1)

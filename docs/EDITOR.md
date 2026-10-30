@@ -33,8 +33,8 @@ calibration name alone does not establish support for a changed program layout.
 ### Single values, such as rev limits
 
 Single values use small cards, normally about 300 pixels wide, with standard-sized
-number fields. Cards wrap across the available width; opening the browser can
-reduce the number of columns. Drag dividers to resize them. The name appears
+number fields. Before manual placement, cards wrap across the available width; opening the browser can
+reduce the number of columns. Drag a card's own edges or corners to resize it independently. The name appears
 once, with its value, units, baseline and change.
 Use the **ⓘ** button beside the pane title, or F1, for its full explanation.
 Click the numeric field, type the value in the displayed units, then choose
@@ -115,9 +115,15 @@ already open map brings its existing pane forward. Numbered maps remain sorted
 naturally in the browser. Each pane has its own selection, comparison baseline,
 text zoom and graph view; Undo/Redo and saved ROM bytes belong to the shared ROM.
 
-Drag the dividers to resize map widths or heights. **View → Tile maps side by
-side** and **Stack maps vertically** arrange the panes. More rows remain reachable
-by scrolling the workspace. **Expand** gives one map the workspace; **Restore**
+Drag any pane's edge or corner to resize only that map. Drag its title to move
+it inside the workspace. The other panes retain their positions and sizes;
+manual placement and resizing allow overlap. Click a map or select it in the
+browser to bring it to the front, even if another pane covers it.
+
+**View → Tile maps side by side** and **Stack maps vertically** reset manual
+placement and restore automatic arrangement. Independently sized panes stay
+where you placed them when the window gets smaller; scroll the workspace to
+reach them. **Expand** gives one map the workspace; **Restore**
 returns to the previous arrangement without closing the other maps.
 
 **Auto fit** is enabled by default. It adjusts cell spacing, never text size.
@@ -129,13 +135,13 @@ Auto fit off uses fixed spacing. Resizing and expanding preserve the chosen zoom
 
 **Undock** moves a map and its editing controls into a separate resizable Windows
 window, which can move to another monitor. **Dock** returns it. Dragging a map's
-title also detaches it; dropping that window over the editor docks it. Closing
+title outside the workspace also detaches it; dropping that window over the editor docks it. Closing
 a detached window or a pane's **×** closes that view and retains the ROM edits.
 Invalid pending input blocks closing that view and blocks saving the ROM until
 corrected or canceled. Opening another pane does not discard a pending entry.
 
 Map windows hide while using another workspace and return with Editor. Opening
-the same calibration restores its open maps, dock proportions, window bounds,
+the same calibration restores its open maps, independent pane bounds, window bounds,
 text sizes, selections, scrolling and graph views. Different calibrations keep
 separate layouts. This restores presentation, not unsaved tuning edits.
 

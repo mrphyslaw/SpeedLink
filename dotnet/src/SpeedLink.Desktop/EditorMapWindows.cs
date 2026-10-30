@@ -19,6 +19,7 @@ public partial class EditorWorkspace
         internal Window? Window;
         internal bool DockOnClose;
         internal PanelBounds Bounds = new(Width: 840, Height: 650);
+        internal MapDockBounds? DockBounds;
     }
     private EditorWorkspace? mapOwner, activeMap;
     private readonly List<MapSlot> mapSlots = [];
@@ -31,6 +32,8 @@ public partial class EditorWorkspace
     private double[] scalarColumnWidths = [];
     private bool scalarDock;
     private bool resizingDock;
+    private bool independentMapLayout;
+    private Action? cancelPaneGesture;
     private int scalarDockColumns = 1;
     private const double ScalarCardWidth = 300;
     private double cellZoom = 1;
@@ -50,19 +53,38 @@ public partial class EditorWorkspace
         MapTabs.Visibility = Visibility.Collapsed;
         MapWorkspace.PreviewMouseDown += (_, _) => ActivateMap();
         MapWorkspace.GotKeyboardFocus += (_, _) => ActivateMap();
-        Point? dragStart = null;
+        Point? dragStart = null; MapDockBounds? moveStart = null;
         PaneCaption.Cursor = Cursors.SizeAll;
         PaneCaption.PreviewMouseLeftButtonDown += (_, e) =>
         {
             if (e.ClickCount == 2) { dragStart = null; ExpandMap_Click(this, new()); e.Handled = true; }
-            else { dragStart = e.GetPosition(PaneCaption); PaneCaption.CaptureMouse(); }
+            else { dragStart = e.GetPosition(MapRoot.mapDock); moveStart = null; PaneCaption.CaptureMouse(); }
         };
-        PaneCaption.PreviewMouseLeftButtonUp += (_, _) => { dragStart = null; PaneCaption.ReleaseMouseCapture(); };
+        void EndMove()
+        {
+            dragStart = null; moveStart = null; PaneCaption.ReleaseMouseCapture();
+            MapRoot.cancelPaneGesture = null; MapRoot.resizingDock = false; MapRoot.UpdateDockExtent(); MapRoot.QueueMapSave();
+        }
+        PaneCaption.PreviewMouseLeftButtonUp += (_, _) => EndMove();
+        PaneCaption.LostMouseCapture += (_, _) => { if (dragStart is not null) EndMove(); };
         PaneCaption.PreviewMouseMove += (_, e) =>
         {
-            if (e.LeftButton != MouseButtonState.Pressed) { dragStart = null; return; }
-            if (dragStart is not Point start || table is null || (e.GetPosition(PaneCaption) - start).Length < 8) return;
-            dragStart = null; PaneCaption.ReleaseMouseCapture(); var selected = table; var root = MapRoot;
+            if (e.LeftButton != MouseButtonState.Pressed) { if (dragStart is not null) EndMove(); return; }
+            var root = MapRoot;
+            if (dragStart is not Point start || table is null) return;
+            var point = e.GetPosition(root.mapDock);
+            if (moveStart is null && (point - start).Length < 8) return;
+            var selected = table;
+            var slot = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor, this));
+            if (slot is null) return;
+            if (slot.Window is null && new Rect(root.mapDockScroll.RenderSize).Contains(e.GetPosition(root.mapDockScroll)))
+            {
+                if (root.expandedMap is not null) return;
+                root.FreezeMapPositions(); moveStart ??= slot.DockBounds; root.resizingDock = true;
+                root.cancelPaneGesture = () => { if (moveStart is not null) { slot.DockBounds = moveStart; PlaceMapFrame(slot, moveStart); } EndMove(); };
+                root.MoveMapPane(slot, moveStart!, point.X - start.X, point.Y - start.Y); return;
+            }
+            EndMove();
             root.DetachMap(this);
             var moved = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor.table, selected));
             if (moved?.Window is not Window window) return;
@@ -84,6 +106,7 @@ public partial class EditorWorkspace
             return;
         }
         Grid.SetColumn(mapDockScroll, 2); mapDockScroll.Content = mapDock;
+        PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape && cancelPaneGesture is { } cancel) { cancel(); e.Handled = true; } };
         EditorLayout.Children.Remove(MapWorkspace);
         var frame = MapFrame(MapWorkspace);
         mapSlots.Add(new(this, frame));
@@ -94,7 +117,10 @@ public partial class EditorWorkspace
     }
     private Border MapFrame(UIElement content)
     {
-        var border = new Border { Child = content, BorderThickness = new(1), Padding = new(3), CornerRadius = new(3), ClipToBounds = true };
+        var surface = new Grid(); surface.Children.Add(content);
+        var border = new Border { Child = surface, BorderThickness = new(1), Padding = new(3), CornerRadius = new(3), ClipToBounds = true };
+        AddPaneResizeGrips(border, surface);
+        border.PreviewMouseDown += (_, _) => MapRoot.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Frame, border))?.Editor.ActivateMap();
         border.SetResourceReference(Border.BackgroundProperty, "ShellBrush");
         border.SetResourceReference(Border.BorderBrushProperty, "LineBrush");
         border.SizeChanged += (_, _) =>
@@ -109,7 +135,13 @@ public partial class EditorWorkspace
         var root = MapRoot;
         root.activeMap = this;
         foreach (var slot in root.mapSlots)
+        {
             slot.Frame.SetResourceReference(Border.BorderBrushProperty, ReferenceEquals(slot.Editor, this) ? "AmberBrush" : "LineBrush");
+        }
+        int z = 0;
+        foreach (var slot in root.mapSlots.OrderBy(s => Panel.GetZIndex(s.Frame)).Where(s => !ReferenceEquals(s.Editor, this))) Panel.SetZIndex(slot.Frame, z++);
+        var current = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor, this));
+        if (current is not null) Panel.SetZIndex(current.Frame, z);
         root.RefreshMapCommandState();
         root.QueueMapSave();
     }
@@ -163,6 +195,13 @@ public partial class EditorWorkspace
             var docked = mapSlots.Where(s => s.Window is null && (s.Editor.table is not null || emptyDock && ReferenceEquals(s.Editor, this))).ToArray();
             var visible = expandedMap is not null ? docked.Where(s => ReferenceEquals(s, expandedMap)).ToArray() : docked;
             foreach (var slot in mapSlots.Where(s => s.Window is null)) slot.Frame.Visibility = visible.Contains(slot) ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var slot in mapSlots) RefreshPaneResizeGrips(slot);
+            if (independentMapLayout)
+            {
+                ArrangeIndependentMaps(visible, emptyDock);
+                return;
+            }
+            mapDockScroll.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
             scalarDock = expandedMap is null && visible.Length > 0 && visible.All(s => s.Editor.ScalarMap);
             int columns = scalarDock ? ScalarColumns(visible.Length) : visible.Length <= 1 || mapDockScroll.ActualWidth is > 0 and < 540 ? 1 : dockColumns;
             scalarDockColumns = columns;
@@ -188,14 +227,15 @@ public partial class EditorWorkspace
             }
             for (int i = 0; i < visible.Length; i++)
             {
-                var slot = visible[i]; Grid.SetRow(slot.Frame, (i / columns) * 2); Grid.SetColumn(slot.Frame, (i % columns) * 2);
+                var slot = visible[i];
+                slot.Frame.Width = slot.Frame.Height = double.NaN; slot.Frame.Margin = new(0);
+                slot.Frame.HorizontalAlignment = HorizontalAlignment.Stretch; slot.Frame.VerticalAlignment = VerticalAlignment.Stretch;
+                Grid.SetRow(slot.Frame, (i / columns) * 2); Grid.SetColumn(slot.Frame, (i % columns) * 2);
                 if (!mapDock.Children.Contains(slot.Frame)) mapDock.Children.Add(slot.Frame);
                 bool expanded = ReferenceEquals(slot, expandedMap);
                 slot.Editor.ExpandMapButton.Content = slot.Editor.ScalarMap ? expanded ? "⤡" : "⤢" : expanded ? "Restore" : "Expand";
                 System.Windows.Automation.AutomationProperties.SetName(slot.Editor.ExpandMapButton, expanded ? "Restore map layout" : "Expand map");
             }
-            for (int c = 1; c < columns * 2 - 1; c += 2) AddDockSplitter(true, c, rows * 2 - 1);
-            for (int r = 1; r < rows * 2 - 1; r += 2) AddDockSplitter(false, r, columns * 2 - 1);
             UpdateDockExtent();
         }
         finally { rebuildingDock = false; }
@@ -208,6 +248,7 @@ public partial class EditorWorkspace
     private void UpdateDockExtent()
     {
         if (resizingDock) return;
+        if (independentMapLayout) { UpdateIndependentExtent(); return; }
         int rows = Math.Max(1, (mapDock.RowDefinitions.Count + 1) / 2);
         if (scalarDock && !rebuildingDock && ScalarColumns(mapSlots.Count(s => s.Window is null && s.Editor.table is not null)) != scalarDockColumns) { ArrangeMaps(); return; }
         if (mapDockScroll.ViewportWidth is > 0 and < 100000)
@@ -227,34 +268,11 @@ public partial class EditorWorkspace
             if (!scalarDock && (narrow && mapDock.ColumnDefinitions.Count == 3 || !narrow && mapDock.ColumnDefinitions.Count == 1 && dockColumns == 2)) ArrangeMaps();
         }
     }
-    private void AddDockSplitter(bool vertical, int position, int span)
-    {
-        var splitter = new GridSplitter { Background = UiTheme.Panel, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch,
-            ResizeDirection = vertical ? GridResizeDirection.Columns : GridResizeDirection.Rows, ResizeBehavior = GridResizeBehavior.PreviousAndNext,
-            ToolTip = vertical ? "Resize map widths" : "Resize map heights", ShowsPreview = false };
-        System.Windows.Automation.AutomationProperties.SetName(splitter, vertical ? "Resize map widths" : "Resize map heights");
-        splitter.DragStarted += (_, _) => resizingDock = true;
-        if (vertical) { Grid.SetColumn(splitter, position); Grid.SetRowSpan(splitter, span); }
-        else { Grid.SetRow(splitter, position); Grid.SetColumnSpan(splitter, span); }
-        splitter.DragCompleted += (_, e) =>
-        {
-            resizingDock = false;
-            if (e.Canceled) { ArrangeMaps(); return; }
-            if (vertical && scalarDock) { scalarColumnWidths = mapDock.ColumnDefinitions.Where((_, i) => i % 2 == 0).Select(c => Math.Clamp(c.ActualWidth, 220, 800)).ToArray(); ArrangeMaps(); }
-            else if (vertical) dockColumnFraction = Math.Clamp(mapDock.ColumnDefinitions[0].ActualWidth / Math.Max(1, mapDock.ActualWidth - 7), .2, .8);
-            else if (mapDock.RowDefinitions.Count == 3) dockRowFraction = Math.Clamp(mapDock.RowDefinitions[0].ActualHeight / Math.Max(1, mapDock.ActualHeight - 7), .2, .8);
-            if (!vertical)
-            {
-                var heights = mapDock.RowDefinitions.Where((_, i) => i % 2 == 0).Select(r => r.ActualHeight).ToArray();
-                double total = Math.Max(1, heights.Sum()); dockRowWeights = heights.Select(h => h / total).ToArray();
-            }
-            QueueMapSave();
-        };
-        mapDock.Children.Add(splitter);
-    }
     private void ArrangeMaps_Click(object sender, RoutedEventArgs e)
     {
         var root = MapRoot; root.expandedMap = null;
+        root.independentMapLayout = false;
+        foreach (var slot in root.mapSlots) slot.DockBounds = null;
         root.dockColumns = sender is MenuItem { Tag: "1" } ? 1 : 2;
         root.dockColumnFraction = root.dockRowFraction = .5;
         root.dockRowWeights = [];
@@ -294,11 +312,14 @@ public partial class EditorWorkspace
                 moved = new EditorWorkspace(inspector, codeGuard, this) { document = document, Definitions = Definitions };
                 document!.Changed += moved.Document_Changed;
                 var movedSlot = new MapSlot(moved, MapFrame(moved)); mapSlots.Add(movedSlot);
+                movedSlot.DockBounds = state.DockBounds; slot.DockBounds = null;
                 moved.OpenTable(tableToMove); RestoreMap(moved, state);
                 MapTabs.Items.Clear(); slot = movedSlot; editor = moved;
             }
         }
         mapDock.Children.Remove(slot.Frame);
+        slot.Frame.Width = slot.Frame.Height = double.NaN; slot.Frame.Margin = new(0);
+        slot.Frame.HorizontalAlignment = HorizontalAlignment.Stretch; slot.Frame.VerticalAlignment = VerticalAlignment.Stretch;
         var window = Floating("SpeedLink · " + editor.table!.Name, slot.Bounds.Width, slot.Bounds.Height, slot.Bounds);
         if (editor.ScalarMap && slot.Bounds.Width == 840 && slot.Bounds.Height == 650) { window.Width = 320; window.Height = 200; }
         window.MinWidth = editor.ScalarMap ? 280 : 300; window.MinHeight = editor.ScalarMap ? 200 : 330; window.ShowInTaskbar = true;
@@ -343,9 +364,10 @@ public partial class EditorWorkspace
                 if (!next.Editor.FinishEdit()) return false;
                 var state = CaptureMap(next.Editor); var selected = next.Editor.table;
                 RemoveMapSlot(next); MapTabs.Items.Clear();
+                slot.DockBounds = state.DockBounds;
                 if (selected is not null) { OpenTable(selected); RestoreMap(this, state with { Floating = false }); }
             }
-            else MapTabs.Items.Clear();
+            else { MapTabs.Items.Clear(); slot.DockBounds = null; }
         }
         else RemoveMapSlot(slot);
         expandedMap = null; activeMap = mapSlots.Select(s => s.Editor).FirstOrDefault(p => p.table is not null) ?? this;
@@ -361,8 +383,11 @@ public partial class EditorWorkspace
     private void ClearMapWindows()
     {
         if (mapOwner is not null) return;
+        cancelPaneGesture?.Invoke(); cancelPaneGesture = null; resizingDock = false;
         disposingMaps = true;
         foreach (var slot in mapSlots.Where(s => !ReferenceEquals(s.Editor, this)).ToArray()) RemoveMapSlot(slot);
+        independentMapLayout = false;
+        foreach (var slot in mapSlots) slot.DockBounds = null;
         disposingMaps = false; expandedMap = null; activeMap = this; ArrangeMaps();
     }
     private bool FinishAllMapEdits()
@@ -443,7 +468,7 @@ public partial class EditorWorkspace
             View = editor.ViewMode, Baseline = Math.Min(1, editor.BaselineBox.SelectedIndex), Selection = editor.SelectedIndices(),
             HorizontalOffset = scroll?.HorizontalOffset ?? 0, VerticalOffset = scroll?.VerticalOffset ?? 0,
             PreviewWidth = editor.previewWidth, TableFraction = editor.tableFraction, Floating = slot.Window is not null,
-            Bounds = Bounds(slot.Window, slot.Bounds)
+            Bounds = Bounds(slot.Window, slot.Bounds), DockBounds = independentMapLayout ? slot.DockBounds : null, ZOrder = Panel.GetZIndex(slot.Frame)
         });
     }
     private void SaveMapWorkspace()
@@ -492,14 +517,17 @@ public partial class EditorWorkspace
             dockColumns = saved.Columns; dockColumnFraction = saved.ColumnFraction; dockRowFraction = saved.RowFraction;
             dockRowWeights = saved.RowWeights;
             scalarColumnWidths = saved.ScalarColumnWidths;
+            independentMapLayout = saved.Maps.Any(s => s.DockBounds is not null);
             foreach (var state in saved.Maps)
             {
                 var selected = document.Definition.Tables.FirstOrDefault(t => MapKey(t) == state.Key); if (selected is null) continue;
                 var editor = OpenMap(selected); RestoreMap(editor, state);
-                var slot = mapSlots.First(s => ReferenceEquals(s.Editor, editor)); slot.Bounds = state.Bounds;
+                var slot = mapSlots.First(s => ReferenceEquals(s.Editor, editor)); slot.Bounds = state.Bounds; slot.DockBounds = state.DockBounds;
                 if (state.Floating) DetachMap(editor);
             }
             var active = mapSlots.FirstOrDefault(s => s.Editor.table is { } t && MapKey(t) == saved.Active);
+            foreach (var slot in mapSlots.Where(s => s.Editor.table is not null))
+                Panel.SetZIndex(slot.Frame, saved.Maps.FirstOrDefault(s => s.Key == MapKey(slot.Editor.table!))?.ZOrder ?? 0);
             active?.Editor.ActivateMap(); ArrangeMaps();
         }
         finally { restoringMaps = false; }

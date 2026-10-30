@@ -35,11 +35,10 @@ public partial class EditorWorkspace
         Check(!MapTabs.IsVisible && !second.MapTabs.IsVisible, "No mandatory map tabs");
         double font = first.MapGrid.FontSize;
         double width = first.MapGrid.ActualWidth;
-        var splitter = mapDock.Children.OfType<GridSplitter>().Single();
-        splitter.RaiseEvent(new DragStartedEventArgs(0, 0) { RoutedEvent = Thumb.DragStartedEvent });
-        splitter.RaiseEvent(new DragDeltaEventArgs(70, 0) { RoutedEvent = Thumb.DragDeltaEvent }); await Idle();
-        splitter.RaiseEvent(new DragCompletedEventArgs(70, 0, false) { RoutedEvent = Thumb.DragCompletedEvent }); await Idle();
-        Check(first.MapGrid.ActualWidth > width && first.MapGrid.FontSize == font, "Column divider changes space without shrinking text");
+        var secondBounds = DockedBounds(second);
+        DragPaneEdge(first, MapResizeEdge.Right, -70, 0); await Idle();
+        Check(first.MapGrid.ActualWidth < width && first.MapGrid.FontSize == font && SameBounds(secondBounds, DockedBounds(second)), "Pane edge changes space without shrinking text or resizing other maps");
+        DragPaneEdge(first, MapResizeEdge.Right, 70, 0); await Idle();
         Check(first.MapGrid.Columns.All(c => c.ActualWidth >= c.MinWidth - 1) && second.MapGrid.Columns.All(c => c.ActualWidth >= c.MinWidth - 1), "Both panes honor measured cell minimums");
         first.SelectCell(Math.Min(first.table!.Count - 1, first.table.Columns + 2));
         int[] selected = first.SelectedIndices();
@@ -113,13 +112,11 @@ public partial class EditorWorkspace
         Check(first.gridDraft && input.Text == "NaN", "Another pane cannot erase a pending grid entry");
         first.MapGrid.CancelEdit(DataGridEditingUnit.Row); second.Undo_Click(second, new()); await Idle();
         OpenMap(maps[2]); OpenMap(maps[3]); await Idle();
-        Check(mapSlots.Count == 4 && mapDock.RowDefinitions.Count == 3, "Four maps tile with row and column dividers");
-        var rowSplitter = mapDock.Children.OfType<GridSplitter>().Single(s => s.ResizeDirection == GridResizeDirection.Rows);
-        double topHeight = mapDock.RowDefinitions[0].ActualHeight;
-        rowSplitter.RaiseEvent(new DragStartedEventArgs(0, 0) { RoutedEvent = Thumb.DragStartedEvent });
-        rowSplitter.RaiseEvent(new DragDeltaEventArgs(0, 25) { RoutedEvent = Thumb.DragDeltaEvent }); await Idle();
-        rowSplitter.RaiseEvent(new DragCompletedEventArgs(0, 25, false) { RoutedEvent = Thumb.DragCompletedEvent }); await Idle();
-        Check(mapDock.RowDefinitions[0].ActualHeight >= topHeight && first.MapGrid.FontSize == 13 * zoom, "Height divider preserves chosen text size");
+        Check(mapSlots.Count == 4 && mapSlots.All(s => PaneGrips(s).Count() == 8), "Four maps have independent edge and corner handles");
+        double topHeight = mapSlots.First(s => ReferenceEquals(s.Editor, first)).Frame.ActualHeight;
+        var otherSizes = mapSlots.Where(s => !ReferenceEquals(s.Editor, first)).ToDictionary(s => s.Editor, s => DockedBounds(s.Editor));
+        DragPaneEdge(first, MapResizeEdge.Bottom, 0, -20); await Idle();
+        Check(DockedBounds(first).Height <= topHeight && first.MapGrid.FontSize == 13 * zoom && otherSizes.All(p => SameBounds(p.Value, DockedBounds(p.Key))), "Height resizing preserves other maps and chosen text size");
         var curve = doc.Definition.Tables.FirstOrDefault(t => t.Rows == 1 && t.Columns > 16 && !t.IsChoice);
         if (curve is not null)
         {
@@ -188,6 +185,7 @@ public partial class EditorWorkspace
         ClearMapWindows(); MapTabs.Items.Clear(); await Idle();
         Check(NoMapPanel.IsVisible && document == doc, "Closing all maps retains ROM and browse prompt");
         cases.AddRange(await ExerciseCompactScalarPanes(folder));
+        cases.AddRange(await ExerciseIndependentMapResize(folder));
         return new { passed = true, cases, calibration, hardwareAccessed = false, synthetic = true };
     }
     private async Task CaptureMapWindowGallery(string folder)
