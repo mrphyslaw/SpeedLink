@@ -13,7 +13,8 @@ Floating editor panels follow the active workspace; empty graphs stay hidden.
 Nine tuning definitions, Fit map, floating panels, changes and undo/redo.
 Compact navigation, saved layouts and zoomable long MAF curves.
 Opening a ROM shows its maps; the Maps button restores the browser at any time.
-Compact single-value panes with units, Apply/Cancel, baseline and change.
+Compact wrapping value cards with units, Apply/Cancel, baseline and change.
+Rejected ROM files preserve the current session, unsaved edits and map windows.
 Proportional small maps and a draggable, remembered table/preview divider.
 Compact 3D table preview beside the grid, with a larger floating graph.
 Labeled 3D axes and tick values sit directly on the map and follow rotation.

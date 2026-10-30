@@ -6,7 +6,7 @@ Connect a Vgate vLinker FS USB or Tactrix Openport 2.0 and select it in the adap
 
 A definition is not required to dump a ROM. Two matching full 1 MiB reads are required before a verified backup is sealed. Original captures, manifest and durable journal are retained in the `data` folder beside the executable. Keep the whole backup folder.
 
-**Editor** opens the seven supported stock layouts for offline editing.
+**Editor** opens the nine supported stock layouts for offline editing.
 **ROM checks → Inspect ROM…** opens known or unknown complete 1 MiB images for
 inspection. Known layouts have guarded checks and separate checksum-corrected-copy
 export; unknown layouts have no guessed checksum. Vehicle match and factory
@@ -22,8 +22,8 @@ Mongoose-Plus ISO/CAN3 is an experimental J2534 reader/logger option. Select it
 and its registered 32-bit 04.04 driver; no serial settings are needed. Hardware
 validation is pending. See the [adapter testing guide](../docs/ADAPTERS.md).
 
-The **Logger** workspace provides stock logging for all seven defined ROMs with both adapters:
-35–38 selectable parameters, display units, measured sample rates, up to six synchronized plots
+The **Logger** workspace provides stock logging for all nine defined ROMs with both adapters:
+35–38 selectable parameters on Gen 1 and 20 on Gen 2, display units, measured sample rates, up to six synchronized plots
 and CSV recording. Load the ECU's current matching ROM backup for MAP calibration.
 Live ECU calibration identity must match. See the [logger guide](../docs/LOGGER.md).
 ROM reads require an engine-stopped connection; logging uses the normal application
@@ -31,7 +31,7 @@ session and can run with the engine running. Real-ECU logger validation is pendi
 
 ## Offline ROM editing
 
-Open **Editor**. The seven bundled tuning
+Open **Editor**. The nine bundled tuning
 definitions provide grid editing, 2D curves, rotatable 3D surfaces, comparison,
 selection arithmetic, clipboard, interpolation and undo/redo. Single values use
 a dedicated value/state card; small grids and previews stay proportional to the

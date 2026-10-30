@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.7.0-alpha.1](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.1)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.7.0-alpha.2](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.2)** — a single Windows EXE, with no installer or .NET installation required.
 
 Open several maps together in resizable panes, or detach a map into its own Windows window. Auto fit adjusts cell spacing while preserving text size and a measured readability minimum; scroll when more room is needed. Each map keeps its own zoom, selection and graph view. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
@@ -29,7 +29,9 @@ Axis headers have a distinct background and bright separators. **Map info**
 inside each map pane, or **F1**, shows units, correction direction and practical examples.
 The map-window preview uses synthetic example values.
 
-Single values have a focused editor with units, help and baseline comparison.
+Single values use compact cards that wrap across the workspace, with units,
+help and baseline comparison. Rejected ROM files leave the current editing
+session available, including unsaved changes and open map windows.
 Small maps stay proportional to their contents, and the table/preview divider
 can be dragged to resize it. See the [editor guide and screenshots](docs/editor/README.md).
 The gallery's layout and MAF examples use synthetic values. Screenshots are not
