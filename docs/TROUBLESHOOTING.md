@@ -96,7 +96,7 @@ real-ECU validation remain separate from passing simulator-bench tests.
 If SpeedLink closes unexpectedly, restart it. A saved crash report is offered
 after the main window opens. Review it, choose **Save crash ZIP…**, and attach the
 ZIP to the [problem form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
-You can reopen reports with **Crash reports** in the top bar, without an adapter.
+You can reopen reports with **Help → Crash reports…**, without an adapter.
 Closing the review acknowledges the displayed reports; it does not delete them.
 Reports contain the application/runtime version, time, error and stack, and a
 broad activity such as logging. Nothing is uploaded automatically.

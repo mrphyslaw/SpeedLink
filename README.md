@@ -4,13 +4,13 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.7.0-alpha.3](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.3)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.7.0-alpha.4](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.4)** — a single Windows EXE, with no installer or .NET installation required.
 
-Open several maps together in resizable panes, or detach a map into its own Windows window. Auto fit adjusts cell spacing while preserving text size and a measured readability minimum; scroll when more room is needed. Each map keeps its own zoom, selection and graph view. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+Use the permanent File, Edit, View, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. Open several maps in independently resizable panes or separate Windows windows. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 Drag a pane's own edge or corner to resize just that map, or drag its title to
 move it. Panes can overlap; click a map or select it in the browser to bring it
-forward. **View → Tile maps side by side** restores automatic arrangement.
+forward. **View → Map layout and display → Tile maps side by side** restores automatic arrangement.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the nine supported stock ROM layouts.
@@ -25,7 +25,7 @@ Gen 2 read protocol. Real ECU validation is pending; see the [Gen 2 guide](docs/
 
 ### ROM editor
 
-[![SpeedLink editor with two resizable map panes, readable axis headers and independent view controls](docs/editor/images/map-windows.png)](docs/editor/README.md)
+[![SpeedLink editor with permanent application menus, labeled navigation, a map grid and 3D preview](docs/editor/images/application-navigation.png)](docs/editor/README.md)
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
@@ -68,7 +68,9 @@ a vehicle test or measured ECU logging rates.
 ## Edit a ROM
 
 The Workbench keeps editing, logging and recordings in one window. **Fit map**
-gives the table the available workspace. The app navigation collapses to icons;
+gives the table the available workspace. A permanent **File / Edit / View / Tools / Help**
+menu stays available throughout the app. Navigation shows icons and names by default
+and remembers your choice to collapse it;
 the map browser and graph can be resized, hidden or moved into separate windows.
 Use **View** for layout options, map information and changed maps. 3D tables can
 keep a small surface preview at the upper-right of the grid; MAF curves keep
@@ -98,7 +100,7 @@ Long MAF curves use a breakpoint/value list beside a zoomable curve. Click a
 point to reach its value, including either end of a 129-point calibration.
 Layout preferences are saved beside the EXE in `data/editor-layout.json`.
 
-Select **Definitions** to import editor XML or logger JSON updates for supported
+Choose **Tools → Manage definitions…** to import editor XML or logger JSON updates for supported
 ROM layouts. Updates are kept in `data/definitions` beside the EXE; the bundled
 copies remain available. See [definition import](docs/DEFINITIONS.md).
 

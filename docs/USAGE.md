@@ -6,14 +6,23 @@ separate .NET installation is needed. Keep the `data` folder beside the EXE
 when updating the app: it holds backups, recordings, imported definitions and
 settings. ROM files and adapter drivers are not included.
 
-Choose a workspace in the left navigation. **☰** expands its labels. Use
+The permanent top menu contains **File**, **Edit**, **View**, **Tools** and **Help**.
+Use **File → Open ROM…** from any workspace; **File → Save ROM copy…** exports
+the current editor document with its mandatory integrity checks. Editor commands
+are disabled when their required ROM or map is unavailable. Open a saved log with
+**File → Open recording…**. Find definition management in **Tools** and guides,
+problem reporting, support export, crash reports and About in **Help**.
+
+Choose a workspace in the labeled left navigation. **☰ Navigation** collapses
+its labels; **View → Navigation labels** controls the same setting. Your explicit
+choice is remembered. Hover over an icon for its name and purpose. Use
 **Editor** to edit a file, **Connection** to read an ECU, **Logger** to record
 live data, **Recordings** to review logs, **ROM checks** to inspect a file, or
 **Backups** to find saved operations. ECU programming is disabled.
 
 ## Edit a ROM without an adapter
 
-1. Choose **Editor → File → Open ROM…** and select a complete supported ROM.
+1. Choose **File → Open ROM…** and select a complete supported ROM.
 2. Find a map in the browser. **Map info** or F1 explains its units and purpose.
 3. For a single value, type in the field and choose **Apply** or Enter;
    **Cancel** or Escape discards typing. For a table, double-click a cell, enter
@@ -27,7 +36,7 @@ sizing; Ctrl+B hides or restores the browser. Editing requires one of the nine
 supported stock program layouts. Static axes are read-only; extended/patched
 layouts are unsupported.
 
-Use **File → Editor guide** for the complete included guide, or see the
+Use **Help → Editor guide** for the complete included guide, or see the
 [editor guide](EDITOR.md) and [screenshots](editor/README.md) on GitHub.
 
 ## Read and back up an ECU
@@ -113,7 +122,7 @@ local paths; review reports before sharing them.
 ## Find help and definition updates
 
 Choose **Help**, then select Getting started, Editor or Logger. In the editor,
-**Map info** / F1 explains the active map; **File → Editor guide** opens the full
+**Map info** / F1 explains the active map; **Help → Editor guide** opens the full
 editing instructions.
 
 **Definitions → Import…** installs editor XML or logger JSON updates for

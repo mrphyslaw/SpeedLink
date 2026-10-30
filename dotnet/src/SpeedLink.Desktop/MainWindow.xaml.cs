@@ -44,6 +44,7 @@ public partial class MainWindow : Window
             EditorPane = new(editorInspector, editorGuard); ((TabItem)Pages.Items[1]).Content = EditorPane;
         }
         EditorPane.Definitions = definitionSnapshot.Editors;
+        ConfigureApplicationMenus();
         ConfigureWorkspaceLayout();
         Width = Math.Min(Width, Math.Max(MinWidth, SystemParameters.WorkArea.Width));
         Height = Math.Min(Height, Math.Max(MinHeight, SystemParameters.WorkArea.Height));
@@ -368,7 +369,7 @@ public partial class MainWindow : Window
     }
     private void About_Click(object sender, RoutedEventArgs e) => MessageBox.Show(this,
         Resource("SpeedLink.About.txt").Replace("{version}", Version).Replace("{runtime}", Environment.Version.ToString()), "About SpeedLink");
-    private Window HelpWindow()
+    private Window HelpWindow(string document = "Getting started")
     {
         var documents = new Dictionary<string, string> { ["Getting started"] = "SpeedLink.Help.md", ["Adapters / testing"] = "SpeedLink.AdapterHelp.md", ["Report a problem"] = "SpeedLink.SupportHelp.md", ["Logger"] = "SpeedLink.LoggerHelp.md", ["Editor"] = "SpeedLink.EditorHelp.md", ["Gen 2 (experimental)"] = "SpeedLink.Gen2Help.md", ["GNU GPL license"] = "SpeedLink.LICENSE", ["Known-ROM checks"] = "SpeedLink.Profiles.md" };
         foreach (var name in Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith("SpeedLink.Notices.", StringComparison.Ordinal)))
@@ -380,7 +381,7 @@ public partial class MainWindow : Window
         var text = new TextBox { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Padding = new Thickness(12) };
         panel.Children.Add(text);
         chooser.SelectionChanged += (_, _) => text.Text = Resource(documents[(string)chooser.SelectedItem]);
-        chooser.SelectedIndex = 0;
+        chooser.SelectedItem = documents.ContainsKey(document) ? document : "Getting started";
         return new Window { Owner = this, Title = "SpeedLink — Help & licenses", Width = 860, Height = 650, Content = panel };
     }
     private void Help_Click(object sender, RoutedEventArgs e) => HelpWindow().Show();

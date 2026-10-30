@@ -6,6 +6,19 @@ namespace SpeedLink.Tests;
 public sealed class EditorLayoutTests
 {
     [Fact]
+    public void NavigationLabelsAreTheDefaultAndExplicitChoicesSurvive()
+    {
+        using var folder = new TempFolder(); string path = Path.Combine(folder.Path, "layout.json");
+        Assert.False(EditorLayoutPreferences.Load(path).NavigationCollapsed);
+        File.WriteAllText(path, "{\"View\":4}");
+        Assert.False(EditorLayoutPreferences.Load(path).NavigationCollapsed);
+        foreach (bool collapsed in new[] { true, false })
+        {
+            new EditorLayoutPreferences { NavigationCollapsed = collapsed }.Save(path);
+            Assert.Equal(collapsed, EditorLayoutPreferences.Load(path).NavigationCollapsed);
+        }
+    }
+    [Fact]
     public void LayoutRoundTripsAndInvalidSettingsRecover()
     {
         using var folder = new TempFolder(); string path = Path.Combine(folder.Path, "layout.json");

@@ -7,7 +7,7 @@ namespace SpeedLink.Desktop;
 
 public partial class MainWindow
 {
-    private bool navigationIsCollapsed = true;
+    private bool navigationIsCollapsed;
     private void ConfigureWorkspaceLayout()
     {
         string path = Path.Combine(vault, "editor-layout.json");
@@ -21,5 +21,8 @@ public partial class MainWindow
         NavigationColumn.Width = new(navigationIsCollapsed ? 52 : 155);
         foreach (var label in new[] { NavLabel0, NavLabel1, NavLabel2, NavLabel3, NavLabel4, NavLabel5 }) label.Visibility = navigationIsCollapsed ? Visibility.Collapsed : Visibility.Visible;
         NavigationToggle.ToolTip = navigationIsCollapsed ? "Expand navigation" : "Collapse navigation";
+        NavigationToggle.Content = navigationIsCollapsed ? "☰" : "☰  Navigation";
+        NavigationToggle.SetValue(System.Windows.Automation.AutomationProperties.NameProperty, navigationIsCollapsed ? "Show navigation labels" : "Hide navigation labels");
+        NavigationLabelsMenu.IsChecked = !navigationIsCollapsed;
     }
 }

@@ -5,7 +5,7 @@ namespace SpeedLink.Core;
 public sealed record PanelBounds(double? Left = null, double? Top = null, double Width = 340, double Height = 650);
 public sealed record EditorLayoutPreferences
 {
-    public bool NavigationCollapsed { get; init; } = true;
+    public bool NavigationCollapsed { get; init; }
     public bool BrowserHidden { get; init; }
     public bool BrowserFloating { get; init; }
     public bool GraphFloating { get; init; }

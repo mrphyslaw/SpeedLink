@@ -4,7 +4,7 @@ SpeedLink includes editor and logger definitions for all nine supported ROMs.
 You can install definition updates without replacing the EXE.
 
 1. Disconnect the adapter and finish any active operation.
-2. Select **Definitions** at the top of the window, then **Import…**.
+2. Choose **Tools → Manage definitions…**, then **Import…**.
 3. Choose one editor `.xml` file or logger `.json` file from a source you trust.
    Review its ROM ID, version and number of controls, then confirm the import.
 4. Reopen the ROM for editor updates. For logger updates, load the current ECU

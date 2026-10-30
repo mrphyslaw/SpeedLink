@@ -13,8 +13,9 @@ all seven profiles, including sustained requests, fault handling, desktop
 recording and USB interruption/reconnect checks. These tests use simulated ECU
 replies through real adapters. See the [validation results](../dotnet/docs/Validation.md).
 
-Choose **Help**, then select **Logger** for this guide inside the app. Choose Logger or
-Recordings in the left navigation; **☰** expands the workspace names.
+Choose **Help → Logger guide** for this guide inside the app. Choose Logger or
+Recordings in the labeled left navigation. **☰ Navigation** or
+**View → Navigation labels** switches between names and compact icons.
 
 ## Before you start
 

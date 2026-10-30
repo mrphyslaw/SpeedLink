@@ -40,6 +40,7 @@ jobs:
       - run: ./tools/Test-SupportUi.ps1 -Output TestResults/SupportUi
       - run: ./tools/Test-ReadProgressUi.ps1 -Output TestResults/ReadProgressUi
       - run: ./tools/Test-MenuUi.ps1 -Output TestResults/MenuUi
+      - run: ./tools/Test-NavigationUi.ps1 -Output TestResults/NavigationUi
       - run: ./tools/Test-MapWindowsUi.ps1 -Output TestResults/MapWindowsUi
       - run: ./tools/Test-LayoutUi.ps1 -Output TestResults/LayoutUi
       - run: ./tools/Test-LoggerUi.ps1 -Output TestResults/LoggerUi
@@ -67,7 +68,7 @@ jobs:
           if (-not $process.WaitForExit(30000)) { $process.Kill(); throw 'Standalone menu check timed out.' }
           if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $report -Raw; throw 'Standalone menus failed.' }
           $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-          if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or $result.menus.Count -ne 3) { throw 'Unexpected standalone menu result.' }
+          if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or !$result.permanentMenus -or !$result.labeledNavigation -or !$result.navigationRemembered -or $result.menus.Count -ne 5) { throw 'Unexpected standalone menu result.' }
       - name: Check standalone startup and bundled resources
         run: |
           $report = Join-Path (Get-Location) 'TestResults/Standalone_GUI.json'

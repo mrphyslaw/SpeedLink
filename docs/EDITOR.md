@@ -11,8 +11,9 @@ code checksum and markers; calibration edits do not change that code sum. Invali
 Gen 2 code is rejected without guessed repair. Every export is read back and
 verified before its final filename is published. Originals are preserved.
 
-This guide is also included in the app: choose **File → Editor guide**, or
-choose **Help** and select **Editor**. **Map info** inside a map pane, or
+This guide is also included in the app: choose **Help → Editor guide**.
+The top **File**, **Edit**, **View**, **Tools** and **Help** menus remain visible
+in every workspace. **Map info** inside a map pane, or
 **F1**, opens help for the selected map instead.
 
 ## Make your first edit
@@ -104,7 +105,7 @@ selector. The single-value card has its own baseline selector.
 
 Orange cell borders and browser dots identify differences from that baseline.
 Cell tooltips and the selection status show current, baseline and difference
-values. **Changed maps only** filters the browser. **View → Changes** opens a
+values. **Changed maps only** filters the browser. **View → Map layout and display → Changes** opens a
 list of changed maps; select an entry to jump to it. These are comparison views,
 not a record of the order in which edits were made.
 
@@ -120,7 +121,7 @@ it inside the workspace. The other panes retain their positions and sizes;
 manual placement and resizing allow overlap. Click a map or select it in the
 browser to bring it to the front, even if another pane covers it.
 
-**View → Tile maps side by side** and **Stack maps vertically** reset manual
+**View → Map layout and display → Tile maps side by side** and **Stack maps vertically** reset manual
 placement and restore automatic arrangement. Independently sized panes stay
 where you placed them when the window gets smaller; scroll the workspace to
 reach them. **Expand** gives one map the workspace; **Restore**
@@ -145,7 +146,9 @@ the same calibration restores its open maps, independent pane bounds, window bou
 text sizes, selections, scrolling and graph views. Different calibrations keep
 separate layouts. This restores presentation, not unsaved tuning edits.
 
-Use the app's **☰** button to collapse navigation to icons. **View → Hide map
+Use the app's **☰ Navigation** button to collapse navigation to icons, or toggle
+**View → Navigation labels**. The sidebar starts with names and remembers your
+choice. **View → Map layout and display → Hide map
 browser** (Ctrl+B) hides or restores the map list. Drag its edge to change its
 width, or pop it into a separate window.
 
@@ -172,7 +175,7 @@ remembered across launches and graph docking. **Fit map** resets that custom
 width to automatic sizing. Small-map previews stay directly beside their grids.
 Graph options are disabled for controls without a curve or surface.
 
-Use the graph's **↗** button or **View → Pop out graph** for a larger floating
+Use the graph's **↗** button or **View → Map layout and display → Pop out graph** for a larger floating
 view. **Dock graph** or closing the floating window returns it to the workspace.
 The map browser has equivalent pop-out/dock commands. Floating panels can move
 to another monitor. Navigation, browser visibility/width, curve-list width,
@@ -193,7 +196,7 @@ Fit map changes the workspace layout.
 
 ## Understand the active map
 
-Click **Map info**, press F1, or choose **View → Map information…**. The same
+Click **Map info**, press F1, or choose **View → Map layout and display → Map information…**. The same
 window comes forward for that map without reducing table height.
 It is unavailable until a map is selected.
 

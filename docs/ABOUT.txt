@@ -13,7 +13,7 @@ Independent 85–150% map text zoom, selections and graph views.
 Per-calibration map layouts and detached-window positions restore on ROM open.
 Floating editor panels follow the active workspace; empty graphs stay hidden.
 Nine tuning definitions, Fit map, floating panels, changes and undo/redo.
-Compact navigation, saved layouts and zoomable long MAF curves.
+Permanent application menus, labeled navigation, saved layouts and zoomable long MAF curves.
 Opening a ROM shows its maps; the Maps button restores the browser at any time.
 Compact wrapping value cards with units, Apply/Cancel, baseline and change.
 Rejected ROM files preserve the current session, unsaved edits and map windows.

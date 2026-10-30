@@ -5,6 +5,22 @@ into the same Windows app as the reader and logger. No adapter is needed to edit
 a file. ECU programming remains disabled in this alpha. The experimental Gen 2
 L3CGEE000 profile has separate [integrity checks and validation limits](../GEN2.md).
 
+## Find your way around
+
+![Permanent application menus and labeled workspace navigation](images/application-navigation.png)
+
+File, Edit, View, Tools and Help stay visible in every workspace. Open a ROM
+or recording from File. Find definition management in Tools and guides,
+support reports, crash reports and About in Help. Commands that need a ROM
+or map stay disabled until one is available.
+
+The sidebar shows icons and names by default. **☰ Navigation** and
+**View → Navigation labels** switch to compact icons and back; your choice is
+remembered. **View → Workspace** also switches screens. The example map uses
+synthetic values.
+
+![The File menu opens ROMs and recordings and saves a verified ROM copy](images/application-file-menu.png)
+
 ## Room for the map
 
 ![Two resizable map panes over one ROM](images/map-windows.png)
@@ -15,7 +31,7 @@ window, including editing controls, for another monitor. Each map retains its ow
 selection, text zoom and graph view. All panes share the same ROM and undo history.
 Drag titles to move panes inside the workspace. Manual resizing and movement
 allow overlap; clicking a map or selecting it in the browser brings it forward.
-Use **View → Tile maps side by side** to reset manual placement.
+Use **View → Map layout and display → Tile maps side by side** to reset manual placement.
 The multi-map screenshot uses synthetic values, not vehicle tuning advice.
 
 ![A lower curve widened independently below three scalar maps and another curve](images/independent-panes.png)
@@ -116,7 +132,7 @@ when you come back. The graph stays hidden until a graphable map is selected.
 
 Click **Map info** inside a map pane, or press **F1**, to open help without
 reducing the map's height. Reusing the control brings that map's help forward.
-**View → Map information…**
+**View → Map layout and display → Map information…**
 remains available too. Map info is disabled until a map is selected.
 Value units and input axes stay visible above the explanation. Help distinguishes
 targets and thresholds from multipliers and signed corrections, with simple
@@ -126,7 +142,7 @@ be scrolled. Cell tooltips and the status strip show comparison values.
 Axis titles and breakpoint headers have a distinct blue-gray band and bright
 borders separating them from editable data. Read-only MAF breakpoints use the
 same treatment.
-**View → Changes** opens a drawer
+**View → Map layout and display → Changes** opens a drawer
 of maps that differ from the selected baseline. Select a map there to jump to it.
 
 The **View** menu supports table and graph above/beside one another, plus
@@ -136,7 +152,7 @@ in place when switching to Logger or Recordings.
 
 Drag a map's edges or corners to change only its width and height. Close a pane with **×**, or close
 a detached window, to remove that view while keeping the shared ROM edits.
-For step-by-step controls and shortcuts, open **File → Editor guide** in the app
+For step-by-step controls and shortcuts, open **Help → Editor guide** in the app
 or use the [full editor guide](../EDITOR.md).
 
 ## First edit

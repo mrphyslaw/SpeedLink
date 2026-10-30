@@ -305,7 +305,7 @@ public partial class EditorWorkspace
         if (table.Rows * rowHeight + MapGrid.ColumnHeaderHeight > MapGrid.ActualHeight)
             size = ReadableTableFit.Calculate(MapGrid.ActualWidth - SystemParameters.VerticalScrollBarWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells);
         bool compact = CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, 0, 0) is not null;
-        double compactCell = Math.Clamp(Math.Floor((MapGrid.ActualWidth - MapGrid.RowHeaderWidth - 4) / table.Columns), 64, previewWidth is not null && ViewMode == 4 ? 160 : table.Columns <= 4 ? 112 : 88);
+        double compactCell = Math.Clamp(Math.Floor((MapGrid.ActualWidth - MapGrid.RowHeaderWidth - 4) / table.Columns), Math.Min(64, minimum), previewWidth is not null && ViewMode == 4 ? 160 : table.Columns <= 4 ? 112 : 88);
         foreach (var column in MapGrid.Columns) { column.MinWidth = minimum; column.Width = new(Math.Max(minimum, compact && autoFitCells ? compactCell : size.ColumnWidth)); }
         MapGrid.RowHeight = compact ? Math.Max(size.RowHeight, 28 * cellZoom) : size.RowHeight;
     }
