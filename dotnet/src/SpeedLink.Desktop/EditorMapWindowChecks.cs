@@ -187,6 +187,7 @@ public partial class EditorWorkspace
         if (calibration == "L38KEH000") await CaptureMapWindowGallery(folder);
         ClearMapWindows(); MapTabs.Items.Clear(); await Idle();
         Check(NoMapPanel.IsVisible && document == doc, "Closing all maps retains ROM and browse prompt");
+        cases.AddRange(await ExerciseCompactScalarPanes(folder));
         return new { passed = true, cases, calibration, hardwareAccessed = false, synthetic = true };
     }
     private async Task CaptureMapWindowGallery(string folder)

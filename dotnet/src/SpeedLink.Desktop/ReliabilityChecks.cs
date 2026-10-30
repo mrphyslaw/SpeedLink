@@ -14,7 +14,9 @@ public partial class MainWindow
         void Check(bool condition, string name)
         { if (!condition) throw new InvalidOperationException(name); cases.Add(name); }
         async Task Idle() { await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle); UpdateLayout(); }
-        Show(); OpenEditorFile(rom); await Idle();
+        Show(); Navigate(1);
+        cases.AddRange(await EditorPane.ExerciseRejectedRomFiles(rom, folder));
+        OpenEditorFile(rom); await Idle();
         var editor = EditorPane;
         var map = editor.Document!.Definition.Tables.First(t => t.Rows > 1 && t.Columns > 1 && !t.IsChoice);
         editor.OpenTable(map);

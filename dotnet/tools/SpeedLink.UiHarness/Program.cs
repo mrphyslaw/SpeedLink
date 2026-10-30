@@ -67,7 +67,7 @@ internal static class Program
             };
             replayApp.Run(); return resultCode;
         }
-        if (args.Contains("--map-windows-offline", StringComparer.Ordinal) || args.Contains("--editor-offline", StringComparer.Ordinal) || args.Contains("--workbench-offline", StringComparer.Ordinal) || args.Contains("--definitions-offline", StringComparer.Ordinal) || args.Contains("--layout-offline", StringComparer.Ordinal) || args.Contains("--reliability-offline", StringComparer.Ordinal))
+        if (args.Contains("--scalar-cards-offline", StringComparer.Ordinal) || args.Contains("--map-windows-offline", StringComparer.Ordinal) || args.Contains("--editor-offline", StringComparer.Ordinal) || args.Contains("--workbench-offline", StringComparer.Ordinal) || args.Contains("--definitions-offline", StringComparer.Ordinal) || args.Contains("--layout-offline", StringComparer.Ordinal) || args.Contains("--reliability-offline", StringComparer.Ordinal))
         {
             var editorApp = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int resultCode = 1;
             editorApp.DispatcherUnhandledException += (_, failure) =>
@@ -96,7 +96,13 @@ internal static class Program
                     string output = Get("--output"); Directory.CreateDirectory(output);
                     string path = Path.Combine(output, "SYNTHETIC_NOT_ECU_FIRMWARE_" + profile.Calibration + ".bin"); File.WriteAllBytes(path, image);
                     object workflow;
-                    if (args.Contains("--map-windows-offline", StringComparer.Ordinal))
+                    if (args.Contains("--scalar-cards-offline", StringComparer.Ordinal))
+                    {
+                        workbench = new MainWindow(Path.Combine(output, "data"), new SpeedLink.Core.RomInspector([profile]), guard); editorApp.MainWindow = workbench;
+                        workbench.Show(); workbench.OpenEditorFile(path); workbench.UpdateLayout();
+                        workflow = new { passed = true, cases = await workbench.EditorPane.ExerciseCompactScalarPanes(output) };
+                    }
+                    else if (args.Contains("--map-windows-offline", StringComparer.Ordinal))
                     {
                         workbench = new MainWindow(Path.Combine(output, "data"), new SpeedLink.Core.RomInspector([profile]), guard); editorApp.MainWindow = workbench;
                         workflow = await workbench.ExerciseMapWindowsOffline(path, output);

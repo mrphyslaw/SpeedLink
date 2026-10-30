@@ -15,7 +15,7 @@ live data, **Recordings** to review logs, **ROM checks** to inspect a file, or
 
 1. Choose **Editor → File → Open ROM…** and select a complete supported ROM.
 2. Find a map in the browser. **Map info** or F1 explains its units and purpose.
-3. For a single value, type in the field and choose **Apply value** or Enter;
+3. For a single value, type in the field and choose **Apply** or Enter;
    **Cancel** or Escape discards typing. For a table, double-click a cell, enter
    a value and press Enter. Switches use named choices.
 4. Compare with the original or last save and use Undo/Redo as needed.

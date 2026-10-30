@@ -24,7 +24,7 @@ public partial class EditorWorkspace
             doc.Definition.Tables.First(t => t.Count == 1 && !t.IsChoice && t.Storage == "float");
         OpenTable(scalar); SetViewMode(4); await Settle();
         if (!ScalarInput.IsVisible || !ScalarPanel.IsVisible || TablePanel.IsVisible || GraphPanel.IsVisible || DataSplitter.IsVisible || EditBar.IsVisible ||
-            ScalarUnits.Text != scalar.Units || ScalarDescription.Text != scalar.Description || ScalarInput.FontSize < 28)
+            ScalarUnits.Text != scalar.Units || HelpText.Text != scalar.Description || !ScalarInfoButton.IsVisible || ScalarInput.FontSize != 13)
             throw new InvalidOperationException("Scalar values do not have a dedicated, labeled value editor.");
         ScalarInput.Focus(); await Settle();
         double original = doc.Read(scalar, 0);

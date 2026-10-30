@@ -22,12 +22,17 @@ public partial class EditorWorkspace
     }
     private EditorWorkspace? mapOwner, activeMap;
     private readonly List<MapSlot> mapSlots = [];
-    private readonly Grid mapDock = new();
+    private readonly Grid mapDock = new() { HorizontalAlignment = HorizontalAlignment.Left };
     private readonly ScrollViewer mapDockScroll = new() { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, HorizontalContentAlignment = HorizontalAlignment.Stretch, VerticalContentAlignment = VerticalAlignment.Stretch };
     private MapSlot? expandedMap;
     private double dockColumnFraction = .5, dockRowFraction = .5;
     private int dockColumns = 2;
     private double[] dockRowWeights = [];
+    private double[] scalarColumnWidths = [];
+    private bool scalarDock;
+    private bool resizingDock;
+    private int scalarDockColumns = 1;
+    private const double ScalarCardWidth = 300;
     private double cellZoom = 1;
     private bool autoFitCells = true, updatingMapControls, rebuildingDock, restoringMaps, disposingMaps, gridDraft;
     private double measuredCellWidth = double.NaN;
@@ -158,40 +163,68 @@ public partial class EditorWorkspace
             var docked = mapSlots.Where(s => s.Window is null && (s.Editor.table is not null || emptyDock && ReferenceEquals(s.Editor, this))).ToArray();
             var visible = expandedMap is not null ? docked.Where(s => ReferenceEquals(s, expandedMap)).ToArray() : docked;
             foreach (var slot in mapSlots.Where(s => s.Window is null)) slot.Frame.Visibility = visible.Contains(slot) ? Visibility.Visible : Visibility.Collapsed;
-            int columns = visible.Length <= 1 || mapDockScroll.ActualWidth is > 0 and < 540 ? 1 : dockColumns;
+            scalarDock = expandedMap is null && visible.Length > 0 && visible.All(s => s.Editor.ScalarMap);
+            int columns = scalarDock ? ScalarColumns(visible.Length) : visible.Length <= 1 || mapDockScroll.ActualWidth is > 0 and < 540 ? 1 : dockColumns;
+            scalarDockColumns = columns;
             int rows = Math.Max(1, (visible.Length + columns - 1) / columns);
+            double available = Math.Max(1, (mapDockScroll.ViewportWidth > 0 ? mapDockScroll.ViewportWidth : mapDockScroll.ActualWidth) - (columns - 1) * 7);
+            var widths = Enumerable.Range(0, columns).Select(c => scalarColumnWidths.Length == columns ? scalarColumnWidths[c] : ScalarCardWidth).ToArray();
+            double widthScale = Math.Min(1, available / widths.Sum());
             for (int c = 0; c < columns; c++)
             {
                 if (c > 0) mapDock.ColumnDefinitions.Add(new() { Width = new(7) });
-                mapDock.ColumnDefinitions.Add(new() { Width = new(columns == 1 ? 1 : c == 0 ? dockColumnFraction : 1 - dockColumnFraction, GridUnitType.Star), MinWidth = 260 });
+                mapDock.ColumnDefinitions.Add(scalarDock
+                    ? new() { Width = new(Math.Max(220, widths[c] * widthScale), GridUnitType.Star), MinWidth = 220 }
+                    : new() { Width = new(columns == 1 ? 1 : c == 0 ? dockColumnFraction : 1 - dockColumnFraction, GridUnitType.Star), MinWidth = 260 });
             }
             for (int r = 0; r < rows; r++)
             {
                 if (r > 0) mapDock.RowDefinitions.Add(new() { Height = new(7) });
                 double weight = dockRowWeights.Length == rows ? dockRowWeights[r] : rows == 2 ? r == 0 ? dockRowFraction : 1 - dockRowFraction : 1;
-                mapDock.RowDefinitions.Add(new() { Height = new(weight, GridUnitType.Star), MinHeight = 260 });
+                bool scalarOnly = visible.Skip(r * columns).Take(columns).All(s => s.Editor.ScalarMap);
+                // Values start at their content height. A deliberate divider resize
+                // still restores its saved proportions, including for scalar rows.
+                mapDock.RowDefinitions.Add(new() { Height = scalarOnly && dockRowWeights.Length != rows ? GridLength.Auto : new(weight, GridUnitType.Star), MinHeight = scalarOnly ? 100 : 260 });
             }
             for (int i = 0; i < visible.Length; i++)
             {
                 var slot = visible[i]; Grid.SetRow(slot.Frame, (i / columns) * 2); Grid.SetColumn(slot.Frame, (i % columns) * 2);
                 if (!mapDock.Children.Contains(slot.Frame)) mapDock.Children.Add(slot.Frame);
-                slot.Editor.ExpandMapButton.Content = ReferenceEquals(slot, expandedMap) ? "Restore" : "Expand";
+                bool expanded = ReferenceEquals(slot, expandedMap);
+                slot.Editor.ExpandMapButton.Content = slot.Editor.ScalarMap ? expanded ? "⤡" : "⤢" : expanded ? "Restore" : "Expand";
+                System.Windows.Automation.AutomationProperties.SetName(slot.Editor.ExpandMapButton, expanded ? "Restore map layout" : "Expand map");
             }
-            if (columns == 2) AddDockSplitter(true, 1, rows * 2 - 1);
+            for (int c = 1; c < columns * 2 - 1; c += 2) AddDockSplitter(true, c, rows * 2 - 1);
             for (int r = 1; r < rows * 2 - 1; r += 2) AddDockSplitter(false, r, columns * 2 - 1);
             UpdateDockExtent();
         }
         finally { rebuildingDock = false; }
     }
+    private int ScalarColumns(int count)
+    {
+        double available = mapDockScroll.ViewportWidth > 0 ? mapDockScroll.ViewportWidth : mapDockScroll.ActualWidth;
+        return dockColumns == 1 ? 1 : Math.Min(count, Math.Clamp((int)((available + 7) / (ScalarCardWidth + 7)), 1, 6));
+    }
     private void UpdateDockExtent()
     {
+        if (resizingDock) return;
         int rows = Math.Max(1, (mapDock.RowDefinitions.Count + 1) / 2);
-        if (mapDockScroll.ViewportWidth is > 0 and < 100000) mapDock.Width = mapDockScroll.ViewportWidth;
-        mapDock.Height = Math.Max(0, Math.Max(mapDockScroll.ActualHeight - 2, rows * 260 + (rows - 1) * 7));
+        if (scalarDock && !rebuildingDock && ScalarColumns(mapSlots.Count(s => s.Window is null && s.Editor.table is not null)) != scalarDockColumns) { ArrangeMaps(); return; }
+        if (mapDockScroll.ViewportWidth is > 0 and < 100000)
+        {
+            if (scalarDock)
+            {
+                var widths = Enumerable.Range(0, scalarDockColumns).Select(c => scalarColumnWidths.Length == scalarDockColumns ? scalarColumnWidths[c] : ScalarCardWidth).ToArray();
+                double scale = Math.Min(1, Math.Max(1, mapDockScroll.ViewportWidth - (scalarDockColumns - 1) * 7) / widths.Sum());
+                for (int c = 0; c < widths.Length; c++) mapDock.ColumnDefinitions[c * 2].Width = new(Math.Max(220, widths[c] * scale), GridUnitType.Star);
+            }
+            mapDock.Width = scalarDock ? Math.Min(mapDockScroll.ViewportWidth, mapDock.ColumnDefinitions.Sum(c => c.Width.Value)) : mapDockScroll.ViewportWidth;
+        }
+        mapDock.Height = Math.Max(0, Math.Max(mapDockScroll.ActualHeight - 2, mapDock.RowDefinitions.Sum(r => r.MinHeight) + (rows - 1) * 7));
         if (mapSlots.Count(s => s.Window is null && s.Editor.table is not null) > 1 && expandedMap is null && !rebuildingDock)
         {
             bool narrow = mapDockScroll.ActualWidth < 540;
-            if (narrow && mapDock.ColumnDefinitions.Count == 3 || !narrow && mapDock.ColumnDefinitions.Count == 1 && dockColumns == 2) ArrangeMaps();
+            if (!scalarDock && (narrow && mapDock.ColumnDefinitions.Count == 3 || !narrow && mapDock.ColumnDefinitions.Count == 1 && dockColumns == 2)) ArrangeMaps();
         }
     }
     private void AddDockSplitter(bool vertical, int position, int span)
@@ -200,12 +233,15 @@ public partial class EditorWorkspace
             ResizeDirection = vertical ? GridResizeDirection.Columns : GridResizeDirection.Rows, ResizeBehavior = GridResizeBehavior.PreviousAndNext,
             ToolTip = vertical ? "Resize map widths" : "Resize map heights", ShowsPreview = false };
         System.Windows.Automation.AutomationProperties.SetName(splitter, vertical ? "Resize map widths" : "Resize map heights");
+        splitter.DragStarted += (_, _) => resizingDock = true;
         if (vertical) { Grid.SetColumn(splitter, position); Grid.SetRowSpan(splitter, span); }
         else { Grid.SetRow(splitter, position); Grid.SetColumnSpan(splitter, span); }
         splitter.DragCompleted += (_, e) =>
         {
+            resizingDock = false;
             if (e.Canceled) { ArrangeMaps(); return; }
-            if (vertical) dockColumnFraction = Math.Clamp(mapDock.ColumnDefinitions[0].ActualWidth / Math.Max(1, mapDock.ActualWidth - 7), .2, .8);
+            if (vertical && scalarDock) { scalarColumnWidths = mapDock.ColumnDefinitions.Where((_, i) => i % 2 == 0).Select(c => Math.Clamp(c.ActualWidth, 220, 800)).ToArray(); ArrangeMaps(); }
+            else if (vertical) dockColumnFraction = Math.Clamp(mapDock.ColumnDefinitions[0].ActualWidth / Math.Max(1, mapDock.ActualWidth - 7), .2, .8);
             else if (mapDock.RowDefinitions.Count == 3) dockRowFraction = Math.Clamp(mapDock.RowDefinitions[0].ActualHeight / Math.Max(1, mapDock.ActualHeight - 7), .2, .8);
             if (!vertical)
             {
@@ -222,6 +258,7 @@ public partial class EditorWorkspace
         root.dockColumns = sender is MenuItem { Tag: "1" } ? 1 : 2;
         root.dockColumnFraction = root.dockRowFraction = .5;
         root.dockRowWeights = [];
+        root.scalarColumnWidths = [];
         root.ArrangeMaps(); root.QueueMapSave();
     }
     private void ExpandMap_Click(object sender, RoutedEventArgs e)
@@ -263,8 +300,9 @@ public partial class EditorWorkspace
         }
         mapDock.Children.Remove(slot.Frame);
         var window = Floating("SpeedLink · " + editor.table!.Name, slot.Bounds.Width, slot.Bounds.Height, slot.Bounds);
-        window.MinWidth = 300; window.MinHeight = 330; window.ShowInTaskbar = true;
-        slot.Window = window; window.Content = slot.Frame; editor.UndockMapButton.Content = "Dock";
+        if (editor.ScalarMap && slot.Bounds.Width == 840 && slot.Bounds.Height == 650) { window.Width = 320; window.Height = 200; }
+        window.MinWidth = editor.ScalarMap ? 280 : 300; window.MinHeight = editor.ScalarMap ? 200 : 330; window.ShowInTaskbar = true;
+        slot.Window = window; window.Content = slot.Frame; editor.RefreshMapControls();
         window.LocationChanged += (_, _) => QueueMapSave();
         window.SizeChanged += (_, _) => QueueMapSave();
         window.Closing += (_, args) =>
@@ -274,7 +312,7 @@ public partial class EditorWorkspace
         window.Closed += (_, _) =>
         {
             slot.Bounds = Bounds(window, slot.Bounds); window.Content = null; slot.Window = null;
-            editor.UndockMapButton.Content = "Undock";
+            editor.RefreshMapControls();
             if (!disposingMaps)
             {
                 expandedMap = null;
@@ -345,12 +383,27 @@ public partial class EditorWorkspace
     {
         if (PaneCaption is null) return;
         PaneCaption.Text = table?.Name ?? "Choose a map"; PaneCaption.ToolTip = PaneCaption.Text;
+        PaneCaption.TextWrapping = ScalarMap ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        PaneCaption.TextTrimming = ScalarMap ? TextTrimming.None : TextTrimming.CharacterEllipsis;
+        bool detached = MapRoot.mapSlots.Any(s => ReferenceEquals(s.Editor, this) && s.Window is not null);
+        UndockMapButton.Content = ScalarMap ? detached ? "↙" : "↗" : detached ? "Dock" : "Undock";
+        System.Windows.Automation.AutomationProperties.SetName(UndockMapButton, detached ? "Dock map" : "Undock map");
+        UndockMapButton.ToolTip = detached ? "Dock this map back in the editor" : "Move this map into its own resizable window";
+        UndockMapButton.Padding = ExpandMapButton.Padding = CloseMapButton.Padding = ScalarMap ? new(5, 2, 5, 2) : new(8, 3, 8, 3);
+        foreach (var button in new[] { UndockMapButton, ExpandMapButton, CloseMapButton, ScalarInfoButton })
+        { button.MinWidth = 0; button.Width = ScalarMap ? 24 : double.NaN; }
+        bool expanded = ReferenceEquals(MapRoot.expandedMap?.Editor, this);
+        ExpandMapButton.Content = ScalarMap ? expanded ? "⤡" : "⤢" : expanded ? "Restore" : "Expand";
         CloseMapButton.IsEnabled = UndockMapButton.IsEnabled = ExpandMapButton.IsEnabled = table is not null;
         updatingMapControls = true;
         AutoFitBox.IsChecked = autoFitCells; CellZoomText.Text = cellZoom.ToString("P0", CultureInfo.InvariantCulture);
         PaneViewBox.SelectedIndex = ViewMode; CellZoomOut.IsEnabled = cellZoom > .85; CellZoomIn.IsEnabled = cellZoom < 1.5;
         var controls = table is { Count: > 1 } ? Visibility.Visible : Visibility.Collapsed;
         AutoFitBox.Visibility = CellZoomOut.Visibility = CellZoomIn.Visibility = CellZoomText.Visibility = PaneViewBox.Visibility = controls;
+        ScalarInfoButton.Visibility = ScalarMap ? Visibility.Visible : Visibility.Collapsed;
+        MapInfoButton.Visibility = ValueUnitsText.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
+        CellText.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
+        if (mapOwner is not null) WorkspaceRoot.RowDefinitions[2].Height = new(ScalarMap ? 0 : 24);
         PaneViewBox.IsEnabled = table is { IsChoice: false };
         updatingMapControls = false;
     }
@@ -400,7 +453,7 @@ public partial class EditorWorkspace
         mapSaveTimer?.Stop();
         var state = new MapWorkspacePreferences { Calibration = document.Definition.Calibration,
             Maps = mapSlots.Where(s => s.Editor.table is not null).Select(s => CaptureMap(s.Editor)).ToArray(),
-            Active = activeMap?.table is { } t ? MapKey(t) : "", Columns = dockColumns, ColumnFraction = dockColumnFraction, RowFraction = dockRowFraction, RowWeights = dockRowWeights };
+            Active = activeMap?.table is { } t ? MapKey(t) : "", Columns = dockColumns, ColumnFraction = dockColumnFraction, RowFraction = dockRowFraction, RowWeights = dockRowWeights, ScalarColumnWidths = scalarColumnWidths };
         mapProfiles = mapProfiles.Where(p => p.Calibration != state.Calibration).Append(state).TakeLast(32).ToArray();
         try { MapWorkspacePreferences.Save(mapsPath, mapProfiles); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException) { EditorStatus.ToolTip = "Map layout could not be saved: " + error.Message; }
@@ -438,6 +491,7 @@ public partial class EditorWorkspace
         {
             dockColumns = saved.Columns; dockColumnFraction = saved.ColumnFraction; dockRowFraction = saved.RowFraction;
             dockRowWeights = saved.RowWeights;
+            scalarColumnWidths = saved.ScalarColumnWidths;
             foreach (var state in saved.Maps)
             {
                 var selected = document.Definition.Tables.FirstOrDefault(t => MapKey(t) == state.Key); if (selected is null) continue;

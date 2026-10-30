@@ -21,6 +21,9 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
     }
     $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
     if (!$result.passed -or !$result.workflow.passed -or !$result.synthetic -or $result.hardwareAccessed -or $result.workflow.cases.Count -lt 20) { throw "Unexpected reliability result: $calibration" }
+    foreach ($required in @('Empty editor: unsupported-program reports one recoverable error', 'Edited multi-map workspace: unsupported-program reports one recoverable error', 'Rejected unsupported-program preserves unsaved bytes and undo', 'Rejected unsupported-program preserves docked and detached maps, selections and zoom', 'Supported calibration-only modified ROM opens after unsupported rejection', 'Unexpected programming errors still reach fatal crash reporting')) {
+        if ($result.workflow.cases -notcontains $required) { throw "Missing ROM rejection regression: $calibration; $required" }
+    }
     $reports += $result
 }
 @{ passed = $true; hardwareAccessed = $false; reports = $reports } | ConvertTo-Json -Depth 14 | Set-Content -LiteralPath (Join-Path $runRoot 'summary.json') -Encoding utf8

@@ -48,6 +48,7 @@ public partial class EditorWorkspace : UserControl
     {
         var opened = new RomEditor(File.ReadAllBytes(path), path, inspector, codeGuard, Definitions);
         SaveMapWorkspace(); ClearMapWindows();
+        scalarColumnWidths = [];
         restoringMaps = true;
         try
         {
@@ -67,7 +68,7 @@ public partial class EditorWorkspace : UserControl
     internal static void ExecuteEditorAction(Action action, Action<string> report)
     {
         try { action(); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or System.Xml.XmlException or FormatException or OverflowException)
+        catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or System.Xml.XmlException or FormatException or OverflowException)
         { report(error.Message); }
     }
     private bool FinishEdit() => CommitScalar() && MapGrid.CommitEdit(DataGridEditingUnit.Row, true);

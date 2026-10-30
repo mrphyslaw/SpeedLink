@@ -1,5 +1,24 @@
 # C# validation
 
+## ROM-open recovery and compact values — 0.7.0-alpha.2
+
+- Each of the nine editor profiles exercises a program-modified file that passes
+  native integrity but fails stock program identification, an unknown calibration,
+  a truncated file and an invalid boot. Rejection is checked in an empty editor
+  and with unsaved edits, undo history, selections and a detached map. Tests then
+  undo, redo, save with mandatory integrity, open a supported calibration-only
+  edited file, and reopen the original. Unexpected programming exceptions still
+  propagate to fatal crash reporting.
+- Nine map-window workflows require five simultaneous value/state cards to fit
+  without internal scrolling at 1280×850 and 1024×768. Default cards are at most
+  302 pixels wide and rows at most 150 pixels high; inputs use standard 13-DIP
+  text. Tests exercise wrapping when the browser opens, row/column resizing,
+  calibration-bound size restoration, full Map info, conditional Apply/Cancel,
+  invalid input and named-state undo. Core coverage bounds saved card widths and
+  verifies compatibility with layouts saved before card support.
+- These checks use synthetic fixtures and no adapter or vehicle. Program-layout
+  protections, mandatory ROM-save integrity and disabled ECU programming remain.
+
 ## Resizable map windows — 0.7.0-alpha.1
 
 - Required Core coverage exercises measured cell minimums across table shapes,
