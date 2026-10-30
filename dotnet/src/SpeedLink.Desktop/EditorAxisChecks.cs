@@ -38,12 +38,20 @@ public partial class EditorWorkspace
             throw new InvalidOperationException($"Axis scrolling fixture did not overflow: {scroll.ScrollableWidth}/{scroll.ScrollableHeight}.");
         var xBefore = XAxisText.TransformToAncestor(TablePanel).TransformBounds(new Rect(XAxisText.RenderSize));
         var yBefore = YAxisText.TransformToAncestor(TablePanel).TransformBounds(new Rect(YAxisText.RenderSize));
+        CheckAxisRowAlignment();
         SelectCell(255);
         scroll.ScrollToRightEnd(); scroll.ScrollToBottom();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
         var xAfter = XAxisText.TransformToAncestor(TablePanel).TransformBounds(new Rect(XAxisText.RenderSize));
         var yAfter = YAxisText.TransformToAncestor(TablePanel).TransformBounds(new Rect(YAxisText.RenderSize));
-        if (xAfter != xBefore || yAfter != yBefore || scroll.HorizontalOffset == 0 || scroll.VerticalOffset == 0 ||
+        CheckAxisRowAlignment();
+        // Titles stay in their bands. A clipped edge cell or the unused part
+        // of the final row may change the visible data span by under one cell;
+        // in that case the title must recenter instead of staying over blank space.
+        if (Math.Abs(xAfter.Top - xBefore.Top) > .5 || Math.Abs(yAfter.Left - yBefore.Left) > .5 ||
+            Math.Abs((xAfter.Left + xAfter.Right - xBefore.Left - xBefore.Right) / 2) > MapGrid.Columns.Max(c => c.ActualWidth) / 2 + 1 ||
+            Math.Abs((yAfter.Top + yAfter.Bottom - yBefore.Top - yBefore.Bottom) / 2) > MapGrid.RowHeight / 2 + 1 ||
+            scroll.HorizontalOffset == 0 || scroll.VerticalOffset == 0 ||
             Math.Abs(AxisHeaderSpacer.ActualWidth - MapGrid.RowHeaderWidth) > .5 || AxisScrollbarSpacer.ActualWidth < 10)
             throw new InvalidOperationException("Axis titles moved or lost their header alignment while scrolling.");
         var lastRow = (DataGridRow)MapGrid.ItemContainerGenerator.ContainerFromIndex(15);

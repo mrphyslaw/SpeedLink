@@ -81,8 +81,9 @@ public partial class EditorWorkspace
         var frame = Bounds(AxisFrame);
         if (!AxisFrame.IsVisible || AxisFrame.BorderThickness != new Thickness(1) ||
             Math.Abs(frame.Left) > 1 || Math.Abs(frame.Top) > 1 || Math.Abs(frame.Right - right) > 1 || Math.Abs(frame.Bottom - bottom) > 1 ||
-            Math.Abs(frame.Right - Bounds(XAxisChrome).Right) > 1 || Math.Abs(frame.Bottom - Bounds(YAxisBand).Bottom) > 1)
-            throw new InvalidOperationException("The table's axis frame does not join at its viewport corners.");
+            XAxisBand.IsVisible && Math.Abs(frame.Right - Bounds(XAxisChrome).Right) > 1 ||
+            YAxisBand.IsVisible && Math.Abs(frame.Bottom - Bounds(YAxisBand).Bottom) > 1)
+            throw new InvalidOperationException($"The table's axis frame does not join at its viewport corners: {table?.Name}; frame {frame}, right {right}, bottom {bottom}.");
     }
 
     private async Task CheckStockScrolling(string folder)

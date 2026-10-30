@@ -67,7 +67,7 @@ internal static class Program
             };
             replayApp.Run(); return resultCode;
         }
-        if (args.Contains("--navigation-offline", StringComparer.Ordinal) || args.Contains("--scalar-cards-offline", StringComparer.Ordinal) || args.Contains("--map-windows-offline", StringComparer.Ordinal) || args.Contains("--editor-offline", StringComparer.Ordinal) || args.Contains("--workbench-offline", StringComparer.Ordinal) || args.Contains("--definitions-offline", StringComparer.Ordinal) || args.Contains("--layout-offline", StringComparer.Ordinal) || args.Contains("--reliability-offline", StringComparer.Ordinal))
+        if (args.Contains("--axes-offline", StringComparer.Ordinal) || args.Contains("--navigation-offline", StringComparer.Ordinal) || args.Contains("--scalar-cards-offline", StringComparer.Ordinal) || args.Contains("--map-windows-offline", StringComparer.Ordinal) || args.Contains("--editor-offline", StringComparer.Ordinal) || args.Contains("--workbench-offline", StringComparer.Ordinal) || args.Contains("--definitions-offline", StringComparer.Ordinal) || args.Contains("--layout-offline", StringComparer.Ordinal) || args.Contains("--reliability-offline", StringComparer.Ordinal))
         {
             var editorApp = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown }; int resultCode = 1;
             editorApp.DispatcherUnhandledException += (_, failure) =>
@@ -96,7 +96,12 @@ internal static class Program
                     string output = Get("--output"); Directory.CreateDirectory(output);
                     string path = Path.Combine(output, "SYNTHETIC_NOT_ECU_FIRMWARE_" + profile.Calibration + ".bin"); File.WriteAllBytes(path, image);
                     object workflow;
-                    if (args.Contains("--navigation-offline", StringComparer.Ordinal))
+                    if (args.Contains("--axes-offline", StringComparer.Ordinal))
+                    {
+                        workbench = new MainWindow(Path.Combine(output, "data"), new SpeedLink.Core.RomInspector([profile]), guard); editorApp.MainWindow = workbench;
+                        workflow = await workbench.ExerciseEveryTableAxesOffline(path, output, args.Contains("--table", StringComparer.Ordinal) ? Get("--table") : null, args.Contains("--panes-only", StringComparer.Ordinal));
+                    }
+                    else if (args.Contains("--navigation-offline", StringComparer.Ordinal))
                     {
                         workbench = new MainWindow(Path.Combine(output, "data"), new SpeedLink.Core.RomInspector([profile]), guard); editorApp.MainWindow = workbench;
                         workflow = await workbench.ExerciseNavigationOffline(path, output);

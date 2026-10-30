@@ -23,6 +23,15 @@ synthetic values.
 
 ## Room for the map
 
+### Axis titles follow the data
+
+![Axis titles centered on the visible rows and columns of two short tables](images/table-axis-alignment.png)
+
+Vertical titles sit beside the populated rows and horizontal titles sit above the
+populated columns. Empty space and scrollbars do not pull them away from the data.
+Titles follow scrolling and resizing; hover to read a full title in a small pane.
+This example uses synthetic values.
+
 ![Two resizable map panes over one ROM](images/map-windows.png)
 
 Open related maps together, drag a pane's own edge or corner to resize only it, and use **Expand** to

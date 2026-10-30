@@ -134,6 +134,12 @@ reducing precision. Axis headings stay visible. **− / +** deliberately changes
 that map's text size between 85% and 150%, with matching cell minimums. Turning
 Auto fit off uses fixed spacing. Resizing and expanding preserve the chosen zoom.
 
+Axis titles are centered on the visible table data: the top title sits over the
+populated columns, and the vertical title sits beside the populated rows. Empty
+space, row headers and scrollbars are excluded. They stay alongside the visible
+cells while scrolling and resizing. Long titles can be trimmed in very small
+panes; hover over an axis title to read its full name and units.
+
 **Undock** moves a map and its editing controls into a separate resizable Windows
 window, which can move to another monitor. **Dock** returns it. Dragging a map's
 title outside the workspace also detaches it; dropping that window over the editor docks it. Closing
