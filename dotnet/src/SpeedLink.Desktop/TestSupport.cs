@@ -18,17 +18,22 @@ internal sealed class LoggerOnlyTestTransport(IReadTransport inner, LoggerDefini
     public int ReadChunkSize => inner.ReadChunkSize;
     public bool ReadAttempted { get => inner.ReadAttempted; set => inner.ReadAttempted = value; }
     public byte[] Exchange(byte[] request)
+        => ExchangeCore(request, () => inner.Exchange(request));
+    public byte[] ExchangeLogger(byte[] request, int expectedResponseLength)
+        => ExchangeCore(request, () => inner.ExchangeLogger(request, expectedResponseLength));
+    private byte[] ExchangeCore(byte[] request, Func<byte[]> exchange)
     {
         string hex = Convert.ToHexString(request);
-        if (!allowed.Contains(hex)) throw new InvalidOperationException("Logging test blocked a non-logging request before hardware I/O.");
-        Requests.Add(hex); return inner.Exchange(request);
+        if (!allowed.Contains(hex) && !(Mode01LoggerProtocol.IsAllowed(request) && request.Skip(1).All(id => allowed.Contains("2200" + id.ToString("X2")))))
+            throw new InvalidOperationException("Logging test blocked a non-logging request before hardware I/O.");
+        Requests.Add(hex); return exchange();
     }
     public void Dispose() { Disposed = true; inner.Dispose(); }
 }
 
 public partial class MainWindow
 {
-    internal async Task<Dictionary<string, object?>> ExerciseLoggerHardware(string port, string rom, string screenshot, bool tactrix, bool realEcu = false)
+    internal async Task<Dictionary<string, object?>> ExerciseLoggerHardware(string port, string rom, string screenshot, bool tactrix, bool realEcu = false, int performanceSeconds = 0)
     {
         Show(); UpdateLayout(); AdapterBox.SelectedIndex = tactrix ? 1 : 0; PortBox.Text = port; BaudBox.SelectedItem = 115200;
         await ClickAndWait(ConnectButton);
@@ -39,18 +44,23 @@ public partial class MainWindow
         var retainedIdentity = identity; var retainedCalibration = loggerCalibration;
         foreach (var row in loggerRows) row.Selected = new[] { "engine_rpm", "boost_pressure", "actual_lambda", "fuel_rail_pressure", "knock_retard", "injector_duty_cycle" }.Contains(row.Id);
         RecordCsvBox.IsChecked = true; Controls(); bool locked = false;
+        if (performanceSeconds > 0 && (int)LoggerRateBox.SelectedValue != 0) throw new InvalidOperationException("Performance test must use Max polling.");
+        var cycleWatch = new System.Diagnostics.Stopwatch();
         var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(20) };
         timer.Tick += (_, _) =>
         {
             locked |= loggingActive && !LoggerRomButton.IsEnabled && !ReadButton.IsEnabled;
-            if (loggerScans >= 5 && LoggerStopButton.IsEnabled) { timer.Stop(); LoggerStopButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); }
+            if (loggerScans >= (performanceSeconds > 0 ? 1 : 5) && (performanceSeconds == 0 || cycleWatch.Elapsed.TotalSeconds >= performanceSeconds) && LoggerStopButton.IsEnabled)
+            { timer.Stop(); LoggerStopButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); }
         };
         var cycleReports = new List<object>();
         for (int cycle = 0; cycle < 3; cycle++)
         {
+            if (performanceSeconds > 0 && cycle == 0) foreach (var row in loggerRows) row.Selected = row.Id == "engine_rpm";
+            if (performanceSeconds > 0 && cycle == 1) foreach (var row in loggerRows) row.Selected = new[] { "engine_rpm", "boost_pressure", "actual_lambda", "fuel_rail_pressure", "knock_retard", "injector_duty_cycle" }.Contains(row.Id);
             if (realEcu && cycle == 2) foreach (var row in loggerRows) row.Selected = true;
             var choices = loggerRows.Select(r => (r.Id, r.Selected, r.Unit, r.Plotted)).ToArray();
-            timer.Start();
+            cycleWatch.Restart(); timer.Start();
             try
             {
                 var work = ClickAndWait(LoggerStartButton);
@@ -63,7 +73,8 @@ public partial class MainWindow
                 loggingActive || loggerScans < 5 || !locked || !LoggerStartButton.IsEnabled || LoggerStopButton.IsEnabled || ReadButton.IsEnabled ||
                 !choices.SequenceEqual(loggerRows.Select(r => (r.Id, r.Selected, r.Unit, r.Plotted))))
                 throw new InvalidOperationException("Physical logger could not restart after normal Stop: " + StatusText.Text);
-            cycleReports.Add(new { cycle = cycle + 1, scans = loggerScans, selected = loggerRows.Count(r => r.Selected), restartEnabled = LoggerStartButton.IsEnabled });
+            cycleReports.Add(new { cycle = cycle + 1, scans = loggerScans, selected = loggerRows.Count(r => r.Selected), restartEnabled = LoggerStartButton.IsEnabled,
+                elapsedSeconds = cycleWatch.Elapsed.TotalSeconds, maximumPolling = (int)LoggerRateBox.SelectedValue == 0 });
         }
         await ClickAndWait(DisconnectButton);
         if (transport is not null || identity is not null || LoggerStartButton.IsEnabled || !guarded.Disposed || guarded.ReadAttempted)
@@ -127,7 +138,7 @@ public partial class MainWindow
         LoadLoggerSettings();
         if (!savedPlotIds.SequenceEqual(loggerRows.Where(r => r.Plotted).Select(r => r.Id).Order())) throw new InvalidOperationException("Remembered plot selections changed on reload.");
         foreach (var row in loggerRows) row.Plotted = new[] { "engine_rpm", "boost_pressure", "actual_lambda" }.Contains(row.Id);
-        LoggerRateBox.SelectedItem = 10; RecordCsvBox.IsChecked = true;
+        LoggerRateBox.SelectedValue = 10; RecordCsvBox.IsChecked = true;
         LoggerGrid.SelectedItem = loggerRows.First(row => row.Id == "engine_rpm"); Controls();
         bool locked = false;
         var retainedCalibration = loggerCalibration;

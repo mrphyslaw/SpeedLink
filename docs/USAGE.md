@@ -92,10 +92,11 @@ logging, or after a connection error.
 The logger supports nine Gen 1 profiles with 33–38 parameters each, plus the
 experimental L3CGEE000 Gen 2 profile with 20. Logging can run with the engine
 running; ROM reads require it stopped. The **Hz** column
-shows measured host sample rates. Real-ECU acceptance, readings and achievable
-rates still require vehicle validation. Read-only start/stop and query acceptance
+shows measured host sample rates. Leave **Polling** on **Max** for the fastest
+completed-reply polling; numeric limits are optional. Physical readings and
+achievable running-engine rates still require vehicle validation. Read-only start/stop and query acceptance
 on one L3M6EG000 bench ECU passed through vLinker FS and Tactrix. See the [logger guide](LOGGER.md) for units, plots and
-unavailable data.
+unavailable data, plus [measured bench performance](LOGGER_PERFORMANCE.md).
 
 Choose **Recordings → Open recording…** to review a SpeedLink `log.csv` without
 an adapter. Logs live under `data/logs` beside the EXE. Keep the complete folder,

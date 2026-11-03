@@ -1,24 +1,34 @@
 # C# validation
 
-## Logging restart — 0.7.0-alpha.8
+## Logging restart and performance — 0.7.0-alpha.8
 
-- Required logger desktop tests cover all ten profiles: three consecutive
-  recorded Start/Stop cycles on one connection, immediate cancellation followed
-  by another live-only session, retained ROM/selection/unit/plot choices, separate
-  replayable recordings, and explicit disconnect. Transport failure requires a
-  manual reconnect without retrying the failed request. A changed ECU identity
-  is rejected before any subsequent logger query or new recording.
-- All 523 core tests and 76 mandatory regression cases passed, including
-  ten-profile ROM-save integrity. The core cancellation regression verifies the
-  current exchange completes before another logger reuses the connection.
-- Read-only tests on one powered L3M6EG000 bench ECU passed three Start/Stop cycles
-  with each of vLinker FS and Tactrix. The third session selected all 33 offered
-  parameters. Six recordings reopened successfully; traffic was limited to
-  identification and stock logger queries. No ECU programming was performed.
-- This is bench query/session acceptance, not sensor-accuracy or running-engine
-  validation. With all parameters selected, the vLinker run hit the existing
-  sample-age/skew limits for some values. Missing or stale values remain explicit
-  gaps. Select fewer parameters when freshness is important.
+- Required desktop tests cover all ten profiles: three consecutive recorded
+  Start/Stop cycles on one connection, immediate cancellation followed by another
+  live-only session, retained ROM/selection/unit/plot choices, separate replayable
+  recordings, and explicit disconnect. Failure requires manual reconnect without
+  retrying the uncertain request; a changed ECU identity is rejected before new
+  logger traffic or recording.
+- All 558 core tests passed, including ten-profile mandatory ROM-save integrity,
+  exact-length reply completion, fragmented/pending/malformed/no-data cases,
+  prompt races, adapter resynchronization, no duplicate ECU requests, completed
+  batch rejection, all-profile conversions, preference migration and bounded
+  concurrent display handoff. Native alias fixtures cover 45 cases across nine
+  Gen 1 reference layouts; Gen 2 is not assigned these aliases.
+- Each wired adapter completed eight uncapped ten-second workload phases with
+  recording off/on and a three-minute all-33-parameter recording on one powered
+  L3M6EG000 bench ECU. More than 25,000 requests combined completed without
+  transport failures or stale/skew gaps in completed frames. Both achieved about
+  50 single-parameter polls/s or 1.85 complete all-parameter scans/s.
+- Actual desktop Max-polling sessions with plots, diagnostics and CSV passed
+  three consecutive Start/Stop cycles per adapter for one, six and all 33
+  parameters. Each released its device cleanly and all six recordings reopened.
+  Traffic was limited to identification and known stock logger queries.
+- These results establish query/session behavior on one bench ECU. Physical
+  sensor accuracy, ECU-internal source update rates, running-engine behavior and
+  the remaining profile/channel vehicle checks are pending. Missing or stale
+  values remain explicit gaps. No ECU programming was performed.
+
+See [measured performance](../../docs/LOGGER_PERFORMANCE.md) for rates and their limits.
 
 ## Independent map sizing — 0.7.0-alpha.3
 

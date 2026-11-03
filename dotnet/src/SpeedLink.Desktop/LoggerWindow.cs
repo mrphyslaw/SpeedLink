@@ -15,6 +15,11 @@ using SpeedLink.Core;
 
 namespace SpeedLink.Desktop;
 
+internal sealed record LoggerPollingRate(int Target)
+{
+    public override string ToString() => Target == 0 ? "Max" : Target.ToString(CultureInfo.CurrentCulture);
+}
+
 internal sealed class LoggerRow(LoggerChannel channel) : INotifyPropertyChanged
 {
     public LoggerChannel Channel { get; } = channel;
@@ -44,6 +49,11 @@ internal sealed class LoggerRow(LoggerChannel channel) : INotifyPropertyChanged
     {
         ValueText = "—"; Status = state; RateText = "—";
         Changed(nameof(ValueText)); Changed(nameof(Status)); Changed(nameof(RateText));
+    }
+    public bool ExpireIfStale(DateTimeOffset now)
+    {
+        if (last is not DateTimeOffset timestamp || ValueText == "—" || now - timestamp <= LiveLogger.MaximumSampleAge) return false;
+        SetUnavailable("Stale · waiting for sample"); return true;
     }
     public void Observe(LoggerReading reading, LoggerDefinition definition, IReadOnlyDictionary<string, double>? parameters, DateTimeOffset? frameTime = null)
     {
@@ -93,7 +103,8 @@ public partial class MainWindow
     {
         ConfigureLoggerProfile(definitionSnapshot.LoggerFor("L38KEH000")!);
         LoggerGrid.ItemsSource = loggerRows;
-        LoggerRateBox.ItemsSource = new[] { 1, 2, 5, 10, 20 }; LoggerRateBox.SelectedItem = 5;
+        LoggerRateBox.ItemsSource = new[] { 0, 1, 2, 5, 10, 20 }.Select(n => new LoggerPollingRate(n)).ToArray();
+        LoggerRateBox.SelectedValuePath = nameof(LoggerPollingRate.Target); LoggerRateBox.SelectedValue = 0;
         var view = CollectionViewSource.GetDefaultView(loggerRows);
         view.Filter = item => item is LoggerRow row && (row.Name.Contains(LoggerSearchBox.Text, StringComparison.CurrentCultureIgnoreCase) || row.Group.Contains(LoggerSearchBox.Text, StringComparison.CurrentCultureIgnoreCase));
         LoadLoggerSettings();
@@ -202,7 +213,7 @@ public partial class MainWindow
         var link = transport; var ecu = identity; var calibration = loggerCalibration;
         var selected = loggerRows.Where(row => row.Selected).ToArray();
         var units = selected.ToDictionary(row => row.Id, row => row.Unit);
-        int target = (int)LoggerRateBox.SelectedItem;
+        int target = (int)LoggerRateBox.SelectedValue;
         bool recording = RecordCsvBox.IsChecked == true;
         IReadOnlyDictionary<string, double>? parameters;
         LiveLogger logger;
@@ -222,6 +233,17 @@ public partial class MainWindow
         {
             bool stoppedCleanly = false;
             bool recordingCreated = false;
+            var display = new LoggerDisplayBuffer();
+            void RenderPending()
+            {
+                var batch = display.Drain();
+                foreach (var update in batch) ShowLoggerFrame(update.Frame, parameters, update.ScanComplete, redraw: false);
+                bool expired = false;
+                foreach (var row in selected) expired |= row.ExpireIfStale(logger.CurrentTime);
+                if (batch.Count > 0 || expired) DrawLoggerChart();
+            }
+            var displayTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+            displayTimer.Tick += (_, _) => RenderPending();
             try
             {
                 diagnosticSession?.Record("logger.started", new { profile = loggerDefinition.SoftwareIds, loggerDefinition.DefinitionVersion, channels = units, targetScansPerSecond = target, recording });
@@ -230,7 +252,7 @@ public partial class MainWindow
                 loggerScans = 0;
                 LoggerFileText.Text = recording ? "Starting a new recording…" : "Live view · CSV recording off";
                 StatusText.Text = "Logging · stock application identifiers";
-                var uiTimer = Stopwatch.StartNew();
+                displayTimer.Start();
                 await Task.Run(() =>
                 {
                     stop!.Token.ThrowIfCancellationRequested();
@@ -252,15 +274,11 @@ public partial class MainWindow
                         while (!stop!.IsCancellationRequested)
                         {
                             var scanTimer = Stopwatch.StartNew();
-                            var frame = logger.ReadFrame(stop.Token, partial =>
-                            {
-                                if (uiTimer.ElapsedMilliseconds < 100) return;
-                                Dispatcher.Invoke(() => ShowLoggerFrame(partial, parameters, false)); uiTimer.Restart();
-                            });
+                            var frame = logger.ReadFrame(stop.Token, partial => display.Publish(partial, false));
                             recordedScan = frame.Scan; file?.Append(frame);
-                            Dispatcher.Invoke(() => ShowLoggerFrame(frame, parameters, true)); uiTimer.Restart();
+                            display.Publish(frame, true);
                             if (logger.ActiveQueryCount == 0) throw new TransportException("The ECU rejected every selected query. Logging stopped; inspect channel statuses and reconnect.");
-                            int delay = (int)Math.Max(0, 1000.0 / target - scanTimer.Elapsed.TotalMilliseconds);
+                            int delay = target > 0 ? (int)Math.Max(0, 1000.0 / target - scanTimer.Elapsed.TotalMilliseconds) : 0;
                             if (delay > 0) stop.Token.WaitHandle.WaitOne(delay);
                         }
                     }
@@ -275,7 +293,7 @@ public partial class MainWindow
                         if (file is not null && logger.LastFrame is { } partial && partial.Scan > recordedScan)
                         {
                             recordedScan = partial.Scan; file.Append(partial);
-                            Dispatcher.Invoke(() => ShowLoggerFrame(partial, parameters, true));
+                            display.Publish(partial, true);
                         }
                         throw;
                     }
@@ -295,10 +313,13 @@ public partial class MainWindow
             finally
             {
                 loggingActive = false;
+                displayTimer.Stop();
+                try { RenderPending(); }
+                catch { stoppedCleanly = false; await Disconnect(); throw; }
                 // Cancellation is observed between bounded exchanges; a clean Stop leaves no reply in flight.
                 // Preserve that connection for another log, but never reuse an uncertain failed exchange.
                 if (!stoppedCleanly || closing) await Disconnect();
-                diagnosticSession?.Record("logger.stopped", new { stoppedCleanly, connectionRetained = transport is not null, completedScans = loggerScans, recordingCreated });
+                diagnosticSession?.Record("logger.stopped", new { stoppedCleanly, connectionRetained = transport is not null, completedScans = loggerScans, recordingCreated, displayUpdatesDropped = display.Dropped });
                 foreach (var row in selected) row.SetUnavailable(row.Status.StartsWith("Unavailable", StringComparison.Ordinal) ? "Stopped · " + row.Status :
                     transport is not null ? "Stopped" : "Stopped · reconnect to log");
                 DrawLoggerChart();
@@ -307,7 +328,7 @@ public partial class MainWindow
             StatusText.Text = recordingCreated ? "Logging stopped · recording saved · ready to start again" : "Logging stopped · ready to start again";
         });
     }
-    private void ShowLoggerFrame(LoggerFrame frame, IReadOnlyDictionary<string, double>? parameters, bool scanComplete)
+    private void ShowLoggerFrame(LoggerFrame frame, IReadOnlyDictionary<string, double>? parameters, bool scanComplete, bool redraw = true)
     {
         foreach (var row in loggerRows)
             if (frame.Readings.TryGetValue(row.Id, out var reading)) row.Observe(reading, loggerDefinition, parameters, frame.Timestamp);
@@ -317,7 +338,7 @@ public partial class MainWindow
             double elapsed = frame.Elapsed.TotalSeconds;
             LoggerRateText.Text = $"{frame.Scan:N0} scans · {(elapsed > 0 ? frame.Scan / elapsed : 0):0.0} scans/s overall · {frame.Exchanges.Count} requests in last scan · per-channel Hz shown above";
         }
-        DrawLoggerChart();
+        if (redraw) DrawLoggerChart();
     }
     private void LoggerEssentials_Click(object sender, RoutedEventArgs e) { foreach (var row in loggerRows) row.Selected = EssentialChannels.Contains(row.Id, StringComparer.Ordinal); }
     private void LoggerAll_Click(object sender, RoutedEventArgs e) { foreach (var row in loggerRows) row.Selected = true; }
@@ -382,7 +403,7 @@ public partial class MainWindow
     {
         if (!loggerSettingsReady) return;
         RememberLoggerProfile();
-        loggerPreferences.Target = LoggerRateBox.SelectedItem is int target ? target : 5;
+        loggerPreferences.Target = LoggerRateBox.SelectedValue is int target ? target : 0;
         loggerPreferences.Stoich = StoichBox.Text; loggerPreferences.Record = RecordCsvBox.IsChecked == true;
         loggerPreferences.ActiveCalibration = loggerDefinition.SoftwareIds.First();
         try { loggerPreferences.Save(System.IO.Path.Combine(vault, "logger-settings.json")); }
@@ -397,7 +418,7 @@ public partial class MainWindow
         try
         {
             loggerPreferences = LoggerPreferences.Load(path);
-            LoggerRateBox.SelectedItem = loggerPreferences.Target;
+            LoggerRateBox.SelectedValue = loggerPreferences.Target;
             StoichBox.Text = loggerPreferences.Stoich; RecordCsvBox.IsChecked = loggerPreferences.Record;
             var priorProfile = loggerDefinition;
             var priorCalibration = loggerCalibration;

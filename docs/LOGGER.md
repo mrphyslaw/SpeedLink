@@ -67,13 +67,14 @@ vehicle; use the vehicle's current backup, especially with a changed MAP sensor.
 
 ## Rates and unavailable data
 
-**Target scans/s** limits complete polling rounds. It is a requested ceiling,
-not an achieved rate. The table shows each channel's measured host sample rate;
-the footer shows completed scans per second. These are request/response rates,
-not proof that the ECU refreshed the underlying value at that rate. Transport
-timing remains conservative pending ECU testing. The
-[protocol guide](LOGGER_PROTOCOL.md) documents the current request scheduling
-and timing limits; measured ECU update rates remain unverified.
+**Polling → Max** is the default: the next request starts as soon as the
+previous reply is complete and the adapter is ready. Numeric limits are optional
+when you want less bus traffic or smaller recordings; they limit complete rounds.
+The table shows each channel's measured host sample rate and the footer shows
+completed scans per second. These rates do not prove that the ECU refreshed its
+underlying value at that rate. Screen redraws do not cap polling or recording.
+See [measured bench performance](LOGGER_PERFORMANCE.md) and the
+[protocol guide](LOGGER_PROTOCOL.md) for scheduling, completion and validation scope.
 
 Only selected parameters and their dependencies are polled. Shared identifiers
 are queried once per scan. Calculated boost and injector duty require fresh
@@ -156,7 +157,8 @@ transport behavior and its remaining validation limits.
   The message shows the selected ROM profile and the ECU's reported calibration.
   Renaming the file will not change the match; include both IDs in a support report.
 - **Updates are slow:** select fewer parameters and watch the measured **Hz**
-  column. Increasing **Target scans/s** does not make the ECU or adapter reply faster.
+  column. Use **Polling → Max**; selecting a higher numeric limit cannot make
+  the ECU or adapter reply faster.
 - **A timeout or USB disconnect stops logging:** reconnect manually, then start a
   new recording. The logger does not retry an uncertain request. Keep any partial
   recording for troubleshooting.
