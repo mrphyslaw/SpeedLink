@@ -30,6 +30,11 @@ Have a full backup of the ROM currently installed in the ECU ready. If you need
 to make one, use **Read & verify backup** with the engine stopped, then disconnect
 and reconnect before logging. Use the verified `rom.bin` from that backup.
 
+Read-only query acceptance and three consecutive Start/Stop sessions also passed
+on one powered L3M6EG000 bench ECU through each of vLinker FS and Tactrix. This
+checks the connection and recording workflow; physical sensor accuracy and
+running-engine sampling behavior still require validation.
+
 ## Start logging
 
 1. In **Connection**, select your adapter and choose **Connect & identify**.
@@ -41,8 +46,10 @@ and reconnect before logging. Use the verified `rom.bin` from that backup.
    actual or desired mixture row. Leave it blank to log lambda.
 5. Leave **Record CSV** checked to save a recording, then select **Start logging**.
    Use **Plot** to select up to six synchronized charts for logged parameters. **Stop** ends the recording
-   and disconnects; reconnect before starting again or reading a ROM. **Open logs**
-   opens the recording folder location.
+   and leaves a healthy connection ready for **Start logging** again. Your ROM,
+   parameters, units and plot choices stay selected; each start creates a separate
+   recording. Disconnect and reconnect before reading a ROM. **Open logs** opens
+   the recording folder location.
 
 Logging can run with the engine running. **ROM backup reads require the engine
 stopped**. They use a different diagnostic session. A connection used for a ROM
@@ -74,7 +81,7 @@ inputs no more than 500 ms apart. Data older than five seconds is unavailable.
 These initial limits are explicit draft settings, pending ECU validation.
 
 A rejected channel shows its negative-response code instead of a number.
-Unsupported identifiers are skipped until the next connection. Transient
+Unsupported identifiers are skipped for the rest of that logging session. Transient
 condition rejections remain eligible on the next normal scan. Malformed replies,
 timeouts and adapter failures stop the logger without resending the uncertain
 request or automatically reconnecting. Stop waits for the bounded exchange in

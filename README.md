@@ -4,7 +4,7 @@ Open-source ROM reading, data logging and offline ROM editing for Mazdaspeed and
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download v0.7.0-alpha.7](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.7)** — a single Windows EXE, with no installer or .NET installation required.
+**[Download v0.7.0-alpha.8](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.8)** — a single Windows EXE, with no installer or .NET installation required.
 
 **Watch the 4-minute SpeedLink demo (4:11)**
 
@@ -174,8 +174,10 @@ logger supports [ten defined ROMs](definitions/logging/All_ROM_Coverage.md).
 5. Leave **Record CSV** checked and select **Start logging**. Use the **Plot** column
    to choose up to six synchronized charts for logged parameters. The **Hz** column shows its measured sample rate;
    **Target scans/s** is a ceiling, not a guaranteed rate.
-6. Select **Stop** to finish the recording and disconnect. Use **Open logs** to
-   find it under `data/logs` beside the EXE. Reconnect before another logging session.
+6. Select **Stop** to finish the recording. The healthy connection stays ready for
+   **Start logging** again, with your ROM and selections retained. Each start creates
+   a separate recording. Use **Open logs** to find them under `data/logs` beside the EXE.
+   Disconnect and reconnect before switching from logging to a ROM backup read.
 
 Logging can run with the engine running. **ROM backup reads require the engine
 stopped.** Unknown ROMs can still be dumped; logging requires a supported profile.
@@ -204,7 +206,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.7.0-alpha.7](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.7), a Windows Workbench alpha.**
+**Current release: [v0.7.0-alpha.7](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.8), a Windows Workbench alpha.**
 
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording

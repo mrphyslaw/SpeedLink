@@ -40,7 +40,7 @@ public partial class MainWindow
 
         var profile = LoggerDefinition.ForCalibration(editor.Document.Definition.Calibration)!;
         ConfigureLoggerProfile(profile); loggerCalibration = LoggerCalibration.ExplicitMap(100, 0);
-        using var peer = new CountingTestTransport(createPeer(profile)); transport = peer; identity = new("test", peer.Adapter, null, profile.SoftwareIds.Single());
+        using var peer = new CountingTestTransport(createPeer(profile)); transport = peer; identity = new("test", peer.Adapter, null, RomInspector.KnownProfiles.Single(p => p.Calibration == profile.SoftwareIds.Single()).Identity);
         foreach (var row in loggerRows) { row.Selected = row.Id == "engine_rpm"; row.Plotted = row.Selected; }
         StoichBox.Text = "invalid"; Navigate(2); Controls();
         LoggerStartButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -71,7 +71,9 @@ public partial class MainWindow
         }
         finally { timer.Stop(); }
         string[] plotted = LoggerPlots.Children.OfType<StackPanel>().SelectMany(p => p.Children.OfType<TextBlock>()).Select(t => t.Text).ToArray();
-        Check(transport is null && loggerScans >= 3 && plotted.Any(t => t.StartsWith("Stopped", StringComparison.Ordinal)) && !plotted.Any(t => t.StartsWith("OK", StringComparison.Ordinal)), "Stopped charts refresh immediately and connection released");
+        Check(ReferenceEquals(transport, peer) && LoggerStartButton.IsEnabled && !LoggerStopButton.IsEnabled && !ReadButton.IsEnabled && loggerScans >= 3 && plotted.Any(t => t.StartsWith("Stopped", StringComparison.Ordinal)) && !plotted.Any(t => t.StartsWith("OK", StringComparison.Ordinal)), "Stopped charts refresh immediately and logging can restart without reconnecting");
+        await ClickAndWait(DisconnectButton);
+        Check(transport is null && !LoggerStartButton.IsEnabled && peer.Disposed, "Explicit disconnect releases the stopped logger connection");
         var display = new LoggerRow(profile.Channels.First(c => c.Id == "engine_rpm")); var now = DateTimeOffset.UtcNow;
         display.Observe(new(display.Id, 1000, now, "OK"), profile, null, now);
         display.Observe(new(display.Id, null, null, "Waiting"), profile, null, now.AddMilliseconds(100));

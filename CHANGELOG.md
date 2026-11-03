@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0-alpha.8
+
+- Fix Start logging staying disabled after Stop. Normal Stop completes the current exchange and recording, preserves a healthy connection and ROM/parameter choices, and allows another Start without reconnecting. Each start uses fresh polling state and a separate recording.
+- Recheck ECU identity before each logging session. Keep explicit reconnect requirements after transport errors, identity changes and before switching between ROM-reading and logging sessions. Failed or uncertain requests are never retried automatically.
+- Exercise three consecutive Start/Stop cycles, immediate cancellation, distinct replayable recordings, retained choices and failure cleanup across every supported logger profile. Add a separately gated read-only real-ECU logger test path; ECU programming remains disabled.
+
 ## 0.7.0-alpha.7
 
 - Add the verified L3M6EG000 / L3M6EG000L3T60A1 stock layout: 263 tuning tables and 600 diagnostic controls. Include tuner-focused help, units and named code states. Unknown compatible ROMs remain readable without a definition.

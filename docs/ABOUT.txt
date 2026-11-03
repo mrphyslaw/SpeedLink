@@ -46,6 +46,7 @@ Compatible unknown Gen 2 dumping uses a separate, bounded read protocol.
 Known short and complete ECU calibration IDs recognized for logging.
 Parameter selection, up to six synchronized charts, CSV and recorded-log viewer.
 Per-profile logger choices saved on close, with explicit pending and stopped states.
+Normal Stop keeps a healthy connection ready for another Start and a new recording.
 Post-read reconnect guidance and recoverable display/recording input errors.
 ROM/offline checked; real-ECU logging validation pending.
 ECU flashing is planned.

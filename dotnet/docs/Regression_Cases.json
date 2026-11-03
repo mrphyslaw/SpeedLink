@@ -223,5 +223,8 @@
   },
   {
     "test": "SpeedLink.Tests.BootFingerprintTests.l3m6_profile_excludes_only_its_native_identification_record"
+  },
+  {
+    "test": "SpeedLink.Tests.LiveLoggerTests.CleanStopFinishesTheCurrentExchangeAndAllowsANewLoggerOnTheSameTransport"
   }
 ]

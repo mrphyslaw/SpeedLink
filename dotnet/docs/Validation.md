@@ -1,5 +1,25 @@
 # C# validation
 
+## Logging restart — 0.7.0-alpha.8
+
+- Required logger desktop tests cover all ten profiles: three consecutive
+  recorded Start/Stop cycles on one connection, immediate cancellation followed
+  by another live-only session, retained ROM/selection/unit/plot choices, separate
+  replayable recordings, and explicit disconnect. Transport failure requires a
+  manual reconnect without retrying the failed request. A changed ECU identity
+  is rejected before any subsequent logger query or new recording.
+- All 523 core tests and 76 mandatory regression cases passed, including
+  ten-profile ROM-save integrity. The core cancellation regression verifies the
+  current exchange completes before another logger reuses the connection.
+- Read-only tests on one powered L3M6EG000 bench ECU passed three Start/Stop cycles
+  with each of vLinker FS and Tactrix. The third session selected all 33 offered
+  parameters. Six recordings reopened successfully; traffic was limited to
+  identification and stock logger queries. No ECU programming was performed.
+- This is bench query/session acceptance, not sensor-accuracy or running-engine
+  validation. With all parameters selected, the vLinker run hit the existing
+  sample-age/skew limits for some values. Missing or stale values remain explicit
+  gaps. Select fewer parameters when freshness is important.
+
 ## Independent map sizing — 0.7.0-alpha.3
 
 - Core tests cover bounded per-pane coordinates, all edge/corner calculations,

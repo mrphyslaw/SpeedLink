@@ -22,10 +22,13 @@ it is not replaced by a zero reading. Recordings preserve explicit gaps.
 
 ## Failures and cancellation
 
-Unsupported identifiers are skipped until reconnecting. Condition rejections
+Unsupported identifiers are skipped for the rest of that logging session. Condition rejections
 can be queried again on a subsequent normal scan. Malformed responses, timeouts
 and adapter failures stop logging without resending the uncertain exchange or
-automatically reconnecting. Stop waits for the bounded exchange in progress.
+automatically reconnecting. Stop waits for the bounded exchange in progress, then
+retains a healthy connection for another logging session. Each Start rechecks ECU
+identity and starts fresh sample, rejection and recording state. Disconnect and
+reconnect before changing from logging to a ROM backup read.
 
 The production transport retains its conservative timing policy. Adapter bench
 results and offline decoder checks are recorded separately from real ECU

@@ -81,7 +81,7 @@ public partial class MainWindow
     private LoggerDefinition loggerDefinition = null!;
     private LoggerCalibration? loggerCalibration;
     private readonly ObservableCollection<LoggerRow> loggerRows = [];
-    private bool loggingActive;
+    private bool loggingActive, loggerReadReconnectRequired;
     private long loggerScans;
     private LoggerPreferences loggerPreferences = new();
     private bool loggerSettingsReady, configuringLogger;
@@ -198,7 +198,7 @@ public partial class MainWindow
     }
     private async void LoggerStart_Click(object sender, RoutedEventArgs e)
     {
-        if (transport is null || identity is null || loggerCalibration is null) return;
+        if (busy || closing || exportingReport || loggingActive || transport is null || identity is null || loggerCalibration is null) return;
         var link = transport; var ecu = identity; var calibration = loggerCalibration;
         var selected = loggerRows.Where(row => row.Selected).ToArray();
         var units = selected.ToDictionary(row => row.Id, row => row.Unit);
@@ -217,8 +217,11 @@ public partial class MainWindow
             LoggerHelpText.Text = error.Message; StatusText.Text = error.Message; Log(error.Message); return;
         }
         loggingActive = true;
+        loggerReadReconnectRequired = true;
         await Run(async () =>
         {
+            bool stoppedCleanly = false;
+            bool recordingCreated = false;
             try
             {
                 diagnosticSession?.Record("logger.started", new { profile = loggerDefinition.SoftwareIds, loggerDefinition.DefinitionVersion, channels = units, targetScansPerSecond = target, recording });
@@ -230,6 +233,11 @@ public partial class MainWindow
                 var uiTimer = Stopwatch.StartNew();
                 await Task.Run(() =>
                 {
+                    stop!.Token.ThrowIfCancellationRequested();
+                    var current = ReadWorkflow.Identify(link);
+                    if (!current.MatchesVehicle(ecu))
+                        throw new TransportException("ECU identity changed. Reconnect and identify before logging.");
+                    stop.Token.ThrowIfCancellationRequested();
                     LoggerRecording? file = null;
                     long recordedScan = 0;
                     string finish = "Stopped";
@@ -238,6 +246,7 @@ public partial class MainWindow
                         if (recording)
                         {
                             file = new(LoggerFolder, loggerDefinition, calibration, ecu, selected.Select(row => row.Id), units, parameters, Version, target);
+                            recordingCreated = true;
                             Dispatcher.Invoke(() => LoggerFileText.Text = file.Folder);
                         }
                         while (!stop!.IsCancellationRequested)
@@ -276,15 +285,26 @@ public partial class MainWindow
                         finally { file?.Dispose(); }
                     }
                 });
+                stoppedCleanly = true;
+            }
+            catch (OperationCanceledException) when (stop!.IsCancellationRequested)
+            {
+                // Also allow Stop before the first poll or recording has been created.
+                stoppedCleanly = true;
             }
             finally
             {
                 loggingActive = false;
-                await Disconnect(); // A fresh connection is required before switching to a ROM-read session.
-                foreach (var row in selected) row.SetUnavailable(row.Status.StartsWith("Unavailable", StringComparison.Ordinal) ? "Stopped · " + row.Status : "Stopped · reconnect to log");
+                // Cancellation is observed between bounded exchanges; a clean Stop leaves no reply in flight.
+                // Preserve that connection for another log, but never reuse an uncertain failed exchange.
+                if (!stoppedCleanly || closing) await Disconnect();
+                diagnosticSession?.Record("logger.stopped", new { stoppedCleanly, connectionRetained = transport is not null, completedScans = loggerScans, recordingCreated });
+                foreach (var row in selected) row.SetUnavailable(row.Status.StartsWith("Unavailable", StringComparison.Ordinal) ? "Stopped · " + row.Status :
+                    transport is not null ? "Stopped" : "Stopped · reconnect to log");
                 DrawLoggerChart();
             }
-            StatusText.Text = "Logging stopped · recording retained";
+            if (recording && !recordingCreated) LoggerFileText.Text = "Stopped before a recording was created";
+            StatusText.Text = recordingCreated ? "Logging stopped · recording saved · ready to start again" : "Logging stopped · ready to start again";
         });
     }
     private void ShowLoggerFrame(LoggerFrame frame, IReadOnlyDictionary<string, double>? parameters, bool scanComplete)

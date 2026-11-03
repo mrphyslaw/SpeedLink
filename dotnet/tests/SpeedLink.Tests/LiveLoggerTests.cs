@@ -155,6 +155,23 @@ public class LiveLoggerTests
     }
 
     [Fact]
+    public void CleanStopFinishesTheCurrentExchangeAndAllowsANewLoggerOnTheSameTransport()
+    {
+        var definition = Profile(); using var peer = new Peer(definition); using var stop = new CancellationTokenSource();
+        peer.Override = key => { stop.Cancel(); return peer.Replies[key]; };
+        var first = new LiveLogger(definition, Calibration(), peer, Identity(), ["engine_rpm", "knock_retard"]);
+        Assert.Throws<OperationCanceledException>(() => first.ReadFrame(stop.Token));
+        Assert.Single(peer.Requests);
+        Assert.NotNull(first.LastFrame!.Readings["engine_rpm"].Value);
+        peer.Override = null;
+        var next = new LiveLogger(definition, Calibration(), peer, Identity(), ["engine_rpm", "knock_retard"]);
+        var frame = next.ReadFrame();
+        Assert.Equal(1, frame.Scan);
+        Assert.Equal(3, peer.Requests.Count);
+        Assert.All(frame.Readings.Values, reading => Assert.NotNull(reading.Value));
+    }
+
+    [Fact]
     public void DisplayUnitsPreserveVacuumAndRequireExplicitAfrStoichiometry()
     {
         var definition = Profile();
