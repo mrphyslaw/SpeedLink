@@ -1,14 +1,14 @@
 # Adapter status and testing candidates
 
-Hardware support is separate from ROM/profile coverage. Bench qualification uses
-simulated ECU replies over real adapters; real Mazda ECU acceptance remains
-pending. ECU access is read-only and flashing is disabled.
+Hardware support is separate from ROM/profile coverage. For programming, normal
+write checks used one L3M6EG000 bench ECU with both adapters. Tactrix also passed
+controlled interruption and recovery on that ECU. [Gen 1 flashing guide](FLASHING.md)
 
 | Adapter | SpeedLink status |
 | --- | --- |
-| Vgate vLinker FS USB | Available; isolated-bench reader and logger checks passed |
-| Tactrix Openport 2.0 | Available through its installed J2534 driver; isolated-bench reader and logger checks passed |
-| Mongoose-Plus ISO/CAN3 | Experimental reader/logger option; hardware testing pending |
+| Vgate vLinker FS USB | Reader and logger available. Gen 1 writing bench-tested. Recovery available with offline coverage and physical recovery pending. |
+| Tactrix Openport 2.0 | Reader and logger available through its installed J2534 driver. Gen 1 writing and controlled recovery bench-tested. |
+| Mongoose-Plus ISO/CAN3 | Experimental reader/logger option. A user reported a successful dump. |
 
 ## Mongoose-Plus ISO/CAN3
 
