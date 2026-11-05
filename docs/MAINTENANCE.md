@@ -11,8 +11,8 @@ In **Actions → CSharp checks → the failed run**, download its `checks-…` a
 It retains synthetic test reports and screenshots for 14 days, including files
 from completed steps when a later step fails. It excludes generated ROM images,
 recordings and support ZIPs. A failure before report creation may have only the
-Actions log. Jobs have a 35-minute limit; newer runs replace obsolete checks for
-the same branch. Pull-request branches run on PR updates; the push trigger is
+Actions log. The Windows check job has a 45-minute limit. Newer runs replace
+obsolete checks for the same branch. Pull-request branches run on PR updates. The push trigger is
 limited to `main` to avoid running the same suite twice. Release checks are not
 canceled by another release.
 
