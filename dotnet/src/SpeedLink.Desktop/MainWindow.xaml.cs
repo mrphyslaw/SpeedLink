@@ -444,8 +444,10 @@ public partial class MainWindow : Window
     {
         Show();
         UpdateLayout();
-        if (new System.Windows.Automation.Peers.TabControlAutomationPeer(Pages).GetChildren()?.Count != 6) throw new InvalidOperationException("Workspace automation containers missing.");
-        if (Pages.Items.Count != 6 || transport is not null || image is not null || !ConnectButton.IsEnabled || ReadButton.IsEnabled || CorrectButton.IsEnabled)
+        if (new System.Windows.Automation.Peers.TabControlAutomationPeer(Pages).GetChildren()?.Count != Pages.Items.Count)
+            throw new InvalidOperationException("Workspace automation containers missing.");
+        if (Pages.Items.Count != FlashPage + 1 || !ReferenceEquals(Pages.Items[FlashPage], FlashTab) ||
+            transport is not null || image is not null || !ConnectButton.IsEnabled || ReadButton.IsEnabled || CorrectButton.IsEnabled)
             throw new InvalidOperationException("Unexpected startup state.");
         if (AdapterBox.Items.Count != 3 || AdapterBox.SelectedIndex != 0 || typeof(ReadWorkflow).Assembly.GetType("SpeedLink.Core.Simulator") is not null)
             throw new InvalidOperationException("Unexpected connection modes.");
