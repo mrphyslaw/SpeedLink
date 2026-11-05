@@ -218,8 +218,6 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
 
 ## Status and development
 
-**Current release: [v0.7.0-alpha.8](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.7.0-alpha.8), a Windows Workbench alpha.**
-
 - **Available:** ROM reading, two-pass verified backups, known-ROM checks and
   checksum correction to a separate file; live logging, charts, CSV recording
   and saved-log viewing; offline ROM editing, comparison, 2D/3D views and undo/redo.
