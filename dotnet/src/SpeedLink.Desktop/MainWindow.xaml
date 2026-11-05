@@ -50,7 +50,7 @@
       <TextBlock x:Name="ReadProgressTiming" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
      </StackPanel>
     </Border>
-    <StackPanel Grid.Row="5" Margin="0,0,0,10"><TextBlock x:Name="DiagnosticStatusText" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8"/><TextBlock x:Name="AdapterNote" Visibility="Collapsed" Text="Mongoose support is experimental. This adapter is available for experimental reading and logging. Gen 1 flashing requires Tactrix or vLinker FS." TextWrapping="Wrap" Foreground="{DynamicResource AmberBrush}" Margin="0,0,0,8"/><TextBlock Text="Two matching 1 MiB reads are required. Original captures, identity, SHA-256 hashes and the journal are retained." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}"/></StackPanel>
+    <StackPanel Grid.Row="5" Margin="0,0,0,10"><TextBlock x:Name="DiagnosticStatusText" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,8"/><TextBlock x:Name="AdapterNote" Visibility="Collapsed" Text="Mongoose support is experimental. This adapter supports experimental reading, logging and Gen 1 programming. Physical programming qualification is pending." TextWrapping="Wrap" Foreground="{DynamicResource AmberBrush}" Margin="0,0,0,8"/><TextBlock Text="Two matching 1 MiB reads are required. Original captures, identity, SHA-256 hashes and the journal are retained." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}"/></StackPanel>
     <TextBox Grid.Row="6" x:Name="LogBox" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontFamily="Consolas"/>
    </Grid></TabItem>
 <TabItem Header="Editor"><local:EditorWorkspace x:Name="EditorPane"/></TabItem>

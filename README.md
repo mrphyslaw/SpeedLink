@@ -29,6 +29,9 @@ verified backup from the same ECU. **Gen 2 flashing is planned for an upcoming
 release.** SpeedLink ships without ROM files or adapter drivers.
 [Flashing and recovery guide](docs/FLASHING.md)
 
+Tactrix Openport 2.0 and vLinker FS have physical write coverage.
+Mongoose-Plus ISO/CAN3 is available for experimental Gen 1 flashing and recovery.
+
 Connect & identify accepts standard VINs and supported short chassis-number
 replies, including space/null-padded identifiers reported by some ECUs. A chassis
 ID is labeled separately; it does not select or authorize a different ROM/logger profile.

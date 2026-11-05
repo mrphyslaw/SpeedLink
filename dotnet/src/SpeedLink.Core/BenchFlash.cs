@@ -190,7 +190,7 @@ public sealed class BenchFlashWorkflow
         string evidenceMode = "hardware")
     {
         if (!samePhysicalEcuConfirmed)
-            throw new InvalidDataException("Confirm the same isolated physical ECU and its original backup before recovery.");
+            throw new InvalidDataException("Confirm the same physical ECU and its original backup before recovery.");
         return ExecuteCore(recovery.Stock, recovery, factory, vault, progress, cancellation, evidenceMode, false);
     }
 

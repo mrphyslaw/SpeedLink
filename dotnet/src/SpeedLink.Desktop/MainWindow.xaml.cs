@@ -517,6 +517,7 @@ public partial class MainWindow : Window
                 simulatorAvailable = false,
                 liveProgrammingEnabled = true,
                 programmingFamily = "Gen1",
+                experimentalProgrammingAdapters = new[] { "Mongoose-Plus ISO/CAN3" },
                 programmingTargets = RomInspector.KnownProfiles.Where(profile => BenchFlashWorkflow.IsNativeWriterVerified(profile.Calibration))
                     .Select(profile => profile.Calibration).ToArray(),
                 noRomBundled = true,

@@ -13,6 +13,8 @@
   normal reset and two exact 1 MiB readbacks. The retained first 32 KiB matched.
 - vLinker FS physical interruption recovery, the other eight layouts on real
   ECUs, power loss during erase, and in-vehicle programming remain pending.
+  Mongoose write and recovery have synthetic desktop and transport coverage.
+  Its physical programming tests remain pending.
   Gen 2 flashing is planned for an upcoming release. [Flashing guide](FLASHING.md)
 
 ## Logging restart and performance — 0.7.0-alpha.8

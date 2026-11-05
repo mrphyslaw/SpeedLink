@@ -19,7 +19,8 @@ public sealed class BenchFlashTransport : IBenchFlashTransport
     public int BatteryMillivolts => initialized && !faulted && !disposed ? voltage() : throw new TransportException("Reconnect before checking supply.");
     public static BenchFlashTransport Create(J2534Driver driver)
     {
-        if (driver.Kind != J2534AdapterKind.Tactrix) throw new TransportException("The Gen 1 J2534 writer requires a Tactrix Openport 2.0.");
+        if (driver.Kind is not (J2534AdapterKind.Tactrix or J2534AdapterKind.MongoosePlusIsoCan3))
+            throw new TransportException("Select a registered Tactrix or Mongoose-Plus ISO/CAN3 driver.");
         var permit = new BenchRequestPermit();
         var channel = new NativeJ2534Channel(driver, diagnostics: null, programmingPermit: permit);
         return new(channel, permit, channel.ReadBatteryMillivolts);

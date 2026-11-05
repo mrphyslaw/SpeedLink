@@ -4,6 +4,15 @@ namespace SpeedLink.Tests;
 
 public class BenchFlashTransportTests
 {
+    [Fact]
+    public void mongoose_programming_rejects_an_unregistered_library_before_loading_it()
+    {
+        var driver = new J2534Driver("Mongoose-Plus ISO3", Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".dll"),
+            J2534AdapterKind.MongoosePlusIsoCan3);
+        var error = Assert.Throws<TransportException>(() => BenchFlashTransport.Create(driver));
+        Assert.Contains("no longer registered", error.Message);
+    }
+
     private sealed class Channel(BenchRequestPermit permit) : IJ2534Channel
     {
         public string? CleanupWarning => null;

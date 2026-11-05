@@ -33,7 +33,8 @@ internal sealed class BenchFlashWindow : Window
     private readonly ComboBox operation = new() { MinWidth = 300, ItemsSource = new[] { "Write ROM", "Recover interrupted write to stock" }, SelectedIndex = 0 };
     private readonly ComboBox driver = new() { MinWidth = 300 };
     private readonly Button load = new() { Content = "Check image & backup" }, start = new() { Content = "Write ROM", IsEnabled = false }, stop = new() { Content = "Stop", IsEnabled = false };
-    private readonly CheckBox ready = new() { Content = "Engine stopped, supply stable, and power and USB will remain connected", Margin = new(0, 10, 0, 10) };
+    private readonly CheckBox ready = new() { Margin = new(0, 10, 0, 10) };
+    private readonly TextBlock readyLabel = new() { TextWrapping = TextWrapping.Wrap };
     private readonly CheckBox singleReadback = new() { Content = "One full readback instead of two", Margin = new(0, 8, 0, 2) };
     private readonly TextBlock summary = new() { TextWrapping = TextWrapping.Wrap }, status = new() { TextWrapping = TextWrapping.Wrap }, detail = new() { TextWrapping = TextWrapping.Wrap, Foreground = UiTheme.Muted };
     private readonly ProgressBar bar = new() { Minimum = 0, Maximum = 100, Height = 16, Margin = new(0, 10, 0, 10) };
@@ -65,7 +66,7 @@ internal sealed class BenchFlashWindow : Window
         var root = new DockPanel { Margin = new(20) }; Content = root;
         var top = new StackPanel(); DockPanel.SetDock(top, Dock.Top); root.Children.Add(top);
         top.Children.Add(new TextBlock { Text = "Gen 1 flashing and recovery", FontSize = 25, FontWeight = FontWeights.SemiBold });
-        top.Children.Add(new TextBlock { Text = "Gen 1 only · Tactrix Openport 2.0 or vLinker FS · alpha", Foreground = UiTheme.Amber, Margin = new(0, 5, 0, 8), TextWrapping = TextWrapping.Wrap });
+        top.Children.Add(new TextBlock { Text = "Gen 1 only · Tactrix or vLinker FS · Mongoose-Plus ISO/CAN3 experimental", Foreground = UiTheme.Amber, Margin = new(0, 5, 0, 8), TextWrapping = TextWrapping.Wrap });
         top.Children.Add(new TextBlock { Text = "Preserves the first 32 KiB. Erases and rewrites the complete application. Requires a verified original SpeedLink backup. After reset, each readback compares every byte with the intended image.", TextWrapping = TextWrapping.Wrap, Margin = new(0, 0, 0, 12) });
         var modes = new DockPanel { Margin = new(0, 5, 0, 5) }; top.Children.Add(modes);
         modes.Children.Add(new TextBlock { Text = "Operation", Width = 180, VerticalAlignment = VerticalAlignment.Center });
@@ -80,8 +81,6 @@ internal sealed class BenchFlashWindow : Window
             imageRow.Visibility = restoring ? Visibility.Collapsed : Visibility.Visible;
             journalRow.Visibility = restoring ? Visibility.Visible : Visibility.Collapsed;
             singleReadback.Visibility = restoring ? Visibility.Collapsed : Visibility.Visible;
-            ready.Content = restoring ? "Same physical ECU as the interrupted run, stable supply, and power and USB will remain connected" :
-                "Engine stopped, supply stable, and power and USB will remain connected";
             load.Content = restoring ? "Check journal & backup" : "Check image & backup";
             start.Content = restoring ? "Recover stock" : "Write ROM";
             InvalidatePlan();
@@ -90,16 +89,19 @@ internal sealed class BenchFlashWindow : Window
         drivers.Children.Add(new TextBlock { Text = "Adapter", Width = 180, VerticalAlignment = VerticalAlignment.Center }); drivers.Children.Add(driver); inputs.Add(driver);
         driver.ItemsSource = offlineFactory is null
             ? J2534Drivers.Discover().Where(d => d.Kind == J2534AdapterKind.Tactrix).Cast<object>()
+                .Concat(J2534Drivers.Discover(J2534AdapterKind.MongoosePlusIsoCan3)
+                    .Select(d => d with { Name = d.Name + " · experimental" }))
                 .Concat(SerialConnection.GetPorts().Select(port => new VLinkerPort(port))).ToArray()
-            : [new VLinkerPort("COM99")];
+            : [new VLinkerPort("COM99"), new J2534Driver("Synthetic Mongoose-Plus ISO/CAN3", "unused.dll", J2534AdapterKind.MongoosePlusIsoCan3)];
         driver.SelectedIndex = -1;
         load.Margin = new(0, 8, 0, 8); load.Click += Load_Click; top.Children.Add(load); inputs.Add(load);
+        ready.Content = readyLabel;
         summary.Margin = new(0, 6, 0, 6); top.Children.Add(summary); top.Children.Add(ready);
         top.Children.Add(singleReadback); inputs.Add(singleReadback);
         ready.Checked += (_, _) => Refresh(); ready.Unchecked += (_, _) => Refresh();
         image.TextChanged += (_, _) => InvalidatePlan(); backup.TextChanged += (_, _) => InvalidatePlan();
         interruptedJournal.TextChanged += (_, _) => InvalidatePlan();
-        driver.SelectionChanged += (_, _) => Refresh();
+        driver.SelectionChanged += (_, _) => { ready.IsChecked = false; Refresh(); };
         var actions = new StackPanel { Orientation = Orientation.Horizontal }; top.Children.Add(actions);
         start.MinWidth = 145; start.Margin = new(0, 0, 8, 0); start.Click += Start_Click; actions.Children.Add(start);
         stop.MinWidth = 80; stop.Click += (_, _) => { cancel?.Cancel(); stop.IsEnabled = false; }; actions.Children.Add(stop);
@@ -109,6 +111,7 @@ internal sealed class BenchFlashWindow : Window
         root.Children.Add(events);
         status.Text = "Choose the ROM image and its verified original backup. No adapter is opened by Check image & backup.";
         Closing += Window_Closing;
+        Refresh();
     }
     private DockPanel PathRow(Panel parent, string label, TextBox box, string filter = "ROM files|*.bin;*.rom|All files|*.*")
     {
@@ -124,6 +127,8 @@ internal sealed class BenchFlashWindow : Window
     {
         foreach (var control in inputs) control.IsEnabled = !active && !loading;
         bool qualified = plan is not null && (offlineFactory is not null || BenchFlashWorkflow.IsNativeWriterVerified(plan.Profile.Calibration));
+        const string setup = "Ignition is on, engine is off, and stable power and USB will stay connected";
+        readyLabel.Text = operation.SelectedIndex == 1 ? "Same physical ECU as the interrupted run. " + setup : setup;
         ready.IsEnabled = !active && !loading && qualified;
         start.IsEnabled = ready.IsEnabled && ready.IsChecked == true && driver.SelectedItem is J2534Driver or VLinkerPort;
         if (!active) stop.IsEnabled = false;
@@ -164,9 +169,9 @@ internal sealed class BenchFlashWindow : Window
             _ => throw new InvalidOperationException("Select a bench adapter.")
         });
         bool verifyOnce = singleReadback.IsChecked == true;
-        if (offlineFactory is null && MessageBox.Show(this, preparedRecovery is null ?
-                "Write the selected ROM? Keep ECU power and USB connected through erase, transfer and reset." :
-                "Restore stock on the same physical ECU? Keep ECU power and USB connected.",
+        string prompt = preparedRecovery is null ? "Write the selected ROM?" : "Restore the original backup to the same ECU?";
+        prompt += "\n\nKeep the ignition on and the engine off. Keep the battery support supply and USB connected through erase, transfer and reset.";
+        if (offlineFactory is null && MessageBox.Show(this, prompt,
                 "Confirm Gen 1 programming", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes) return;
         active = true; cancel?.Dispose(); cancel = new(); workflow = new(resetWait: offlineFactory is null ? null : _ => { });
         bar.Value = 0; events.Clear(); lastStage = null; uiStateFailed = false; Refresh();
@@ -177,7 +182,7 @@ internal sealed class BenchFlashWindow : Window
             {
                 string mutexName = offlineFactory is null ? "Local\\SpeedLink.LocalBenchFlash" : "Local\\SpeedLink.OfflineBenchFlash." + Guid.NewGuid().ToString("N");
                 using var mutex = new Mutex(false, mutexName);
-                if (!mutex.WaitOne(0)) throw new InvalidOperationException("Another local bench flash is already active.");
+                if (!mutex.WaitOne(0)) throw new InvalidOperationException("Another SpeedLink programming operation is already active.");
                 bool holdingWake = false;
                 try
                 {
@@ -244,10 +249,11 @@ internal sealed class BenchFlashWindow : Window
     internal async Task<object> Smoke(string imagePath, string backupPath, string output, Action simulateInterruptedWrite)
     {
         Show(); image.Text = imagePath; backup.Text = backupPath; await LoadPlan();
-        if (plan is null || start.IsEnabled) throw new InvalidOperationException("Plan did not load or Start was armed without bench confirmation.");
+        if (plan is null || start.IsEnabled) throw new InvalidOperationException("Plan did not load or Start was armed without setup confirmation.");
         ready.IsChecked = true; Refresh();
         if (start.IsEnabled) throw new InvalidOperationException("Start was armed without an adapter selection.");
         driver.SelectedItem = driver.Items.OfType<VLinkerPort>().Single();
+        ready.IsChecked = true;
         if (!start.IsEnabled) throw new InvalidOperationException("Valid plan could not be armed with vLinker.");
         image.Text += ".missing";
         if (plan is not null || start.IsEnabled) throw new InvalidOperationException("Changing an input retained a stale armed plan.");
@@ -274,6 +280,9 @@ internal sealed class BenchFlashWindow : Window
             if (plan is not null || start.IsEnabled) throw new InvalidOperationException("A completed flash was armed for recovery.");
             operation.SelectedIndex = 0;
             await LoadPlan();
+            driver.SelectedItem = driver.Items.OfType<J2534Driver>().Single(d => d.Experimental);
+            if (start.IsEnabled || !readyLabel.Text.StartsWith("Ignition is on, engine is off", StringComparison.Ordinal))
+                throw new InvalidOperationException("Experimental writing requires the standard setup confirmation.");
             ready.IsChecked = true;
             simulateInterruptedWrite();
             await RunSmokeOperation();
@@ -284,6 +293,8 @@ internal sealed class BenchFlashWindow : Window
             interruptedJournal.Text = stoppedJournal;
             await LoadPlan();
             if (recovery is null || start.IsEnabled) throw new InvalidOperationException("Recovery was not validated or was armed before confirmation.");
+            if (start.IsEnabled || !readyLabel.Text.Contains("Same physical ECU", StringComparison.Ordinal))
+                throw new InvalidOperationException("Experimental recovery requires same-ECU confirmation.");
             ready.IsChecked = true;
             await RunSmokeOperation();
             if (workflow?.Stage != BenchFlashStage.Complete || uiStateFailed || start.IsEnabled)
@@ -292,9 +303,10 @@ internal sealed class BenchFlashWindow : Window
             if (recovered.RootElement.GetProperty("readbackPasses").GetInt32() != 2)
                 throw new InvalidOperationException("Recovery did not require two readbacks.");
         }
-        return new { passed = true, hardwareAccessed = false, planValidated = true, explicitBenchArming = true, changedInputDisarms = true,
+        return new { passed = true, hardwareAccessed = false, planValidated = true, explicitSetupConfirmation = true, changedInputDisarms = true,
             rejectedInputRecovers = true, vlinkerSelectionVerified = true, offlineTransferVerified = offlineFactory is not null,
-            offlineStockRecoveryVerified = offlineFactory is not null, progressAndLockingVerified = !uiStateFailed, target = plan?.FullCalibration };
+            offlineStockRecoveryVerified = offlineFactory is not null, mongooseRecoverySelectionVerified = driver.SelectedItem is J2534Driver { Experimental: true },
+            progressAndLockingVerified = !uiStateFailed, target = plan?.FullCalibration };
 
         async Task RunSmokeOperation()
         {

@@ -37,7 +37,7 @@ Gen 2 code and markers are validated; no arbitrary checksum repair is offered.
 A definition is not required to dump a ROM.
 
 Adapters: Vgate vLinker FS (USB), Tactrix Openport 2.0
-Experimental: Mongoose-Plus ISO/CAN3 reader/logger; hardware testing pending.
+Experimental: Mongoose-Plus ISO/CAN3 reading, logging and Gen 1 programming.
 Stock-ROM logger: nine Gen 1 profiles with 33–38 parameters; Gen 2 with 20.
 L3M6EG000: 863 editor controls, mandatory checksum correction, 33 stock logger parameters.
 Per-ECU identification bytes preserved unchanged in ROM exports.
@@ -61,6 +61,7 @@ Gen 2 flashing is planned for an upcoming release.
 Tools opens Gen 1 flashing and recovery. Help contains the flashing guide.
 Normal writes passed on one Gen 1 bench ECU with both wired adapters.
 Tactrix passed an interrupted-write stock recovery on that same bench ECU.
+Mongoose physical write and recovery qualification is pending.
 
 Source: github.com/mrphyslaw/SpeedLink
 Definitions: github.com/mrphyslaw/MazdaSpeedDefs

@@ -8,9 +8,11 @@ disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
 ## Before writing
 
 1. Use a **Tactrix Openport 2.0** with its installed 32-bit J2534 driver or a
-   wired **vLinker FS**. Close other applications using the adapter. Keep the
-   ECU powered, the engine stopped, and the programming supply stable.
-   SpeedLink checks for 12–15 V at the adapter.
+   wired **vLinker FS**. **Mongoose-Plus ISO/CAN3** or **ISO3** is also available
+   as an experimental option with its installed 32-bit J2534 04.04 driver.
+   Close other applications using the adapter. Switch the ignition **ON** with
+   the engine **OFF** and connect a stable battery support supply. SpeedLink
+   checks for 12–15 V at the adapter.
 2. In **Connection**, identify the ECU and run **Read & verify backup**. Keep the
    full backup directory, including `rom.bin`, its manifest, journal and both
    read captures. Use a backup from the same physical ECU, captured while it
@@ -49,8 +51,9 @@ disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
    **Connection**, read a verified backup and compare it with the intended
    image before using the ECU.
 2. For **Recovery required**, keep the same physical ECU attached. Once the
-   failed operation has ended and the adapter is closed, cycle ECU power with
-   the engine stopped. Reopen **Tools → Gen 1 flashing and recovery…** and
+   failed operation has ended and the adapter is closed, turn the ignition off
+   and wait for the ECU to shut down, then turn the ignition back on without
+   starting the engine. Reopen **Tools → Gen 1 flashing and recovery…** and
    choose **Recover interrupted write to stock**.
 3. Select the failed run's `journal.jsonl` and the original backup's
    `rom.bin`. Choose **Check journal & backup**, select the adapter, confirm
@@ -71,6 +74,7 @@ identifiers. Keep them private when reporting a problem.
 The nine layouts were checked in native-handler replay and simulated workflows.
 Uninterrupted stock and edited writes were verified on one L3M6EG000 bench ECU
 with both adapters. A controlled interruption after one acknowledged block and
-stock restore were exercised on that same ECU with Tactrix. Broader physical
-profile coverage, vLinker FS interruption recovery, power loss during erase and
+stock restore were exercised on that same ECU with Tactrix. Mongoose
+flashing and recovery have synthetic coverage and still need physical tests.
+Broader physical profile coverage, vLinker FS interruption recovery, power loss during erase and
 in-vehicle programming remain pending. See [validation](VALIDATION.md).
