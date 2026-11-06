@@ -39,8 +39,9 @@ configuration or scaled by other maps; its description retains those qualificati
 ### Set up boost pressure mode
 
 The bundled factory ROMs ship with **BCS Correction Mode** set to **Engine
-load**. Use the following steps on a ROM that exposes the pressure mode and
-its target table.
+load**. The walkthrough uses Gen 1 **L3M6EG000**, where the pressure mode has
+been traced through the wastegate command in firmware. Vehicle behavior
+remains unverified.
 
 1. In the Editor, open **Boost Control → BCS Correction Mode** and select
    **Boost pressure**. Keep **BCS Throttle Input** at its existing setting.
@@ -50,8 +51,9 @@ its target table.
    the manifold-pressure target for the RPM and throttle cells you want to
    tune. The values are in **psi absolute**. Add local barometric pressure to
    your gauge target. For example, 10 psi of gauge boost at 14.5 psia barometric
-   pressure is a target of 24.5 psia. Use a target already validated on the setup
-   for the first comparison.
+   pressure is a target of 24.5 psia. Start with pressures already validated on
+   your setup. Check the surrounding cells too, because the ECU interpolates
+   between them and the factory pressure table contains zero-valued cells.
 3. Start with your proven **BCS DC Base** and the stock **BCS DC Adjustment Boost
    Target Correction (Boost Targeting Mode)** curve. Keep the load requests
    and overboost protections at their known-good settings. **Load Targets
@@ -60,10 +62,11 @@ its target table.
    pressure, and commanded wastegate duty where those channels are available.
    Compare actual MAP to the matching target cells in the same units. Use
    **BCS DC Base** to bring a steady pull closer to target. Use the correction
-   curve to tune how quickly duty responds to pressure error. If duty stops
-   changing while error persists, check the accumulated correction limits, the
-   combined correction limits and the final duty bounds before adding more
-   correction. Change one map at a time so you can see its effect in the log.
+   curve to tune how quickly duty responds to pressure error. The ECU can look
+   up a pressure correction and still clear the accumulated term or override
+   the final duty. If duty stops changing while error persists, check whether
+   the controller is active and whether a correction or duty limit is reached.
+   Change one map at a time so you can see its effect in the log.
 
 On stock **L3M6EG000**, about 1.015 psi under target adds 0.30 duty percentage
 points per active update. About 1.015 psi over target subtracts 0.60 points.
@@ -71,6 +74,12 @@ The firmware schedules this controller every **25 ms nominally** (40 Hz).
 Four active updates at that same over-target error remove 2.4 points from the
 accumulated term in about 100 ms, subject to the limits. The period comes from
 the ROM scheduler. Live timing and pressure response remain unmeasured.
+
+The L3M6EG000 enable threshold is based on **gauge boost** and RPM. At
+1,500 RPM the stock threshold to start accumulating correction is about
+7.7 psi gauge. Once enabled, it can stay active down to about 4.8 psi gauge
+at that same RPM, depending on other ECU conditions. A below-threshold test
+can show an active table lookup with zero accumulated correction.
 
 ### How the ECU combines the corrections
 

@@ -9,8 +9,12 @@
 - Desktop editor checks open the embedded boost guide at the selected topic.
   Simulated Flash & Recover checks accept a fresh matching backup and reject
   a backup captured before the write.
-- The 25 ms boost-correction example is the nominal firmware schedule traced
-  on L3M6EG000. Live timing and pressure response remain unmeasured.
+- An offline replay of L3M6EG000 follows one pressure target cell through the
+  pressure error, correction curve, accumulator and final wastegate command.
+  The same edit leaves the load-mode command unchanged. Separate cases
+  exercise the native boost enable threshold, accumulator reset and output
+  override. The 25 ms period is the nominal firmware schedule. Live timing
+  and pressure response remain unmeasured.
 
 ## Tuning help · 0.8.0-alpha.3
 
