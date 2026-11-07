@@ -6,14 +6,6 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 **[Download v0.8.0-alpha.5](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.5)** · A single Windows EXE with the runtime included.
 
-**Watch the 4-minute SpeedLink demo (4:11)**
-
-https://github.com/user-attachments/assets/91f3d616-09c2-4cf5-926d-4642d296aaaa
-
-See verified backups, real-ROM editing, 2D/3D views, saving and ROM checks,
-logging and recorded-log review, definitions and built-in help.
-**Real-ROM editing shown; ECU reading and logging simulated.**
-
 Use the permanent File, Edit, View, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. Open several maps in independently resizable panes or separate Windows windows. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 Drag a pane's own edge or corner to resize just that map, or drag its title to
