@@ -37,7 +37,8 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
         'Invalid grid input also blocks a workspace switch',
         'Returning to a tab restores its pins, selection and detached window bounds',
         'Reopening the ROM restores workspace names, selected tab and preview',
-        'Deleting a tab removes only its layout and retains applied edits'
+        'Deleting a tab removes only its layout and retains applied edits',
+        'Old fuel feedback layouts reopen the same ROM addresses under the new names'
     )) {
         if ($result.workflow.cases -notcontains $required) { throw "Missing workspace tab regression: $calibration; $required" }
     }

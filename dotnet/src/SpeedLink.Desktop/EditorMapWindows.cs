@@ -593,14 +593,33 @@ public partial class EditorWorkspace
     private void RestorePage(MapPagePreferences saved)
     {
         if (document is null) return;
+        var definition = document.Definition;
+        var tables = definition.Tables.ToDictionary(MapKey);
+        string CurrentKey(string key)
+        {
+            if (tables.ContainsKey(key)) return key;
+            int separator = key.IndexOf(':');
+            if (separator < 0) return key;
+            string? control = key[(separator + 1)..] switch
+            {
+                "Fuel Feedback Gain" => "Gain",
+                "Fuel Feedback Response Period" => "Response Period",
+                _ => null
+            };
+            // The former Gen 2 labels pointed to the rear loop. Preserve the
+            // original address so upgrading never selects a different control.
+            string sensor = definition.Calibration == "L3CGEE000" ? "Rear O2" : "Primary Wideband";
+            return control is null ? key : key[..(separator + 1)] + $"Fuel Feedback - {sensor} {control}";
+        }
+        var maps = saved.Maps.Select(s => s with { Key = CurrentKey(s.Key) }).DistinctBy(s => s.Key).ToArray();
+        string activeKey = CurrentKey(saved.Active), expandedKey = CurrentKey(saved.Expanded);
         dockColumns = saved.Columns; dockColumnFraction = saved.ColumnFraction; dockRowFraction = saved.RowFraction;
         dockRowWeights = saved.RowWeights;
         scalarColumnWidths = saved.ScalarColumnWidths;
-        independentMapLayout = saved.Maps.Any(s => s.DockBounds is not null);
-        foreach (var state in saved.Maps)
+        independentMapLayout = maps.Any(s => s.DockBounds is not null);
+        foreach (var state in maps)
         {
-            var selected = document.Definition.Tables.FirstOrDefault(t => MapKey(t) == state.Key);
-            if (selected is null) continue;
+            if (!tables.TryGetValue(state.Key, out var selected)) continue;
             var editor = OpenMap(selected, state.Pinned);
             RestoreMap(editor, state);
             var slot = mapSlots.First(s => ReferenceEquals(s.Editor, editor));
@@ -608,10 +627,10 @@ public partial class EditorWorkspace
             slot.DockBounds = state.DockBounds;
             if (state.Floating) DetachMap(editor);
         }
-        var active = mapSlots.FirstOrDefault(s => s.Editor.table is { } t && MapKey(t) == saved.Active);
+        var active = mapSlots.FirstOrDefault(s => s.Editor.table is { } t && MapKey(t) == activeKey);
         foreach (var slot in mapSlots.Where(s => s.Editor.table is not null))
-            Panel.SetZIndex(slot.Frame, saved.Maps.FirstOrDefault(s => s.Key == MapKey(slot.Editor.table!))?.ZOrder ?? 0);
-        expandedMap = mapSlots.FirstOrDefault(s => s.Window is null && s.Editor.table is { } t && MapKey(t) == saved.Expanded);
+            Panel.SetZIndex(slot.Frame, maps.FirstOrDefault(s => s.Key == MapKey(slot.Editor.table!))?.ZOrder ?? 0);
+        expandedMap = mapSlots.FirstOrDefault(s => s.Window is null && s.Editor.table is { } t && MapKey(t) == expandedKey);
         (active?.Editor ?? this).ActivateMap();
         ArrangeMaps();
     }
