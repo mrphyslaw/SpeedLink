@@ -56,20 +56,19 @@ public partial class EditorWorkspace
         MapWorkspace.PreviewMouseDown += (_, _) => ActivateMap();
         MapWorkspace.GotKeyboardFocus += (_, _) => ActivateMap();
         Point? dragStart = null; MapDockBounds? moveStart = null;
-        PaneCaption.Cursor = Cursors.SizeAll;
-        PaneCaption.PreviewMouseLeftButtonDown += (_, e) =>
+        PaneDragArea.PreviewMouseLeftButtonDown += (_, e) =>
         {
             if (e.ClickCount == 2) { dragStart = null; ExpandMap_Click(this, new()); e.Handled = true; }
-            else { dragStart = e.GetPosition(MapRoot.mapDock); moveStart = null; PaneCaption.CaptureMouse(); }
+            else { dragStart = e.GetPosition(MapRoot.mapDock); moveStart = null; PaneDragArea.CaptureMouse(); }
         };
         void EndMove()
         {
-            dragStart = null; moveStart = null; PaneCaption.ReleaseMouseCapture();
+            dragStart = null; moveStart = null; PaneDragArea.ReleaseMouseCapture();
             MapRoot.cancelPaneGesture = null; MapRoot.resizingDock = false; MapRoot.UpdateDockExtent(); MapRoot.QueueMapSave();
         }
-        PaneCaption.PreviewMouseLeftButtonUp += (_, _) => EndMove();
-        PaneCaption.LostMouseCapture += (_, _) => { if (dragStart is not null) EndMove(); };
-        PaneCaption.PreviewMouseMove += (_, e) =>
+        PaneDragArea.PreviewMouseLeftButtonUp += (_, _) => EndMove();
+        PaneDragArea.LostMouseCapture += (_, _) => { if (dragStart is not null) EndMove(); };
+        PaneDragArea.PreviewMouseMove += (_, e) =>
         {
             if (e.LeftButton != MouseButtonState.Pressed) { if (dragStart is not null) EndMove(); return; }
             var root = MapRoot;

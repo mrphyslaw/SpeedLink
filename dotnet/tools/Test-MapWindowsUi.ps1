@@ -28,6 +28,8 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
         if ($result.workflow.cases -notcontains $required) { throw "Missing independent resize regression: $calibration; $required" }
     }
     foreach ($required in @(
+        'Blank map header space receives drag input while pinned',
+        'The pin button still receives pointer input',
         'Browsing replaces the reusable map pane',
         'Replacing the preview keeps pane sizes and pinned positions',
         'Invalid scalar input blocks preview replacement without losing the draft',
