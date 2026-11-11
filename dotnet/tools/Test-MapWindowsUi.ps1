@@ -36,6 +36,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
         'Table button returns to the grid',
         'Bulk editing tools can be revealed',
         'Close other maps keeps the active view even when it must take the first pane',
+        'Close other maps keeps the panes open when any has invalid input',
         'Replacing the preview keeps pane sizes and pinned positions',
         'Invalid scalar input blocks preview replacement without losing the draft',
         'Valid input is applied before preview replacement',

@@ -73,6 +73,9 @@ public partial class EditorWorkspace
         Choose(maps[0]); await Idle();
         Check(ReferenceEquals(table, scalar) && scalarDraft && ScalarInput.Text == "invalid" && before == doc.Read(scalar, 0),
             "Invalid scalar input blocks preview replacement without losing the draft");
+        preview.Editor.CloseOtherMaps();
+        Check(OpenCount() == 2 && ReferenceEquals(table, scalar) && scalarDraft && ScalarInput.Text == "invalid",
+            "Close other maps keeps the panes open when any has invalid input");
         ScalarInput.Text = (before + 1).ToString("R", CultureInfo.InvariantCulture);
         Choose(maps[0]); await Idle();
         Check(ReferenceEquals(table, maps[0]) && doc.Read(scalar, 0) != before && doc.CanUndo &&

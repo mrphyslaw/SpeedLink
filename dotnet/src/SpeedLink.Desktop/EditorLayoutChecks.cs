@@ -54,6 +54,7 @@ public partial class EditorWorkspace
         resize(1280, 720 + WorkspaceTabsBar.ActualHeight + WorkspaceTabsBar.Margin.Top + WorkspaceTabsBar.Margin.Bottom);
         await Settle();
         await CheckTableAxes(sample);
+        SetViewMode(4);
         resize(1280, 720);
         await Settle();
         Graph.CheckSurfaceDrag();

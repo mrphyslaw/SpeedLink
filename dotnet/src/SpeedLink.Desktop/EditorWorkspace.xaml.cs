@@ -403,8 +403,8 @@ public partial class EditorWorkspace : UserControl
         doc.Undo(); if (doc.IsDirty) throw new InvalidOperationException("Direct cell edit undo failed.");
         SelectCell(0); OperandBox.Text = "1"; Add_Click(this, new()); if (!doc.IsDirty || !UndoButton.IsEnabled) throw new InvalidOperationException("Scalar UI edit failed.");
         Undo_Click(this, new()); if (doc.IsDirty) throw new InvalidOperationException("UI undo failed."); Redo_Click(this, new());
-        var curve = doc.Definition.Tables.First(t => t.Kind == "2D"); OpenTable(curve); SelectCell(1); UpdateLayout(); Capture(Path.Combine(folder, "curve.png"));
-        var surface = doc.Definition.Tables.First(t => t.Kind == "3D"); OpenTable(surface); SelectCell(surface.Columns + 2); UpdateLayout(); Capture(Path.Combine(folder, "surface.png"));
+        var curve = doc.Definition.Tables.First(t => t.Kind == "2D"); OpenTable(curve); SetViewMode(4); SelectCell(1); UpdateLayout(); Capture(Path.Combine(folder, "curve.png"));
+        var surface = doc.Definition.Tables.First(t => t.Kind == "3D"); OpenTable(surface); SetViewMode(4); SelectCell(surface.Columns + 2); UpdateLayout(); Capture(Path.Combine(folder, "surface.png"));
         var bit = doc.Definition.Tables.FirstOrDefault(t => t.Bit is not null) ?? doc.Definition.Tables.First(t => t.IsChoice); OpenTable(bit); double before = doc.Read(bit, 0);
         var selector = bit.Count == 1 ? ScalarChoice : ChoiceBox;
         selector.SelectedItem = selector.Items.Cast<TuningState>().First(s => s.Value != before); if (doc.Read(bit, 0) == before) throw new InvalidOperationException("State selector did not edit.");
@@ -422,12 +422,12 @@ public partial class EditorWorkspace : UserControl
         Capture(Path.Combine(folder, "editor.png")); closingForTest = true;
         MapTabs.Items.Clear();
         var documentationCurve = doc.Definition.Tables.FirstOrDefault(t => t.Name.Contains("Injector Base Pulsewidth", StringComparison.OrdinalIgnoreCase) && t.Kind == "2D") ?? curve;
-        OpenTable(documentationCurve); SelectCell(0);
+        OpenTable(documentationCurve); SetViewMode(4); SelectCell(0);
         foreach (var category in MapTreeEntries(MapTree).Where(i => i.Tag is string))
             category.IsExpanded = IsMapFolder((string)category.Tag, documentationCurve.Category);
         UpdateLayout(); Capture(Path.Combine(folder, "CurveEditor.png"));
         var illustrated = doc.Definition.Tables.FirstOrDefault(t => t.Name == "Intake Cam Advance (VVT)") ?? surface;
-        OpenTable(illustrated); FocusButton.IsChecked = true; DetailsButton.IsChecked = false; FitMap_Click(this, new()); SelectCell(illustrated.Columns + 2); UpdateLayout();
+        OpenTable(illustrated); SetViewMode(4); FocusButton.IsChecked = true; DetailsButton.IsChecked = false; FitMap_Click(this, new()); SelectCell(illustrated.Columns + 2); UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
         Graph.CheckSurfaceDrag();
         Graph.CheckSurfaceAxes();
