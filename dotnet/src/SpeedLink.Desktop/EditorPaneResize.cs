@@ -99,9 +99,6 @@ public partial class EditorWorkspace
                 PlaceMapFrame(slot, slot.DockBounds);
             }
             if (!mapDock.Children.Contains(slot.Frame)) mapDock.Children.Add(slot.Frame);
-            bool expanded = ReferenceEquals(slot, expandedMap);
-            slot.Editor.ExpandMapButton.Content = slot.Editor.ScalarMap ? expanded ? "⤡" : "⤢" : expanded ? "Restore" : "Expand";
-            System.Windows.Automation.AutomationProperties.SetName(slot.Editor.ExpandMapButton, expanded ? "Restore map layout" : "Expand map");
         }
         UpdateIndependentExtent();
     }

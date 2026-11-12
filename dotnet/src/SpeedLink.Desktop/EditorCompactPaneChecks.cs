@@ -62,7 +62,7 @@ public partial class EditorWorkspace
                     (editor.table!.IsChoice ? Inside(editor.ScalarChoice) : Inside(editor.ScalarInput) && Inside(editor.ScalarUnits)),
                     $"All value, state, baseline and edit controls fit in {editor.table!.Name} at {size}");
                 Check(!editor.ScalarActions.IsVisible && editor.ScalarInput.FontSize == 13 && editor.ScalarInput.MaxWidth == 160, $"Normal text and no idle edit buttons in {editor.table.Name} at {sizeKey}");
-                Check(editor.PaneCaption.Text == editor.table.Name && editor.ScalarInfoButton.IsVisible && !editor.MapInfoButton.IsVisible && !editor.ValueUnitsText.IsVisible && !editor.EditBar.IsVisible,
+                Check(editor.PaneCaption.Text == editor.table.Name && !editor.ValueUnitsText.IsVisible && !editor.EditBar.IsVisible,
                     $"Scalar pane has one title and no duplicate toolbar in {editor.table.Name} at {size}");
             }
         }
@@ -80,9 +80,9 @@ public partial class EditorWorkspace
         ArrangeMaps(); await Idle();
         Check(DockedBounds(editors[^1]).Height > cardHeight && editors.All(e => e.ScalarInput.IsVisible || e.ScalarChoice.IsVisible), "Deliberate scalar sizes survive layout recalculation");
         var first = editors[0]; var scalar = scalars[0]; first.ActivateMap();
-        first.ScalarInfoButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        first.ShowMapInformation(); await Idle();
         Check(first.infoWindow is { IsVisible: true } && first.HelpText.Text == scalar.Description && first.HelpUnitsText.Text.Contains(scalar.Units, StringComparison.Ordinal), "Compact scalar retains full help and units through Map info");
-        first.DetailsButton.IsChecked = false; await Idle();
+        first.CloseMapInformation(); await Idle();
         double original = doc.Read(scalar, 0);
         first.ScalarInput.Text = (original + 1).ToString("R", System.Globalization.CultureInfo.InvariantCulture);
         await Idle();

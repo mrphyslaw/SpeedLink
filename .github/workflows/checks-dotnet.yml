@@ -71,7 +71,7 @@ jobs:
           if (-not $process.WaitForExit(30000)) { $process.Kill(); throw 'Standalone menu check timed out.' }
           if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $report -Raw; throw 'Standalone menus failed.' }
           $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-          if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or !$result.permanentMenus -or !$result.labeledNavigation -or !$result.navigationRemembered -or $result.menus.Count -ne 5) { throw 'Unexpected standalone menu result.' }
+          if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or !$result.permanentMenus -or !$result.labeledNavigation -or !$result.navigationRemembered -or $result.menus.Count -ne 6) { throw 'Unexpected standalone menu result.' }
       - name: Check standalone startup and bundled resources
         run: |
           $report = Join-Path (Get-Location) 'TestResults/Standalone_GUI.json'

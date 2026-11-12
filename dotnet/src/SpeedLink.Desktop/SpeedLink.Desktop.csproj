@@ -4,6 +4,7 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>SpeedLink</AssemblyName>
+    <ApplicationIcon>Assets/SpeedLink.ico</ApplicationIcon>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
@@ -12,6 +13,7 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Resource Include="Assets/SpeedLink.ico" />
     <ProjectReference Include="../SpeedLink.Core/SpeedLink.Core.csproj" />
     <ProjectReference Include="../SpeedLink.Serial/SpeedLink.Serial.csproj" />
     <ProjectReference Include="../SpeedLink.J2534/SpeedLink.J2534.csproj" />

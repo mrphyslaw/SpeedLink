@@ -65,10 +65,10 @@ public partial class EditorWorkspace
             throw new InvalidOperationException("Editing did not restore the full stored precision.");
         if (!FinishEdit() || !precise.AsSpan().SequenceEqual(document.Snapshot())) throw new InvalidOperationException("A no-op cell edit changed ROM bytes.");
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-        double height = MapGrid.ActualHeight; DetailsButton.IsChecked = true; UpdateLayout();
+        double height = MapGrid.ActualHeight; ShowMapInformation(); UpdateLayout();
         if (!DetailsPanel.IsVisible || Math.Abs(MapGrid.ActualHeight - height) > 1) throw new InvalidOperationException("Map information takes space from the table.");
         CaptureWindow(infoWindow!, Path.Combine(folder, "MapInformation.png"));
-        DetailsButton.IsChecked = false;
+        CloseMapInformation();
         PopGraph_Click(this, new());
         foreach (var size in new[] { (900d, 260d), (400d, 600d) })
         {
@@ -103,6 +103,16 @@ public partial class EditorWorkspace
         if (BrowserColumn.ActualWidth < 160) throw new InvalidOperationException("Browser divider did not retain a usable width.");
         TableColumn.Width = new(340); UpdateLayout(); LayoutSplitter_Completed(DataSplitter, new System.Windows.Controls.Primitives.DragCompletedEventArgs(0, 0, false)); UpdateLayout();
         if (Math.Abs(TableColumn.ActualWidth - 340) > 1) throw new InvalidOperationException("Curve divider width did not persist.");
+        SelectCell(maf.Count - 1);
+        SetViewMode(2); await Settle(); await Settle();
+        if (GraphPanel.IsVisible || DataSplitter.IsVisible || MapGrid.ActualWidth > 320 ||
+            MapGrid.ActualWidth >= TableViewport.ActualWidth || SelectedIndices().Single() != maf.Count - 1 ||
+            Descendants(MapGrid).OfType<ScrollViewer>().First().ScrollableHeight <= 0)
+            throw new InvalidOperationException("Table only did not compact the curve or preserve access to its rows.");
+        SetViewMode(1); await Settle(); await Settle();
+        if (!GraphPanel.IsVisible || !DataSplitter.IsVisible || Math.Abs(TableColumn.ActualWidth - 340) > 1 ||
+            SelectedIndices().Single() != maf.Count - 1)
+            throw new InvalidOperationException("Returning to the graph did not restore the curve split and selection.");
         byte[] beforePop = document.Snapshot(); PopBrowser_Click(this, new()); browserWindow!.UpdateLayout();
         if (!beforePop.AsSpan().SequenceEqual(document.Snapshot())) throw new InvalidOperationException("Moving browser changed ROM edits.");
         Graph.PickCurvePoint(maf.Count - 1);

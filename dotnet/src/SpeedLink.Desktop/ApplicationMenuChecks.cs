@@ -11,6 +11,54 @@ using SpeedLink.Core;
 
 namespace SpeedLink.Desktop;
 
+public partial class EditorWorkspace
+{
+    internal async Task CheckFocusedMapCommands(MenuItem menu, TuningTable firstMap)
+    {
+        var other = document!.Definition.Tables.First(t => !ReferenceEquals(t, firstMap) &&
+            t is { Rows: > 1, Columns: > 1, IsChoice: false });
+        var first = OpenMap(firstMap);
+        var second = OpenMap(other);
+        int firstView = first.ViewMode;
+        int firstBaseline = first.BaselineBox.SelectedIndex;
+        double firstZoom = first.cellZoom;
+        static MenuItem Item(ItemsControl items, string title) =>
+            items.Items.OfType<MenuItem>().Single(item => item.Header is string header && header == title);
+        static void Click(MenuItem item) => item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+        try
+        {
+            await Settle();
+            menu.IsSubmenuOpen = true;
+            await Settle();
+            if (!Equals(((MenuItem)menu.Items[0]).Header, other.Name.Replace("_", "__", StringComparison.Ordinal)))
+                throw new InvalidOperationException("The Map menu did not identify the active pane.");
+            var display = Item(menu, "Cell display");
+            Click(Item(display, "Compact rows"));
+            Click(Item(display, $"Larger text ({second.cellZoom:P0})"));
+            Click(Item(Item(menu, "Comparison baseline"), "Last save"));
+            Click(Item(menu, "Graph only"));
+            Click(Item(menu, "Map information…"));
+            await Settle();
+            if (!second.compactRows || second.cellZoom != 1.05 || second.ViewMode != 3 || second.BaselineBox.SelectedIndex != 1 ||
+                second.infoWindow is null || first.infoWindow is not null || first.compactRows || first.cellZoom != firstZoom ||
+                first.ViewMode != firstView || first.BaselineBox.SelectedIndex != firstBaseline || first.EditBar.IsVisible)
+                throw new InvalidOperationException("A Map menu command did not stay scoped to the active pane.");
+            second.CloseMapInformation();
+            first.ActivateMap();
+            await Settle();
+            if (!Equals(((MenuItem)menu.Items[0]).Header, firstMap.Name.Replace("_", "__", StringComparison.Ordinal)) ||
+                Item(display, "Compact rows").IsChecked)
+                throw new InvalidOperationException("Map commands kept the previous pane after focus moved.");
+        }
+        finally
+        {
+            menu.IsSubmenuOpen = false;
+            CloseMap(second);
+            first.ActivateMap();
+        }
+    }
+}
+
 public partial class MainWindow
 {
     private async Task MenuIdle() { await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle); UpdateLayout(); }
@@ -19,10 +67,11 @@ public partial class MainWindow
     {
         Directory.CreateDirectory(folder); Show(); Activate(); Navigate(0); await MenuIdle();
         var menu = ApplicationMenu.Items.OfType<MenuItem>().ToArray();
-        if (!menu.Select(m => m.Header.ToString()!.Replace("_", "")).SequenceEqual(["File", "Edit", "View", "Tools", "Help"]))
+        if (!menu.Select(m => m.Header.ToString()!.Replace("_", "")).SequenceEqual(["File", "Edit", "View", "Map", "Tools", "Help"]) ||
+            ApplicationHeader.ActualHeight > 26 || !Title.Contains(Version, StringComparison.Ordinal))
             throw new InvalidOperationException("The permanent application menus are incomplete.");
-        if (!menu[3].Items.OfType<MenuItem>().Any(item => Equals(item.Header, "Gen 1 _flashing and recovery…")) ||
-            !menu[4].Items.OfType<MenuItem>().Any(item => Equals(item.Tag, "Gen 1 flashing and recovery")) ||
+        if (!menu[4].Items.OfType<MenuItem>().Any(item => Equals(item.Header, "Gen 1 _flashing and recovery…")) ||
+            !menu[5].Items.OfType<MenuItem>().Any(item => Equals(item.Tag, "Gen 1 flashing and recovery")) ||
             !Resource("SpeedLink.FlashingHelp.md").Contains("Gen 2 flashing is planned", StringComparison.Ordinal))
             throw new InvalidOperationException("Gen 1 flashing or the built-in guide is missing from the menus.");
         if (ApplicationSaveMenu.IsEnabled || EditorPane.UndoButton.IsEnabled || EditorPane.CompareButton.IsEnabled)
@@ -72,9 +121,9 @@ public partial class MainWindow
             var logger = WorkspaceMenu.Items.OfType<MenuItem>().Single(m => m.Tag as string == "2");
             logger.Focus(); EditorWorkspace.SendMenuKey(logger, Key.Enter); await MenuIdle();
             if (Pages.SelectedIndex != 2 || !logger.IsChecked) throw new InvalidOperationException("Keyboard menu navigation did not select Logger.");
-            menu[4].IsSubmenuOpen = true; await MenuIdle();
-            var help = menu[4].Items.OfType<MenuItem>().First(); help.Focus(); EditorWorkspace.SendMenuKey(help, Key.Escape); await MenuIdle();
-            if (menu[4].IsSubmenuOpen) throw new InvalidOperationException("Escape did not close the application menu.");
+            menu[5].IsSubmenuOpen = true; await MenuIdle();
+            var help = menu[5].Items.OfType<MenuItem>().First(); help.Focus(); EditorWorkspace.SendMenuKey(help, Key.Escape); await MenuIdle();
+            if (menu[5].IsSubmenuOpen) throw new InvalidOperationException("Escape did not close the application menu.");
         }
         finally
         {
@@ -137,6 +186,7 @@ public partial class MainWindow
         }
         Navigate(1); await MenuIdle(); CaptureApplicationPreview(Path.Combine(folder, "EditorNavigation.png"));
         await CheckEditorAppearance(folder, map);
+        await EditorPane.CheckFocusedMapCommands(ApplicationMapViewMenu, map);
         ApplicationFileMenu.IsSubmenuOpen = true; await MenuIdle();
         if (ApplicationFileMenu.Template.FindName("PART_Popup", ApplicationFileMenu) is Popup { Child: Border file })
             EditorWorkspace.SaveMenuImage(file, Path.Combine(folder, "LoadedFileMenu.png"));
@@ -148,7 +198,7 @@ public partial class MainWindow
         CaptureWorkbench(Path.Combine(folder, "MinimumNavigation.png"));
         Width = 1440; Height = 880; await MenuIdle();
         return new { passed = true, hardwareAccessed = false, menuChecks, editorCommands = true, navigationPreservesEdits = true, minimumLayout = true,
-            appearanceVerified = true, gridAdjustmentsVerified = true, mapFoldersVerified = true, previewMap = map.Name };
+            appearanceVerified = true, gridAdjustmentsVerified = true, mapFoldersVerified = true, focusedMapCommands = true, previewMap = map.Name };
     }
 
     private async Task CheckEditorAppearance(string folder, TuningTable map)
@@ -191,16 +241,19 @@ public partial class MainWindow
         Color selection = UiTheme.Brush("CellSelectionBrush").Color;
         Color changed = UiTheme.Brush("ChangedCellBrush").Color;
         Color axis = UiTheme.Brush("AxisBandBrush").Color;
+        var shades = new HashSet<Color>();
         if (selection == axis || EditorWorkspace.Contrast(text, selection) < 4.5 ||
             EditorWorkspace.Contrast(text, axis) < 4.5 || EditorWorkspace.Contrast(changed, selection) < 3)
             throw new InvalidOperationException("Selected values, axes, or edit outlines have insufficient contrast.");
         for (int step = 0; step <= UiTheme.HeatSteps; step++)
         {
             Color fill = UiTheme.Heat((double)step / UiTheme.HeatSteps).Color;
+            shades.Add(fill);
             if (fill == selection || EditorWorkspace.Contrast(text, fill) < 4.5 ||
                 EditorWorkspace.Contrast(changed, fill) < 3)
                 throw new InvalidOperationException($"Map color step {step} obscures a value, selection, or edit outline.");
         }
+        if (shades.Count < 100) throw new InvalidOperationException("The map gradient rendered too few distinct shades.");
     }
 
     private void CaptureApplicationPreview(string path, MenuItem? menu = null)

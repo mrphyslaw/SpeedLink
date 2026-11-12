@@ -69,10 +69,10 @@ public partial class EditorWorkspace
         var doc = document!;
         var maps = doc.Definition.Tables.Where(t => t.Rows > 1 && t.Columns > 1 && !t.IsChoice).Take(2).ToArray();
         var firstMap = OpenMap(maps[0]); var floating = OpenMap(maps[1]);
-        floating.UndockMapButton.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent)); await Idle();
+        floating.UndockMap_Click(floating, new()); await Idle();
         var native = mapSlots.Single(s => ReferenceEquals(s.Editor, floating)).Window!;
         firstMap.SelectCell(1); floating.SelectCell(2);
-        firstMap.CellZoomIn.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+        firstMap.SetCellZoom(firstMap.cellZoom + .05);
         doc.Apply([new(maps[0], 0, doc.Read(maps[0], 0) + 1)], "Existing unsaved edit"); await Idle();
         var snapshot = doc.Snapshot(); var slots = mapSlots.ToArray();
         var selection = firstMap.SelectedIndices(); var floatingSelection = floating.SelectedIndices();

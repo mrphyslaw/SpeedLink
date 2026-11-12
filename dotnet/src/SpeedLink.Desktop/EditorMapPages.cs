@@ -69,14 +69,18 @@ public partial class EditorWorkspace
         try
         {
             WorkspaceTabs.Items.Clear();
-            foreach (var page in workspacePages)
+            for (int i = 0; i < workspacePages.Count; i++)
             {
+                var page = workspacePages[i];
+                int index = i;
                 var label = new TextBlock { Text = page.Name, MaxWidth = 180, TextTrimming = TextTrimming.CharacterEllipsis };
-                WorkspaceTabs.Items.Add(new TabItem { Header = label, ToolTip = page.Name, Padding = new(9, 4, 9, 4) });
+                var actions = MapContextMenu();
+                AddAction(actions, "Rename workspace…", "", () => RunTabAction(index, RenameCurrentWorkspace), true);
+                AddAction(actions, "Delete workspace…", "", () => RunTabAction(index, ConfirmDeleteWorkspace), workspacePages.Count > 1);
+                WorkspaceTabs.Items.Add(new TabItem { Header = label, ToolTip = page.Name, Padding = new(9, 4, 9, 4), ContextMenu = actions });
             }
             WorkspaceTabsBar.Visibility = workspacePages.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             NewWorkspaceButton.IsEnabled = workspacePages.Count < MapWorkspacePreferences.MaxPages;
-            DeleteWorkspaceButton.IsEnabled = workspacePages.Count > 1;
             WorkspaceTabs.SelectedIndex = currentPage;
         }
         finally { updatingWorkspaceTabs = false; }
@@ -111,7 +115,13 @@ public partial class EditorWorkspace
     private void NewWorkspace_Click(object sender, RoutedEventArgs e)
     {
         if (workspacePages.Count >= MapWorkspacePreferences.MaxPages || !FinishAllMapEdits()) return;
-        if (PromptWorkspaceName("New workspace tab", "", -1) is { } name) AddWorkspace(name);
+        string name = Enumerable.Range(workspacePages.Count + 1, MapWorkspacePreferences.MaxPages)
+            .Select(number => $"Workspace {number}")
+            .First(candidate => !workspacePages.Any(p => p.Name.Equals(candidate, StringComparison.OrdinalIgnoreCase)));
+        AddWorkspace(name);
+        var tab = (TabItem)WorkspaceTabs.SelectedItem;
+        tab.Focus();
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => NewWorkspaceButton.BringIntoView()));
     }
 
     private void AddWorkspace(string name)
@@ -123,9 +133,15 @@ public partial class EditorWorkspace
         SaveMapWorkspace();
     }
 
-    private void RenameWorkspace_Click(object sender, RoutedEventArgs e)
+    private void RunTabAction(int index, Action action)
     {
-        if (PromptWorkspaceName("Rename workspace tab", workspacePages[currentPage].Name, currentPage) is { } name)
+        WorkspaceTabs.SelectedIndex = index;
+        if (currentPage == index) action();
+    }
+
+    private void RenameCurrentWorkspace()
+    {
+        if (PromptWorkspaceName() is { } name)
             RenameWorkspace(name);
     }
 
@@ -136,7 +152,7 @@ public partial class EditorWorkspace
         SaveMapWorkspace();
     }
 
-    private void DeleteWorkspace_Click(object sender, RoutedEventArgs e)
+    private void ConfirmDeleteWorkspace()
     {
         if (workspacePages.Count <= 1 || !FinishAllMapEdits()) return;
         var choice = MessageBox.Show(Window.GetWindow(this),
@@ -153,28 +169,28 @@ public partial class EditorWorkspace
         SaveMapWorkspace();
     }
 
-    private string? PromptWorkspaceName(string title, string initial, int renamedIndex)
+    private string? PromptWorkspaceName()
     {
-        var dialog = Floating(title, 360, 200);
+        var dialog = Floating("Rename workspace tab", 360, 200);
         dialog.MinHeight = 0;
         dialog.ResizeMode = ResizeMode.NoResize;
         dialog.SizeToContent = SizeToContent.Height;
         var form = new StackPanel { Margin = new(18) };
         form.Children.Add(new TextBlock { Text = "Workspace name", Margin = new(0, 0, 0, 6) });
-        var input = new TextBox { Text = initial, MaxLength = MapPagePreferences.MaxNameLength, MinHeight = 28 };
+        var input = new TextBox { Text = workspacePages[currentPage].Name, MaxLength = MapPagePreferences.MaxNameLength, MinHeight = 28 };
         System.Windows.Automation.AutomationProperties.SetName(input, "Workspace name");
         form.Children.Add(input);
         var error = new TextBlock { Foreground = UiTheme.Amber, TextWrapping = TextWrapping.Wrap, Margin = new(0, 6, 0, 0), Visibility = Visibility.Collapsed };
         form.Children.Add(error);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new(0, 12, 0, 0) };
-        var confirm = new Button { Content = renamedIndex < 0 ? "Create" : "Rename", IsDefault = true };
+        var confirm = new Button { Content = "Rename", IsDefault = true };
         actions.Children.Add(confirm);
         actions.Children.Add(new Button { Content = "Cancel", IsCancel = true, Margin = new(6, 0, 0, 0) });
         form.Children.Add(actions);
         confirm.Click += (_, _) =>
         {
             string name = input.Text.Trim();
-            bool duplicate = workspacePages.Where((_, i) => i != renamedIndex)
+            bool duplicate = workspacePages.Where((_, i) => i != currentPage)
                 .Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
             if (!MapPagePreferences.ValidName(name) || duplicate)
             {

@@ -24,9 +24,9 @@ public partial class MainWindow
             if (RecordingsPane.PlottedChannels == 0 || RecordingsPane.Recording is null) throw new InvalidOperationException("Embedded recording did not load.");
             CaptureWorkbench(System.IO.Path.Combine(folder, "RecordedWorkbench.png"));
         }
-        Navigate(1); EditorPane.DetailsButton.IsChecked = true; UpdateLayout();
+        Navigate(1); EditorPane.ShowMapInformation(); UpdateLayout();
         CaptureWorkbench(System.IO.Path.Combine(folder, "DetailsWorkbench.png"));
-        EditorPane.DetailsButton.IsChecked = false; UpdateLayout();
+        EditorPane.CloseMapInformation(); UpdateLayout();
         CaptureWorkbench(System.IO.Path.Combine(folder, "Workbench.png"));
         EditorPane.FocusButton.IsChecked = true; EditorPane.SetViewMode(1); UpdateLayout();
         CaptureWorkbench(System.IO.Path.Combine(folder, "FocusedWorkbench.png"));

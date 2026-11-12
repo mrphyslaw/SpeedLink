@@ -1,7 +1,6 @@
 # Tuning guide
 
-In **Editor**, open a map and click **Map info** or **ⓘ** in its pane. You can
-also press **F1** or choose **View → Map layout and display → Map information…**.
+In **Editor**, open a map and choose **Map → Map information…** or press **F1**.
 The popup explains the selected control and shows its units and input axes.
 When this guide covers the control, a link in the popup opens the relevant
 section inside SpeedLink, including offline. You can also open **Help → Tuning
