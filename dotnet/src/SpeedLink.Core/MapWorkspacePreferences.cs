@@ -8,6 +8,7 @@ public sealed record MapPanePreferences
     public string Key { get; init; } = "";
     public double Zoom { get; init; } = 1;
     public bool AutoFit { get; init; } = true;
+    public bool CompactRows { get; init; }
     public bool? FitTable { get; init; }
     public int View { get; init; } = 4;
     public int Baseline { get; init; }
@@ -64,11 +65,10 @@ public record MapPagePreferences
     internal MapPagePreferences ValidatePage()
     {
         var panes = (Maps ?? []).Where(m => m is not null).Select(m => m.Validate()).Where(m => m.Key.Length > 0).DistinctBy(m => m.Key).Take(24).ToArray();
-        var preview = panes.FirstOrDefault(m => !m.Pinned);
         return this with
         {
             Name = Name?.Trim() ?? "",
-            Maps = panes.Select(m => !m.Pinned && !ReferenceEquals(m, preview) ? m with { Pinned = true } : m).ToArray(),
+            Maps = panes,
             Active = Active is { Length: <= 320 } ? Active : "",
             Expanded = Expanded is { Length: <= 320 } ? Expanded : "",
             Columns = Math.Clamp(Columns, 1, 2),
@@ -131,14 +131,17 @@ public sealed record MapWorkspacePreferences : MapPagePreferences
 /// <summary>Fits cell spacing around measured text; never chooses a smaller font.</summary>
 public readonly record struct ReadableTableFit(double ColumnWidth, double RowHeight, bool Fits)
 {
-    public static ReadableTableFit Calculate(double width, double height, int columns, int rows, double headerWidth, double headerHeight, double measuredTextWidth, double fontSize, double zoom, bool autoFit)
+    public static ReadableTableFit Calculate(double width, double height, int columns, int rows, double headerWidth, double headerHeight, double measuredTextWidth, double fontSize, double zoom, bool autoFit, bool compact = false)
     {
         if (columns < 1 || rows < 1 || !double.IsFinite(width) || !double.IsFinite(height) || !double.IsFinite(headerWidth) || !double.IsFinite(headerHeight) || !double.IsFinite(zoom) || zoom < .85 || zoom > 1.5 || !double.IsFinite(fontSize) || fontSize < 11 || !double.IsFinite(measuredTextWidth) || measuredTextWidth < 0)
             throw new ArgumentOutOfRangeException(nameof(columns));
-        double minWidth = Math.Ceiling(Math.Max(44 * zoom, measuredTextWidth + 14 * zoom));
-        double minHeight = Math.Ceiling(Math.Max(22 * zoom, fontSize + 10));
-        double cell = autoFit ? Math.Max(minWidth, Math.Min(112 * zoom, Math.Floor((Math.Max(0, width) - headerWidth - 4) / columns))) : Math.Max(minWidth, 70 * zoom);
-        double row = autoFit ? Math.Max(minHeight, Math.Min(28 * zoom, Math.Floor((Math.Max(0, height) - headerHeight - 4) / rows))) : Math.Max(minHeight, 25 * zoom);
+        double minWidth = MinimumColumnWidth(measuredTextWidth, zoom, compact);
+        double minHeight = Math.Ceiling(Math.Max((compact ? 17 : 22) * zoom, fontSize + (compact ? 5 : 10)));
+        double cell = autoFit ? Math.Max(minWidth, Math.Min((compact ? 64 : 112) * zoom, Math.Floor((Math.Max(0, width) - headerWidth - 4) / columns))) : Math.Max(minWidth, (compact ? 48 : 70) * zoom);
+        double row = compact ? minHeight : autoFit ? Math.Max(minHeight, Math.Min(28 * zoom, Math.Floor((Math.Max(0, height) - headerHeight - 4) / rows))) : Math.Max(minHeight, 25 * zoom);
         return new(cell, row, cell * columns + headerWidth + 4 <= width && row * rows + headerHeight + 4 <= height);
     }
+
+    public static double MinimumColumnWidth(double textWidth, double zoom, bool compact) =>
+        Math.Ceiling(Math.Max((compact ? 29 : 44) * zoom, textWidth + (compact ? 8 : 14) * zoom));
 }

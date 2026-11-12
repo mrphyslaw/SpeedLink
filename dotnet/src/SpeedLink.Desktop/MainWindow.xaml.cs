@@ -63,7 +63,6 @@ public partial class MainWindow : Window
         Navigate(0);
         Closed += (_, _) => { RecordingsPane.CancelLoading(); readProgressTimer?.Stop(); };
         Title = $"SpeedLink · Alpha {Version}";
-        VersionLabel.Text = $"ALPHA {Version}";
         BaudBox.ItemsSource = new[] { 115200, 38400, 57600, 230400, 500000, 1000000, 2000000 };
         BaudBox.SelectedItem = 115200;
         AdapterBox.ItemsSource = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0", "Mongoose-Plus ISO/CAN3 (experimental)" };

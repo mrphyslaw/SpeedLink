@@ -42,13 +42,11 @@ public partial class EditorWorkspace
         MapGrid.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(MapGrid)!, 0, Key.F4)
             { RoutedEvent = Keyboard.PreviewKeyDownEvent });
         Check(ViewMode == 3 && GraphPanel.IsVisible && !TablePanel.IsVisible, "F4 opens the full map graph");
-        ToggleGraphButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        ToggleGraphView();
         Check(ViewMode == 2 && !GraphPanel.IsVisible && TablePanel.IsVisible, "Table button returns to the grid");
-        EditToolsButton.IsChecked = true;
-        EditToolsButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        ToggleMapEditTools();
         Check(EditBar.IsVisible, "Bulk editing tools can be revealed");
-        EditToolsButton.IsChecked = false;
-        EditToolsButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+        ToggleMapEditTools();
         Choose(maps[1]); await Idle();
         Check(OpenCount() == 1 && ReferenceEquals(table, maps[1]) && !Slot(maps[1]).Pinned, "Browsing replaces the reusable map pane");
         Pin(this);
@@ -64,9 +62,18 @@ public partial class EditorWorkspace
             SameBounds(pinnedBounds, DockedBounds(this)), "Replacing the preview keeps pane sizes and pinned positions");
         Choose(maps[1]); await Idle();
         Check(ReferenceEquals(activeMap, this) && OpenCount() == 2, "Choosing a pinned map focuses it without replacing the preview");
-        preview.Editor.SetViewMode(4);
         Pin(this);
-        Check(!pinned.Pinned && preview.Pinned, "Unpinning makes that pane reusable while keeping the other map");
+        Check(OpenCount() == 2 && !pinned.Pinned && !preview.Pinned && Equals(preview.Editor.PinMapButton.Content, "Pin"),
+            "Unpinning changes only the clicked pane and keeps both maps open");
+        Choose(maps[2]); await Idle();
+        Choose(maps[0]); await Idle();
+        Check(OpenCount() == 2 && ReferenceEquals(Slot(maps[0]), preview) && ReferenceEquals(Slot(maps[1]), pinned) &&
+            !pinned.Pinned && !preview.Pinned && SameBounds(bounds, DockedBounds(preview.Editor)) && SameBounds(pinnedBounds, DockedBounds(this)),
+            "Browsing reuses the most recently active unpinned pane without changing the other pane");
+        Choose(maps[2]); await Idle();
+        preview.Editor.SetViewMode(4);
+        Pin(preview.Editor);
+        Choose(maps[1]); await Idle();
         Choose(scalar); await Idle();
         double before = doc.Read(scalar, 0);
         ScalarInput.Text = "invalid";
@@ -81,13 +88,18 @@ public partial class EditorWorkspace
         Check(ReferenceEquals(table, maps[0]) && doc.Read(scalar, 0) != before && doc.CanUndo &&
             !EditorStatus.Text.StartsWith("Correct or cancel", StringComparison.Ordinal), "Valid input is applied before preview replacement");
         SelectCell(1);
-        preview.Editor.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        preview.Editor.UndockMap_Click(preview.Editor, new());
         await Idle();
         var floating = preview.Window ?? throw new InvalidOperationException("Pinned map failed to undock.");
         floating.Width = 570; floating.Height = 450;
         await Idle();
         RenameWorkspace("Boost Control");
-        AddWorkspace("Fuel Tuning"); await Idle();
+        NewWorkspaceButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent)); await Idle();
+        var added = (TabItem)WorkspaceTabs.SelectedItem;
+        Check(workspacePages[1].Name == "Workspace 2" && NewWorkspaceButton.Content as string == "+" &&
+            NewWorkspaceButton.TranslatePoint(new(), WorkspaceTabsBar).X >= added.TranslatePoint(new(added.ActualWidth, 0), WorkspaceTabsBar).X,
+            "The trailing plus opens and selects an empty workspace");
+        RenameWorkspace("Fuel Tuning"); await Idle();
         Check(currentPage == 1 && WorkspaceTabs.Items.Count == 2 && OpenCount() == 0 && !floating.IsVisible,
             "A new workspace is empty and hides the other workspace's detached maps");
         Choose(scalar); await Idle();
@@ -138,7 +150,7 @@ public partial class EditorWorkspace
         reopened.Apply([new(reopenedScalar, 0, before + 1)], "Workspace deletion fixture");
         byte[] edited = reopened.Snapshot();
         DeleteWorkspace(); await Idle();
-        Check(WorkspaceTabs.Items.Count == 1 && !DeleteWorkspaceButton.IsEnabled && workspacePages[0].Name == "Fuel Tuning" &&
+        Check(WorkspaceTabs.Items.Count == 1 && !((MenuItem)((TabItem)WorkspaceTabs.SelectedItem).ContextMenu.Items[1]).IsEnabled && workspacePages[0].Name == "Fuel Tuning" &&
             edited.AsSpan().SequenceEqual(reopened.Snapshot()), "Deleting a tab removes only its layout and retains applied edits");
         reopened.Undo();
         Check(original.AsSpan().SequenceEqual(reopened.Snapshot()), "Workspace presentation and undo preserve the synthetic ROM");

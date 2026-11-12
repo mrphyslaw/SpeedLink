@@ -34,7 +34,7 @@ public partial class EditorWorkspace
         if (layoutClosing) return;
         SetVisible(browserWindow, workspaceActive && !FocusButton.IsChecked);
         SetVisible(graphWindow, workspaceActive && table is { Count: > 1, IsChoice: false });
-        SetVisible(infoWindow, workspaceActive && table is not null && DetailsButton.IsChecked);
+        SetVisible(infoWindow, workspaceActive && table is not null);
         static void SetVisible(Window? window, bool visible)
         {
             if (window is null || window.IsVisible == visible) return;
@@ -105,14 +105,30 @@ public partial class EditorWorkspace
         if (BrowserColumn is null || DetailsPanel is null || FocusButton is null || ChangesButton is null) return;
         ApplyLayout(); SaveLayout();
     }
-    private void MapInfo_Click(object sender, RoutedEventArgs e) => ShowMapInformation();
-    private void ShowMapInformation()
+    internal void ShowMapInformation()
     {
         if (table is null) return;
-        DetailsButton.IsChecked = true;
-        if (infoWindow?.WindowState == WindowState.Minimized) infoWindow.WindowState = WindowState.Normal;
-        infoWindow?.Activate();
+        if (infoWindow is null)
+        {
+            var window = Floating("SpeedLink · Map information", 540, 400);
+            infoWindow = window;
+            EditorLayout.Children.Remove(DetailsPanel);
+            DetailsPanel.Visibility = Visibility.Visible;
+            window.Content = DetailsPanel;
+            window.Closed += (_, _) =>
+            {
+                window.Content = null;
+                EditorLayout.Children.Add(DetailsPanel);
+                DetailsPanel.Visibility = Visibility.Collapsed;
+                infoWindow = null;
+            };
+            UpdateFloatingVisibility();
+        }
+        if (infoWindow.WindowState == WindowState.Minimized) infoWindow.WindowState = WindowState.Normal;
+        infoWindow.Activate();
     }
+
+    internal void CloseMapInformation() => infoWindow?.Close();
 
     private void RefreshGuideTopic(TuningDefinition? definition, TuningTable? map)
     {
@@ -172,14 +188,6 @@ public partial class EditorWorkspace
         BrowserSplitter.Visibility = hidden || browserWindow is not null ? Visibility.Collapsed : Visibility.Visible;
         bool changes = ChangesButton.IsChecked; ChangesColumn.Width = new(changes ? 220 : 0); ChangesDivider.Width = new(changes ? 5 : 0);
         ChangesPanel.Visibility = ChangesSplitter.Visibility = changes ? Visibility.Visible : Visibility.Collapsed;
-        if (DetailsButton.IsChecked && infoWindow is null)
-        {
-            var window = Floating("SpeedLink · Map information", 540, 400); infoWindow = window;
-            EditorLayout.Children.Remove(DetailsPanel); DetailsPanel.Visibility = Visibility.Visible; window.Content = DetailsPanel;
-            window.Closed += (_, _) => { window.Content = null; EditorLayout.Children.Add(DetailsPanel); DetailsPanel.Visibility = Visibility.Collapsed; infoWindow = null; DetailsButton.IsChecked = false; };
-            UpdateFloatingVisibility();
-        }
-        else if (!DetailsButton.IsChecked && infoWindow is not null) infoWindow.Close();
         ApplyView();
     }
     internal void SetViewMode(int mode)
@@ -229,7 +237,7 @@ public partial class EditorWorkspace
         else GraphTitle.Text = surface ? "3D · drag to rotate · wheel to zoom" : "Curve · wheel to zoom · Shift+drag to pan · click a point";
         TablePanel.Visibility = table is null || graphOnly || ScalarMap ? Visibility.Collapsed : Visibility.Visible;
         ScalarPanel.Visibility = ScalarMap ? Visibility.Visible : Visibility.Collapsed;
-        EditBar.Visibility = table is not null && !ScalarMap && (table.IsChoice || EditToolsButton.IsChecked == true) ? Visibility.Visible : Visibility.Collapsed;
+        EditBar.Visibility = table is not null && !ScalarMap && (table.IsChoice || showMapEditTools) ? Visibility.Visible : Visibility.Collapsed;
         GraphPanel.Visibility = graphable && (floating || ViewMode != 2 && (ViewMode != 4 || preview)) ? Visibility.Visible : Visibility.Collapsed;
         UpdateFloatingVisibility();
         Grid.SetRow(DataSplitter, vertical ? 0 : 1); Grid.SetColumn(DataSplitter, vertical ? 1 : 0);
@@ -249,7 +257,18 @@ public partial class EditorWorkspace
         RefreshMapControls();
         if (mapOwner is null) RefreshMapCommandState();
     }
-    private void ViewMenu_Click(object sender, RoutedEventArgs e) { if (sender is MenuItem { Tag: string mode } && CommandMap.FinishEdit()) { CommandMap.fitTable = false; CommandMap.SetViewMode(int.Parse(mode, System.Globalization.CultureInfo.InvariantCulture)); } }
+    private void ViewMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem { Tag: string mode }) CommandMap.ChangeViewMode(int.Parse(mode, CultureInfo.InvariantCulture));
+    }
+    private void ChangeViewMode(int mode)
+    {
+        if (!FinishEdit()) return;
+        fitTable = false;
+        if (mode == 2) graphWindow?.Close();
+        SetViewMode(mode);
+        QueueMapSave();
+    }
     private void FitMap_Click(object sender, RoutedEventArgs e)
     {
         if (!ReferenceEquals(CommandMap, this)) { CommandMap.FitMap_Click(sender, e); return; }
@@ -263,7 +282,7 @@ public partial class EditorWorkspace
             if (slot.Window is null) { root.expandedMap = slot; root.ArrangeMaps(); }
             root.FocusButton.IsChecked = true;
         }
-        previewWidth = null; FocusButton.IsChecked = true; ChangesButton.IsChecked = false; DetailsButton.IsChecked = false; fitTable = true;
+        previewWidth = null; FocusButton.IsChecked = true; ChangesButton.IsChecked = false; CloseMapInformation(); fitTable = true;
         SetViewMode(ViewMode == 3 ? (CurveList ? 1 : 2) : ViewMode); Graph.ResetView();
         Dispatcher.BeginInvoke(new Action(() => { UpdateLayout(); UpdateTableSizing(); SaveLayout(); }));
     }
@@ -330,6 +349,12 @@ public partial class EditorWorkspace
     private void UpdateCompactMap()
     {
         var size = table is null ? null : CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, AxisLabelColumn.Width.Value, AxisTitleRow.Height.Value, table.IsChoice);
+        if (ViewMode == 2 && CurveList && MapGrid.Columns.Count == 2)
+        {
+            double height = MapGrid.ColumnHeaderHeight + MapGrid.Items.Count * CurveRowHeight + 4;
+            double scrollbar = height > TableViewport.ActualHeight ? SystemParameters.VerticalScrollBarWidth : 0;
+            size = new(MapGrid.RowHeaderWidth + 2 * CurveColumnWidth + scrollbar + 4, height);
+        }
         bool fillPreview = ViewMode == 4 && graphWindow is null && table is { IsChoice: false, Count: > 1 };
         TablePanel.HorizontalAlignment = size is null || fillPreview ? HorizontalAlignment.Stretch : HorizontalAlignment.Left;
         TablePanel.VerticalAlignment = size is null ? VerticalAlignment.Stretch : VerticalAlignment.Top;
@@ -340,25 +365,32 @@ public partial class EditorWorkspace
     {
         if (table is null || MapGrid.ActualWidth < 10 || MapGrid.Columns.Count == 0) return;
         QueueAxisGeometry();
-        MapGrid.FontSize = 13 * cellZoom;
         double minimum = MinimumCellWidth();
         if (CurveList)
         {
-            foreach (var column in MapGrid.Columns) { column.MinWidth = minimum; column.Width = autoFitCells ? new(1, DataGridLengthUnitType.Star) : new(Math.Max(minimum, 120 * cellZoom)); }
-            MapGrid.RowHeight = Math.Ceiling(25 * cellZoom); return;
+            foreach (var column in MapGrid.Columns)
+            {
+                column.MinWidth = minimum;
+                column.Width = autoFitCells ? new(1, DataGridLengthUnitType.Star) : new(CurveColumnWidth);
+            }
+            MapGrid.RowHeight = CurveRowHeight;
+            return;
         }
         // Leave room for a transient horizontal scrollbar so it cannot keep the
         // vertical scrollbar alive and prevent an otherwise fitting grid from settling.
         double availableHeight = MapGrid.ActualHeight - (fitTable ? SystemParameters.HorizontalScrollBarHeight : 0);
-        var size = ReadableTableFit.Calculate(MapGrid.ActualWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells);
+        var size = ReadableTableFit.Calculate(MapGrid.ActualWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells, compactRows);
         double rowHeight = size.RowHeight;
         if (table.Rows * rowHeight + MapGrid.ColumnHeaderHeight > MapGrid.ActualHeight)
-            size = ReadableTableFit.Calculate(MapGrid.ActualWidth - SystemParameters.VerticalScrollBarWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells);
+            size = ReadableTableFit.Calculate(MapGrid.ActualWidth - SystemParameters.VerticalScrollBarWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells, compactRows);
         bool compact = CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, 0, 0) is not null;
         double compactCell = Math.Clamp(Math.Floor((MapGrid.ActualWidth - MapGrid.RowHeaderWidth - 4) / table.Columns), Math.Min(64, minimum), previewWidth is not null && ViewMode == 4 ? 160 : table.Columns <= 4 ? 112 : 88);
         foreach (var column in MapGrid.Columns) { column.MinWidth = minimum; column.Width = new(Math.Max(minimum, compact && autoFitCells ? compactCell : size.ColumnWidth)); }
-        MapGrid.RowHeight = compact ? Math.Max(size.RowHeight, 28 * cellZoom) : size.RowHeight;
+        MapGrid.RowHeight = compact && !compactRows ? Math.Max(size.RowHeight, 28 * cellZoom) : size.RowHeight;
     }
+    private double CurveRowHeight => Math.Ceiling(compactRows ? Math.Max(17 * cellZoom, MapGrid.FontSize + 5) : 25 * cellZoom);
+    private double CurveColumnWidth => Math.Max(MinimumCellWidth(), 120 * cellZoom);
+
     private double MinimumCellWidth()
     {
         var typeface = new Typeface(MapGrid.FontFamily, MapGrid.FontStyle, MapGrid.FontWeight, MapGrid.FontStretch);
@@ -367,6 +399,6 @@ public partial class EditorWorkspace
             var strings = MapGrid.Items.OfType<EditorRow>().SelectMany(r => r.Values).Concat(MapGrid.Columns.Select(c => c.Header?.ToString() ?? "")).Distinct();
             measuredCellWidth = strings.Select(s => new FormattedText(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, MapGrid.FontSize, UiTheme.Text, VisualTreeHelper.GetDpi(this).PixelsPerDip).WidthIncludingTrailingWhitespace).DefaultIfEmpty(0).Max();
         }
-        return Math.Ceiling(Math.Max(44 * cellZoom, measuredCellWidth + 14 * cellZoom));
+        return ReadableTableFit.MinimumColumnWidth(measuredCellWidth, cellZoom, compactRows);
     }
 }

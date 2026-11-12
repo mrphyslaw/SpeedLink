@@ -39,7 +39,7 @@ public partial class EditorWorkspace
     private int scalarDockColumns = 1;
     private const double ScalarCardWidth = 300;
     private double cellZoom = 1;
-    private bool autoFitCells = true, updatingMapControls, rebuildingDock, restoringMaps, disposingMaps, gridDraft;
+    private bool autoFitCells = true, rebuildingDock, restoringMaps, disposingMaps, gridDraft;
     private double measuredCellWidth = double.NaN;
     private string? mapsPath;
     private MapWorkspacePreferences[] mapProfiles = [];
@@ -156,6 +156,8 @@ public partial class EditorWorkspace
         PreviewItem.IsEnabled = BelowItem.IsEnabled = BesideItem.IsEnabled = GraphItem.IsEnabled = graphable;
         PreviewItem.IsChecked = graphable && current.ViewMode == 4; BelowItem.IsChecked = current.ViewMode == 0;
         BesideItem.IsChecked = current.ViewMode == 1; TableItem.IsChecked = current.ViewMode == 2; GraphItem.IsChecked = current.ViewMode == 3;
+        PreviewItem.Header = current.table is { Rows: > 1, Columns: > 1 } ? "Table with 3D preview" : "Table with curve preview";
+        refreshFocusedMapMenu?.Invoke();
     }
     private void MenuMapInfo_Click(object sender, RoutedEventArgs e) => CommandMap.ShowMapInformation();
     /// <summary>Each map is a view over the same document, not a second ROM copy.</summary>
@@ -196,7 +198,8 @@ public partial class EditorWorkspace
     }
     private void BrowseMap(TuningTable selected)
     {
-        var preview = mapSlots.FirstOrDefault(s => s.Editor.table is not null && s.Window is null && !s.Pinned);
+        var preview = mapSlots.Where(s => s.Editor.table is not null && s.Window is null && !s.Pinned)
+            .MaxBy(s => Panel.GetZIndex(s.Frame));
         if (preview is null || mapSlots.Any(s => ReferenceEquals(s.Editor.table, selected)))
         {
             var opened = OpenMap(selected, pinned: false);
@@ -229,11 +232,6 @@ public partial class EditorWorkspace
         var root = MapRoot;
         var slot = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor, this));
         if (slot is null || slot.Window is not null || table is null) return;
-        if (slot.Pinned)
-        {
-            var preview = root.mapSlots.FirstOrDefault(s => s.Editor.table is not null && !s.Pinned && s.Window is null);
-            if (preview is not null) { preview.Pinned = true; preview.Editor.RefreshPinButton(); }
-        }
         slot.Pinned = !slot.Pinned;
         RefreshPinButton(); root.QueueMapSave();
     }
@@ -288,9 +286,6 @@ public partial class EditorWorkspace
                 slot.Frame.HorizontalAlignment = HorizontalAlignment.Stretch; slot.Frame.VerticalAlignment = VerticalAlignment.Stretch;
                 Grid.SetRow(slot.Frame, (i / columns) * 2); Grid.SetColumn(slot.Frame, (i % columns) * 2);
                 if (!mapDock.Children.Contains(slot.Frame)) mapDock.Children.Add(slot.Frame);
-                bool expanded = ReferenceEquals(slot, expandedMap);
-                slot.Editor.ExpandMapButton.Content = slot.Editor.ScalarMap ? expanded ? "⤡" : "⤢" : expanded ? "Restore" : "Expand";
-                System.Windows.Automation.AutomationProperties.SetName(slot.Editor.ExpandMapButton, expanded ? "Restore map layout" : "Expand map");
             }
             UpdateDockExtent();
         }
@@ -477,31 +472,10 @@ public partial class EditorWorkspace
         PaneCaption.Text = table?.Name ?? "Choose a map"; PaneCaption.ToolTip = PaneCaption.Text;
         PaneCaption.TextWrapping = ScalarMap ? TextWrapping.Wrap : TextWrapping.NoWrap;
         PaneCaption.TextTrimming = ScalarMap ? TextTrimming.None : TextTrimming.CharacterEllipsis;
-        bool detached = MapRoot.mapSlots.Any(s => ReferenceEquals(s.Editor, this) && s.Window is not null);
-        UndockMapButton.Content = ScalarMap ? detached ? "↙" : "↗" : detached ? "Dock" : "Undock";
-        System.Windows.Automation.AutomationProperties.SetName(UndockMapButton, detached ? "Dock map" : "Undock map");
-        UndockMapButton.ToolTip = detached ? "Dock this map back in the editor" : "Move this map into its own resizable window";
-        UndockMapButton.Padding = ExpandMapButton.Padding = CloseMapButton.Padding = ScalarMap ? new(5, 2, 5, 2) : new(8, 3, 8, 3);
-        foreach (var button in new[] { UndockMapButton, ExpandMapButton, CloseMapButton, ScalarInfoButton })
-        { button.MinWidth = 0; button.Width = ScalarMap ? 24 : double.NaN; }
-        bool expanded = ReferenceEquals(MapRoot.expandedMap?.Editor, this);
-        ExpandMapButton.Content = ScalarMap ? expanded ? "⤡" : "⤢" : expanded ? "Restore" : "Expand";
-        CloseMapButton.IsEnabled = UndockMapButton.IsEnabled = ExpandMapButton.IsEnabled = table is not null;
+        CloseMapButton.IsEnabled = table is not null;
         RefreshPinButton();
-        updatingMapControls = true;
-        AutoFitBox.IsChecked = autoFitCells; CellZoomText.Text = cellZoom.ToString("P0", CultureInfo.InvariantCulture);
-        PaneViewBox.SelectedIndex = ViewMode; CellZoomOut.IsEnabled = cellZoom > .85; CellZoomIn.IsEnabled = cellZoom < 1.5;
-        var controls = table is { Count: > 1 } ? Visibility.Visible : Visibility.Collapsed;
-        AutoFitBox.Visibility = CellZoomOut.Visibility = CellZoomIn.Visibility = CellZoomText.Visibility = PaneViewBox.Visibility = controls;
-        ScalarInfoButton.Visibility = ScalarMap ? Visibility.Visible : Visibility.Collapsed;
-        ToggleGraphButton.Visibility = table is { Count: > 1, IsChoice: false } ? Visibility.Visible : Visibility.Collapsed;
-        ToggleGraphButton.Content = ViewMode == 3 ? "Table" : "Graph";
-        EditToolsButton.Visibility = table is { Count: > 1, IsChoice: false } ? Visibility.Visible : Visibility.Collapsed;
-        MapInfoButton.Visibility = ValueUnitsText.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
-        CellText.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
+        ValueUnitsText.Visibility = CellText.Visibility = ScalarMap ? Visibility.Collapsed : Visibility.Visible;
         if (mapOwner is not null) WorkspaceRoot.RowDefinitions[3].Height = new(ScalarMap ? 0 : 24);
-        PaneViewBox.IsEnabled = table is { IsChoice: false };
-        updatingMapControls = false;
     }
     private void RefreshPinButton()
     {
@@ -511,28 +485,9 @@ public partial class EditorWorkspace
         PinMapButton.Content = pinned ? "Pinned" : "Pin";
         PinMapButton.IsEnabled = slot is { Window: null } && table is not null;
         PinMapButton.ToolTip = slot?.Window is not null ? "Undocked maps stay pinned" :
-            pinned ? "Pinned maps stay open. Click to make this pane reusable." : "Pin to keep this map open. Opening another map replaces the unpinned pane.";
+            pinned ? "Pinned maps stay open. Click to make this pane reusable." : "Pin to keep this map open while browsing.";
         System.Windows.Automation.AutomationProperties.SetName(PinMapButton, pinned ? "Unpin map" : "Pin map");
     }
-    private void CellFit_Changed(object sender, RoutedEventArgs e)
-    {
-        if (updatingMapControls || AutoFitBox is null) return;
-        autoFitCells = AutoFitBox.IsChecked == true; UpdateTableSizing(); QueueMapSave();
-    }
-    private void CellZoom_Click(object sender, RoutedEventArgs e)
-    {
-        cellZoom = Math.Round(Math.Clamp(cellZoom + (ReferenceEquals(sender, CellZoomOut) ? -.05 : .05), .85, 1.5), 2);
-        MapGrid.FontSize = 13 * cellZoom; MapGrid.ColumnHeaderHeight = Math.Ceiling(26 * cellZoom);
-        measuredCellWidth = double.NaN;
-        RefreshAxes(); RefreshMapControls(); UpdateCompactMap(); UpdateTableSizing(); QueueMapSave();
-    }
-    private void PaneView_Changed(object sender, SelectionChangedEventArgs e)
-    {
-        if (updatingMapControls || PaneViewBox.SelectedIndex < 0) return;
-        if (!FinishEdit()) { RefreshMapControls(); return; }
-        SetViewMode(PaneViewBox.SelectedIndex); QueueMapSave();
-    }
-
     private void QueueMapSave()
     {
         var root = MapRoot;
@@ -546,7 +501,7 @@ public partial class EditorWorkspace
         var scroll = Descendants(editor.MapGrid).OfType<ScrollViewer>().FirstOrDefault();
         return editor.Graph.CaptureView(new MapPanePreferences
         {
-            Key = editor.table is null ? "" : MapKey(editor.table), Zoom = editor.cellZoom, AutoFit = editor.autoFitCells, FitTable = editor.fitTable,
+            Key = editor.table is null ? "" : MapKey(editor.table), Zoom = editor.cellZoom, AutoFit = editor.autoFitCells, CompactRows = editor.compactRows, FitTable = editor.fitTable,
             View = editor.ViewMode, Baseline = Math.Max(0, editor.BaselineBox.SelectedIndex), Selection = editor.SelectedIndices(),
             HorizontalOffset = scroll?.HorizontalOffset ?? 0, VerticalOffset = scroll?.VerticalOffset ?? 0,
             PreviewWidth = editor.previewWidth, TableFraction = editor.tableFraction, Floating = slot.Window is not null,
@@ -571,8 +526,8 @@ public partial class EditorWorkspace
     {
         editor.cellZoom = state.Zoom; editor.autoFitCells = state.AutoFit; editor.previewWidth = state.PreviewWidth; editor.tableFraction = state.TableFraction;
         editor.fitTable = state.FitTable ?? editor.fitTable;
-        editor.MapGrid.FontSize = 13 * state.Zoom; editor.MapGrid.ColumnHeaderHeight = Math.Ceiling(26 * state.Zoom);
-        editor.measuredCellWidth = double.NaN;
+        editor.compactRows = state.CompactRows;
+        editor.ApplyGridDensity();
         editor.BaselineBox.SelectedIndex = state.Baseline == 2 && editor.document?.HasComparison != true ? 0 : state.Baseline;
         editor.SetViewMode(state.View); editor.RefreshAxes(); editor.RefreshMapControls();
         void ApplySelection()

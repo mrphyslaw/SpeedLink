@@ -10,7 +10,7 @@ L3CGEE000 profile has separate [integrity checks and validation limits](../GEN2.
 
 ![Permanent application menus and labeled workspace navigation](images/application-navigation.png)
 
-File, Edit, View, Tools and Help stay visible in every workspace. Open a ROM
+File, Edit, View, Map, Tools and Help stay visible in every workspace. Open a ROM
 or recording from File. Find definition management in Tools and guides,
 support reports, crash reports and About in Help. Commands that need a ROM
 or map stay disabled until one is available.
@@ -35,13 +35,13 @@ This example uses synthetic values.
 
 ![Two resizable map panes over one ROM](images/map-windows.png)
 
-Open related maps together, drag a pane's own edge or corner to resize only it, and use **Expand** to
-focus on one without closing the others. **Undock** gives a map its own Windows
+Open related maps together, drag a pane's own edge or corner to resize only it, and use **Map → Expand map** to
+focus on one without closing the others. **Map → Undock map** gives a map its own Windows
 window, including editing controls, for another monitor. Each map retains its own
 selection, text zoom and graph view. All panes share the same ROM and undo history.
 Drag titles to move panes inside the workspace. Manual resizing and movement
 allow overlap; clicking a map or selecting it in the browser brings it forward.
-Use **View → Map layout and display → Tile maps side by side** to reset manual placement.
+Use **Map → Tile maps side by side** to reset manual placement.
 The multi-map screenshot uses synthetic values, not vehicle tuning advice.
 
 ![A lower curve widened independently below three scalar maps and another curve](images/independent-panes.png)
@@ -53,15 +53,15 @@ in the browser to bring it forward. This screenshot uses synthetic test data.
 
 ![A detached resizable map with its editing controls](images/detached-map.png)
 
-Drag a map's title out of the workspace, or choose **Undock**. Drag it back over
+Drag a map's title out of the workspace, or choose **Map → Undock map**. Drag it back over
 the editor or choose **Dock** to return it. The native window's close button
 closes that view while keeping its ROM edits.
 
 ![A complete synthetic 16×16 map with both axes visible](images/fit-map.png)
 
-**Fit map** (Ctrl+0) gives the active map the available workspace. Auto fit adjusts
+**Map → Fit entire map** (Ctrl+0) gives the active map the available workspace. Auto fit adjusts
 cell spacing without shrinking text. Measured cell minimums keep values readable;
-tables scroll when the whole map cannot fit. **− / +** sets a deliberate text size.
+tables scroll when the whole map cannot fit. **Map → Cell display** adjusts text size and offers compact rows.
 The ☰ button expands or collapses navigation; Ctrl+B hides or restores the
 map browser. Use **View** for layout options and floating panels.
 
@@ -92,8 +92,7 @@ and paste retain full precision. Axis names and units label the list's two colum
 Single-value maps use small wrapping cards, normally about 300 pixels wide,
 with standard-size number fields and a single baseline row. Resize individual
 cards from their edges or corners. Positions and sizes restore for that calibration.
-Full help is available from the
-**ⓘ** button beside the title or F1. Type a value and choose **Apply**
+Full help is available from **Map → Map information…** or F1. Type a value and choose **Apply**
 or press Enter. Apply/Cancel appear only while typing. Escape or **Cancel**
 discards the typed value. The **↶** button beside the baseline
 restores the chosen Original ROM, Last save or Comparison ROM value. Undo/Redo
@@ -112,14 +111,14 @@ Multi-state controls retain their labeled rows without an empty graph.
 
 ![Intake cam advance table with a compact 3D preview at the upper-right](images/table-preview.png)
 
-New maps open in **Table only**. Press F4 or choose **Graph** to switch to the
+New maps open in **Table only**. Press F4 or choose **Map → Toggle table and graph** to switch to the
 full graph. **Table with 3D preview** places the surface at the upper-right of the grid,
 keeping the table's full height. Small panes temporarily omit the preview to
 prioritize the table; expanding restores it. The graph stays on the right, like the
 MAF editor. Its controls and linked cell selection work the same way.
 
 Drag the divider at the table's right edge to give the grid or preview more room.
-The width is remembered across launches and graph docking. **Fit map** resets it
+The width is remembered across launches and graph docking. **Map → Fit entire map** resets it
 to the automatic compact preview so a full 16×16 grid can fit again. Short curves
 use the same divider, with a wider default preview for readable curve labels.
 
@@ -141,10 +140,8 @@ when you come back. The graph stays hidden until a graphable map is selected.
 
 ![Map information in a separate window](images/details-editor.png)
 
-Click **Map info** inside a map pane, or press **F1**, to open help without
-reducing the map's height. Reusing the control brings that map's help forward.
-**View → Map layout and display → Map information…**
-remains available too. Map info is disabled until a map is selected.
+Choose **Map → Map information…** or press **F1** to open help without
+reducing the map's height. The command follows the focused map.
 Value units and input axes stay visible above the explanation. Help distinguishes
 targets and thresholds from multipliers and signed corrections, with simple
 examples. Controls with a guide topic link to it directly. The
@@ -154,10 +151,10 @@ be scrolled. Cell tooltips and the status strip show comparison values.
 Axis titles and breakpoint headers have a distinct blue-gray band and bright
 borders separating them from editable data. Read-only MAF breakpoints use the
 same treatment.
-**View → Map layout and display → Changes** opens a drawer
+**Map → Changes** opens a drawer
 of maps that differ from the selected baseline. Select a map there to jump to it.
 
-The **View** menu supports table and graph above/beside one another, plus
+The **Map** menu supports table and graph above/beside one another, plus
 table-only and graph-only views. The browser can also pop into a separate
 window. Layout preferences are remembered. Open maps and unsaved edits remain
 in place when switching to Logger or Recordings.
@@ -170,7 +167,7 @@ or use the [full editor guide](../EDITOR.md).
 ## First edit
 
 1. Open **Editor → File → Open ROM…**.
-2. Choose a map and check **Map info**. For a single value, type in the field
+2. Choose a map and open **Map → Map information…**. For a single value, type in the field
    and choose **Apply** or Enter; Cancel or Escape discards typing.
    For a table, double-click a cell, enter a value and press Enter. State
    controls use named choices.

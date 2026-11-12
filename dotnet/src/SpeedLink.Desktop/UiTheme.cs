@@ -58,7 +58,7 @@ internal static class UiTheme
         ["XAxisBrush"] = Pair(0x7CC4ED, 0x166391),
         ["YAxisBrush"] = Pair(0x7DD5B3, 0x28674F)
     };
-    internal const int HeatSteps = 32;
+    internal const int HeatSteps = 256;
     private static readonly Swatch[] heat = CreateHeat();
 
     private static Swatch[] CreateHeat()

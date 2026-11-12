@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0-alpha.11
+
+- Use a compact menu bar and a single-row map header. The **Map** menu follows the focused pane for view, zoom, comparison, help and editing tools. Right-click a map title for the same controls, including in detached windows.
+- Create a workspace with the **+** after the last tab. Right-click a tab to rename or delete its layout. Pin and unpin each pane independently.
+- Blend the map palette with finer gradients in both themes. Choose **Map → Cell display → Compact rows** for denser tables, or **Table only** for a compact breakpoint and value list on long curves.
+
 ## 0.8.0-alpha.10
 
 - Shade map cells from rose through gold to mint in Light mode and from plum through amber to green in Dark mode.

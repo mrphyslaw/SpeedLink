@@ -13,17 +13,16 @@ needed for edits to its six MAP scaling controls. The program signature guards
 the surrounding code. SpeedLink verifies each saved file and preserves the original.
 
 This guide is also included in the app: choose **Help → Editor guide**.
-The top **File**, **Edit**, **View**, **Tools** and **Help** menus remain visible
-in every workspace. **Map info** inside a map pane, or
-**F1**, opens help for the selected map. Where available, the link in Map info
-opens the corresponding section of the offline **Tuning guide**.
+The top **File**, **Edit**, **View**, **Map**, **Tools** and **Help** menus remain visible
+in every workspace. **Map → Map information…** and **F1** open help for the focused map.
+Where available, the help links to the corresponding section of the offline **Tuning guide**.
 
 ## Make your first edit
 
 1. Choose **Editor** in the left navigation, then **File → Open ROM…**.
    Opening a ROM shows the map browser, even if it was hidden in your saved layout.
 2. Find a map in the category folders or search by name, description or category. Each entry's icon identifies it as a setting, curve or surface.
-   Click **Map info** to check its units, purpose and correction direction.
+   Choose **Map → Map information…** to check its units, purpose and correction direction.
 3. Edit the control using the instructions below for its shape. Compare with
    the baseline and use Undo/Redo to review or reverse an operation.
 4. Choose **Save copy…** or press Ctrl+S. Pick a new filename. Every export
@@ -78,6 +77,9 @@ Long curves use a vertical breakpoint/value list beside a 2D graph. Only the
 value column is editable. Click a graph point to select its list value; selecting
 a list value also brings the point into view. Use the wheel to zoom and
 Shift+drag to pan. The first and last points remain reachable in a 129-point curve.
+Choose **Table only** for a compact breakpoint/value list. Its width follows
+the text size and it scrolls when the available height cannot show every row.
+Returning to **Table beside graph** restores the previous divider position.
 
 Copy includes both columns at full precision. Paste accepts a value column,
 matching breakpoint/value rows, or one horizontal row of three or more values.
@@ -112,25 +114,24 @@ selector. The single-value card has its own baseline selector.
 
 Orange cell borders and browser dots identify differences from that baseline.
 Cell tooltips and the selection status show current, baseline and difference
-values. **Changed maps only** filters the browser. **View → Map layout and display → Changes** opens a
+values. **Changed maps only** filters the browser. **Map → Changes** opens a
 list of changed maps; select an entry to jump to it. These are comparison views,
 not a record of the order in which edits were made.
 
 ## Arrange the workspace
 
-Click a map in the browser to open it in the reusable pane. The next map
-replaces it. Turn on **Pin** in the pane title to keep the map visible while
-you browse other maps. The button changes to **Pinned**. Picking an already open map brings it forward. If you
-turn off **Pin** while another reusable pane is open, that other pane becomes
-pinned so both maps stay open.
+Click a map in the browser to open it in a reusable pane. Turn on **Pin** in
+the pane title to keep the map visible while you browse other maps. Picking an
+already open map brings it forward. **Pin** changes only the pane you click.
+When several unpinned maps are open, opening a new map reuses the most
+recently active unpinned pane.
 
-Use **View → Map layout and display → Close other maps**, or right-click the
+Use **Map → Close other maps**, or right-click the
 map header, to keep just the active map in this workspace. Closing a view
 keeps applied ROM edits. Correct or cancel invalid pending input before closing.
 
-Use **+ New tab** above the editor to make a workspace such as Fuel Tuning or
-Boost Control. **Rename** changes the current tab's name. **Delete** removes
-that layout and keeps all applied ROM edits. Each tab remembers its own maps
+Click the **+** after the last tab to open a blank workspace. Right-click a tab
+to rename it or delete its layout. Applied ROM edits remain in the open document. Each tab remembers its own maps
 and arrangement, and every tab shares the open ROM, Undo/Redo and **Save copy**.
 Valid pending input is applied before replacing its pane or switching tabs.
 Correct or cancel invalid input before continuing.
@@ -140,18 +141,18 @@ including the space between its title and buttons, to move that map.
 Panes can overlap. Click a map or select it in the
 browser to bring it to the front, even if another pane covers it.
 
-**View → Map layout and display → Tile maps side by side** and **Stack maps vertically** reset manual
+**Map → Tile maps side by side** and **Stack maps vertically** reset manual
 placement and restore automatic arrangement. Independently sized panes stay
 where you placed them when the window gets smaller; scroll the workspace to
-reach them. **Expand** gives one map the workspace; **Restore**
+reach them. **Map → Expand map** gives one map the workspace. **Restore map layout**
 returns to the previous arrangement without closing the other maps.
 
-**Auto fit** is enabled by default. It adjusts cell spacing, never text size.
+**Map → Cell display → Auto fit cells** is enabled by default. It adjusts cell spacing, never text size.
 Cell minimums include the measured displayed numbers and column headings plus
 padding. At the minimum, the grid scrolls instead of truncating numbers or
-reducing precision. Axis headings stay visible. **− / +** deliberately changes
+reducing precision. Axis headings stay visible. **Larger text** and **Smaller text** change
 that map's text size between 85% and 150%, with matching cell minimums. Turning
-Auto fit off uses fixed spacing. Resizing and expanding preserve the chosen zoom.
+Auto fit off uses fixed spacing. **Compact rows** reduces row height and cell padding for the focused map. Right-click the map title for these commands in a detached window.
 
 Axis titles are centered on the visible table data: the top title sits over the
 populated columns, and the vertical title sits beside the populated rows. Empty
@@ -159,9 +160,9 @@ space, row headers and scrollbars are excluded. They stay alongside the visible
 cells while scrolling and resizing. Long titles can be trimmed in very small
 panes; hover over an axis title to read its full name and units.
 
-**Undock** moves a map and its editing controls into a separate resizable Windows
+**Map → Undock map** moves a map and its editing controls into a separate resizable Windows
 window, which can move to another monitor. Undocking also pins the map.
-**Dock** returns it. Dragging a map's
+**Dock map** returns it. Dragging a map's
 header outside the workspace also detaches it; dropping that window over the editor docks it. Closing
 a detached window or a pane's **×** closes that view and retains the ROM edits.
 Invalid pending input blocks closing that view and blocks saving the ROM until
@@ -176,7 +177,7 @@ store display settings. Use **Save copy** to save ROM edits.
 
 Use the app's **☰ Navigation** button to collapse navigation to icons, or toggle
 **View → Navigation labels**. The sidebar starts with names and remembers your
-choice. **View → Map layout and display → Hide map
+choice. **Map → Hide map
 browser** (Ctrl+B) hides or restores the map list. Drag its edge to change its
 width, or pop it into a separate window.
 
@@ -184,7 +185,7 @@ The **Maps** button in the editor toolbar always brings the map browser back.
 When no map is selected, **Browse maps** opens the list instead of leaving an
 empty grid. Closing the last map pane keeps the ROM and its edits loaded.
 
-**Fit map** (Ctrl+0) restores automatic sizing and hides the browser, Changes
+**Map → Fit entire map** (Ctrl+0) restores automatic sizing and hides the browser, Changes
 drawer and map-information window. With several maps open, it expands the active
 map. Full tables fit when the measured cell minimums and selected text size allow;
 otherwise they scroll. Long curves retain their list/graph layout. Windows display
@@ -196,18 +197,17 @@ preview to give the table priority; the selected preview view returns with room.
 | Table with 3D preview / Table with curve preview | A compact graph at the right while keeping the full table height. The label follows the selected map. |
 | Table above graph | A larger graph beneath the table, separated by a draggable horizontal divider. |
 | Table beside graph | Side-by-side panes with a draggable vertical divider. Long MAF curves use this layout. |
-| Table only / Graph only | Give the selected view the available space. |
+| Table only / Graph only | Show just the grid or graph. Long curve lists stay compact in Table only. |
 
 New maps open in **Table only**. Long MAF curves open with the breakpoint
-list and graph together. Use **Graph** or F4 to show the full graph, then
-**Table** or F4 to return. Existing workspace tabs restore their saved views.
+list and graph together. Use **Map → Toggle table and graph** or F4 to switch views. Existing workspace tabs restore their saved views.
 
 Drag the divider at the table's right edge to resize the preview. Its width is
-remembered across launches and graph docking. **Fit map** resets that custom
+remembered across launches and graph docking. **Map → Fit entire map** resets that custom
 width to automatic sizing. Small-map previews stay directly beside their grids.
 Graph options are disabled for controls without a curve or surface.
 
-Use the graph's **↗** button or **View → Map layout and display → Pop out graph** for a larger floating
+Use the graph's **↗** button or **Map → Pop out graph** for a larger floating
 view. **Dock graph** or closing the floating window returns it to the workspace.
 The map browser has equivalent pop-out/dock commands. Floating panels can move
 to another monitor. Navigation, browser visibility/width, curve-list width,
@@ -228,7 +228,7 @@ Fit map changes the workspace layout.
 
 ## Understand the active map
 
-Click **Map info**, press F1, or choose **View → Map layout and display → Map information…**. The same
+Choose **Map → Map information…** or press F1. The same
 window comes forward for that map without reducing table height.
 It is unavailable until a map is selected.
 
@@ -255,8 +255,8 @@ tune-project format or recovery of unsaved work in this version.
 ## Keyboard shortcuts
 
 Right-click selected grid cells for copy, paste, reset, adjustments and
-interpolation. **Edit tools** opens the row for entering an amount, applying
-bulk operations, and changing the comparison baseline.
+interpolation. **Map → Edit tools** opens the row for entering an amount
+and applying bulk operations. Choose the baseline from **Map → Comparison baseline**.
 
 Use **View → Appearance** for System, Light, or Dark. System uses the Windows
 app theme. SpeedLink remembers the choice.
@@ -265,7 +265,7 @@ app theme. SpeedLink remembers the choice.
 | --- | --- |
 | Ctrl+O | Open ROM. |
 | Ctrl+S | Save a new copy. |
-| Ctrl+0 | Fit map. |
+| Ctrl+0 | Fit the active map. |
 | Ctrl+B | Hide/restore the map browser. |
 | F1 | Open/restore help for the active map. |
 | F4 | Switch the active map between the table and graph. |

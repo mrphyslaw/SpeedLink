@@ -75,7 +75,7 @@ public sealed class MapWorkspaceTests
     }
 
     [Fact]
-    public void Legacy_open_maps_restore_as_pinned_and_new_pages_keep_one_reusable_pane_each()
+    public void Legacy_maps_default_to_pinned_and_each_docked_pin_state_roundtrips()
     {
         using var temp = new TempFolder(); string path = Path.Combine(temp.Path, "maps.json");
         File.WriteAllText(path, """[{"Calibration":"L38KEH000","Maps":[{"Key":"old map"}]}]""");
@@ -85,7 +85,7 @@ public sealed class MapWorkspaceTests
         var fuel = new MapPagePreferences
         {
             Name = " Fuel Tuning ",
-            Maps = [new() { Key = "preview", Pinned = false }, new() { Key = "also unpinned", Pinned = false },
+            Maps = [new() { Key = "preview", Pinned = false, CompactRows = true }, new() { Key = "also unpinned", Pinned = false },
                 new() { Key = "floating", Floating = true, Pinned = false }],
             Active = "preview", Expanded = "preview", Columns = 1
         };
@@ -100,7 +100,20 @@ public sealed class MapWorkspaceTests
         Assert.Equal("Boost Control", saved.SelectedPage);
         Assert.Equal("preview", saved.Pages[0].Expanded);
         Assert.Equal(1, saved.Pages[0].Columns);
-        Assert.Equal(new[] { false, true, true }, saved.Pages[0].Maps.Select(p => p.Pinned));
+        Assert.Equal(new[] { false, false, true }, saved.Pages[0].Maps.Select(p => p.Pinned));
+        Assert.Equal(new[] { true, false, false }, saved.Pages[0].Maps.Select(p => p.CompactRows));
         Assert.False(saved.Pages[1].Maps.Single().Pinned);
+    }
+
+    [Fact]
+    public void Compact_density_fits_a_30_by_15_map_when_the_text_fits()
+    {
+        var compact = ReadableTableFit.Calculate(1024, 350, 30, 15, 60, 19, 21, 12, 1, autoFit: true, compact: true);
+        Assert.True(compact.Fits);
+        Assert.InRange(compact.RowHeight, 17, 19);
+        Assert.InRange(compact.ColumnWidth, 29, 32);
+        var longValues = ReadableTableFit.Calculate(1024, 350, 30, 15, 60, 19, 47, 12, 1, autoFit: true, compact: true);
+        Assert.False(longValues.Fits);
+        Assert.True(longValues.ColumnWidth >= 55);
     }
 }

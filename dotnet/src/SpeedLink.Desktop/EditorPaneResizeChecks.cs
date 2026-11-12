@@ -56,7 +56,7 @@ public partial class EditorWorkspace
         Check(Hits(pinButton, new(pinButton.ActualWidth / 2, pinButton.ActualHeight / 2)),
             "The pin button still receives pointer input");
         var upper = new[] { DockedBounds(first), DockedBounds(second) }; double thirdWidth = DockedBounds(third).Width;
-        third.SelectCell(1); third.CellZoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); double zoom = third.cellZoom;
+        third.SelectCell(1); third.SetCellZoom(third.cellZoom + .05); double zoom = third.cellZoom;
         DragPaneEdge(third, MapResizeEdge.Right, thirdWidth, 0); await Idle();
         Check(DockedBounds(third).Width > thirdWidth * 1.8 && SameBounds(upper[0], DockedBounds(first)) && SameBounds(upper[1], DockedBounds(second)), "Bottom map widens across empty space without moving either upper map");
         Check(third.cellZoom == zoom && third.SelectedIndices().SequenceEqual([1]), "Independent resizing preserves selected cells and text zoom");
@@ -111,10 +111,10 @@ public partial class EditorWorkspace
         Check(CloseMap(fourth), "Additional independent pane closes"); await Idle();
         Check(resized.All(p => SameBounds(p.Value, DockedBounds(p.Key))), "Closing another map preserves independently sized panes");
         var thirdBeforeDetach = DockedBounds(third);
-        third.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        third.UndockMap_Click(third, new()); await Idle();
         var floating = mapSlots.Single(s => ReferenceEquals(s.Editor, third));
         Check(floating.Window is { IsVisible: true } && double.IsNaN(floating.Frame.Width) && double.IsNaN(floating.Frame.Height), "Independent pane stretches correctly in its native window");
-        third.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        third.UndockMap_Click(third, new()); await Idle();
         Check(SameBounds(thirdBeforeDetach, DockedBounds(third)) && SameBounds(resized[first], DockedBounds(first)) && SameBounds(resized[second], DockedBounds(second)), "Docking back restores only that pane's bounds");
         var afterDock = peers.ToDictionary(p => p, DockedBounds);
         host.Width = 1024; host.Height = 768; await Idle();

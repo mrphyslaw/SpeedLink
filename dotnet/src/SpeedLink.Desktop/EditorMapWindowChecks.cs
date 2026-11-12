@@ -43,21 +43,21 @@ public partial class EditorWorkspace
         Check(first.MapGrid.Columns.All(c => c.ActualWidth >= c.MinWidth - 1) && second.MapGrid.Columns.All(c => c.ActualWidth >= c.MinWidth - 1), "Both panes honor measured cell minimums");
         first.SelectCell(Math.Min(first.table!.Count - 1, first.table.Columns + 2));
         int[] selected = first.SelectedIndices();
-        first.CellZoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        first.SetCellZoom(first.cellZoom + .05); await Idle();
         double zoom = first.cellZoom;
-        first.ExpandMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        first.ExpandMap_Click(first, new()); await Idle();
         Check(!second.MapGrid.IsVisible && first.MapGrid.IsVisible && first.MapGrid.ActualWidth > width, "Expand hides other panes without closing them");
-        first.ExpandMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        first.ExpandMap_Click(first, new()); await Idle();
         Check(second.MapGrid.IsVisible && first.cellZoom == zoom && first.SelectedIndices().SequenceEqual(selected), "Restore keeps selection and deliberate zoom");
-        for (int i = 0; i < 20; i++) first.CellZoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        for (int i = 0; i < 20; i++) first.SetCellZoom(first.cellZoom + .05);
         await Idle();
-        Check(first.cellZoom == 1.5 && first.MapGrid.FontSize == 19.5 && !first.CellZoomIn.IsEnabled, "Manual zoom has an upper bound");
+        Check(first.cellZoom == 1.5 && first.MapGrid.FontSize == 19.5, "Manual zoom has an upper bound");
         var glyph = new FormattedText("0123456789", System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
             new Typeface(first.MapGrid.FontFamily, first.MapGrid.FontStyle, first.MapGrid.FontWeight, first.MapGrid.FontStretch), first.MapGrid.FontSize, UiTheme.Text, VisualTreeHelper.GetDpi(this).PixelsPerDip);
         Check(first.MapGrid.RowHeight >= glyph.Height + 2, "Large text fits within the measured row height");
-        for (int i = 0; i < 20; i++) first.CellZoomOut.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        await Idle(); Check(first.cellZoom == .85 && first.MapGrid.FontSize >= 11 && !first.CellZoomOut.IsEnabled, "Manual zoom cannot pass the readability floor");
-        while (first.cellZoom < zoom) first.CellZoomIn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        for (int i = 0; i < 20; i++) first.SetCellZoom(first.cellZoom - .05);
+        await Idle(); Check(first.cellZoom == .85 && first.MapGrid.FontSize >= 11, "Manual zoom cannot pass the readability floor");
+        while (first.cellZoom < zoom) first.SetCellZoom(first.cellZoom + .05);
         await Idle();
         var firstSnapshot = CaptureMap(first);
         second.ActivateMap(); PopGraph_Click(this, new()); await Idle();
@@ -65,7 +65,7 @@ public partial class EditorWorkspace
         DockGraph_Click(this, new()); await Idle();
         Check(second.graphWindow is null, "Global graph docking follows the active map");
         first.Graph.ZoomCurve(.5);
-        second.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        second.UndockMap_Click(second, new()); await Idle();
         var secondSlot = mapSlots.Single(s => ReferenceEquals(s.Editor, second));
         Check(secondSlot.Window is { IsVisible: true } && second.MapGrid.IsVisible && second.ScalarPanel.Visibility == Visibility.Collapsed, "Detached map has a real native window");
         var secondWindow = secondSlot.Window ?? throw new InvalidOperationException("Detached window is missing.");
@@ -86,10 +86,10 @@ public partial class EditorWorkspace
         second.Undo_Click(second, new()); await Idle();
         SetWorkspaceActive(false); await Idle(); Check(!secondWindow.IsVisible, "Detached windows hide outside editor");
         SetWorkspaceActive(true); await Idle(); Check(secondWindow.IsVisible, "Detached windows return with editor");
-        second.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
-        Check(secondSlot.Window is null && second.MapGrid.IsVisible && second.UndockMapButton.Content.ToString() == "Undock", "Dock returns the map without losing it");
-        second.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
-        second.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        second.UndockMap_Click(second, new()); await Idle();
+        Check(secondSlot.Window is null && second.MapGrid.IsVisible, "Dock returns the map without losing it");
+        second.UndockMap_Click(second, new()); await Idle();
+        second.UndockMap_Click(second, new()); await Idle();
         Check(secondSlot.Window is null && second.MapGrid.IsVisible, "Repeated detach and dock works");
         var valueEditor = OpenMap(scalar); await Idle();
         valueEditor.ScalarInput.Text = "not a value";
@@ -107,8 +107,8 @@ public partial class EditorWorkspace
         Check(!first.FinishEdit(), "Invalid grid entry blocks export preflight");
         int oldBaseline = first.BaselineBox.SelectedIndex; first.BaselineBox.SelectedIndex = oldBaseline == 0 ? 1 : 0;
         Check(first.BaselineBox.SelectedIndex == oldBaseline && input.Text == "NaN", "Baseline switching cannot discard invalid grid input");
-        int oldView = first.ViewMode; first.PaneViewBox.SelectedIndex = 3;
-        Check(first.ViewMode == oldView && first.PaneViewBox.SelectedIndex == oldView && input.Text == "NaN", "View switching cannot hide invalid grid input");
+        int oldView = first.ViewMode; first.ChangeViewMode(3);
+        Check(first.ViewMode == oldView && input.Text == "NaN", "View switching cannot hide invalid grid input");
         second.SelectCell(0); second.OperandBox.Text = "1"; second.Add_Click(second, new()); await Idle();
         Check(first.gridDraft && input.Text == "NaN", "Another pane cannot erase a pending grid entry");
         first.MapGrid.CancelEdit(DataGridEditingUnit.Row); second.Undo_Click(second, new()); await Idle();
@@ -131,7 +131,7 @@ public partial class EditorWorkspace
         Check(choiceEditor.ScalarMap ? choiceEditor.ScalarChoice.IsVisible : choiceEditor.ChoiceBox.IsVisible, "Named state controls work in map panes");
         Check(CloseMap(choiceEditor), "State pane closes safely");
         first.ActivateMap(); first.RestoreMap(first, firstSnapshot); await Idle();
-        second.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        second.UndockMap_Click(second, new()); await Idle();
         SaveMapWorkspace();
         string calibration = doc.Definition.Calibration;
         var saved = MapWorkspacePreferences.Load(mapsPath!).Single(p => p.Calibration == calibration).Pages.Single();
@@ -159,14 +159,14 @@ public partial class EditorWorkspace
         var export = Path.Combine(folder, "MAP_PANES_VERIFIED_COPY.bin");
         Check(FinishAllMapEdits(), "All panes commit before export"); doc.SaveNew(export);
         Check(inspector.Inspect(File.ReadAllBytes(export)).ChecksumValid == true, "Multi-map export passes mandatory integrity gate");
-        first.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        first.UndockMap_Click(first, new()); await Idle();
         var primaryPopout = mapSlots.Single(s => s.Window is not null && ReferenceEquals(s.Editor.table, maps[0]));
         Check(primaryPopout.Window is { IsVisible: true } && ReferenceEquals(primaryPopout.Editor.document, doc), "The primary map can detach without detaching the ROM document");
-        primaryPopout.Editor.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        primaryPopout.Editor.UndockMap_Click(primaryPopout.Editor, new()); await Idle();
         Check(primaryPopout.Window is null && primaryPopout.Editor.MapGrid.IsVisible, "Primary map docks back into the workspace");
         CloseMap(primaryPopout.Editor); OpenMap(maps[0]); await Idle();
         Check(ReferenceEquals(table, maps[0]) && ReferenceEquals(document, doc), "Main pane remains usable after primary map detaches");
-        var floatingScalar = OpenMap(scalar); floatingScalar.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        var floatingScalar = OpenMap(scalar); floatingScalar.UndockMap_Click(floatingScalar, new()); await Idle();
         var scalarSlot = mapSlots.Single(s => ReferenceEquals(s.Editor, floatingScalar));
         var scalarWindow = scalarSlot.Window ?? throw new InvalidOperationException("Scalar window did not detach.");
         scalarWindow.Width = 300; scalarWindow.Height = 500; await Idle();
@@ -177,7 +177,7 @@ public partial class EditorWorkspace
         floatingScalar.ScalarCancel_Click(floatingScalar, new()); scalarWindow.Close(); await Idle();
         Check(!mapSlots.Contains(scalarSlot) && ReferenceEquals(document, doc), "Native window close removes only the view");
         ClearMapWindows(); MapTabs.Items.Clear(); OpenMap(maps[0]);
-        var remaining = OpenMap(maps[1]); remaining.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await Idle();
+        var remaining = OpenMap(maps[1]); remaining.UndockMap_Click(remaining, new()); await Idle();
         var remainingWindow = mapSlots.Single(s => ReferenceEquals(s.Editor, remaining)).Window;
         CloseMap(this); await Idle();
         Check(remainingWindow is { IsVisible: true } && mapSlots.Any(s => ReferenceEquals(s.Editor, remaining) && s.Window == remainingWindow), "Closing the final docked map leaves detached maps in place");
@@ -213,11 +213,11 @@ public partial class EditorWorkspace
             scrollViewport = mapDockScroll.ViewportWidth, dock = mapDock.ActualWidth
         });
         File.WriteAllText(Path.Combine(folder, "MapGalleryMetrics.json"), System.Text.Json.JsonSerializer.Serialize(galleryMetrics));
-        right.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        right.UndockMap_Click(right, new());
         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
         var window = mapSlots.Single(s => ReferenceEquals(s.Editor, right)).Window!;
         CaptureWindow(window, Path.Combine(folder, "DetachedMapGallery.png"));
-        right.UndockMapButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        right.UndockMap_Click(right, new());
         document.Undo(); document.Undo();
     }
 }

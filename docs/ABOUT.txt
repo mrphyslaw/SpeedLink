@@ -25,7 +25,7 @@ Axis labels beside their breakpoints and linked row/column highlighting.
 Axis titles center on visible rows and columns, excluding unused table space.
 Distinct axis header bands and borders separate inputs from editable values.
 Tuner-focused map help with visible units, arithmetic and correction examples.
-Map info and F1 open help for that map, with links into the bundled offline tuning guide.
+Map → Map information… and F1 open help for the focused map, with links into the bundled offline tuning guide.
 Import editor/logger definition updates and restore bundled copies.
 Automatic adapter diagnostics and support ZIP export, including failed connections.
 Local crash reports with next-launch review and support ZIP export; nothing sent automatically.

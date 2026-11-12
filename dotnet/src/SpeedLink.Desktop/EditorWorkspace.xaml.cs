@@ -43,6 +43,12 @@ public partial class EditorWorkspace : UserControl
     {
         this.inspector = inspector; this.codeGuard = codeGuard;
         UiTheme.Ensure(); InitializeComponent(); InitializeMapActions(); InitializeMapWindows(mapOwner); BaselineBox.ItemsSource = new[] { "Original ROM", "Last save", "Comparison ROM" }; BaselineBox.SelectedIndex = 0;
+        if (mapOwner is null)
+        {
+            var view = (MenuItem)EditorMenu.Items[2];
+            refreshFocusedMapMenu = AddFocusedMapOptions(view.Items, () => CommandMap, includeViews: false);
+            view.SubmenuOpened += (_, e) => { if (ReferenceEquals(e.Source, view)) RefreshMapCommandState(); };
+        }
         Graph.CellPicked += index => SelectCell(index); RefreshControls(); SetViewMode(2);
     }
     public void OpenRom(string path)
@@ -122,7 +128,7 @@ public partial class EditorWorkspace : UserControl
             $"{document.Definition.Calibration} is loaded with {document.Definition.Tables.Count:N0} controls. Choose a map from the list or search by name.";
         NoMapAction.Content = document is null ? "Open ROM…" : "Browse maps";
         DetailsButton.IsEnabled = table is not null;
-        if (table is null) DetailsButton.IsChecked = false;
+        if (table is null) infoWindow?.Close();
         RefreshChanges();
         RefreshMapControls();
         if (document is not null) ProfileText.Text = document.Definition.Calibration + " · " + document.Definition.Model + (document.IsDirty ? " · Unsaved changes" : " · Saved state");
@@ -241,7 +247,9 @@ public partial class EditorWorkspace : UserControl
                 trigger.Setters.Add(new Setter(ForegroundProperty, new DynamicResourceExtension("TextBrush")));
                 style.Triggers.Add(trigger);
                 string header = CurveList ? (col == 0 ? table.X.Name : table.Units) : table.Columns == 1 ? "Value" : table.X.Values[col].ToString("G5", CultureInfo.InvariantCulture);
-                MapGrid.Columns.Add(new DataGridTextColumn { Header = header, Width = new DataGridLength(70), Binding = new Binding($"Values[{col}]") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.Explicit }, IsReadOnly = table.IsChoice || CurveList && col == 0, CellStyle = style });
+                bool readOnly = table.IsChoice || CurveList && col == 0;
+                MapGrid.Columns.Add(new DataGridTextColumn { Header = header, Width = new DataGridLength(70), Binding = new Binding($"Values[{col}]") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.Explicit }, IsReadOnly = readOnly, CellStyle = style,
+                    ElementStyle = compactRows && !readOnly ? compactValueStyle : DataGridTextColumn.DefaultElementStyle });
             }
             MapGrid.ItemsSource = CurveList ? Enumerable.Range(0, table.Columns).Select(i => new EditorRow(i, [table.X.Values[i].ToString("0.#####", CultureInfo.InvariantCulture), table.Compact(values[i])])).ToArray() :
                 Enumerable.Range(0, table.Rows).Select(row => new EditorRow(row, Enumerable.Range(0, table.Columns).Select(col => table.Compact(values[row * table.Columns + col])).ToArray())).ToArray();
@@ -412,12 +420,12 @@ public partial class EditorWorkspace : UserControl
         doc.LoadComparison(doc.Snapshot(), path); BaselineBox.SelectedIndex = 2; ChangedOnly.IsChecked = true; if (MapTree.Items.Count != 0) throw new InvalidOperationException("Changed filter failed.");
         ChangedOnly.IsChecked = false; BaselineBox.SelectedIndex = 0; OpenTable(surface); SelectCell(surface.Columns + 2);
         string export = Path.Combine(folder, "UI_UNEDITED_COPY.bin"); doc.SaveNew(export); if (!File.ReadAllBytes(export).AsSpan().SequenceEqual(File.ReadAllBytes(path))) throw new InvalidOperationException("No-edit roundtrip differs.");
-        FocusButton.IsChecked = true; DetailsButton.IsChecked = false; SetViewMode(1); UpdateLayout();
+        FocusButton.IsChecked = true; CloseMapInformation(); SetViewMode(1); UpdateLayout();
         if (BrowserPanel.IsVisible || Grid.GetColumn(GraphPanel) != 2 || MapGrid.ActualWidth < 100 || GraphPanel.ActualWidth < 100) throw new InvalidOperationException("Focused split layout failed.");
         Capture(Path.Combine(folder, "focused.png"));
         SetViewMode(2); UpdateLayout(); if (GraphPanel.IsVisible) throw new InvalidOperationException("Table-only view failed.");
         SetViewMode(3); UpdateLayout(); if (MapGrid.IsVisible || !GraphPanel.IsVisible) throw new InvalidOperationException("Graph-only view failed.");
-        SetViewMode(0); FocusButton.IsChecked = false; DetailsButton.IsChecked = true; UpdateLayout();
+        SetViewMode(0); FocusButton.IsChecked = false; ShowMapInformation(); UpdateLayout();
         if (!BrowserPanel.IsVisible || !DetailsPanel.IsVisible || Grid.GetRow(GraphPanel) != 2) throw new InvalidOperationException("Workbench layout did not restore.");
         Capture(Path.Combine(folder, "editor.png")); closingForTest = true;
         MapTabs.Items.Clear();
@@ -427,7 +435,7 @@ public partial class EditorWorkspace : UserControl
             category.IsExpanded = IsMapFolder((string)category.Tag, documentationCurve.Category);
         UpdateLayout(); Capture(Path.Combine(folder, "CurveEditor.png"));
         var illustrated = doc.Definition.Tables.FirstOrDefault(t => t.Name == "Intake Cam Advance (VVT)") ?? surface;
-        OpenTable(illustrated); SetViewMode(4); FocusButton.IsChecked = true; DetailsButton.IsChecked = false; FitMap_Click(this, new()); SelectCell(illustrated.Columns + 2); UpdateLayout();
+        OpenTable(illustrated); SetViewMode(4); FocusButton.IsChecked = true; infoWindow?.Close(); FitMap_Click(this, new()); SelectCell(illustrated.Columns + 2); UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle); UpdateLayout();
         Graph.CheckSurfaceDrag();
         Graph.CheckSurfaceAxes();

@@ -4,7 +4,7 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink](https://github.com/mrphyslaw/SpeedLink/releases)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.11](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.11)** · A single Windows EXE with the runtime included.
 
 **Watch the SpeedLink v0.8.0-alpha.5 walkthrough (1:27)** · Silent with on-screen captions.
 
@@ -13,11 +13,11 @@ https://github.com/user-attachments/assets/b4f13fbb-896c-4eae-93b6-aa2b6b252f4c
 See verified backups, side-by-side maps and 3D previews, the built-in tuning guide,
 logging and playback, and Gen 1 post-write verification. ECU operations shown are simulated.
 
-Use the permanent File, Edit, View, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. Browse maps in one reusable pane and **Pin** the maps you want to keep side by side. Use **+ New tab** to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+Use the permanent File, Edit, View, Map, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 Drag a pane's own edge or corner to resize just that map, or drag its header to
 move it. Panes can overlap; click a map or select it in the browser to bring it
-forward. **View → Map layout and display → Tile maps side by side** restores automatic arrangement.
+forward. **Map → Tile maps side by side** restores automatic arrangement.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the ten supported stock ROM layouts.
@@ -46,12 +46,11 @@ Gen 2 read protocol. Real ECU validation is pending; see the [Gen 2 guide](docs/
 
 ### ROM editor
 
-[![SpeedLink editor with permanent application menus, labeled navigation, a map grid and 3D preview](docs/editor/images/application-navigation.png)](docs/editor/README.md)
+[![SpeedLink editor with permanent application menus, labeled navigation, a workspace tab and a shaded map grid](docs/editor/images/application-navigation.png)](docs/editor/README.md)
 
 Browse related maps, edit the grid, compare values and inspect 2D curves or
 rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
-Axis headers have a distinct background and bright separators. **Map info**
-inside each map pane, or **F1**, shows units, correction direction and practical examples.
+Axis headers have a distinct background and bright separators. **Map → Map information…** and **F1** show units, correction direction and practical examples.
 Axis titles stay centered beside the visible rows and above the visible columns,
 including short tables with unused space. [See the alignment example →](docs/editor/README.md#axis-titles-follow-the-data)
 The map-window preview uses synthetic example values.
@@ -93,20 +92,20 @@ existing timing and data precision.
 
 ## Edit a ROM
 
-The Workbench keeps editing, logging and recordings in one window. **Fit map**
-gives the table the available workspace. A permanent **File / Edit / View / Tools / Help**
+The Workbench keeps editing, logging and recordings in one window. **Map → Fit entire map**
+gives the table the available workspace. A permanent **File / Edit / View / Map / Tools / Help**
 menu stays available throughout the app. Navigation shows icons and names by default
 and remembers your choice to collapse it;
 the map browser and graph can be resized, hidden or moved into separate windows.
-Use **View** for layout options, map information, changed maps and appearance.
-New maps open in table view. Use **Graph** or F4 to switch to the full graph,
+Use **View** for app appearance and **Map** for the focused pane. The map header shows its title, Pin and Close. Right-click the title for map commands, including in a detached window.
+New maps open in table view. Use **Map → Toggle table and graph** or F4 to switch to the full graph,
 or choose a split view. Long MAF curves open with their value list and graph
 together. **View → Appearance** offers System, Light and Dark.
 Cell shading follows the value range of each map, and blue highlights the
 selected cells and their axis headers.
 Axis names sit directly above the column breakpoints and beside the row
 breakpoints. Selected row and column headers highlight together; value units
-stay inside the map's header. 3D maps carry labeled axis rulers and tick values
+appear beneath the table and in Map information. 3D maps carry labeled axis rulers and tick values
 directly on their frame, aligned with the surface as it rotates.
 
 1. Open **Editor**, then **File → Open ROM…**.
@@ -114,7 +113,7 @@ directly on their frame, aligned with the surface as it rotates.
    settings, curves and surfaces. Pin maps to keep them open while browsing.
 3. For a single value, type in the field and choose **Apply** or Enter;
    Cancel or Escape discards typing. For a table, double-click a cell, use
-   **Edit tools**, or right-click selected cells to see actions and shortcuts.
+   **Map → Edit tools**, or right-click selected cells to see actions and shortcuts.
    State controls use named
    choices. Compare with the original, last save or another compatible ROM;
    Undo/Redo restores operations. Review a curve or surface when available.

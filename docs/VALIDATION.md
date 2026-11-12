@@ -1,5 +1,12 @@
 # Alpha validation scope
 
+## Focused map controls · 0.8.0-alpha.11
+
+- Desktop checks switch between two maps and exercise view, cell density, zoom,
+  comparison and help on the focused pane. Workspace tests cover the trailing
+  **+**, independent pins, and persistence. Layout checks cover compact curve
+  columns and restore the previous graph divider when switching back.
+
 ## Map cell colors · 0.8.0-alpha.10
 
 - Desktop navigation checks verify value and edit-outline contrast across

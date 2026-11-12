@@ -20,7 +20,7 @@ public partial class MainWindow
         var editor = EditorPane;
         var map = editor.Document!.Definition.Tables.First(t => t.Rows > 1 && t.Columns > 1 && !t.IsChoice);
         editor.OpenTable(map);
-        editor.PopBrowserForTest(); editor.PopGraphForTest(); editor.DetailsButton.IsChecked = true;
+        editor.PopBrowserForTest(); editor.PopGraphForTest(); editor.ShowMapInformation();
         await Idle();
         Check(editor.FloatingVisibilityForTest().SequenceEqual(new[] { true, true, true }), "Floating panels visible in Editor");
         foreach (int page in new[] { 0, 2, 3, 4, 5 })

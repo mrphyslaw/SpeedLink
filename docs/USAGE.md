@@ -6,7 +6,7 @@ separate .NET installation is needed. Keep the `data` folder beside the EXE
 when updating the app: it holds backups, recordings, imported definitions and
 settings. ROM files and adapter drivers are not included.
 
-The permanent top menu contains **File**, **Edit**, **View**, **Tools** and **Help**.
+The permanent top menu contains **File**, **Edit**, **View**, **Map**, **Tools** and **Help**.
 Use **File → Open ROM…** from any workspace; **File → Save ROM copy…** exports
 the current editor document with its mandatory integrity checks. Editor commands
 are disabled when their required ROM or map is unavailable. Open a saved log with
@@ -27,7 +27,7 @@ release. [Flashing guide](FLASHING.md)
 ## Edit a ROM without an adapter
 
 1. Choose **File → Open ROM…** and select a complete supported ROM.
-2. Find a map in the browser. **Map info** or F1 explains its units and purpose.
+2. Find a map in the browser. **Map → Map information…** or F1 explains its units and purpose.
 3. For a single value, type in the field and choose **Apply** or Enter;
    **Cancel** or Escape discards typing. For a table, double-click a cell, enter
    a value and press Enter. Switches use named choices.
@@ -35,7 +35,7 @@ release. [Flashing guide](FLASHING.md)
 5. Choose **Save copy…** and pick a new filename. Every export applies its mandatory
    ROM-specific checksum/integrity checks. The original and existing files are preserved.
 
-Drag the table/preview divider to resize it. **Fit map** restores automatic
+Drag the table/preview divider to resize it. **Map → Fit entire map** restores automatic
 sizing; Ctrl+B hides or restores the browser. Editing requires one of the ten
 supported stock program layouts. Static axes are read-only; extended/patched
 layouts are unsupported.
@@ -137,7 +137,7 @@ local paths; review reports before sharing them.
 ## Find help and definition updates
 
 Choose **Help**, then select Getting started, Editor or Logger. In the editor,
-**Map info** / F1 explains the active map; **Help → Editor guide** opens the full
+**Map → Map information…** or F1 explains the active map; **Help → Editor guide** opens the full
 editing instructions.
 
 **Definitions → Import…** installs editor XML or logger JSON updates for

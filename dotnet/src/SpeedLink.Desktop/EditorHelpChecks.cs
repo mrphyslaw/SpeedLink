@@ -16,17 +16,15 @@ public partial class EditorWorkspace
     }
     private void CheckNoMapHelp()
     {
-        if (MapInfoButton.IsEnabled || DetailsButton.IsEnabled || SendMapHelpKey().Handled || infoWindow is not null)
+        if (DetailsButton.IsEnabled || SendMapHelpKey().Handled || infoWindow is not null)
             throw new InvalidOperationException("Map help is available without an active map.");
-        MapInfoButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        ShowMapInformation();
         if (infoWindow is not null) throw new InvalidOperationException("Map help opened without an active map.");
     }
     private void CheckMapHelpPlacement()
     {
-        var bounds = MapInfoButton.TransformToAncestor(this).TransformBounds(new Rect(MapInfoButton.RenderSize));
-        if (!MapInfoButton.IsVisible || !MapInfoButton.IsEnabled || bounds.Right > ActualWidth + 1 ||
-            bounds.Bottom > DataLayout.TransformToAncestor(this).Transform(new Point()).Y + 1 || bounds.Width < 70)
-            throw new InvalidOperationException("Map info is clipped or takes space from the table.");
+        if (!DetailsButton.IsEnabled || EditBar.IsVisible)
+            throw new InvalidOperationException("Map information needs an active map and must leave the edit row collapsed.");
     }
     private async Task CheckMapInformation(string folder)
     {
@@ -35,22 +33,22 @@ public partial class EditorWorkspace
         var sample = document.Definition.Tables.Single(t => t.Name == "Knock Retard Additive");
         OpenTable(sample); UpdateLayout(); CheckMapHelpPlacement();
         double height = MapGrid.ActualHeight;
-        MapInfoButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); UpdateLayout(); infoWindow!.UpdateLayout();
+        ShowMapInformation(); UpdateLayout(); infoWindow!.UpdateLayout();
         await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         if (HelpUnitsText.Text != "Values: " + sample.Units || !HelpUnitsText.IsVisible ||
             !HelpAxesText.Text.Contains(sample.X.Name, StringComparison.Ordinal) ||
             !HelpAxesText.Text.Contains(sample.Y.Name, StringComparison.Ordinal) || HelpText.Text != sample.Description ||
             Descendants(DetailsPanel).OfType<Expander>().Single().IsExpanded)
             throw new InvalidOperationException("Map information hides units or does not match the selected map.");
-        if (!DetailsButton.IsChecked || Math.Abs(MapGrid.ActualHeight - height) > 1)
+        if (Math.Abs(MapGrid.ActualHeight - height) > 1)
             throw new InvalidOperationException("Map info changed the table height.");
         infoWindow.Close(); await Settle();
-        if (DetailsButton.IsChecked || infoWindow is not null) throw new InvalidOperationException("Closing help retained an open state.");
+        if (infoWindow is not null) throw new InvalidOperationException("Closing help retained an open state.");
         if (!SendMapHelpKey().Handled || infoWindow is null || !infoWindow.IsVisible)
             throw new InvalidOperationException("F1 did not open help for the active map.");
         var opened = infoWindow; opened.WindowState = WindowState.Minimized;
         SendMapHelpKey(); await Settle();
-        MapInfoButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        ShowMapInformation();
         if (!ReferenceEquals(infoWindow, opened) || opened.WindowState == WindowState.Minimized)
             throw new InvalidOperationException("Repeated help requests duplicate or leave the window minimized.");
         // Changing maps while the window is open must replace both help and units.
