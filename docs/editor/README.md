@@ -22,6 +22,20 @@ synthetic values.
 
 ![The File menu opens ROMs and recordings and saves a verified ROM copy](images/application-file-menu.png)
 
+## Appearance and shortcuts
+
+**View → Appearance** switches among System, Light and Dark. Map cells use a
+smooth low-to-high color gradient for the selected theme. This example shows
+the same synthetic table in Light mode.
+
+![A synthetic VVT table showing the Light theme's rose, gold and mint gradients](images/application-navigation-light.png)
+
+Use **Tools → Keyboard shortcuts** to reassign or clear a binding, restore
+individual defaults, or reset the whole list. F4 switches the active map
+between table and graph, and F7 docks or undocks it by default.
+
+![Keyboard shortcut settings with editable bindings and restore controls](images/keyboard-shortcuts.png)
+
 ## Room for the map
 
 ### Axis titles follow the data
@@ -43,6 +57,8 @@ Drag titles to move panes inside the workspace. Manual resizing and movement
 allow overlap; clicking a map or selecting it in the browser brings it forward.
 Use **Map → Tile maps side by side** to reset manual placement.
 The multi-map screenshot uses synthetic values, not vehicle tuning advice.
+
+![Named Boost Control and Fuel Tuning workspace tabs with a trailing plus button](images/named-workspaces.png)
 
 ![A lower curve widened independently below three scalar maps and another curve](images/independent-panes.png)
 
@@ -107,6 +123,12 @@ switching maps. Single-state maps use a named selector in the same layout.
 Small tables use a grid sized to their data, with clear axis bands and readable
 cells. Short curves get a curve preview with fewer ticks when space is limited.
 Multi-state controls retain their labeled rows without an empty graph.
+
+![A Monitor Requests table showing both full row labels and the resizable divider beside Value](images/named-row-labels.png)
+
+Named rows fit their labels on open. Drag the divider beside **Value** to
+resize the label column while keeping the font and cells at the same size.
+Double-click to fit the text again.
 
 ## Rotatable 3D surfaces
 
