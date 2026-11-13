@@ -5,6 +5,7 @@ namespace SpeedLink.Desktop;
 
 public partial class EditorWorkspace
 {
+    private const double CurveGraphSpace = 207;
     private bool automaticCompactRows;
 
     private void FitInitialMapDensity()
@@ -14,10 +15,16 @@ public partial class EditorWorkspace
             automaticCompactRows = compactRows = false;
             ApplyGridDensity();
         }
-        if (compactRows || !autoFitCells || table is not { Rows: > 1, IsChoice: false }) return;
-        var normal = MinimumMapPaneSize();
+        if (compactRows || !autoFitCells || table is not { Count: > 1, IsChoice: false }) return;
         var root = MapRoot;
-        if (normal.Width <= root.mapDockScroll.ViewportWidth && normal.Height <= root.mapDockScroll.ViewportHeight - 2) return;
+        var normal = MinimumMapPaneSize();
+        if (CurveList && normal.Height <= root.mapDockScroll.ViewportHeight - 2 && normal.Width + CurveGraphSpace <= root.mapDockScroll.ViewportWidth)
+            return;
+        if (!CurveList && normal.Width <= root.mapDockScroll.ViewportWidth && normal.Height <= root.mapDockScroll.ViewportHeight - 2)
+            return;
+        if (CurveList && table.Count * ReadableTableFit.MinimumRowHeight(Math.Max(11, 12 * cellZoom), cellZoom, true) >
+            root.mapDockScroll.ViewportHeight)
+            return;
         automaticCompactRows = compactRows = true;
         ApplyGridDensity();
     }
@@ -86,8 +93,8 @@ public partial class EditorWorkspace
             fitted = Place(Math.Max(400, minimum.Width), minimum.Height) ?? Place(minimum.Width, minimum.Height);
         else if (editor.CurveList)
         {
-            double width = Math.Max(600, previous?.Width ?? 0);
-            fitted = Place(Math.Min(width, availableWidth), availableHeight);
+            double width = Math.Max(Math.Max(600, minimum.Width + CurveGraphSpace), previous?.Width ?? 0);
+            fitted = Place(Math.Min(width, availableWidth), Math.Min(availableHeight, minimum.Height));
         }
         else
         {
@@ -114,7 +121,7 @@ public partial class EditorWorkspace
         // Open in front if other maps occupy the only space that can show the
         // data at a readable size. Their positions and dimensions stay intact.
         fitted ??= new(0, 0, shortCurve ? Math.Min(availableWidth, Math.Max(400, minimum.Width)) : availableWidth,
-            editor.CurveList ? availableHeight : Math.Min(availableHeight, minimum.Height));
+            Math.Min(availableHeight, minimum.Height));
         slot.DockBounds = fitted;
         slot.PreserveBoundsOnOpen = false;
         ArrangeMaps();

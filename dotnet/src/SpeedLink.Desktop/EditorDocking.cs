@@ -213,7 +213,8 @@ public partial class EditorWorkspace
         DataDividerRow.Height = new(below ? 5 : 0); DataDividerColumn.Width = new(vertical ? 7 : 0);
         TableColumn.MinWidth = vertical ? Math.Min(200, Math.Max(80, DataLayout.ActualWidth * .45)) : 0; GraphColumn.MinWidth = vertical ? Math.Min(160, Math.Max(80, DataLayout.ActualWidth * .35)) : 0;
         GraphColumn.MaxWidth = preview ? 800 : double.PositiveInfinity;
-        TableColumn.Width = beside && CurveList ? new(Math.Min(curveWidth, Math.Max(180, DataLayout.ActualWidth - 200))) : new(beside ? tableFraction : 1, GridUnitType.Star);
+        double curveListWidth = Math.Max(curveWidth, MinimumMapGridWidth() + SystemParameters.VerticalScrollBarWidth);
+        TableColumn.Width = beside && CurveList ? new(Math.Min(curveListWidth, Math.Max(180, DataLayout.ActualWidth - 200))) : new(beside ? tableFraction : 1, GridUnitType.Star);
         var thumbnail = TablePreviewSize.Calculate(DataLayout.ActualWidth, DataLayout.ActualHeight, table?.Columns ?? 1,
             MapGrid.RowHeaderWidth + AxisLabelColumn.Width.Value + SystemParameters.VerticalScrollBarWidth, previewWidth, MinimumCellWidth());
         double previewSize = !surface && previewWidth is null ? Math.Min(360, Math.Max(260, DataLayout.ActualWidth * .32)) : thumbnail.Width;
@@ -345,7 +346,12 @@ public partial class EditorWorkspace
     }
     private void DataSplitter_Started(object sender, DragStartedEventArgs e) => resizingData = true;
     private void TableViewport_SizeChanged(object sender, SizeChangedEventArgs e) { UpdateCompactMap(); UpdateTableSizing(); }
-    private void DataLayout_SizeChanged(object sender, SizeChangedEventArgs e) { if (resizingData) return; if (ViewMode == 4) ApplyView(); else { UpdateCompactMap(); UpdateTableSizing(); } }
+    private void DataLayout_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (resizingData) return;
+        if (ViewMode == 4 || ViewMode == 1 && CurveList) ApplyView();
+        else { UpdateCompactMap(); UpdateTableSizing(); }
+    }
     private void UpdateCompactMap()
     {
         var size = table is null ? null : CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, AxisLabelColumn.Width.Value, AxisTitleRow.Height.Value, table.IsChoice);

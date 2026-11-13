@@ -48,7 +48,8 @@ public partial class EditorWorkspace
                 double allRows = rowHeight * rowCount;
                 fits = !horizontal && !vertical && !needsWidth && visibleHeight + 1 >= allRows;
                 var minimum = editor.MinimumMapPaneSize();
-                bool enoughRoom = editor.ViewMode == 2 && minimum.Width <= mapDockScroll.ViewportWidth &&
+                double graphSpace = editor.CurveList ? CurveGraphSpace : 0;
+                bool enoughRoom = minimum.Width + graphSpace <= mapDockScroll.ViewportWidth &&
                     minimum.Height <= mapDockScroll.ViewportHeight - 2;
                 if (visibleHeight + 1 < rowHeight || enoughRoom && !fits)
                 {
