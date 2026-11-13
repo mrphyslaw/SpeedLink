@@ -64,10 +64,12 @@ public partial class EditorWorkspace
                 selected.Name is "BCS DC Adjustment IAT" or "Open Loop Part Throttle AFR Target Knock Present")
                 CaptureHost(Path.Combine(folder, selected.Name == "BCS DC Adjustment IAT" ? "BCS-IAT.png" : "AFR-Knock.png"));
         }
-        if (!bytes.AsSpan().SequenceEqual(doc.Snapshot())) throw new InvalidOperationException("Opening maps changed the ROM bytes.");
-        foreach (var selected in tables.Where(t => t.Name is "BCS DC Adjustment IAT" or "Open Loop Part Throttle AFR Target Knock Present"))
+        foreach (var selected in tables.Where(t => doc.Definition.Calibration == "L3P4EM000" &&
+            t.Name is "BCS DC Adjustment IAT" or "Open Loop Part Throttle AFR Target Knock Present"))
+        foreach (var size in new[] { new Size(1540, 980), new Size(1044, 760) })
         {
-            if (doc.Definition.Calibration != "L3P4EM000") continue;
+            host.Width = size.Width; host.Height = size.Height;
+            await Settle();
             var prior = doc.Definition.Tables.First(t => t.Count == 1 && !t.IsChoice && t != pinnedMap);
             BrowseMap(prior);
             await Settle();
@@ -80,11 +82,29 @@ public partial class EditorWorkspace
             BrowseMap(selected);
             await Settle();
             var scroll = Descendants(reusable.MapGrid).OfType<ScrollViewer>().First();
-            if (!ReferenceEquals(CommandMap, reusable) || !SameBounds(pinnedBounds, DockedBounds(pinned)) ||
-                scroll.ComputedHorizontalScrollBarVisibility == Visibility.Visible ||
-                scroll.ComputedVerticalScrollBarVisibility == Visibility.Visible)
-                failures.Add($"The saved 300×260 preview did not fit {selected.Name}.");
+            var bounds = DockedBounds(reusable);
+            var minimum = reusable.MinimumMapPaneSize();
+            double width = mapDockScroll.ViewportWidth, height = mapDockScroll.ViewportHeight - 2;
+            bool horizontal = scroll.ComputedHorizontalScrollBarVisibility == Visibility.Visible;
+            bool vertical = scroll.ComputedVerticalScrollBarVisibility == Visibility.Visible;
+            bool fits = minimum.Width <= width && minimum.Height <= height;
+            // The deliberately undersized pane can temporarily add a workspace
+            // scrollbar. Its removal gives the viewport one scrollbar's height back.
+            bool valid = ReferenceEquals(CommandMap, reusable) && SameBounds(pinnedBounds, DockedBounds(pinned)) &&
+                (fits ? !horizontal && !vertical : (!horizontal || bounds.Width >= width - SystemParameters.VerticalScrollBarWidth - 2) &&
+                    (!vertical || bounds.Height >= height - SystemParameters.HorizontalScrollBarHeight - 2));
+            if (valid && (horizontal || vertical))
+            {
+                reusable.SelectCell(selected.Count - 1);
+                await Settle();
+                valid = reusable.SelectedIndices().SequenceEqual([selected.Count - 1]) &&
+                    (!horizontal || scroll.HorizontalOffset > 0) && (!vertical || scroll.VerticalOffset > 0);
+            }
+            if (!valid)
+                failures.Add($"The saved 300×260 preview did not fit {selected.Name} to the available workspace " +
+                    $"({width:F0}×{height:F0}, minimum {minimum}, pane {bounds}, scroll {horizontal}/{vertical}).");
         }
+        if (!bytes.AsSpan().SequenceEqual(doc.Snapshot())) throw new InvalidOperationException("Opening maps changed the ROM bytes.");
         return new { passed = failures.Count == 0, checkedMaps = results.Count, complete, scrolling, failures, results };
     }
 
