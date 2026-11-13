@@ -6,12 +6,12 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 **[Download SpeedLink v0.8.0-alpha.13](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.13)** · A single Windows EXE with the runtime included.
 
-**Watch the SpeedLink v0.8.0-alpha.5 walkthrough (1:27)** · Silent with on-screen captions.
+**Watch the SpeedLink v0.8.0-alpha.13 walkthrough (1:03)** · Silent with on-screen captions.
 
-https://github.com/user-attachments/assets/b4f13fbb-896c-4eae-93b6-aa2b6b252f4c
+https://github.com/user-attachments/assets/bd476c2f-417a-4cbd-9468-7bdceb906616
 
-See verified backups, side-by-side maps and 3D previews, the built-in tuning guide,
-logging and playback, and Gen 1 post-write verification. ECU operations shown are simulated.
+See verified backups, map docking, reassignable shortcuts, Light and Dark cell
+colors, row-label resizing, and logging and playback. The examples use synthetic data.
 
 Use the permanent File, Edit, View, Map, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
@@ -52,7 +52,8 @@ rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →
 Axis headers have a distinct background and bright separators. **Map → Map information…** and **F1** show units, correction direction and practical examples.
 Axis titles stay centered beside the visible rows and above the visible columns,
 including short tables with unused space. [See the alignment example →](docs/editor/README.md#axis-titles-follow-the-data)
-The map-window preview uses synthetic example values.
+The map-window preview uses synthetic example values. **View → Appearance** changes
+the map gradient with the theme. [Compare Light and Dark and see the shortcut settings](docs/editor/README.md#appearance-and-shortcuts).
 
 Single values use compact cards that wrap across the workspace, with units,
 help and baseline comparison. Rejected ROM files leave the current editing
