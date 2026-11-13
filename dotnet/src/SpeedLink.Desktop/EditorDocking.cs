@@ -352,9 +352,11 @@ public partial class EditorWorkspace
         if (size is { } compact && table is not null && !CurveList && MapGrid.Columns.Count == table.Columns)
         {
             double rowHeight = CompactGridRowHeight;
-            double requiredWidth = MinimumMapGridWidth();
-            size = new(Math.Max(compact.Width, requiredWidth + AxisLabelColumn.Width.Value),
-                AxisTitleRow.Height.Value + MapGrid.ColumnHeaderHeight + rowHeight * table.Rows + SystemParameters.HorizontalScrollBarHeight + 4);
+            double requiredWidth = MinimumMapGridWidth() + AxisLabelColumn.Width.Value;
+            double scrollbar = ViewMode == 2 || requiredWidth > TableViewport.ActualWidth
+                ? SystemParameters.HorizontalScrollBarHeight : 0;
+            size = new(Math.Max(compact.Width, requiredWidth),
+                AxisTitleRow.Height.Value + MapGrid.ColumnHeaderHeight + rowHeight * table.Rows + scrollbar + 4);
         }
         if (ViewMode == 2 && CurveList && MapGrid.Columns.Count == 2)
         {
