@@ -5,8 +5,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Deterministic>true</Deterministic>
     <DebugType>embedded</DebugType>
-    <Version>0.8.0-alpha.11</Version>
-    <RuntimeFrameworkVersion>10.0.14</RuntimeFrameworkVersion>
+    <Version>0.8.0-alpha.12</Version>
+    <RuntimeFrameworkVersion>10.0.15</RuntimeFrameworkVersion>
     <Authors>SpeedLink contributors</Authors>
     <Copyright>Copyright (C) 2026 SpeedLink contributors</Copyright>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

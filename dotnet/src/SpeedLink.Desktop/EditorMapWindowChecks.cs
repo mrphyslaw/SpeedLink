@@ -188,6 +188,8 @@ public partial class EditorWorkspace
         cases.AddRange(await ExerciseCompactScalarPanes(folder));
         cases.AddRange(await ExerciseIndependentMapResize(folder));
         cases.AddRange(await ExerciseWorkspaceTabs(folder));
+        ClearMapWindows(); MapTabs.Items.Clear(); await Idle();
+        cases.AddRange(await ExerciseEdgeDocking());
         return new { passed = true, cases, calibration, hardwareAccessed = false, synthetic = true };
     }
     private async Task CaptureMapWindowGallery(string folder)

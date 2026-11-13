@@ -168,7 +168,7 @@ See [measured performance](../../docs/LOGGER_PERFORMANCE.md) for rates and their
 
 ## .NET security maintenance — 0.6.0-alpha.2
 
-- SDK 10.0.403 and bundled runtime 10.0.14 are pinned together. Dependency locks
+- SDK 10.0.404 and bundled runtime 10.0.15 are pinned together. Dependency locks
   are refreshed with that SDK; locked restore stays enabled.
 - Release checks cover all 426 unit cases and 62 baseline regressions, the full
   offline desktop suite, and standalone startup, menus, support export and replay.

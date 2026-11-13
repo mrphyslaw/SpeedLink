@@ -4,7 +4,7 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.11](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.11)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.12](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.12)** · A single Windows EXE with the runtime included.
 
 **Watch the SpeedLink v0.8.0-alpha.5 walkthrough (1:27)** · Silent with on-screen captions.
 
@@ -16,8 +16,7 @@ logging and playback, and Gen 1 post-write verification. ECU operations shown ar
 Use the permanent File, Edit, View, Map, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 Drag a pane's own edge or corner to resize just that map, or drag its header to
-move it. Panes can overlap; click a map or select it in the browser to bring it
-forward. **Map → Tile maps side by side** restores automatic arrangement.
+move it. New maps use the space they need when the whole table fits at a readable size. Drag a detached map's title bar to a highlighted workspace edge to dock it. Panes can overlap; click a map or select it in the browser to bring it forward. **Map → Tile maps side by side** restores automatic arrangement.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the ten supported stock ROM layouts.

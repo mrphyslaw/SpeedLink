@@ -123,8 +123,14 @@ not a record of the order in which edits were made.
 Click a map in the browser to open it in a reusable pane. Turn on **Pin** in
 the pane title to keep the map visible while you browse other maps. Picking an
 already open map brings it forward. **Pin** changes only the pane you click.
+A reused pane grows to fit the next map when there is room. Auto fit can use
+compact rows to show more of a large table. Tables that exceed the available
+space scroll at a readable text size.
 When several unpinned maps are open, opening a new map reuses the most
 recently active unpinned pane.
+
+Drag a detached map by its Windows title bar to a highlighted editor edge, then
+release to dock it there. Docked maps keep their positions.
 
 Use **Map → Close other maps**, or right-click the
 map header, to keep just the active map in this workspace. Closing a view

@@ -55,6 +55,7 @@ public partial class EditorWorkspace
     private void ToggleCompactRows()
     {
         if (!FinishEdit()) return;
+        automaticCompactRows = false;
         compactRows = !compactRows;
         ApplyGridDensity();
         QueueMapSave();

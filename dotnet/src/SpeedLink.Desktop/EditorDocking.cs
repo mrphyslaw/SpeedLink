@@ -349,6 +349,13 @@ public partial class EditorWorkspace
     private void UpdateCompactMap()
     {
         var size = table is null ? null : CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, AxisLabelColumn.Width.Value, AxisTitleRow.Height.Value, table.IsChoice);
+        if (size is { } compact && table is not null && !CurveList && MapGrid.Columns.Count == table.Columns)
+        {
+            double rowHeight = CompactGridRowHeight;
+            double requiredWidth = MinimumMapGridWidth();
+            size = new(Math.Max(compact.Width, requiredWidth + AxisLabelColumn.Width.Value),
+                AxisTitleRow.Height.Value + MapGrid.ColumnHeaderHeight + rowHeight * table.Rows + SystemParameters.HorizontalScrollBarHeight + 4);
+        }
         if (ViewMode == 2 && CurveList && MapGrid.Columns.Count == 2)
         {
             double height = MapGrid.ColumnHeaderHeight + MapGrid.Items.Count * CurveRowHeight + 4;
@@ -378,17 +385,23 @@ public partial class EditorWorkspace
         }
         // Leave room for a transient horizontal scrollbar so it cannot keep the
         // vertical scrollbar alive and prevent an otherwise fitting grid from settling.
-        double availableHeight = MapGrid.ActualHeight - (fitTable ? SystemParameters.HorizontalScrollBarHeight : 0);
+        double availableHeight = MapGrid.ActualHeight - SystemParameters.HorizontalScrollBarHeight;
         var size = ReadableTableFit.Calculate(MapGrid.ActualWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells, compactRows);
-        double rowHeight = size.RowHeight;
-        if (table.Rows * rowHeight + MapGrid.ColumnHeaderHeight > MapGrid.ActualHeight)
-            size = ReadableTableFit.Calculate(MapGrid.ActualWidth - SystemParameters.VerticalScrollBarWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells, compactRows);
         bool compact = CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, 0, 0) is not null;
-        double compactCell = Math.Clamp(Math.Floor((MapGrid.ActualWidth - MapGrid.RowHeaderWidth - 4) / table.Columns), Math.Min(64, minimum), previewWidth is not null && ViewMode == 4 ? 160 : table.Columns <= 4 ? 112 : 88);
+        double gridWidth = MapGrid.ActualWidth;
+        double rowHeight = compact ? CompactGridRowHeight : size.RowHeight;
+        if (table.Rows * rowHeight + MapGrid.ColumnHeaderHeight + 4 > availableHeight)
+        {
+            gridWidth -= SystemParameters.VerticalScrollBarWidth;
+            size = ReadableTableFit.Calculate(gridWidth, availableHeight, table.Columns, table.Rows, MapGrid.RowHeaderWidth, MapGrid.ColumnHeaderHeight, measuredCellWidth, MapGrid.FontSize, cellZoom, autoFitCells, compactRows);
+        }
+        double compactCell = Math.Clamp(Math.Floor((gridWidth - MapGrid.RowHeaderWidth - 6) / table.Columns), Math.Min(64, minimum), previewWidth is not null && ViewMode == 4 ? 160 : table.Columns <= 4 ? 112 : 88);
         foreach (var column in MapGrid.Columns) { column.MinWidth = minimum; column.Width = new(Math.Max(minimum, compact && autoFitCells ? compactCell : size.ColumnWidth)); }
-        MapGrid.RowHeight = compact && !compactRows ? Math.Max(size.RowHeight, 28 * cellZoom) : size.RowHeight;
+        MapGrid.RowHeight = compact ? CompactGridRowHeight : size.RowHeight;
     }
-    private double CurveRowHeight => Math.Ceiling(compactRows ? Math.Max(17 * cellZoom, MapGrid.FontSize + 5) : 25 * cellZoom);
+    private double MinimumGridRowHeight => ReadableTableFit.MinimumRowHeight(MapGrid.FontSize, cellZoom, compactRows);
+    private double CompactGridRowHeight => compactRows ? MinimumGridRowHeight : Math.Max(MinimumGridRowHeight, 28 * cellZoom);
+    private double CurveRowHeight => Math.Ceiling(compactRows ? MinimumGridRowHeight : Math.Max(MinimumGridRowHeight, 25 * cellZoom));
     private double CurveColumnWidth => Math.Max(MinimumCellWidth(), 120 * cellZoom);
 
     private double MinimumCellWidth()

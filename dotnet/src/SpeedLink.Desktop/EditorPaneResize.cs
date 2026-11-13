@@ -36,7 +36,11 @@ public partial class EditorWorkspace
             {
                 if (original is null) return;
                 var root = MapRoot; var slot = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Frame, frame));
-                if (canceled && slot is not null) { slot.DockBounds = original; PlaceMapFrame(slot, original); }
+                if (slot is not null)
+                {
+                    if (canceled) { slot.DockBounds = original; PlaceMapFrame(slot, original); }
+                    else slot.PreserveBoundsOnOpen = true;
+                }
                 original = null; root.cancelPaneGesture = null; root.resizingDock = false; root.UpdateIndependentExtent(); root.QueueMapSave();
             }
             grip.DragStarted += (_, _) =>
@@ -52,7 +56,7 @@ public partial class EditorWorkspace
                 var root = MapRoot; var slot = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Frame, frame));
                 if (slot is null) { original = null; root.cancelPaneGesture = null; root.resizingDock = false; return; }
                 dx += e.HorizontalChange; dy += e.VerticalChange;
-                slot.DockBounds = original.Resize(edge, dx, dy, slot.Editor.ScalarMap ? 220 : 260, slot.Editor.ScalarMap ? 100 : 260);
+                slot.DockBounds = original.Resize(edge, dx, dy, slot.Editor.ScalarMap ? 220 : 260, slot.Editor.ScalarMap ? 100 : 118);
                 PlaceMapFrame(slot, slot.DockBounds);
             };
             grip.DragCompleted += (_, e) => FinishResize(e.Canceled);
@@ -77,7 +81,7 @@ public partial class EditorWorkspace
     }
     private void MoveMapPane(MapSlot slot, MapDockBounds original, double dx, double dy)
     {
-        slot.DockBounds = original.Move(dx, dy); PlaceMapFrame(slot, slot.DockBounds); slot.Editor.ActivateMap();
+        slot.DockBounds = original.Move(dx, dy); slot.PreserveBoundsOnOpen = true; PlaceMapFrame(slot, slot.DockBounds); slot.Editor.ActivateMap();
     }
     private static void PlaceMapFrame(MapSlot slot, MapDockBounds bounds)
     {
@@ -95,7 +99,7 @@ public partial class EditorWorkspace
             else
             {
                 slot.DockBounds ??= FindMapSpace(slot);
-                slot.DockBounds = slot.DockBounds with { Width = Math.Max(slot.Editor.ScalarMap ? 220 : 260, slot.DockBounds.Width), Height = Math.Max(slot.Editor.ScalarMap ? 100 : 260, slot.DockBounds.Height) };
+                slot.DockBounds = slot.DockBounds with { Width = Math.Max(slot.Editor.ScalarMap ? 220 : 260, slot.DockBounds.Width), Height = Math.Max(slot.Editor.ScalarMap ? 100 : 118, slot.DockBounds.Height) };
                 PlaceMapFrame(slot, slot.DockBounds);
             }
             if (!mapDock.Children.Contains(slot.Frame)) mapDock.Children.Add(slot.Frame);

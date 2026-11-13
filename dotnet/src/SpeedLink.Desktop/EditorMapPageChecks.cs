@@ -55,11 +55,10 @@ public partial class EditorWorkspace
         var preview = Slot(maps[0]);
         Check(OpenCount() == 2 && pinned.Pinned && !preview.Pinned && Equals(PinMapButton.Content, "Pinned") &&
             Equals(preview.Editor.PinMapButton.Content, "Pin"), "Pinning opens a second pane for browsing");
-        var bounds = DockedBounds(preview.Editor);
         var pinnedBounds = DockedBounds(this);
         Choose(maps[2]); await Idle();
-        Check(OpenCount() == 2 && ReferenceEquals(Slot(maps[2]), preview) && SameBounds(bounds, DockedBounds(preview.Editor)) &&
-            SameBounds(pinnedBounds, DockedBounds(this)), "Replacing the preview keeps pane sizes and pinned positions");
+        Check(OpenCount() == 2 && ReferenceEquals(Slot(maps[2]), preview) &&
+            SameBounds(pinnedBounds, DockedBounds(this)), "Replacing the preview keeps the pinned map's size and position");
         Choose(maps[1]); await Idle();
         Check(ReferenceEquals(activeMap, this) && OpenCount() == 2, "Choosing a pinned map focuses it without replacing the preview");
         Pin(this);
@@ -68,7 +67,7 @@ public partial class EditorWorkspace
         Choose(maps[2]); await Idle();
         Choose(maps[0]); await Idle();
         Check(OpenCount() == 2 && ReferenceEquals(Slot(maps[0]), preview) && ReferenceEquals(Slot(maps[1]), pinned) &&
-            !pinned.Pinned && !preview.Pinned && SameBounds(bounds, DockedBounds(preview.Editor)) && SameBounds(pinnedBounds, DockedBounds(this)),
+            !pinned.Pinned && !preview.Pinned && SameBounds(pinnedBounds, DockedBounds(this)),
             "Browsing reuses the most recently active unpinned pane without changing the other pane");
         Choose(maps[2]); await Idle();
         preview.Editor.SetViewMode(4);

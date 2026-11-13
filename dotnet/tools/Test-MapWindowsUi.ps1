@@ -37,7 +37,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
         'Bulk editing tools can be revealed',
         'Close other maps keeps the active view even when it must take the first pane',
         'Close other maps keeps the panes open when any has invalid input',
-        'Replacing the preview keeps pane sizes and pinned positions',
+        'Replacing the preview keeps the pinned map''s size and position',
         'Unpinning changes only the clicked pane and keeps both maps open',
         'Browsing reuses the most recently active unpinned pane without changing the other pane',
         'Invalid scalar input blocks preview replacement without losing the draft',
@@ -49,6 +49,7 @@ foreach ($calibration in @('L33XEH000','L35HEH000','L38KEH000','L39SED000','L39S
         'Returning to a tab restores its pins, selection and detached window bounds',
         'Reopening the ROM restores workspace names, selected tab and preview',
         'Deleting a tab removes only its layout and retains applied edits',
+        'Detached maps dock to every edge without shifting the pinned map',
         'Old fuel feedback layouts reopen the same ROM addresses under the new names'
     )) {
         if ($result.workflow.cases -notcontains $required) { throw "Missing workspace tab regression: $calibration; $required" }
