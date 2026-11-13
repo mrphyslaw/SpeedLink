@@ -136,11 +136,14 @@ public readonly record struct ReadableTableFit(double ColumnWidth, double RowHei
         if (columns < 1 || rows < 1 || !double.IsFinite(width) || !double.IsFinite(height) || !double.IsFinite(headerWidth) || !double.IsFinite(headerHeight) || !double.IsFinite(zoom) || zoom < .85 || zoom > 1.5 || !double.IsFinite(fontSize) || fontSize < 11 || !double.IsFinite(measuredTextWidth) || measuredTextWidth < 0)
             throw new ArgumentOutOfRangeException(nameof(columns));
         double minWidth = MinimumColumnWidth(measuredTextWidth, zoom, compact);
-        double minHeight = Math.Ceiling(Math.Max((compact ? 17 : 22) * zoom, fontSize + (compact ? 5 : 10)));
+        double minHeight = MinimumRowHeight(fontSize, zoom, compact);
         double cell = autoFit ? Math.Max(minWidth, Math.Min((compact ? 64 : 112) * zoom, Math.Floor((Math.Max(0, width) - headerWidth - 4) / columns))) : Math.Max(minWidth, (compact ? 48 : 70) * zoom);
         double row = compact ? minHeight : autoFit ? Math.Max(minHeight, Math.Min(28 * zoom, Math.Floor((Math.Max(0, height) - headerHeight - 4) / rows))) : Math.Max(minHeight, 25 * zoom);
         return new(cell, row, cell * columns + headerWidth + 4 <= width && row * rows + headerHeight + 4 <= height);
     }
+
+    public static double MinimumRowHeight(double fontSize, double zoom, bool compact) =>
+        Math.Ceiling(Math.Max((compact ? 22 : 24) * zoom, fontSize + (compact ? 9 : 11)));
 
     public static double MinimumColumnWidth(double textWidth, double zoom, bool compact) =>
         Math.Ceiling(Math.Max((compact ? 29 : 44) * zoom, textWidth + (compact ? 8 : 14) * zoom));

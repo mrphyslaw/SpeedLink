@@ -53,8 +53,9 @@ in the browser to bring it forward. This screenshot uses synthetic test data.
 
 ![A detached resizable map with its editing controls](images/detached-map.png)
 
-Drag a map's title out of the workspace, or choose **Map → Undock map**. Drag it back over
-the editor or choose **Dock** to return it. The native window's close button
+Drag a map's title out of the workspace, or choose **Map → Undock map**. Drag
+the detached window's title bar to a highlighted editor edge, or choose
+**Dock map**, to return it. The native window's close button
 closes that view while keeping its ROM edits.
 
 ![A complete synthetic 16×16 map with both axes visible](images/fit-map.png)

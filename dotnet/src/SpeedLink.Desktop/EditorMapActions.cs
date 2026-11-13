@@ -47,14 +47,15 @@ public partial class EditorWorkspace
             column.ElementStyle = compactRows && !column.IsReadOnly ? compactValueStyle : DataGridTextColumn.DefaultElementStyle;
         measuredCellWidth = double.NaN;
         RefreshAxes();
-        UpdateCompactMap();
-        UpdateTableSizing();
+        if (ViewMode == 1 && CurveList) ApplyView();
+        else { UpdateCompactMap(); UpdateTableSizing(); }
         MapRoot.RefreshMapCommandState();
     }
 
     private void ToggleCompactRows()
     {
         if (!FinishEdit()) return;
+        automaticCompactRows = false;
         compactRows = !compactRows;
         ApplyGridDensity();
         QueueMapSave();

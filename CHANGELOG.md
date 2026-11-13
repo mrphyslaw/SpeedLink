@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0-alpha.12
+
+- Open maps at a readable size that shows the whole table when the workspace has room. Preserve pinned pane positions while browsing and keep the value row visible in short curves.
+- Dock a detached map by dragging its title bar to any highlighted editor edge.
+- Bundle .NET 10.0.15 and pin SDK 10.0.404. Update the SDK setup action and xUnit test adapter.
+
 ## 0.8.0-alpha.11
 
 - Use a compact menu bar and a single-row map header. The **Map** menu follows the focused pane for view, zoom, comparison, help and editing tools. Right-click a map title for the same controls, including in detached windows.

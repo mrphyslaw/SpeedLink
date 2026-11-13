@@ -108,11 +108,11 @@ public sealed class MapWorkspaceTests
     [Fact]
     public void Compact_density_fits_a_30_by_15_map_when_the_text_fits()
     {
-        var compact = ReadableTableFit.Calculate(1024, 350, 30, 15, 60, 19, 21, 12, 1, autoFit: true, compact: true);
+        var compact = ReadableTableFit.Calculate(1024, 360, 30, 15, 60, 19, 21, 12, 1, autoFit: true, compact: true);
         Assert.True(compact.Fits);
-        Assert.InRange(compact.RowHeight, 17, 19);
+        Assert.Equal(22, compact.RowHeight);
         Assert.InRange(compact.ColumnWidth, 29, 32);
-        var longValues = ReadableTableFit.Calculate(1024, 350, 30, 15, 60, 19, 47, 12, 1, autoFit: true, compact: true);
+        var longValues = ReadableTableFit.Calculate(1024, 360, 30, 15, 60, 19, 47, 12, 1, autoFit: true, compact: true);
         Assert.False(longValues.Fits);
         Assert.True(longValues.ColumnWidth >= 55);
     }
