@@ -29,14 +29,16 @@ public partial class EditorWorkspace
         ApplyGridDensity();
     }
 
-    private double MinimumMapGridWidth()
+    private double MinimumMapGridWidth(double? rowHeaderWidth = null)
     {
+        double header = rowHeaderWidth ?? DesiredRowHeaderWidth;
+        if (HasNamedRows) return header + NamedRowValueWidth + 4;
         double minimum = MinimumCellWidth();
         if (CurveList)
-            return MapGrid.RowHeaderWidth + 2 * (autoFitCells ? minimum : CurveColumnWidth) + 4;
+            return header + 2 * (autoFitCells ? minimum : CurveColumnWidth) + 4;
         if (!autoFitCells)
             minimum = Math.Max(minimum, (compactRows ? 48 : 70) * cellZoom);
-        return MapGrid.RowHeaderWidth + minimum * MapGrid.Columns.Count + 4;
+        return header + minimum * MapGrid.Columns.Count + 4;
     }
 
     private Size MinimumMapPaneSize()
@@ -48,7 +50,7 @@ public partial class EditorWorkspace
         double height = MapGrid.ColumnHeaderHeight + (CurveList ? table.Count : table.Rows) * row + AxisTitleRow.Height.Value + 4;
         double width = MinimumMapGridWidth() + AxisLabelColumn.Width.Value;
         if (table.IsChoice)
-            width = Math.Max(width, MapGrid.RowHeaderWidth + 200 + 4);
+            width = Math.Max(width, DesiredRowHeaderWidth + 200 + 4);
         // Leave enough space for the title, footer, pane frame and the inner
         // margins of secondary workspaces. Include the optional controls row.
         double controls = table.IsChoice || showMapEditTools ? Math.Max(54, EditBar.ActualHeight) : 0;

@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Threading;
 using SpeedLink.Core;
 
@@ -10,106 +9,115 @@ namespace SpeedLink.Desktop;
 
 public partial class EditorWorkspace
 {
+    private const double DockSnapDistance = 24;
+    private sealed record DockPlacement(MapResizeEdge Edge, Rect Preview, MapDockBounds Bounds);
     private readonly Border dockTarget = new()
     {
         IsHitTestVisible = false, Visibility = Visibility.Collapsed, BorderThickness = new(2),
-        CornerRadius = new(3), Opacity = .75
+        CornerRadius = new(3), Opacity = .55, HorizontalAlignment = HorizontalAlignment.Left,
+        VerticalAlignment = VerticalAlignment.Top
     };
 
     private void EnableEdgeDocking(MapSlot slot, Window window)
     {
         const int moving = 0x0216, exitSizeMove = 0x0232, cancelMode = 0x001F, escape = 0x1B;
-        MapResizeEdge? CursorEdge() => GetCursorPos(out var cursor) && mapDockScroll.IsVisible
-            ? DockEdgeAt(mapDockScroll.PointFromScreen(new(cursor.X, cursor.Y)))
-            : null;
-        MapResizeEdge? edge = null;
+        DockPlacement? placement = null;
         nint TrackMove(nint handle, int message, nint wParam, nint lParam, ref bool handled)
         {
             if (message == moving)
             {
-                edge = CursorEdge();
-                ShowDockTarget(edge);
+                placement = GetCursorPos(out var cursor) && mapDockScroll.IsVisible
+                    ? PlanDockPlacement(mapDockScroll.PointFromScreen(new(cursor.X, cursor.Y)), slot,
+                        new(slot.Frame.ActualWidth, slot.Frame.ActualHeight), placement?.Edge)
+                    : null;
+                ShowDockTarget(placement);
             }
             else if (message == cancelMode)
             {
-                edge = null;
+                placement = null;
                 ShowDockTarget(null);
             }
             else if (message == exitSizeMove)
             {
-                var drop = edge is not null ? CursorEdge() : null;
-                edge = null;
+                var drop = placement;
+                placement = null;
                 ShowDockTarget(null);
-                if (drop is { } side && GetAsyncKeyState(escape) >= 0)
+                if (drop is not null && GetAsyncKeyState(escape) >= 0)
                     Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
                     {
-                        if (slot.Window == window && mapDockScroll.IsVisible) DockDetachedMap(slot, side);
+                        if (slot.Window == window && mapDockScroll.IsVisible) DockDetachedMap(slot, drop);
                     }));
             }
             return 0;
         }
 
-        window.SourceInitialized += (_, _) =>
-        {
-            var source = (HwndSource)PresentationSource.FromVisual(window)!;
-            source.AddHook(TrackMove);
-        };
+        window.SourceInitialized += (_, _) => ((HwndSource)PresentationSource.FromVisual(window)!).AddHook(TrackMove);
         window.Closed += (_, _) => ShowDockTarget(null);
     }
 
-    private MapResizeEdge? DockEdgeAt(Point point)
+    private DockPlacement? PlanDockPlacement(Point point, MapSlot slot, Size pane, MapResizeEdge? previous = null)
     {
-        const double targetWidth = 32;
+        const double target = DockSnapDistance;
+        const double cornerHysteresis = 8;
         double width = mapDockScroll.ViewportWidth, height = mapDockScroll.ViewportHeight;
-        if (width <= 0 || height <= 0 || point.X < -targetWidth || point.X > width + targetWidth ||
-            point.Y < -targetWidth || point.Y > height + targetWidth) return null;
+        if (width <= 0 || height <= 0 || point.X < -target || point.X > width + target ||
+            point.Y < -target || point.Y > height + target) return null;
 
-        double left = Math.Abs(point.X), right = Math.Abs(width - point.X);
-        double top = Math.Abs(point.Y), bottom = Math.Abs(height - point.Y);
-        double closest = Math.Min(Math.Min(left, right), Math.Min(top, bottom));
-        if (closest > targetWidth) return null;
-        if (closest == left) return MapResizeEdge.Left;
-        if (closest == top) return MapResizeEdge.Top;
-        return closest == right ? MapResizeEdge.Right : MapResizeEdge.Bottom;
+        var edges = new (MapResizeEdge Edge, double Distance)[]
+        {
+            (MapResizeEdge.Left, Math.Abs(point.X)), (MapResizeEdge.Top, Math.Abs(point.Y)),
+            (MapResizeEdge.Right, Math.Abs(width - point.X)), (MapResizeEdge.Bottom, Math.Abs(height - point.Y))
+        };
+        var nearest = edges.MinBy(candidate => candidate.Distance);
+        if (nearest.Distance > target) return null;
+        var side = nearest.Edge;
+        if (previous is { } prior)
+        {
+            double distance = edges.Single(candidate => candidate.Edge == prior).Distance;
+            if (distance <= target && distance <= nearest.Distance + cornerHysteresis) side = prior;
+        }
+
+        var minimum = slot.Editor.MinimumMapPaneSize();
+        double paneWidth = Math.Min(width, Math.Max(minimum.Width, pane.Width));
+        double paneHeight = Math.Min(height, Math.Max(minimum.Height, pane.Height));
+        double left = side switch
+        {
+            MapResizeEdge.Left => 0,
+            MapResizeEdge.Right => width - paneWidth,
+            _ => Math.Clamp(point.X - paneWidth / 2, 0, width - paneWidth)
+        };
+        double top = side switch
+        {
+            MapResizeEdge.Top => 0,
+            MapResizeEdge.Bottom => height - paneHeight,
+            _ => Math.Clamp(point.Y - paneHeight / 2, 0, height - paneHeight)
+        };
+        return new(side, new(left, top, paneWidth, paneHeight),
+            new(left + mapDockScroll.HorizontalOffset, top + mapDockScroll.VerticalOffset, paneWidth, paneHeight));
     }
 
-    private void ShowDockTarget(MapResizeEdge? edge)
+    private void ShowDockTarget(DockPlacement? placement)
     {
-        dockTarget.Visibility = edge is null ? Visibility.Collapsed : Visibility.Visible;
-        if (edge is null) return;
-        bool horizontal = edge is MapResizeEdge.Top or MapResizeEdge.Bottom;
-        dockTarget.Width = horizontal ? double.NaN : 28;
-        dockTarget.Height = horizontal ? 28 : double.NaN;
-        dockTarget.HorizontalAlignment = horizontal ? HorizontalAlignment.Stretch : edge == MapResizeEdge.Left ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-        dockTarget.VerticalAlignment = horizontal ? edge == MapResizeEdge.Top ? VerticalAlignment.Top : VerticalAlignment.Bottom : VerticalAlignment.Stretch;
+        if (placement is null)
+        {
+            dockTarget.Visibility = Visibility.Collapsed;
+            return;
+        }
+        var area = placement.Preview;
+        dockTarget.Width = area.Width;
+        dockTarget.Height = area.Height;
+        dockTarget.Margin = new(area.Left, area.Top, 0, 0);
+        dockTarget.Visibility = Visibility.Visible;
     }
 
-    private void DockDetachedMap(MapSlot slot, MapResizeEdge? edge = null)
+    private void DockDetachedMap(MapSlot slot, DockPlacement? placement = null)
     {
         if (slot.Window is not Window window || !slot.Editor.FinishEdit()) return;
-        if (edge is { } side)
+        if (placement is not null)
         {
             if (expandedMap is not null) { expandedMap = null; ArrangeMaps(); }
             FreezeMapPositions();
-            double width = Math.Max(260, mapDockScroll.ViewportWidth);
-            double height = Math.Max(118, mapDockScroll.ViewportHeight - 2);
-            var minimum = slot.Editor.MinimumMapPaneSize();
-            double paneWidth = Math.Min(width, Math.Max(minimum.Width, slot.Editor.ScalarMap ? 300 : Math.Min(window.ActualWidth, width)));
-            double paneHeight = Math.Min(height, Math.Max(minimum.Height, slot.Editor.ScalarMap ? 120 : Math.Min(window.ActualHeight, height)));
-            var position = mapDockScroll.PointFromScreen(window.PointToScreen(new()));
-            double left = mapDockScroll.HorizontalOffset + (side switch
-            {
-                MapResizeEdge.Left => 0,
-                MapResizeEdge.Right => width - paneWidth,
-                _ => Math.Clamp(position.X, 0, width - paneWidth)
-            });
-            double top = mapDockScroll.VerticalOffset + (side switch
-            {
-                MapResizeEdge.Top => 0,
-                MapResizeEdge.Bottom => height - paneHeight,
-                _ => Math.Clamp(position.Y, 0, height - paneHeight)
-            });
-            slot.DockBounds = new(left, top, paneWidth, paneHeight);
+            slot.DockBounds = placement.Bounds;
             slot.PreserveBoundsOnOpen = true;
         }
         slot.DockOnClose = true;

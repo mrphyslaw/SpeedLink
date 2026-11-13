@@ -1,5 +1,21 @@
 # Alpha validation scope
 
+## Map browser, docking and keyboard shortcuts · 0.8.0-alpha.13
+
+- Every bundled table with named rows is checked for fully visible labels on
+  open. Desktop checks also widen the label divider, narrow and widen the pane,
+  and reopen the ROM to verify the custom width is restored. Resizing preserves
+  font size, row height and the width of the Value column.
+- The desktop harness selects every bundled control across all ten editor
+  profiles. It checks that opening a map preserves the browser's horizontal
+  position and the pinned pane's bounds. The longest name on each profile
+  is also checked with the browser scrolled horizontally.
+- Docking checks compare the preview outline with the final pane at all four
+  workspace edges, including near a corner.
+- Navigation checks exercise duplicate shortcut detection, reassignment,
+  clearing, saving and reloading. A remapped shortcut is checked in a docked
+  map, a detached map and a search field.
+
 ## Map opening and docking · 0.8.0-alpha.12
 
 - Open every bundled control beside a pinned map. Compare the actual grid viewport

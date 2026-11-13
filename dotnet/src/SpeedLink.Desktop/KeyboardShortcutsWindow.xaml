@@ -1,0 +1,49 @@
+<Window x:Class="SpeedLink.Desktop.KeyboardShortcutsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:ClassModifier="internal" Title="SpeedLink · Keyboard shortcuts" Width="650" Height="680" MinWidth="540" MinHeight="440"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource ShellBrush}" Foreground="{DynamicResource TextBrush}">
+ <Grid Margin="18">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <StackPanel Margin="0,0,0,12">
+   <TextBlock Text="Keyboard shortcuts" FontSize="22" FontWeight="SemiBold"/>
+   <TextBlock Text="Select an action, then press the new keys in the shortcut field." TextWrapping="Wrap" Margin="0,5,0,0" Foreground="{DynamicResource MutedBrush}"/>
+  </StackPanel>
+  <ListBox x:Name="List" Grid.Row="1" SelectionChanged="SelectionChanged" HorizontalContentAlignment="Stretch"
+           AutomationProperties.Name="Shortcut actions" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+   <ListBox.GroupStyle>
+    <GroupStyle>
+     <GroupStyle.HeaderTemplate>
+      <DataTemplate><TextBlock Text="{Binding Name}" Foreground="{DynamicResource MutedBrush}" FontWeight="SemiBold" Margin="7,8,0,3"/></DataTemplate>
+     </GroupStyle.HeaderTemplate>
+    </GroupStyle>
+   </ListBox.GroupStyle>
+   <ListBox.ItemTemplate>
+    <DataTemplate>
+     <DockPanel Margin="4,2">
+      <TextBlock DockPanel.Dock="Right" MinWidth="105" TextAlignment="Right" Margin="8,0,0,0"
+                 Text="{Binding Gesture}"/>
+      <TextBlock Text="{Binding Label}" TextWrapping="Wrap"/>
+     </DockPanel>
+    </DataTemplate>
+   </ListBox.ItemTemplate>
+  </ListBox>
+  <StackPanel Grid.Row="2" Margin="0,12,0,10">
+   <WrapPanel>
+    <TextBlock Text="Shortcut" VerticalAlignment="Center" Margin="0,0,8,0"/>
+    <TextBox x:Name="Capture" MinWidth="128" IsReadOnly="True" PreviewKeyDown="CaptureKey" AutomationProperties.Name="Record a shortcut"/>
+    <Button x:Name="ClearButton" Content="Clear" Click="Clear_Click" Margin="8,0,0,0"/>
+    <Button x:Name="ResetButton" Content="Use default" Click="Reset_Click" Margin="8,0,0,0"/>
+   </WrapPanel>
+   <TextBlock x:Name="Feedback" Foreground="{DynamicResource ErrorBrush}" TextWrapping="Wrap" MinHeight="18" Margin="0,6,0,0"/>
+  </StackPanel>
+  <DockPanel Grid.Row="3">
+   <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+    <Button Content="Cancel" IsCancel="True" Margin="0,0,8,0"/>
+    <Button Content="Save shortcuts" Style="{DynamicResource PrimaryButton}" Click="Save_Click"/>
+   </StackPanel>
+   <Button HorizontalAlignment="Left" Content="Restore all defaults" Click="ResetAll_Click"/>
+  </DockPanel>
+ </Grid>
+</Window>

@@ -25,16 +25,35 @@ public partial class EditorWorkspace
         int complete = 0, scrolling = 0;
         var tables = doc.Definition.Tables.Where(t => name is null || t.Name == name).ToArray();
         if (tables.Length == 0) throw new InvalidOperationException("No matching map to check.");
+        var entries = MapTreeEntries(MapTree).Where(row => row.Tag is TuningTable).ToDictionary(row => (TuningTable)row.Tag);
+        foreach (var group in MapTreeEntries(MapTree).Where(row => row.Tag is string)) group.IsExpanded = true;
+        await Settle();
+        var browser = Descendants(MapTree).OfType<ScrollViewer>().First();
+        int stableBrowserSelections = 0, namedRowsChecked = 0;
         foreach (var selected in tables)
         {
-            BrowseMap(selected);
+            var entry = entries[selected];
+            // A folder can expand its extent after virtualized rows are laid out.
+            // Start at the left edge and request the same reveal as keyboard focus.
+            browser.ScrollToLeftEnd();
+            entry.IsSelected = false;
+            entry.IsSelected = true;
+            entry.BringIntoView();
             await Settle();
+            if (browser.HorizontalOffset > 1)
+                failures.Add($"Selecting {selected.Name} moved the map browser horizontally ({browser.HorizontalOffset:F0}).");
+            else stableBrowserSelections++;
             var editor = CommandMap;
             if (!ReferenceEquals(editor.table, selected) || !SameBounds(pinnedBounds, DockedBounds(pinned)))
                 throw new InvalidOperationException($"Browsing {selected.Name} changed the pinned map or did not open the requested control.");
             bool fits = editor.ScalarMap;
             if (!editor.ScalarMap)
             {
+                if (editor.HasNamedRows)
+                {
+                    editor.CheckNamedRowLabels(requireUnwrapped: true);
+                    namedRowsChecked++;
+                }
                 var grid = editor.MapGrid;
                 var scroll = Descendants(grid).OfType<ScrollViewer>().First();
                 var rows = scroll.Template.FindName("PART_ScrollContentPresenter", scroll) as ScrollContentPresenter;
@@ -104,8 +123,12 @@ public partial class EditorWorkspace
                 failures.Add($"The saved 300×260 preview did not fit {selected.Name} to the available workspace " +
                     $"({width:F0}×{height:F0}, minimum {minimum}, pane {bounds}, scroll {horizontal}/{vertical}).");
         }
-        if (!bytes.AsSpan().SequenceEqual(doc.Snapshot())) throw new InvalidOperationException("Opening maps changed the ROM bytes.");
-        return new { passed = failures.Count == 0, checkedMaps = results.Count, complete, scrolling, failures, results };
+        var namedMap = tables.FirstOrDefault(t => t.Name == "P0012 Intake Cam Timing Over-Retarded - Monitor Requests")
+            ?? tables.Where(t => t is { Count: > 1, Bits.Length: > 0 }).MaxBy(t => t.BitNames.Max(label => label.Length));
+        if (namedMap is not null) await ExerciseRowLabelResize(pinned, namedMap, folder);
+        if (!bytes.AsSpan().SequenceEqual(document!.Snapshot())) throw new InvalidOperationException("Opening maps changed the ROM bytes.");
+        return new { passed = failures.Count == 0, checkedMaps = results.Count, stableBrowserSelections, namedRowsChecked,
+            rowLabelResize = namedMap is not null, complete, scrolling, failures, results };
     }
 
     private async Task<string[]> ExerciseEdgeDocking()
@@ -130,15 +153,24 @@ public partial class EditorWorkspace
                 MapResizeEdge.Right => new Point(width + 5, height / 2),
                 _ => new Point(width / 2, height - 5)
             };
-            if (DockEdgeAt(new(width / 2, height / 2)) is not null ||
-                DockEdgeAt(new(-70, height / 2)) is not null || DockEdgeAt(point) != side)
+            var size = new Size(slot.Frame.ActualWidth, slot.Frame.ActualHeight);
+            var placement = PlanDockPlacement(point, slot, size);
+            if (PlanDockPlacement(new(width / 2, height / 2), slot, size) is not null ||
+                PlanDockPlacement(new(-70, height / 2), slot, size) is not null || placement?.Edge != side)
                 throw new InvalidOperationException($"The dock target did not recognize the {side} edge.");
-            var edge = DockEdgeAt(point);
-            ShowDockTarget(edge);
-            if (!dockTarget.IsVisible || dockTarget.IsHitTestVisible)
-                throw new InvalidOperationException("Dock preview was absent or blocked pointer input.");
+            if (side == MapResizeEdge.Left &&
+                (PlanDockPlacement(new(12, 8), slot, size, side)?.Edge != side ||
+                 PlanDockPlacement(new(20, 2), slot, size, side)?.Edge != MapResizeEdge.Top))
+                throw new InvalidOperationException("The dock preview did not handle the corner consistently.");
+            ShowDockTarget(placement);
+            await Settle();
+            var outline = dockTarget.TransformToVisual(mapDockScroll).TransformBounds(new Rect(dockTarget.RenderSize));
+            if (!dockTarget.IsVisible || dockTarget.IsHitTestVisible ||
+                Math.Abs(outline.Left - placement.Preview.Left) > 1 || Math.Abs(outline.Top - placement.Preview.Top) > 1 ||
+                Math.Abs(outline.Width - placement.Preview.Width) > 1 || Math.Abs(outline.Height - placement.Preview.Height) > 1)
+                throw new InvalidOperationException("The dock preview did not match the planned pane.");
             ShowDockTarget(null);
-            DockDetachedMap(slot, edge);
+            DockDetachedMap(slot, placement);
             await Settle();
             var bounds = DockedBounds(editor);
             double gap = side switch
@@ -150,6 +182,7 @@ public partial class EditorWorkspace
             };
             editor.SelectCell(0);
             if (slot.Window is not null || !editor.MapGrid.IsVisible || !editor.HasEditableCells || Math.Abs(gap) > 3 ||
+                !SameBounds(placement.Bounds, bounds) ||
                 !slot.Pinned || !SameBounds(fixedBounds, DockedBounds(pinned)) || dockTarget.IsVisible)
                 throw new InvalidOperationException($"Docking to {side} did not preserve the map and its neighbor. " +
                     $"Gap {gap}, floating {slot.Window is not null}, visible {editor.MapGrid.IsVisible}, pinned {slot.Pinned}, " +

@@ -7,6 +7,42 @@ namespace SpeedLink.Desktop;
 
 public partial class EditorWorkspace
 {
+    internal async Task CheckBrowserHorizontalScroll()
+    {
+        var doc = document!;
+        var longName = doc.Definition.Tables.MaxBy(t => t.Name.Length)!;
+        double originalWidth = browserWidth;
+        browserWidth = 160;
+        ShowMapBrowser();
+        var row = RevealMapEntry(longName);
+        row.IsSelected = false;
+        await Settle();
+        var scroll = Descendants(MapTree).OfType<ScrollViewer>().First();
+        if (scroll.ScrollableWidth < 20) throw new InvalidOperationException("Long map names are no longer manually scrollable.");
+        try
+        {
+            foreach (double offset in new[] { 0, 20 })
+            {
+                scroll.ScrollToHorizontalOffset(offset);
+                await Settle();
+                row.IsSelected = false;
+                row.IsSelected = true;
+                row.Focus();
+                row.BringIntoView();
+                await Settle();
+                if (Math.Abs(scroll.HorizontalOffset - offset) > 1 || !ReferenceEquals(CommandMap.table, longName) ||
+                    row.ToolTip?.ToString()?.Contains(longName.Name, StringComparison.Ordinal) != true)
+                    throw new InvalidOperationException($"Opening a long map name shifted the browser from {offset} to {scroll.HorizontalOffset}.");
+            }
+        }
+        finally
+        {
+            scroll.ScrollToLeftEnd();
+            browserWidth = originalWidth;
+            ApplyLayout();
+        }
+    }
+
     private void CheckBrowserReady(bool floating)
     {
         if (FocusButton.IsChecked || !BrowserPanel.IsVisible || BrowserFloating != floating ||

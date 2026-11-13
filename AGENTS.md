@@ -2,6 +2,7 @@
 
 ## Reliability and releases
 
+- Use the `mrphyslaw/` prefix for SpeedLink topic branches.
 - Publishing an application fix includes a matching standalone EXE release unless
   source-only delivery is explicitly requested. Complete the version-tag workflow
   and verify the public download before reporting publication complete.

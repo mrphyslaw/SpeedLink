@@ -6,7 +6,12 @@ namespace SpeedLink.Desktop;
 public sealed class EditorWindow : Window
 {
     private readonly EditorWorkspace workspace;
-    public EditorWindow() : this(new(), new()) { workspace.ConfigureLayout(System.IO.Path.Combine(AppContext.BaseDirectory, "data", "editor-layout.json"), () => true); }
+    public EditorWindow() : this(new(), new())
+    {
+        string data = System.IO.Path.Combine(AppContext.BaseDirectory, "data");
+        workspace.SetShortcuts(ShortcutPreferences.Load(System.IO.Path.Combine(data, "keyboard-shortcuts.json")));
+        workspace.ConfigureLayout(System.IO.Path.Combine(data, "editor-layout.json"), () => true);
+    }
     internal EditorWindow(RomInspector inspector, TuningCodeGuard guard)
     {
         UiTheme.Ensure(); SetResourceReference(StyleProperty, typeof(Window)); Title = "SpeedLink · ROM editor"; Width = 1480; Height = 940; MinWidth = 1080; MinHeight = 720;

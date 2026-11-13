@@ -45,6 +45,15 @@ public partial class EditorWorkspace : UserControl
         UiTheme.Ensure(); InitializeComponent(); InitializeMapActions(); InitializeMapWindows(mapOwner); BaselineBox.ItemsSource = new[] { "Original ROM", "Last save", "Comparison ROM" }; BaselineBox.SelectedIndex = 0;
         if (mapOwner is null)
         {
+            BindShortcutHint(EditorOpenMenu, ShortcutAction.OpenRom);
+            BindShortcutHint(EditorSaveMenu, ShortcutAction.SaveRom);
+            BindShortcutHint(CopyMenu, ShortcutAction.Copy);
+            BindShortcutHint(PasteMenu, ShortcutAction.Paste);
+            BindShortcutHint(ResetCellsMenu, ShortcutAction.ResetCells);
+            BindShortcutHint(FitEntireMapMenu, ShortcutAction.FitMap);
+            BindShortcutHint(FocusButton, ShortcutAction.ToggleBrowser);
+            BindShortcutHint(ToggleGraphItem, ShortcutAction.ToggleGraph);
+            BindShortcutHint(DetailsButton, ShortcutAction.MapInformation);
             var view = (MenuItem)EditorMenu.Items[2];
             refreshFocusedMapMenu = AddFocusedMapOptions(view.Items, () => CommandMap, includeViews: false);
             view.SubmenuOpened += (_, e) => { if (ReferenceEquals(e.Source, view)) RefreshMapCommandState(); };
@@ -189,6 +198,7 @@ public partial class EditorWorkspace : UserControl
         }
         refreshing = true; MapGrid.SelectedCells.Clear(); refreshing = false;
         table = (MapTabs.SelectedItem as TabItem)?.Tag as TuningTable;
+        rowLabelWidth = null;
         if (table is null && MapTree.SelectedItem is TreeViewItem selectedMap) selectedMap.IsSelected = false;
         returnView = CurveList ? 1 : 2;
         SetViewMode(returnView);
@@ -261,7 +271,7 @@ public partial class EditorWorkspace : UserControl
                 ChoiceBox.Visibility = Visibility.Visible;
             }
             foreach (int index in selection.Where(i => i < table.Count)) MapGrid.SelectedCells.Add(new(MapGrid.Items[CurveList ? index : index / table.Columns], MapGrid.Columns[CurveList ? 1 : index % table.Columns]));
-            MapGrid.RowHeaderWidth = table.Bits.Length > 0 ? 230 : CurveList ? 36 : 64;
+            MapGrid.RowHeaderWidth = CurveList ? 36 : 64;
             RefreshAxes();
             Graph.SetData(table.IsChoice ? null : table, values, selection.FirstOrDefault(-1));
             GraphTitle.Text = table.IsChoice ? "Choose a row, then a named state" : table.Rows > 1 ? "3D · drag to rotate · wheel to zoom" : table.Columns > 1 ? "Curve · wheel to zoom · Shift+drag to pan · click a point" : "Scalar";
@@ -362,27 +372,6 @@ public partial class EditorWorkspace : UserControl
     {
         using var stream = typeof(EditorWindow).Assembly.GetManifestResourceStream("SpeedLink.EditorHelp.md")!; using var reader = new StreamReader(stream);
         new Window { Owner = Window.GetWindow(this), Title = "SpeedLink · Editor guide", Width = 830, Height = 650, Content = new TextBox { Text = reader.ReadToEnd(), IsReadOnly = true, TextWrapping = TextWrapping.Wrap, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Padding = new(20) } }.Show();
-    }
-    private void Editor_KeyDown(object sender, KeyEventArgs e)
-    {
-        if (HandleMapShortcut(e)) return;
-        if (!ReferenceEquals(CommandMap, this) && e.Key is not (Key.S or Key.O or Key.B)) { CommandMap.Editor_KeyDown(sender, e); return; }
-        if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
-        {
-            if (table is not null) { ShowMapInformation(); e.Handled = true; }
-            return;
-        }
-        if (Keyboard.Modifiers != ModifierKeys.Control) return;
-        bool editingText = Keyboard.FocusedElement is TextBox;
-        if (e.Key == Key.S) Save_Click(sender, e);
-        else if (e.Key == Key.O) Open_Click(sender, e);
-        else if (!editingText && e.Key == Key.B) MapRoot.FocusButton.IsChecked = !MapRoot.FocusButton.IsChecked;
-        else if (!editingText && e.Key is Key.D0 or Key.NumPad0) FitMap_Click(sender, e);
-        else if (!editingText && e.Key == Key.Z) Undo_Click(sender, e);
-        else if (!editingText && e.Key == Key.Y) Redo_Click(sender, e);
-        else if (!editingText && e.Key == Key.C) Copy_Click(sender, e);
-        else if (!editingText && e.Key == Key.V) Paste_Click(sender, e);
-        else return; e.Handled = true;
     }
     internal bool MayClose() => closingForTest || (FinishAllMapEdits() && MayReplace());
     internal void CloseOfflineTest() => closingForTest = true;

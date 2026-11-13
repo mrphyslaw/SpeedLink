@@ -57,6 +57,7 @@ public partial class EditorWorkspace
         MapWorkspace.PreviewMouseDown += (_, _) => ActivateMap();
         MapWorkspace.GotKeyboardFocus += (_, _) => ActivateMap();
         Point? dragStart = null; MapDockBounds? moveStart = null;
+        DockPlacement? dockPlacement = null;
         PaneDragArea.PreviewMouseLeftButtonDown += (_, e) =>
         {
             if (e.ClickCount == 2) { dragStart = null; ExpandMap_Click(this, new()); e.Handled = true; }
@@ -64,10 +65,21 @@ public partial class EditorWorkspace
         };
         void EndMove()
         {
-            dragStart = null; moveStart = null; PaneDragArea.ReleaseMouseCapture();
+            dragStart = null; moveStart = null; dockPlacement = null;
+            MapRoot.ShowDockTarget(null); PaneDragArea.ReleaseMouseCapture();
             MapRoot.cancelPaneGesture = null; MapRoot.resizingDock = false; MapRoot.UpdateDockExtent(); MapRoot.QueueMapSave();
         }
-        PaneDragArea.PreviewMouseLeftButtonUp += (_, _) => EndMove();
+        PaneDragArea.PreviewMouseLeftButtonUp += (_, _) =>
+        {
+            var root = MapRoot;
+            if (dockPlacement is { } landing && root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor, this)) is { } slot)
+            {
+                slot.DockBounds = landing.Bounds;
+                slot.PreserveBoundsOnOpen = true;
+                PlaceMapFrame(slot, landing.Bounds);
+            }
+            EndMove();
+        };
         PaneDragArea.LostMouseCapture += (_, _) => { if (dragStart is not null) EndMove(); };
         PaneDragArea.PreviewMouseMove += (_, e) =>
         {
@@ -79,23 +91,27 @@ public partial class EditorWorkspace
             var selected = table;
             var slot = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor, this));
             if (slot is null) return;
-            if (slot.Window is null && new Rect(root.mapDockScroll.RenderSize).Contains(e.GetPosition(root.mapDockScroll)))
+            var workspacePoint = e.GetPosition(root.mapDockScroll);
+            // Keep the drag captured just outside the edge so it can snap on
+            // release without starting a detached window.
+            var workspaceArea = new Rect(root.mapDockScroll.RenderSize);
+            workspaceArea.Inflate(DockSnapDistance, DockSnapDistance);
+            if (slot.Window is null && workspaceArea.Contains(workspacePoint))
             {
                 if (root.expandedMap is not null) return;
                 root.FreezeMapPositions(); moveStart ??= slot.DockBounds; root.resizingDock = true;
                 root.cancelPaneGesture = () => { if (moveStart is not null) { slot.DockBounds = moveStart; PlaceMapFrame(slot, moveStart); } EndMove(); };
-                root.MoveMapPane(slot, moveStart!, point.X - start.X, point.Y - start.Y); return;
+                root.MoveMapPane(slot, moveStart!, point.X - start.X, point.Y - start.Y);
+                dockPlacement = root.PlanDockPlacement(workspacePoint, slot,
+                    new(moveStart!.Width, moveStart.Height), dockPlacement?.Edge);
+                root.ShowDockTarget(dockPlacement);
+                return;
             }
             EndMove();
             root.DetachMap(this);
             var moved = root.mapSlots.FirstOrDefault(s => ReferenceEquals(s.Editor.table, selected));
             if (moved?.Window is not Window window) return;
             try { window.DragMove(); } catch (InvalidOperationException) { return; }
-            if (moved.Window != window) return;
-            var pointer = root.mapDockScroll.PointFromScreen(window.PointToScreen(Mouse.GetPosition(window)));
-            var edge = root.DockEdgeAt(pointer);
-            if (edge is not null || new Rect(root.mapDockScroll.RenderSize).Contains(pointer))
-                root.DockDetachedMap(moved, edge);
         };
         if (owner is not null)
         {
@@ -528,7 +544,7 @@ public partial class EditorWorkspace
             Key = editor.table is null ? "" : MapKey(editor.table), Zoom = editor.cellZoom, AutoFit = editor.autoFitCells, CompactRows = editor.compactRows, FitTable = editor.fitTable,
             View = editor.ViewMode, Baseline = Math.Max(0, editor.BaselineBox.SelectedIndex), Selection = editor.SelectedIndices(),
             HorizontalOffset = scroll?.HorizontalOffset ?? 0, VerticalOffset = scroll?.VerticalOffset ?? 0,
-            PreviewWidth = editor.previewWidth, TableFraction = editor.tableFraction, Floating = slot.Window is not null,
+            PreviewWidth = editor.previewWidth, RowLabelWidth = editor.rowLabelWidth, TableFraction = editor.tableFraction, Floating = slot.Window is not null,
             Bounds = Bounds(slot.Window, slot.Bounds), DockBounds = independentMapLayout ? slot.DockBounds : null,
             ZOrder = Panel.GetZIndex(slot.Frame), Pinned = slot.Pinned
         });
@@ -549,6 +565,7 @@ public partial class EditorWorkspace
     private void RestoreMap(EditorWorkspace editor, MapPanePreferences state)
     {
         editor.cellZoom = state.Zoom; editor.autoFitCells = state.AutoFit; editor.previewWidth = state.PreviewWidth; editor.tableFraction = state.TableFraction;
+        editor.rowLabelWidth = editor.HasNamedRows ? state.RowLabelWidth : null;
         editor.fitTable = state.FitTable ?? editor.fitTable;
         editor.automaticCompactRows = false;
         editor.compactRows = state.CompactRows;

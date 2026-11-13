@@ -147,7 +147,8 @@ public partial class MainWindow
         if (ApplicationMenu.TranslatePoint(new(ApplicationMenu.ActualWidth, 0), this).X > ActualWidth || labels.Any(l => l.ActualWidth < 30))
             throw new InvalidOperationException("Application navigation clips at the minimum window size.");
         Width = 1440; Height = 880; await MenuIdle();
-        return new { passed = true, hardwareAccessed = false, menus = results, hostColorsIndependent = true, checkedStatesVisible = true,
+        await CheckShortcutSettings(folder);
+        return new { passed = true, hardwareAccessed = false, shortcutSettings = true, menus = results, hostColorsIndependent = true, checkedStatesVisible = true,
             disabledSave = true, keyboardActivation = true, escapeCloses = true, permanentMenus = true,
             labeledNavigation = true, navigationRemembered = true, minimumLayout = true };
     }
@@ -187,6 +188,8 @@ public partial class MainWindow
         Navigate(1); await MenuIdle(); CaptureApplicationPreview(Path.Combine(folder, "EditorNavigation.png"));
         await CheckEditorAppearance(folder, map);
         await EditorPane.CheckFocusedMapCommands(ApplicationMapViewMenu, map);
+        await EditorPane.CheckRemappedEditorShortcuts(map);
+        await EditorPane.CheckBrowserHorizontalScroll();
         ApplicationFileMenu.IsSubmenuOpen = true; await MenuIdle();
         if (ApplicationFileMenu.Template.FindName("PART_Popup", ApplicationFileMenu) is Popup { Child: Border file })
             EditorWorkspace.SaveMenuImage(file, Path.Combine(folder, "LoadedFileMenu.png"));
@@ -198,7 +201,7 @@ public partial class MainWindow
         CaptureWorkbench(Path.Combine(folder, "MinimumNavigation.png"));
         Width = 1440; Height = 880; await MenuIdle();
         return new { passed = true, hardwareAccessed = false, menuChecks, editorCommands = true, navigationPreservesEdits = true, minimumLayout = true,
-            appearanceVerified = true, gridAdjustmentsVerified = true, mapFoldersVerified = true, focusedMapCommands = true, previewMap = map.Name };
+            appearanceVerified = true, gridAdjustmentsVerified = true, mapFoldersVerified = true, focusedMapCommands = true, remappedEditorShortcuts = true, stableMapBrowserScroll = true, previewMap = map.Name };
     }
 
     private async Task CheckEditorAppearance(string folder, TuningTable map)

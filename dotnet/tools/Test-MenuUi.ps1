@@ -13,5 +13,5 @@ if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $report)) {
     throw "Menu UI failed; see $report"
 }
 $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or !$result.hostColorsIndependent -or !$result.permanentMenus -or !$result.labeledNavigation -or !$result.navigationRemembered -or $result.menus.Count -ne 6) { throw 'Unexpected menu test result.' }
+if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or !$result.hostColorsIndependent -or !$result.permanentMenus -or !$result.labeledNavigation -or !$result.navigationRemembered -or !$result.shortcutSettings -or $result.menus.Count -ne 6) { throw 'Unexpected menu test result.' }
 Write-Output ("Application menus and labeled navigation checks passed: " + $runRoot)

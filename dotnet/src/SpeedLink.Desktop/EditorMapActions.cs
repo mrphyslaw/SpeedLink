@@ -146,17 +146,17 @@ public partial class EditorWorkspace
             ActivateMap();
             actions.Items.Clear();
             bool values = HasEditableCells;
-            AddAction(actions, "Copy", "Ctrl+C", () => Copy_Click(this, new()), MapGrid.SelectedCells.Count > 0);
-            AddAction(actions, "Paste", "Ctrl+V", () => Paste_Click(this, new()), values);
-            AddAction(actions, "Reset to baseline", "", () => Reset_Click(this, new()), values);
+            AddAction(actions, "Copy", Shortcuts.Label(ShortcutAction.Copy), () => Copy_Click(this, new()), MapGrid.SelectedCells.Count > 0);
+            AddAction(actions, "Paste", Shortcuts.Label(ShortcutAction.Paste), () => Paste_Click(this, new()), values);
+            AddAction(actions, "Reset to baseline", Shortcuts.Label(ShortcutAction.ResetCells), () => Reset_Click(this, new()), values);
             actions.Items.Add(new Separator());
-            AddAction(actions, "Increase", "Q", () => Nudge(1), values);
-            AddAction(actions, "Decrease", "A", () => Nudge(-1), values);
-            AddAction(actions, "Increase by 10 steps", "Shift+Q", () => Nudge(10), values);
-            AddAction(actions, "Decrease by 10 steps", "Shift+A", () => Nudge(-10), values);
+            AddAction(actions, "Increase", Shortcuts.Label(ShortcutAction.Increase), () => Nudge(1), values);
+            AddAction(actions, "Decrease", Shortcuts.Label(ShortcutAction.Decrease), () => Nudge(-1), values);
+            AddAction(actions, "Increase by 10 steps", Shortcuts.Label(ShortcutAction.IncreaseLarge), () => Nudge(10), values);
+            AddAction(actions, "Decrease by 10 steps", Shortcuts.Label(ShortcutAction.DecreaseLarge), () => Nudge(-10), values);
             actions.Items.Add(new Separator());
-            AddAction(actions, "Interpolate horizontally", "Shift+H", () => Interpolate("Horizontal"), values && table!.Columns > 1);
-            AddAction(actions, "Interpolate vertically", "Shift+V", () => Interpolate("Vertical"), values && table!.Rows > 1);
+            AddAction(actions, "Interpolate horizontally", Shortcuts.Label(ShortcutAction.InterpolateAcross), () => Interpolate("Horizontal"), values && table!.Columns > 1);
+            AddAction(actions, "Interpolate vertically", Shortcuts.Label(ShortcutAction.InterpolateDown), () => Interpolate("Vertical"), values && table!.Rows > 1);
         };
         var paneMenu = MapContextMenu();
         PaneDragArea.ContextMenu = paneMenu;
@@ -170,12 +170,13 @@ public partial class EditorWorkspace
         static bool Loaded(EditorWorkspace map) => map.table is not null;
         static bool Numeric(EditorWorkspace map) => map.table is { Count: > 1, IsChoice: false };
         MenuItem Add(ItemCollection parent, string title, Action<EditorWorkspace> run, Func<EditorWorkspace, bool> enabled,
-            Func<EditorWorkspace, bool>? selected = null, string shortcut = "")
+            Func<EditorWorkspace, bool>? selected = null, ShortcutAction? shortcut = null)
         {
-            var item = new MenuItem { Header = title, InputGestureText = shortcut };
+            var item = new MenuItem { Header = title };
             item.Click += (_, _) => { var map = target(); if (enabled(map)) run(map); };
             parent.Add(item);
-            update.Add(() => { var map = target(); item.IsEnabled = enabled(map); item.IsChecked = selected?.Invoke(map) == true; });
+            update.Add(() => { var map = target(); item.IsEnabled = enabled(map); item.IsChecked = selected?.Invoke(map) == true;
+                if (shortcut is { } action) item.InputGestureText = map.Shortcuts.Label(action); });
             return item;
         }
 
@@ -184,7 +185,7 @@ public partial class EditorWorkspace
         update.Add(() => heading.Header = target().table?.Name.Replace("_", "__", StringComparison.Ordinal) ?? "No map selected");
         if (includeViews)
         {
-            Add(items, "Toggle table and graph", m => m.ToggleGraphView(), Numeric, shortcut: "F4");
+            Add(items, "Toggle table and graph", m => m.ToggleGraphView(), Numeric, shortcut: ShortcutAction.ToggleGraph);
             var views = new MenuItem { Header = "Table and graph layout" };
             items.Add(views);
             string[] names = ["Table above graph", "Table beside graph", "Table only", "Graph only", "Table with preview"];
@@ -194,8 +195,8 @@ public partial class EditorWorkspace
                 Add(views.Items, names[mode], m => m.ChangeViewMode(mode), Numeric, m => m.ViewMode == mode);
             }
             update.Add(() => views.IsEnabled = Numeric(target()));
-            Add(items, "Fit entire map", m => m.FitMap_Click(m, new()), Numeric, shortcut: "Ctrl+0");
-            Add(items, "Map information…", m => m.ShowMapInformation(), Loaded, shortcut: "F1");
+            Add(items, "Fit entire map", m => m.FitMap_Click(m, new()), Numeric, shortcut: ShortcutAction.FitMap);
+            Add(items, "Map information…", m => m.ShowMapInformation(), Loaded, shortcut: ShortcutAction.MapInformation);
             Add(items, "Pop out graph", m => m.PopGraph_Click(m, new()), Numeric);
             Add(items, "Dock graph", m => m.graphWindow?.Close(), m => m.graphWindow is not null);
         }
@@ -217,9 +218,12 @@ public partial class EditorWorkspace
         Add(compare.Items, "Load comparison ROM…", m => m.Compare_Click(m, new()), Loaded);
         update.Add(() => compare.IsEnabled = Loaded(target()));
 
-        Add(items, "Edit tools", m => m.ToggleMapEditTools(), Numeric, m => m.showMapEditTools);
-        var dock = Add(items, "Undock map", m => m.UndockMap_Click(m, new()), Loaded);
-        var expand = Add(items, "Expand map", m => m.ExpandMap_Click(m, new()), Loaded);
+        Add(items, "Edit tools", m => m.ToggleMapEditTools(), Numeric, m => m.showMapEditTools, ShortcutAction.EditTools);
+        var dock = Add(items, "Undock map", m => m.UndockMap_Click(m, new()), Loaded, shortcut: ShortcutAction.DockMap);
+        var expand = Add(items, "Expand map", m => m.ExpandMap_Click(m, new()), Loaded, shortcut: ShortcutAction.ExpandMap);
+        Add(items, "Pin map", m => m.PinMap_Click(m, new()), m => m.PinMapButton.IsEnabled,
+            m => m.PinMapButton.IsChecked == true, ShortcutAction.PinMap);
+        Add(items, "Close map", m => m.MapRoot.CloseMap(m), Loaded, shortcut: ShortcutAction.CloseMap);
         if (includeViews) Add(items, "Close other maps", m => m.CloseOtherMaps(), m => m.MapRoot.mapSlots.Count(s => s.Editor.table is not null) > 1);
         update.Add(() =>
         {
@@ -241,35 +245,6 @@ public partial class EditorWorkspace
 
     private bool HasEditableCells => table is { IsChoice: false } && MapGrid.SelectedCells.Count > 0 &&
         MapGrid.SelectedCells.All(cell => cell.Column is { IsReadOnly: false });
-
-    private bool HandleMapShortcut(KeyEventArgs e)
-    {
-        var map = CommandMap;
-        if (Keyboard.FocusedElement is TextBox or ComboBox) return false;
-        var modifiers = Keyboard.Modifiers;
-        if (e.Key == Key.F4 && modifiers == ModifierKeys.None && map.table is { Count: > 1, IsChoice: false })
-        {
-            if (!e.IsRepeat) map.ToggleGraphView();
-        }
-        else if (map.MapGrid.IsKeyboardFocusWithin && map.HasEditableCells && modifiers is ModifierKeys.None or ModifierKeys.Shift)
-        {
-            int steps = modifiers == ModifierKeys.Shift ? 10 : 1;
-            switch (e.Key)
-            {
-                case Key.Q: map.Nudge(steps); break;
-                case Key.A: map.Nudge(-steps); break;
-                case Key.H when modifiers == ModifierKeys.Shift && map.table!.Columns > 1:
-                    map.Interpolate("Horizontal"); break;
-                case Key.V when modifiers == ModifierKeys.Shift && map.table!.Rows > 1:
-                    map.Interpolate("Vertical"); break;
-                default: return false;
-            }
-            map.MapGrid.Focus();
-        }
-        else return false;
-        e.Handled = true;
-        return true;
-    }
 
     private void Interpolate(string direction)
     {

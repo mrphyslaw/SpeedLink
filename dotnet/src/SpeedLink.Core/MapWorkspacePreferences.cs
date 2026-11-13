@@ -16,6 +16,7 @@ public sealed record MapPanePreferences
     public double HorizontalOffset { get; init; }
     public double VerticalOffset { get; init; }
     public double? PreviewWidth { get; init; }
+    public double? RowLabelWidth { get; init; }
     public double TableFraction { get; init; } = .6;
     public bool Floating { get; init; }
     public bool Pinned { get; init; } = true;
@@ -35,6 +36,7 @@ public sealed record MapPanePreferences
         Selection = (Selection ?? []).Where(i => i >= 0).Distinct().Take(4096).ToArray(),
         HorizontalOffset = Offset(HorizontalOffset), VerticalOffset = Offset(VerticalOffset),
         PreviewWidth = PreviewWidth is double width && double.IsFinite(width) ? Math.Clamp(width, 160, 800) : null,
+        RowLabelWidth = RowLabelWidth is double labelWidth && double.IsFinite(labelWidth) ? Math.Clamp(labelWidth, 64, 32_000) : null,
         TableFraction = double.IsFinite(TableFraction) ? Math.Clamp(TableFraction, .2, .8) : .6,
         Pinned = Pinned || Floating,
         Bounds = new EditorLayoutPreferences { GraphBounds = Bounds }.Validate().GraphBounds,

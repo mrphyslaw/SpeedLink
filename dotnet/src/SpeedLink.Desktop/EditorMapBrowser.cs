@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using SpeedLink.Core;
 
 namespace SpeedLink.Desktop;
@@ -16,6 +17,15 @@ public partial class EditorWorkspace
     private static readonly Geometry SurfaceIcon = Icon("M1,4 H15 V13 H1 Z M1,7 H15 M1,10 H15 M5,4 V13 M10,4 V13");
     private HashSet<string> expandedMapFolders = new(StringComparer.Ordinal);
     private bool mapBrowserFiltered;
+    private void PreserveBrowserScroll(object sender, RequestBringIntoViewEventArgs e)
+    {
+        if (e.TargetObject is not FrameworkElement || Descendants(MapTree).OfType<ScrollViewer>().FirstOrDefault() is not { } scroll)
+            return;
+        double offset = scroll.HorizontalOffset;
+        // The tree reveals focused rows via queued ScrollViewer commands.
+        // Restore just the horizontal coordinate after the vertical reveal.
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => scroll.ScrollToHorizontalOffset(offset)));
+    }
 
     private static Geometry Icon(string path)
     {
