@@ -309,6 +309,7 @@ public partial class EditorWorkspace
         if (browserWindow is not null) { FocusButton.IsChecked = false; browserWindow.Activate(); return; }
         var window = Floating("SpeedLink · Maps", 340, 650, preferences.BrowserBounds); browserWindow = window;
         EditorLayout.Children.Remove(BrowserPanel); window.Content = BrowserPanel;
+        window.PreviewKeyDown += Editor_KeyDown;
         window.Closed += (_, _) =>
         {
             preferences = preferences with { BrowserBounds = Bounds(window, preferences.BrowserBounds) };
@@ -324,6 +325,7 @@ public partial class EditorWorkspace
         if (graphWindow is not null) { graphWindow.Activate(); return; }
         var window = Floating("SpeedLink · Graph", 700, 520, preferences.GraphBounds); graphWindow = window;
         DataLayout.Children.Remove(GraphPanel); window.Content = GraphPanel;
+        window.PreviewKeyDown += Editor_KeyDown;
         window.Closed += (_, _) =>
         {
             preferences = preferences with { GraphBounds = Bounds(window, preferences.GraphBounds) };
@@ -354,11 +356,12 @@ public partial class EditorWorkspace
     }
     private void UpdateCompactMap()
     {
+        SizeRowLabels();
         var size = table is null ? null : CompactMapSize.Calculate(table.Columns, table.Rows, MapGrid.RowHeaderWidth, AxisLabelColumn.Width.Value, AxisTitleRow.Height.Value, table.IsChoice);
         if (size is { } compact && table is not null && !CurveList && MapGrid.Columns.Count == table.Columns)
         {
             double rowHeight = CompactGridRowHeight;
-            double requiredWidth = MinimumMapGridWidth() + AxisLabelColumn.Width.Value;
+            double requiredWidth = MinimumMapGridWidth(MapGrid.RowHeaderWidth) + AxisLabelColumn.Width.Value;
             double scrollbar = ViewMode == 2 || requiredWidth > TableViewport.ActualWidth
                 ? SystemParameters.HorizontalScrollBarHeight : 0;
             size = new(Math.Max(compact.Width, requiredWidth),
@@ -381,6 +384,14 @@ public partial class EditorWorkspace
         if (table is null || MapGrid.ActualWidth < 10 || MapGrid.Columns.Count == 0) return;
         QueueAxisGeometry();
         double minimum = MinimumCellWidth();
+        if (HasNamedRows)
+        {
+            var valueColumn = MapGrid.Columns[0];
+            valueColumn.MinWidth = minimum;
+            valueColumn.Width = new(NamedRowValueWidth);
+            MapGrid.RowHeight = CompactGridRowHeight;
+            return;
+        }
         if (CurveList)
         {
             foreach (var column in MapGrid.Columns)

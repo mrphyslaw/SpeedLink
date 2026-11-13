@@ -35,6 +35,7 @@ public partial class EditorWorkspace
         ValueUnitsText.ToolTip = ValueUnitsText.Text;
         AutomationProperties.SetName(MapGrid, table is null ? "ROM map" :
             table.Name + (x ? "; columns: " + table.X.Name : "") + (y ? "; rows: " + table.Y.Name : "") + "; values: " + table.Units);
+        RefreshRowLabels();
         if (y)
         {
             // The label uses the former row-header padding. Size breakpoints from
@@ -86,6 +87,7 @@ public partial class EditorWorkspace
         AxisScrollbarSpacer.Width = new(verticalBar);
         YAxisBand.Margin = new(0, 0, 0, horizontalBar);
         AxisFrame.Margin = new(0, 0, verticalBar, horizontalBar);
+        RowLabelDivider.Margin = new(Math.Max(0, MapGrid.RowHeaderWidth - RowLabelDivider.Width / 2), 0, 0, horizontalBar);
         axisRowsViewport = scroll?.Template.FindName("PART_ScrollContentPresenter", scroll) as ScrollContentPresenter;
         axisRowsPanel = axisRowsViewport is null ? null : Descendants(axisRowsViewport).OfType<DataGridRowsPresenter>().FirstOrDefault();
         var headers = scroll is null ? null : Descendants(scroll).OfType<DataGridColumnHeadersPresenter>().FirstOrDefault();

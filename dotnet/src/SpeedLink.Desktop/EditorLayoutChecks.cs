@@ -153,7 +153,7 @@ public partial class EditorWorkspace
         for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++) { var child = VisualTreeHelper.GetChild(root, i); yield return child; foreach (var item in Descendants(child)) yield return item; }
     }
     private void CaptureHost(string path) => CaptureWindow(Window.GetWindow(this), path);
-    private static void CaptureWindow(Window window, string path)
+    internal static void CaptureWindow(Window window, string path)
     {
         window.UpdateLayout(); var bitmap = new RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32); bitmap.Render(window);
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap)); using var stream = File.Create(path); encoder.Save(stream);

@@ -28,13 +28,16 @@ for ($start = 0; $start -lt $definitions.Count; $start += $Parallelism) {
                 throw "Map-opening UI failed: $calibration"
             }
             $result = Get-Content -LiteralPath $job.Report -Raw | ConvertFrom-Json
-            $expected = @(([xml](Get-Content -LiteralPath $job.Definition.FullName -Raw)).roms.rom.table.name | Sort-Object)
+            $tables = @(([xml](Get-Content -LiteralPath $job.Definition.FullName -Raw)).roms.rom.table)
+            $expected = @($tables.name | Sort-Object)
+            $namedRows = @($tables | Where-Object { $_.type -eq 'BitwiseSwitch' -and @($_.bit).Count -gt 1 }).Count
             $actual = @($result.workflow.results.Name | Sort-Object)
-            if (!$result.passed -or !$result.workflow.passed -or !$result.synthetic -or $result.hardwareAccessed -or $result.workflow.checkedMaps -ne $expected.Count -or
+            if (!$result.passed -or !$result.workflow.passed -or !$result.synthetic -or $result.hardwareAccessed -or $result.workflow.checkedMaps -ne $expected.Count -or $result.workflow.stableBrowserSelections -ne $expected.Count -or
+                $result.workflow.namedRowsChecked -ne $namedRows -or ($namedRows -gt 0 -and !$result.workflow.rowLabelResize) -or
                 $actual.Count -ne $expected.Count -or @(Compare-Object $expected $actual).Count -ne 0) { $result.workflow.failures | Select-Object -First 20 | Write-Output
                 throw "Incomplete map-opening coverage: $calibration"
             }
-            $reports += $result | ForEach-Object { [ordered]@{calibration=$_.calibration; checkedMaps=$_.workflow.checkedMaps; complete=$_.workflow.complete; scrolling=$_.workflow.scrolling} }
+            $reports += $result | ForEach-Object { [ordered]@{calibration=$_.calibration; checkedMaps=$_.workflow.checkedMaps; complete=$_.workflow.complete; scrolling=$_.workflow.scrolling; namedRowsChecked=$_.workflow.namedRowsChecked} }
             Write-Output "$calibration opened $($result.workflow.checkedMaps) controls ($($result.workflow.complete) fully visible, $($result.workflow.scrolling) scrollable)."
         }
     } finally {

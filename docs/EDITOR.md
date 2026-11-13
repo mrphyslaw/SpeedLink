@@ -129,8 +129,16 @@ space scroll at a readable text size.
 When several unpinned maps are open, opening a new map reuses the most
 recently active unpinned pane.
 
-Drag a detached map by its Windows title bar to a highlighted editor edge, then
-release to dock it there. Docked maps keep their positions.
+Drag a map by its header toward a workspace edge. For a detached map, use its
+Windows title bar. The outline shows the pane's landing position and size.
+Release inside the snap area to place it there. Other panes keep their positions.
+The map browser keeps its horizontal position as you select maps. Use its
+horizontal scrollbar to read a long name.
+
+Tables with named rows, such as Monitor Requests, size their label column to
+the text when they open. Drag the divider before **Value** to change the label
+width. Double-click it to fit the text again. Row height and text size stay
+fixed as you drag. Hover over a shortened label to read the full text.
 
 Use **Map → Close other maps**, or right-click the
 map header, to keep just the active map in this workspace. Closing a view
@@ -260,6 +268,12 @@ tune-project format or recovery of unsaved work in this version.
 
 ## Keyboard shortcuts
 
+Open **Tools → Keyboard shortcuts…** (Ctrl+Shift+K by default). Select an
+action, focus the shortcut field, and press the new keys. Use **Clear** to
+unassign an action, **Use default** to reset one, or **Restore all defaults**
+to reset the list. **Save shortcuts** applies the changes and remembers them
+for the next launch. Menus show the assigned keys.
+
 Right-click selected grid cells for copy, paste, reset, adjustments and
 interpolation. **Map → Edit tools** opens the row for entering an amount
 and applying bulk operations. Choose the baseline from **Map → Comparison baseline**.
@@ -273,8 +287,19 @@ app theme. SpeedLink remembers the choice.
 | Ctrl+S | Save a new copy. |
 | Ctrl+0 | Fit the active map. |
 | Ctrl+B | Hide/restore the map browser. |
+| Ctrl+F | Show and focus map search. |
+| Ctrl+T | Create an empty workspace tab. |
+| Ctrl+Tab / Ctrl+Shift+Tab | Next / previous workspace tab. |
+| Ctrl+Shift+O | Open a recording. |
+| Ctrl+1 through Ctrl+7 | Switch application workspaces. |
 | F1 | Open/restore help for the active map. |
 | F4 | Switch the active map between the table and graph. |
+| F6 | Expand the active map or restore its size. |
+| F7 | Dock or undock the active map. |
+| F8 | Show or hide the active map's edit tools. |
+| Ctrl+Shift+P | Pin or unpin the active map. |
+| Ctrl+W | Close the active map view. |
+| Ctrl+Shift+Backspace | Reset selected cells to the comparison baseline. |
 | Q / A | Increase / decrease selected values by one step while the grid has focus. |
 | Shift+Q / Shift+A | Increase / decrease selected values by ten steps. |
 | Shift+H / Shift+V | Interpolate the selected rectangle horizontally / vertically. |
@@ -282,7 +307,7 @@ app theme. SpeedLink remembers the choice.
 | Ctrl+C / Ctrl+V | Copy/paste selected table values; in a focused text field, edit its text. |
 | Enter / Escape in a single-value field | Apply / cancel typing. |
 
-Layout shortcuts apply when you are not typing in a text field.
+While a text field or drop-down has focus, SpeedLink leaves keyboard input to that control.
 Adjustment steps use the map's display precision and are at least as large
 as one storage step. A shortcut applies to the selected value cells and can
 be undone as one edit.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0-alpha.13
+
+- Keep the map browser's horizontal position when selecting a map. Long names remain accessible with the scrollbar.
+- Show where a map will land when dragging it to a workspace edge. Docked and detached maps snap without shifting other panes.
+- Add assignable keyboard shortcuts for map actions, workspace tabs and navigation under **Tools → Keyboard shortcuts**.
+- Fit named row labels when a table opens. Drag the divider beside **Value** to resize the labels while keeping text and cells the same size.
+
 ## 0.8.0-alpha.12
 
 - Open maps at a readable size that shows the whole table when the workspace has room. Preserve pinned pane positions while browsing and keep the value row visible in short curves.
