@@ -24,11 +24,12 @@ synthetic values.
 
 ## Appearance and shortcuts
 
-**View → Appearance** switches among System, Light and Dark. Map cells use a
-smooth low-to-high color gradient for the selected theme. This example shows
-the same synthetic table in Light mode.
+**View → Appearance** switches among System, Light and Dark. In both themes,
+low map values are green, the midpoint is amber, and high values are red by
+default. **View → Map cell colors** reverses the scale and remembers your choice.
+This example shows the same synthetic table in Light mode.
 
-![A synthetic VVT table showing the Light theme's rose, gold and mint gradients](images/application-navigation-light.png)
+![A synthetic VVT table with green low values, amber midrange and red high values in Light mode](images/application-navigation-light.png)
 
 Use **Tools → Keyboard shortcuts** to reassign or clear a binding, restore
 individual defaults, or reset the whole list. F4 switches the active map

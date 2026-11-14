@@ -1,8 +1,10 @@
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -13,6 +15,23 @@ namespace SpeedLink.Desktop;
 
 public partial class EditorWorkspace
 {
+    internal void CheckMapGridColors(TuningTable map)
+    {
+        var values = Enumerable.Range(0, map.Count).Select(index => document!.Read(map, index)).ToArray();
+        double low = values.Min(), high = values.Max();
+        if (low >= high) throw new InvalidOperationException("The palette check needs different map values.");
+        foreach (var (value, fraction) in new[] { (low, 0d), (high, 1d) })
+        {
+            int index = Array.IndexOf(values, value);
+            int column = index % map.Columns;
+            var binding = (Binding)MapGrid.Columns[column].CellStyle.Setters.OfType<Setter>()
+                .Single(setter => setter.Property == BackgroundProperty).Value;
+            var row = MapGrid.Items[index / map.Columns];
+            if (!ReferenceEquals(binding.Converter.Convert(row, typeof(Brush), "color", CultureInfo.InvariantCulture), UiTheme.Heat(fraction)))
+                throw new InvalidOperationException($"The map grid did not assign value {value} to its palette endpoint.");
+        }
+    }
+
     internal async Task CheckFocusedMapCommands(MenuItem menu, TuningTable firstMap)
     {
         var other = document!.Definition.Tables.First(t => !ReferenceEquals(t, firstMap) &&
@@ -210,6 +229,22 @@ public partial class MainWindow
         var dark = AppearanceMenu.Items.OfType<MenuItem>().Single(i => Equals(i.Tag, "Dark"));
         var original = UiTheme.Panel.Color;
         EditorPane.CheckGridActionsAndFolders(map);
+        var lowBrush = UiTheme.Heat(0);
+        var highBrush = UiTheme.Heat(1);
+        var middleBrush = UiTheme.Heat(.5);
+        var originalBytes = EditorPane.Document!.Snapshot();
+        EditorPane.CheckMapGridColors(map);
+        void CheckDirection(bool greenHigh)
+        {
+            if (GreenHighMenu.IsChecked != greenHigh || RedHighMenu.IsChecked == greenHigh ||
+                (lowBrush.Color.G > lowBrush.Color.R) == greenHigh ||
+                (highBrush.Color.G > highBrush.Color.R) != greenHigh ||
+                !ReferenceEquals(lowBrush, UiTheme.Heat(0)) || !ReferenceEquals(highBrush, UiTheme.Heat(1)) ||
+                !UiTheme.SurfaceHeat.GradientStops.Select(stop => stop.Color).SequenceEqual(new[] { lowBrush.Color, middleBrush.Color, highBrush.Color }))
+                throw new InvalidOperationException("The map palette did not apply the selected low and high colors.");
+            CheckMapColorContrast();
+        }
+        CheckDirection(false);
         try
         {
             light.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
@@ -217,14 +252,20 @@ public partial class MainWindow
             if (!light.IsChecked || dark.IsChecked || UiTheme.Load(appearancePath) != Appearance.Light ||
                 UiTheme.Panel.Color == original || !ReferenceEquals(Background, FindResource("ShellBrush")))
                 throw new InvalidOperationException("Light appearance did not update the open window or save its choice.");
-            CheckMapColorContrast();
             CaptureApplicationPreview(Path.Combine(folder, "EditorNavigationLight.png"));
+            CheckDirection(false);
+            Color low = lowBrush.Color, high = highBrush.Color, middle = middleBrush.Color;
+            GreenHighMenu.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            await MenuIdle();
+            CheckDirection(true);
+            if (lowBrush.Color != high || highBrush.Color != low || middleBrush.Color != middle)
+                throw new InvalidOperationException("Reversing the palette changed its shades or midpoint.");
             var restarted = new MainWindow(vault);
             try
             {
                 if (!restarted.AppearanceMenu.Items.OfType<MenuItem>().Single(i => Equals(i.Tag, "Light")).IsChecked ||
-                    UiTheme.Panel.Color == original)
-                    throw new InvalidOperationException("The light theme did not survive restart.");
+                    UiTheme.Panel.Color == original || !restarted.GreenHighMenu.IsChecked || !UiTheme.LoadGreenForHighValues(MapColorDirectionPath))
+                    throw new InvalidOperationException("The light theme or map color direction did not survive restart.");
             }
             finally { restarted.CloseWorkbenchTest(); }
         }
@@ -235,7 +276,12 @@ public partial class MainWindow
         }
         if (!dark.IsChecked || UiTheme.Panel.Color != original || UiTheme.Load(appearancePath) != Appearance.Dark)
             throw new InvalidOperationException("Dark appearance did not restore the original palette.");
-        CheckMapColorContrast();
+        CheckDirection(true);
+        RedHighMenu.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+        await MenuIdle();
+        CheckDirection(false);
+        if (!originalBytes.AsSpan().SequenceEqual(EditorPane.Document.Snapshot()))
+            throw new InvalidOperationException("Changing the map colors changed the ROM.");
     }
 
     private static void CheckMapColorContrast()

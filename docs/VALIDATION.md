@@ -1,5 +1,13 @@
 # Alpha validation scope
 
+## Map cell color direction · 0.8.0-alpha.14
+
+- Desktop navigation checks verify the lowest and highest values in the map
+  grid across all ten bundled editor profiles. They check the default
+  green-to-red scale and matching 3D surface colors in Light and Dark mode,
+  then reverse the palette, reload the setting and confirm the ROM bytes
+  remain identical.
+
 ## Map browser, docking and keyboard shortcuts · 0.8.0-alpha.13
 
 - Every bundled table with named rows is checked for fully visible labels on

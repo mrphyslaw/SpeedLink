@@ -11,6 +11,8 @@ public partial class MainWindow
 {
     private readonly string appearancePath;
     private Appearance appearance = Appearance.Dark;
+    private bool greenForHighValues;
+    private string MapColorDirectionPath => Path.Combine(vault, "map-cell-colors.txt");
 
     private void ConfigureApplicationMenus()
     {
@@ -25,6 +27,7 @@ public partial class MainWindow
         ApplicationSaveMenu.SetBinding(IsEnabledProperty, new Binding(nameof(IsEnabled)) { Source = EditorPane.SaveButton });
         RefreshApplicationMenus();
         RefreshAppearanceMenu();
+        RefreshMapColorMenu();
     }
 
     private void RefreshAppearanceMenu()
@@ -37,7 +40,7 @@ public partial class MainWindow
     {
         if (sender is not MenuItem { Tag: string name } || !Enum.TryParse(name, out Appearance choice)) return;
         appearance = choice;
-        UiTheme.Apply(appearance);
+        UiTheme.Apply(appearance, greenForHighValues);
         try
         {
             UiTheme.Save(appearancePath, choice);
@@ -49,11 +52,33 @@ public partial class MainWindow
         RefreshAppearanceMenu();
     }
 
+    private void RefreshMapColorMenu()
+    {
+        RedHighMenu.IsChecked = !greenForHighValues;
+        GreenHighMenu.IsChecked = greenForHighValues;
+    }
+
+    private void MapColors_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem { Tag: string direction }) return;
+        greenForHighValues = direction == "GreenHigh";
+        UiTheme.Apply(appearance, greenForHighValues);
+        RefreshMapColorMenu();
+        try
+        {
+            UiTheme.SaveMapColorDirection(MapColorDirectionPath, greenForHighValues);
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            StatusText.Text = "Map cell colors could not be saved. " + error.Message;
+        }
+    }
+
     private void WindowsAppearanceChanged(object sender, Microsoft.Win32.UserPreferenceChangedEventArgs e)
     {
         Dispatcher.BeginInvoke(new Action(() =>
         {
-            if (appearance == Appearance.System) UiTheme.Apply(appearance);
+            if (appearance == Appearance.System) UiTheme.Apply(appearance, greenForHighValues);
         }));
     }
 

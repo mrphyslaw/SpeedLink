@@ -4,7 +4,7 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.13](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.13)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.14](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.14)** · A single Windows EXE with the runtime included.
 
 **Watch the SpeedLink v0.8.0-alpha.13 walkthrough (2:58)** · Light mode with on-screen captions and no audio.
 

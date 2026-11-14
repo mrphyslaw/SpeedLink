@@ -105,8 +105,7 @@ public sealed partial class TuningGraph : Grid
             if (new[] { a, b, c, d }.Any(i => !double.IsFinite(values[i]))) continue;
             foreach (int i in new[] { a, b, c, c, b, d }) mesh.TriangleIndices.Add(i);
         }
-        var brush = new LinearGradientBrush { StartPoint = new(0, 1), EndPoint = new(0, 0), GradientStops = [new(Color.FromRgb(96, 112, 124), 0), new(Color.FromRgb(171, 149, 104), .5), new(Color.FromRgb(242, 182, 93), 1)] };
-        var material = new DiffuseMaterial(brush); surface = new(mesh, material) { BackMaterial = material };
+        var material = new DiffuseMaterial(UiTheme.SurfaceHeat); surface = new(mesh, material) { BackMaterial = material };
         var group = new Model3DGroup(); group.Children.Add(new AmbientLight(Color.FromRgb(150, 150, 150))); group.Children.Add(new DirectionalLight(Colors.White, new(-1, -3, -2))); group.Children.Add(surface);
         var wire = new MeshGeometry3D();
         void Line(Point3D a, Point3D b)

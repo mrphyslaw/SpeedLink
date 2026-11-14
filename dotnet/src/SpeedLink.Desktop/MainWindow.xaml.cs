@@ -44,7 +44,8 @@ public partial class MainWindow : Window
         UiTheme.Ensure();
         appearancePath = Path.Combine(vault, "appearance.txt");
         appearance = testVault is null || File.Exists(appearancePath) ? UiTheme.Load(appearancePath) : Appearance.Dark;
-        UiTheme.Apply(appearance);
+        greenForHighValues = UiTheme.LoadGreenForHighValues(MapColorDirectionPath);
+        UiTheme.Apply(appearance, greenForHighValues);
         if (testVault is null)
         {
             SystemEvents.UserPreferenceChanged += WindowsAppearanceChanged;
