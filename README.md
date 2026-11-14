@@ -8,7 +8,7 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 **Watch the SpeedLink v0.8.0-alpha.13 walkthrough (2:58)** · Light mode with on-screen captions and no audio.
 
-https://github.com/user-attachments/assets/bd476c2f-417a-4cbd-9468-7bdceb906616
+https://github.com/user-attachments/assets/2e521a3f-db59-4626-b529-4d03cfb935a2
 
 Follow a verified backup, open and edit a map, switch to the 3D graph, pin and
 dock maps, organize workspace tabs, and reassign shortcuts. The editor uses an
