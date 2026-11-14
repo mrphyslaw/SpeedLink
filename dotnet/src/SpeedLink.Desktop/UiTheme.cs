@@ -28,7 +28,9 @@ internal static class UiTheme
             BindingOperations.SetBinding(Brush, SolidColorBrush.ColorProperty, new Binding(nameof(Color)) { Source = this });
         }
 
-        internal void Apply(bool useLight) => SetValue(ColorProperty, useLight ? light : dark);
+        internal Color ForAppearance(bool useLight) => useLight ? light : dark;
+        internal void Apply(bool useLight) => Apply(ForAppearance(useLight));
+        internal void Apply(Color color) => SetValue(ColorProperty, color);
     }
 
     private static Color Rgb(uint rgb) => Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb);
@@ -60,11 +62,12 @@ internal static class UiTheme
     };
     internal const int HeatSteps = 256;
     private static readonly Swatch[] heat = CreateHeat();
+    internal static LinearGradientBrush SurfaceHeat { get; } = CreateSurfaceHeat();
 
     private static Swatch[] CreateHeat()
     {
-        Color[] dark = [Rgb(0x603449), Rgb(0x62502C), Rgb(0x285B4A)];
-        Color[] light = [Rgb(0xF1B6C2), Rgb(0xFAE8AD), Rgb(0xB9E2C8)];
+        Color[] dark = [Rgb(0x285B4A), Rgb(0x62502C), Rgb(0x603449)];
+        Color[] light = [Rgb(0xB9E2C8), Rgb(0xFAE8AD), Rgb(0xF1B6C2)];
         return Enumerable.Range(0, HeatSteps + 1)
             .Select(index => new Swatch(BlendRamp(dark, index), BlendRamp(light, index))).ToArray();
     }
@@ -88,6 +91,18 @@ internal static class UiTheme
     internal static SolidColorBrush Amber => Brush("AmberBrush");
     internal static SolidColorBrush Heat(double fraction) => heat[(int)Math.Round(Math.Clamp(fraction, 0, 1) * HeatSteps)].Brush;
 
+    private static LinearGradientBrush CreateSurfaceHeat()
+    {
+        var brush = new LinearGradientBrush { StartPoint = new(0, 1), EndPoint = new(0, 0) };
+        foreach (double fraction in new[] { 0d, .5, 1d })
+        {
+            var stop = new GradientStop { Offset = fraction };
+            BindingOperations.SetBinding(stop, GradientStop.ColorProperty, new Binding(nameof(SolidColorBrush.Color)) { Source = Heat(fraction) });
+            brush.GradientStops.Add(stop);
+        }
+        return brush;
+    }
+
     internal static void Ensure()
     {
         if (Application.Current is not { } app || app.Resources.Contains("ShellBrush")) return;
@@ -103,12 +118,17 @@ internal static class UiTheme
         app.Resources.MergedDictionaries.Add(new() { Source = new Uri("/SpeedLink;component/Theme.xaml", UriKind.Relative) });
     }
 
-    internal static void Apply(Appearance choice)
+    internal static void Apply(Appearance choice, bool greenForHighValues = false)
     {
         Ensure();
         bool light = choice == Appearance.Light || choice == Appearance.System && WindowsUsesLightApps();
         foreach (var swatch in palette.Values) swatch.Apply(light);
-        foreach (var swatch in heat) swatch.Apply(light);
+        for (int index = 0; index < heat.Length; index++)
+        {
+            // Keep the brushes attached to already-open cells when the direction changes.
+            int rampIndex = greenForHighValues ? HeatSteps - index : index;
+            heat[index].Apply(heat[rampIndex].ForAppearance(light));
+        }
     }
 
     private static bool WindowsUsesLightApps()
@@ -121,25 +141,39 @@ internal static class UiTheme
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or System.Security.SecurityException) { return true; }
     }
 
-    internal static Appearance Load(string path)
+    private static string? LoadSetting(string path)
     {
         try
         {
             using var stream = File.OpenRead(path);
-            if (stream.Length > 16) return Appearance.System;
+            if (stream.Length > 16) return null;
             using var reader = new StreamReader(stream);
-            return reader.ReadToEnd().Trim() switch { "Light" => Appearance.Light, "Dark" => Appearance.Dark, _ => Appearance.System };
+            return reader.ReadToEnd().Trim();
         }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return Appearance.System; }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { return null; }
     }
 
-    internal static void Save(string path, Appearance choice)
+    internal static Appearance Load(string path) => LoadSetting(path) switch
+    {
+        "Light" => Appearance.Light,
+        "Dark" => Appearance.Dark,
+        _ => Appearance.System
+    };
+
+    internal static bool LoadGreenForHighValues(string path) => LoadSetting(path) == "GreenHigh";
+
+    internal static void Save(string path, Appearance choice) => SaveSetting(path, choice.ToString());
+
+    internal static void SaveMapColorDirection(string path, bool greenForHighValues) =>
+        SaveSetting(path, greenForHighValues ? "GreenHigh" : "RedHigh");
+
+    private static void SaveSetting(string path, string value)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
-            File.WriteAllText(temporary, choice.ToString());
+            File.WriteAllText(temporary, value);
             File.Move(temporary, path, overwrite: true);
         }
         finally

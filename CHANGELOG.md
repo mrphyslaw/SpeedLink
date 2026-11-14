@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0-alpha.14
+
+- Default to green for low map values, amber at the midpoint and red for high values in Light and Dark mode. **View → Map cell colors** can reverse the scale and remembers your choice.
+
 ## 0.8.0-alpha.13
 
 - Keep the map browser's horizontal position when selecting a map. Long names remain accessible with the scrollbar.

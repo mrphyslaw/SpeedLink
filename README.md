@@ -4,15 +4,17 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.13](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.13)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.14](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.14)** · A single Windows EXE with the runtime included.
 
-**Watch the SpeedLink v0.8.0-alpha.13 walkthrough (2:58)** · Light mode with on-screen captions and no audio.
+**Watch the SpeedLink v0.8.0-alpha.14 walkthrough (3:30)** · Light mode with on-screen captions and no audio.
 
-https://github.com/user-attachments/assets/2e521a3f-db59-4626-b529-4d03cfb935a2
+https://github.com/user-attachments/assets/f8f9edb4-10d7-484b-af48-afa54bfc24fe
 
-Follow a verified backup, open and edit a map, switch to the 3D graph, pin and
-dock maps, organize workspace tabs, and reassign shortcuts. The editor uses an
-L3M6EG000 bench ECU backup. The logging and playback examples use simulated data.
+Follow a verified backup, then see the Gen 1 Flash & Recover workflow with
+a simulated write, readback verification, and recovery-mode check. The editor
+uses an L3M6EG000 bench ECU backup to show the green-low, red-high default in
+the table and 3D graph. The walkthrough also covers docking, workspace tabs,
+assignable shortcuts, logging, and playback.
 
 Use the permanent File, Edit, View, Map, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 

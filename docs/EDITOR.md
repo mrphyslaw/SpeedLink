@@ -60,9 +60,11 @@ and row breakpoints directly; their distinct header bands stay visible while
 scrolling. The selected cells highlight their row and column headers.
 Static breakpoints are read-only.
 
-Cell colors show values relative to the open map. In Light mode, the scale
-runs from rose through gold to mint. In Dark mode, it runs from plum through
-amber to muted green. Blue highlights the selected cells and their headers.
+Cell colors show values relative to the open map. In both themes, the default
+scale runs from green for low values through amber at the midpoint to red for
+high values. The 3D surface uses the same scale. **View → Map cell colors**
+reverses the scale and remembers your choice. Blue highlights the selected
+cells and their headers.
 An amber outline marks a cell that differs from the selected comparison baseline.
 
 Small maps use a grid proportional to their contents. A short curve has a curve
