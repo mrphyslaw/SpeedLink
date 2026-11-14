@@ -6,12 +6,13 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 **[Download SpeedLink v0.8.0-alpha.14](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.14)** · A single Windows EXE with the runtime included.
 
-**Watch the SpeedLink v0.8.0-alpha.13 walkthrough (2:58)** · Light mode with on-screen captions and no audio.
+**Watch the SpeedLink v0.8.0-alpha.14 walkthrough (2:58)** · Light mode with on-screen captions and no audio.
 
-https://github.com/user-attachments/assets/2e521a3f-db59-4626-b529-4d03cfb935a2
+https://github.com/user-attachments/assets/2aa043e2-5535-47af-ab89-b706516d8eba
 
 Follow a verified backup, open and edit a map, switch to the 3D graph, pin and
-dock maps, organize workspace tabs, and reassign shortcuts. The editor uses an
+dock maps, organize workspace tabs, and reassign shortcuts. The Intake Cam
+Advance map shows the green-low, red-high default. The editor uses an
 L3M6EG000 bench ECU backup. The logging and playback examples use simulated data.
 
 Use the permanent File, Edit, View, Map, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
