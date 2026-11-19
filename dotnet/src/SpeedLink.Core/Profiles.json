@@ -13,6 +13,19 @@
     "LoopSha256": null
   },
   {
+    "Calibration": "L38KEG000",
+    "Model": "Mazdaspeed6 / Mazda 6 MPS",
+    "IdentityOffset": 174040,
+    "Identity": "L38KEG000L3T6021",
+    "BootSha256": "7a1db81d845f10d5eb762145d377672f7625243dc0c1e89c8c34f36af163a7c5",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [],
+    "LoopAddress": null,
+    "LoopSize": null,
+    "LoopSha256": null
+  },
+  {
     "Calibration": "L39SED000",
     "Model": "Mazdaspeed3",
     "IdentityOffset": 191260,

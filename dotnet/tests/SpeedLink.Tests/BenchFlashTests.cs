@@ -64,7 +64,7 @@ public class BenchFlashTests
     {
         var bundled = TuningDefinition.Known.Select(definition => Fixture.Profiles.Single(profile =>
             profile.Calibration == definition.Calibration && profile.Identity == definition.Identity)).ToArray();
-        Assert.Equal(9, bundled.Count(profile => profile.Family == "Gen1"));
+        Assert.Equal(10, bundled.Count(profile => profile.Family == "Gen1"));
         Assert.All(bundled, profile => Assert.Equal(profile.Family == "Gen1",
             BenchFlashWorkflow.IsNativeWriterVerified(profile.Calibration)));
 
@@ -160,10 +160,10 @@ public class BenchFlashTests
     }
 
     [Theory]
-    [InlineData("L33XEH000")] [InlineData("L35HEH000")] [InlineData("L38KEH000")]
+    [InlineData("L33XEH000")] [InlineData("L35HEH000")] [InlineData("L38KEH000")] [InlineData("L38KEG000")]
     [InlineData("L39SED000")] [InlineData("L39SEE000")] [InlineData("L39SEF000")]
     [InlineData("L3M6EG000")] [InlineData("L3M7EF000")] [InlineData("L3P4EM000")]
-    public void nine_gen1_profiles_support_per_ecu_binding_edit_flash_and_recovery_in_simulation(string calibration)
+    public void all_gen1_profiles_support_per_ecu_binding_edit_flash_and_recovery_in_simulation(string calibration)
     {
         var profile = Fixture.Profiles.Single(p => p.Calibration == calibration);
         var definition = TuningDefinition.Known.Single(d => d.Calibration == calibration);

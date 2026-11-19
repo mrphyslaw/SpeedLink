@@ -1,6 +1,6 @@
 # Importing definitions
 
-SpeedLink includes editor and logger definitions for all ten supported ROMs.
+SpeedLink includes editor and logger definitions for all eleven supported ROMs.
 You can install definition updates without replacing the EXE.
 
 1. Disconnect the adapter and finish any active operation.

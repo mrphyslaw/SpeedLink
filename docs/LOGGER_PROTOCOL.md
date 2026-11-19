@@ -2,7 +2,7 @@
 
 SpeedLink sends sequential stock read requests over 500 kbit/s ISO-TP, using
 CAN IDs 7E0/7E8. Enhanced `22 xxxx` identifiers retain their native data widths
-and conversions. On nine independently checked Gen 1 layouts, byte-equivalent
+and conversions. On ten independently checked Gen 1 layouts, byte-equivalent
 standard Mode 01 RPM, absolute load, spark, MAF and fuel-pressure fields can share
 one request. Gen 2 retains its separately established enhanced-identifier path.
 No patch, security access or ROM reading/programming session is needed.
@@ -45,7 +45,7 @@ old display values. Tactrix driver reads likewise return when data is available.
 
 A completed unsupported standard-batch rejection selects individual enhanced
 queries on the next scheduled scan. A malformed or uncertain exchange stops
-without fallback or resend. Synthetic native-handler fixtures cover all nine
+without fallback or resend. Synthetic native-handler fixtures cover all ten
 enabled alias layouts; real acceptance is narrower. See
 [performance](LOGGER_PERFORMANCE.md) and [validation](VALIDATION.md) for scope.
 

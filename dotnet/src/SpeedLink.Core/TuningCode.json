@@ -5,6 +5,11 @@
     "Sha256": "8f5670bbde85da4ca79199177cdbd777cdae79c17e68d46ca68bdc894531aeb2"
   },
   {
+    "Calibration": "L38KEG000",
+    "CodeStart": 294912,
+    "Sha256": "8f5670bbde85da4ca79199177cdbd777cdae79c17e68d46ca68bdc894531aeb2"
+  },
+  {
     "Calibration": "L39SED000",
     "CodeStart": 294912,
     "Sha256": "500c623a77c921cf827b8a1ec40a9fb13127c75d463dac52b2e7ab2e52da82e0"

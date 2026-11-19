@@ -1,5 +1,20 @@
 # Alpha validation scope
 
+## L38KEG000 support · 0.8.0-alpha.15
+
+- The supplied 1 MiB image matches the complete L38KEG000 identity. Its native
+  checksum and program region match the established L38KEH000 implementation.
+- The full upstream definition contains 889 controls. The new profile participates
+  in the mandatory checksum-save, logger, flash/recovery and desktop matrices.
+- The editor audit against the supplied image decoded all 25,613 values and
+  checked every control's storage, edit/undo behavior and checksum-corrected
+  exports. The original file remained unchanged.
+- All 660 core tests and 88 baseline regression cases passed locally, including
+  mandatory ROM-save integrity checks for all eleven supported profiles.
+- Offline replay against the supplied ROM passed 298 native logging vectors,
+  238 independent scalar checks, five standard/enhanced alias cases and both
+  retained-loader write/recovery scenarios. The physical ECU was not accessed.
+
 ## Map cell color direction · 0.8.0-alpha.14
 
 - Desktop navigation checks verify the lowest and highest values in the map

@@ -39,7 +39,7 @@ does not establish the ECU's internal sensor/calculation update rate.
   It does not shorten the response timeout or resend the ECU request. Missing,
   truncated, mismatched or malformed replies stop the session.
 - Read-only standard batches combine byte-equivalent RPM, absolute-load, spark,
-  MAF and fuel-pressure data on nine independently checked Gen 1 layouts.
+  MAF and fuel-pressure data on ten independently checked Gen 1 layouts.
   Enhanced channels, MAP voltage/calibration and numeric precision are retained.
   Gen 2 keeps its separately established enhanced-identifier path. A completed
   unsupported-batch rejection selects individual queries on the next scheduled

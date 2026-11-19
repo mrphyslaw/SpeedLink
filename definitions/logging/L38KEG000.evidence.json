@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "calibration": "L38KEG000",
+  "romSha256": "8d95f62b2d35f004388236f839c6bcfb537322c7e3455267495a90b8cf1d3c21",
+  "channels": 38,
+  "distinctRequests": 34,
+  "nativeVectors": 298,
+  "independentScalarChecks": 238,
+  "instructionSteps": 394117,
+  "executedInstructionWords": 1978,
+  "realEcuTested": false,
+  "loggerAdapterBenchTested": false,
+  "excludedChannels": [],
+  "sourceRomUnchanged": true,
+  "scope": "Original bounded encoders and descriptor copy paths with synthetic RAM; bitmap refresh and unrelated capture/status paths held out. No peripheral, scheduler or physical ECU validation."
+}

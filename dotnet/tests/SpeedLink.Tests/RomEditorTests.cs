@@ -15,8 +15,8 @@ public sealed class RomEditorTests
     [Fact]
     public void DefinitionsAreCompleteAndNaturallySorted()
     {
-        Assert.Equal(10, TuningDefinition.Known.Count);
-        Assert.Equal(8411, TuningDefinition.Known.Sum(d => d.Tables.Count));
+        Assert.Equal(11, TuningDefinition.Known.Count);
+        Assert.Equal(9300, TuningDefinition.Known.Sum(d => d.Tables.Count));
         foreach (var d in TuningDefinition.Known)
         {
             Assert.Equal(d.Calibration switch { "L3CGEE000" => 450, "L3M6EG000" or "L3M7EF000" => 865, "L3P4EM000" => 897, _ => 889 }, d.Tables.Count);

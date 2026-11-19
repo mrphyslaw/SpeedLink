@@ -5,7 +5,7 @@ public static class Mode01LoggerProtocol
 {
     private static readonly Dictionary<byte, int> widths = new() { [0x0C] = 2, [0x43] = 2, [0x0E] = 1, [0x10] = 2, [0x23] = 2 };
     private static readonly HashSet<string> verified = new(StringComparer.Ordinal)
-    { "L33XEH000", "L35HEH000", "L38KEH000", "L39SED000", "L39SEE000", "L39SEF000", "L3M6EG000", "L3M7EF000", "L3P4EM000" };
+    { "L33XEH000", "L35HEH000", "L38KEH000", "L38KEG000", "L39SED000", "L39SEE000", "L39SEF000", "L3M6EG000", "L3M7EF000", "L3P4EM000" };
     internal static bool HasVerifiedAliases(LoggerDefinition definition) => definition.SoftwareIds.Count == 1 && verified.Contains(definition.SoftwareIds[0]);
     internal static bool IsAlias(byte[] request, int responseLength) => request.Length == 3 && request[0] == 0x22 && request[1] == 0 &&
         widths.TryGetValue(request[2], out int width) && responseLength == width + 3;

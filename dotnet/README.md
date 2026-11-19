@@ -6,7 +6,7 @@ Connect a Vgate vLinker FS USB or Tactrix Openport 2.0 and select it in the adap
 
 A definition is not required to dump a ROM. Two matching full 1 MiB reads are required before a verified backup is sealed. Original captures, manifest and durable journal are retained in the `data` folder beside the executable. Keep the whole backup folder.
 
-**Editor** opens all ten bundled layouts for offline editing, including the
+**Editor** opens all eleven bundled layouts for offline editing, including the
 experimental Gen 2 L3CGEE000 profile.
 **ROM checks → Inspect ROM…** opens known or unknown complete 1 MiB images for
 inspection. Known layouts have guarded checks and separate checksum-corrected-copy
@@ -18,7 +18,7 @@ Install the manufacturer's Windows driver and close other diagnostic apps before
 The vLinker temporarily uses 2000000 baud during reads and restores 115200 on a clean disconnect. After reconnecting USB, start with 115200. If the app was interrupted while the adapter stayed connected, select 2000000 to reconnect. Baud selection is explicit; the port is never probed automatically. Tactrix uses its J2534 driver and needs no serial baud selection. Both adapters use 500 kbit/s CAN.
 
 The standalone programming smoke test uses generated ECU replies. The public
-programming workflow accepts only the nine bundled Gen 1 layouts.
+programming workflow accepts only the ten bundled Gen 1 layouts.
 [Flashing guide](../docs/FLASHING.md)
 
 Mongoose-Plus ISO/CAN3 is experimental for reading, logging, and Gen 1 flashing
@@ -26,7 +26,7 @@ and recovery. Select its registered 32-bit J2534 04.04 driver. A user reported a
 successful dump. Logging and programming still need physical qualification.
 See the [adapter testing guide](../docs/ADAPTERS.md).
 
-The **Logger** workspace provides 33–38 parameters for each of the nine Gen 1
+The **Logger** workspace provides 33–38 parameters for each of the ten Gen 1
 profiles and 20 for L3CGEE000 Gen 2. It shows measured host sample rates and
 supports selectable units, up to six synchronized plots and CSV recording.
 Load the ECU's current matching ROM backup for MAP calibration.
@@ -38,7 +38,7 @@ sensor accuracy remain to be checked.
 
 ## Offline ROM editing
 
-Open **Editor**. The ten bundled tuning
+Open **Editor**. The eleven bundled tuning
 definitions provide grid editing, 2D curves, rotatable 3D surfaces, comparison,
 selection arithmetic, clipboard, interpolation and undo/redo. Single values use
 a dedicated value/state card; small grids and previews stay proportional to the

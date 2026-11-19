@@ -96,7 +96,7 @@ public class KnownAndUnknownRomTests
     public void test_build_identity_mismatch_and_ambiguous_images_are_not_guessed()
     {
         var first = Fixture.Profiles[0];
-        var second = Fixture.Profiles[1];
+        var second = Fixture.Profiles.First(p => p.IdentityOffset != first.IdentityOffset);
         var data = Fixture.Image(first);
         data[first.IdentityOffset + first.Identity.Length - 1] ^= 1;
         Assert.False(Fixture.Inspector().Inspect(data).IdentityValid);

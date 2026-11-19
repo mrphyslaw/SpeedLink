@@ -316,7 +316,7 @@ be undone as one edit.
 
 ## Compatible files and definition updates
 
-Supported stock layouts: **L33XEH000, L35HEH000, L38KEH000, L39SED000,
+Supported stock layouts: **L33XEH000, L35HEH000, L38KEH000, L38KEG000, L39SED000,
 L39SEE000, L39SEF000, L3M6EG000, L3M7EF000 and L3P4EM000**. Opening requires a complete 1 MiB image
 with matching calibration, boot, checksum layout and program-area signature.
 The program check allows defined tuning controls and checksum changes while
