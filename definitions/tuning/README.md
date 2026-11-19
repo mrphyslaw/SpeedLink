@@ -1,6 +1,6 @@
 # Bundled tuning definitions
 
-These ten XML files are SpeedLink snapshots of the MazdaSpeedDefs definitions,
+These eleven XML files are SpeedLink snapshots of the MazdaSpeedDefs definitions,
 incorporated under its MIT license (LICENSE in this folder). They
 are embedded into the executable. No ROM image or commercial software is bundled.
 
@@ -37,3 +37,13 @@ program sum starts at 0x3F000; automatic correction uses reserved padding at
 normalizes only the established 128-byte per-ECU identification record. That
 record is retained byte-for-byte in every exported ROM; the remaining boot bytes
 and program/checksum guards remain checked.
+
+L38KEG000 includes the complete 889-control upstream definition from
+[e48da53](https://github.com/mrphyslaw/MazdaSpeedDefs/commit/e48da53fc6582fb77ac7a53c9aa24635d9990e81).
+It identifies the reported 2007 Canadian Mazdaspeed6 and shares the
+established L38KEH000 map geometry and native program region. Its own
+complete identity and boot fingerprint are checked before editing or writing.
+
+SpeedLink applies its existing L38KEH000 help, display labels and units to the
+matching L38KEG000 controls. Storage addresses, dimensions, scaling arithmetic,
+static breakpoints, switch values and checksum support follow the complete upstream XML.

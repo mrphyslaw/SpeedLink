@@ -2,7 +2,7 @@
 
 For a visual tour, see the [logger overview and screenshots](logger/README.md).
 
-The logger covers nine Gen 1 ROMs with 33–38 parameters, plus experimental Gen 2
+The logger covers ten Gen 1 ROMs with 33–38 parameters, plus experimental Gen 2
 L3CGEE000 with 20. It uses the factory application's read-identifier interface
 with stock ROMs. The encoders and offline conversions have been checked.
 

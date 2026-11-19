@@ -21,7 +21,7 @@ public sealed class Mode01LoggerTests
                 foreach (byte id in request.Skip(1)) Assert.Equal(Enumerable.Range(0, split[id].Length).Select(n => (byte)(id + n * 43)), split[id]);
             }
         }
-        Assert.Equal(9, profiles); Assert.Equal(45, cases);
+        Assert.Equal(10, profiles); Assert.Equal(50, cases);
     }
 
     private static LiveLogger Logger(Peer peer) => new(LoggerDefinition.Speed6, LoggerCalibration.ExplicitMap(100, 0), peer,

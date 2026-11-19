@@ -19,7 +19,7 @@ choice is remembered. Hover over an icon for its name and purpose. Use
 **Editor** to edit a file, **Connection** to read an ECU, **Logger** to record
 live data, **Recordings** to review logs, **ROM checks** to inspect a file, or
 **Backups** to find saved operations. **Flash & Recover** under **Connection**
-opens programming for the nine bundled Gen 1 layouts. A verified Gen 1 read also
+opens programming for the ten bundled Gen 1 layouts. A verified Gen 1 read also
 offers **Open in Flash & Recover**. Use **Help → Gen 1 flashing
 guide** for the write and recovery steps. Gen 2 flashing is planned for an upcoming
 release. [Flashing guide](FLASHING.md)
@@ -36,7 +36,7 @@ release. [Flashing guide](FLASHING.md)
    ROM-specific checksum/integrity checks. The original and existing files are preserved.
 
 Drag the table/preview divider to resize it. **Map → Fit entire map** restores automatic
-sizing; Ctrl+B hides or restores the browser. Editing requires one of the ten
+sizing; Ctrl+B hides or restores the browser. Editing requires one of the eleven
 supported stock program layouts. Static axes are read-only; extended/patched
 layouts are unsupported.
 
@@ -93,7 +93,7 @@ connection ready for another Start. The current ROM, selections, units and plots
 stay selected. Disconnect and reconnect when switching between ROM reading and
 logging, or after a connection error.
 
-The logger supports nine Gen 1 profiles with 33–38 parameters each, plus the
+The logger supports ten Gen 1 profiles with 33–38 parameters each, plus the
 experimental L3CGEE000 Gen 2 profile with 20. Logging can run with the engine
 running; ROM reads require it stopped. The **Hz** column
 shows measured host sample rates. Leave **Polling** on **Max** for the fastest

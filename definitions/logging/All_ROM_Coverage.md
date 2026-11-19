@@ -1,9 +1,10 @@
 # Logger ROM coverage
 
-All ten ROMs with local tuning definitions have a logger profile. Each profile uses its own identifier records, MAP calibration locations and code guards. The existing 38-channel baseline was checked separately in every image.
+All eleven ROMs with local tuning definitions have a logger profile. Each profile uses its own identifier records, MAP calibration locations and code guards. The existing 38-channel baseline was checked separately in every image.
 
 | ROM | Parameters | Distinct enhanced identifiers | Excluded baseline parameters | Native vectors |
 | --- | ---: | ---: | ---: | ---: |
+| L38KEG000 | 38 | 34 | 0 | 298 |
 | L38KEH000 | 38 | 34 | 0 | 298 |
 | L39SED000 | 38 | 34 | 0 | 298 |
 | L39SEE000 | 38 | 34 | 0 | 298 |
@@ -17,12 +18,12 @@ All ten ROMs with local tuning definitions have a logger profile. Each profile u
 
 The counts above describe native enhanced identifiers. The runtime combines
 byte-equivalent RPM, absolute-load, spark, MAF and fuel-pressure fields on the
-nine checked Gen 1 layouts. Selecting all five saves four wire requests per
+ten checked Gen 1 layouts. Selecting all five saves four wire requests per
 scan (L3M6EG000: 30 identifiers, 26 wire requests). Gen 2 retains 19 separate
 identifiers. Selection and calculated dependencies determine the actual plan.
-[Alias fixtures](Mode01_Aliases.vectors.json) cover 45 bounded native cases.
+[Alias fixtures](Mode01_Aliases.vectors.json) cover 50 bounded native cases.
 
-The native checks execute bounded original ROM routines with synthetic RAM. Separately, read-only query and recording workflows passed on one L3M6EG000 bench ECU with vLinker FS and Tactrix. Physical values and running-engine rates for the 346 ROM/channel combinations remain to be checked. [Bench measurements](../../docs/LOGGER_PERFORMANCE.md)
+The native checks execute bounded original ROM routines with synthetic RAM. Separately, read-only query and recording workflows passed on one L3M6EG000 bench ECU with vLinker FS and Tactrix. Physical values and running-engine rates for the 384 ROM/channel combinations remain to be checked. [Bench measurements](../../docs/LOGGER_PERFORMANCE.md)
 
 ## Parameters excluded from the current profiles
 

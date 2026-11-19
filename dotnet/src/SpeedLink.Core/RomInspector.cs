@@ -143,7 +143,7 @@ public sealed class RomInspector
             foreach (var range in profile.RoutineRanges) hash.AppendData(data.Slice(range.Address, range.Length));
             layout &= Convert.ToHexStringLower(hash.GetHashAndReset()) == profile.LoopSha256;
         }
-        if (profile.Calibration == "L38KEH000")
+        if (profile.Calibration is "L38KEH000" or "L38KEG000")
             layout &= bootKnown;
         uint? sum = layout ? Sum(data, profile) : null;
         bool? valid = sum.HasValue ? sum.Value == ChecksumTarget : null;

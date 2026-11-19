@@ -11,7 +11,7 @@ public class MultiRomLoggerTests
 {
     public static TheoryData<string, int, int, int> Profiles => new()
     {
-        { "L38KEH000", 38, 34, 298 }, { "L39SED000", 38, 34, 298 },
+        { "L38KEH000", 38, 34, 298 }, { "L38KEG000", 38, 34, 298 }, { "L39SED000", 38, 34, 298 },
         { "L39SEE000", 38, 34, 298 }, { "L39SEF000", 38, 34, 298 },
         { "L3M7EF000", 35, 31, 277 }, { "L35HEH000", 36, 32, 284 },
         { "L33XEH000", 35, 31, 277 }, { "L3P4EM000", 35, 31, 277 }, { "L3CGEE000", 20, 19, 77 },
@@ -58,8 +58,8 @@ public class MultiRomLoggerTests
         var expected = Profiles.Select(row => (string)row[0]).Order().ToArray();
         Assert.Equal(expected, LoggerDefinition.Known.SelectMany(p => p.SoftwareIds).Order().ToArray());
         Assert.Equal(expected, RomInspector.KnownProfiles.Select(p => p.Calibration).Order().ToArray());
-        Assert.Equal(2631, Profiles.Sum(row => (int)row[3]));
-        Assert.Equal(346, LoggerDefinition.Known.Sum(p => p.ChannelIds.Count));
+        Assert.Equal(2929, Profiles.Sum(row => (int)row[3]));
+        Assert.Equal(384, LoggerDefinition.Known.Sum(p => p.ChannelIds.Count));
         Assert.Equal(38, LoggerDefinition.Known.Sum(p => p.UnavailableChannels.Count));
         foreach (var profile in document.RootElement.GetProperty("profiles").EnumerateArray())
         {

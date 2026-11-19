@@ -15,6 +15,18 @@
       "realEcuTested": false
     },
     {
+      "calibration": "L38KEG000",
+      "vehicle": "Mazdaspeed6 / Mazda 6 MPS (2007 Canada, reported)",
+      "profileFile": "L38KEG000.logger.json",
+      "channels": 38,
+      "queries": 34,
+      "unavailable": 0,
+      "vectors": 298,
+      "romSha256": "8d95f62b2d35f004388236f839c6bcfb537322c7e3455267495a90b8cf1d3c21",
+      "definitionSha256": "89fca7ac020b9769689fa5a1091add082ec7d42644a61c51aa3ab8c8bdae2c28",
+      "realEcuTested": false
+    },
+    {
       "calibration": "L39SED000",
       "vehicle": "Mazdaspeed3",
       "profileFile": "L39SED000.logger.json",

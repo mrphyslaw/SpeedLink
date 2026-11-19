@@ -1,7 +1,7 @@
 # SpeedLink logger
 
 Choose engine parameters, watch live values and record a CSV for later review.
-The logger supports nine Gen 1 profiles with 33–38 parameters each, plus the
+The logger supports ten Gen 1 profiles with 33–38 parameters each, plus the
 experimental L3CGEE000 Gen 2 profile with 20. Reader/logger adapter paths include
 Vgate vLinker FS USB and Tactrix Openport 2.0, with Mongoose-Plus ISO/CAN3
 available for experimental testing. The logger uses the stock ROM interface.

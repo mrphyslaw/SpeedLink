@@ -1,6 +1,6 @@
 # Gen 1 flashing and recovery
 
-SpeedLink supports writing and stock recovery for all nine bundled **Gen 1**
+SpeedLink supports writing and stock recovery for all ten bundled **Gen 1**
 ROM layouts. **Gen 2 flashing is planned for an upcoming release** and remains
 disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
 [adapter matrix](ADAPTERS.md) before starting.
@@ -88,7 +88,7 @@ identifiers. Keep them private when reporting a problem.
 
 ## Validation scope
 
-The nine layouts were checked in native-handler replay and simulated workflows.
+The ten layouts were checked in native-handler replay and simulated workflows.
 Uninterrupted stock and edited writes were verified on one L3M6EG000 bench ECU
 with both adapters. A controlled interruption after one acknowledged block and
 stock restore were exercised on that same ECU with Tactrix. Mongoose

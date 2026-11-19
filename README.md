@@ -4,7 +4,7 @@ Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recov
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.14](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.14)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.15](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.15)** · A single Windows EXE with the runtime included.
 
 **Watch the SpeedLink v0.8.0-alpha.14 walkthrough (3:30)** · Light mode with on-screen captions and no audio.
 
@@ -22,8 +22,8 @@ Drag a pane's own edge or corner to resize just that map, or drag its header to
 move it. New maps use the space they need when the whole table fits at a readable size. Drag a map to a workspace edge and release to place it where the outline shows. Use the Windows title bar to return a detached map. Panes can overlap, and clicking a map or selecting it in the browser brings it forward. **Map → Tile maps side by side** restores automatic arrangement. Use **Tools → Keyboard shortcuts** to change the default bindings.
 
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
-log stock-ECU data, review recordings and edit the ten supported stock ROM layouts.
-**Flashing and stock recovery are Gen 1 only**, covering all nine bundled Gen 1
+log stock-ECU data, review recordings and edit the eleven supported stock ROM layouts.
+**Flashing and stock recovery are Gen 1 only**, covering all ten bundled Gen 1
 ROM layouts. Open **Flash & Recover** below **Connection**. Pick the ROM to
 write and SpeedLink looks up the ECU's verified original by VIN or chassis ID
 and calibration. Recovery lists saved runs by date and calibration, checks the
@@ -124,7 +124,7 @@ directly on their frame, aligned with the surface as it rotates.
    creates and verifies a new file; the original and existing copies are preserved.
 
 Editing needs no adapter. Supported tuning profiles are **L33XEH000, L35HEH000,
-L38KEH000, L39SED000, L39SEE000, L39SEF000, L3M6EG000, L3M7EF000, L3P4EM000 and L3CGEE000**. A matching calibration,
+L38KEH000, L38KEG000, L39SED000, L39SEE000, L39SEF000, L3M6EG000, L3M7EF000, L3P4EM000 and L3CGEE000**. A matching calibration,
 boot and program area are required. Patched/extended ROM layouts are unsupported.
 Static axes are read-only. See the [editor guide](docs/EDITOR.md) for details.
 
@@ -178,7 +178,7 @@ folder, including its captures, manifest and journal.
 
 You need a full backup of the ROM currently installed in the ECU. SpeedLink uses
 it to choose the logging profile and read the MAP sensor calibration. The current
-logger supports [ten defined ROMs](definitions/logging/All_ROM_Coverage.md).
+logger supports [eleven defined ROMs](definitions/logging/All_ROM_Coverage.md).
 
 1. Connect the adapter and select **Connect & identify**. If you just read a ROM,
    disconnect and reconnect before logging.
@@ -227,7 +227,7 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   checksum correction to a separate file; live logging, charts, CSV recording
   and saved-log viewing; offline ROM editing, comparison, 2D/3D views and undo/redo.
   The reader covers the 1 MiB MZR DISI ECU family.
-- **Logger coverage:** nine Gen 1 profiles with 33–38 stock-ROM parameters each,
+- **Logger coverage:** ten Gen 1 profiles with 33–38 stock-ROM parameters each,
   plus experimental L3CGEE000 Gen 2 logging with 20 parameters.
   No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
 - **Fixed:** logger matching accepts known complete ECU calibration IDs, including
@@ -246,9 +246,9 @@ Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.c
   three-minute all-parameter recordings and repeated desktop Start/Stop sessions.
   See [measured rates and scope](docs/LOGGER_PERFORMANCE.md).
 - **Still pending:** broader Mazda ECU read coverage, physical sensor readings,
-  running-engine behavior and achievable vehicle logging rates. The 346 channel/profile
+  running-engine behavior and achievable vehicle logging rates. The 384 channel/profile
   vehicle validation checks remain pending.
-- **Gen 1 programming:** Nine bundled layouts pass the offline write and recovery
+- **Gen 1 programming:** Ten bundled layouts pass the offline write and recovery
   matrix. Both supported adapters completed edited and stock writes on one
   L3M6EG000 bench ECU. Tactrix also completed recovery after a controlled
   interruption. Broader hardware qualification and Gen 2 flashing are upcoming.
