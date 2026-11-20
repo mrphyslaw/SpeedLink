@@ -47,6 +47,7 @@ public partial class MainWindow
     {
         if (flashWorkspace?.HardwareInUse == true && page != FlashPage) return;
         if (page == FlashPage && FlashTab is not null) ShowFlashWorkspace();
+        if (page == ObdPage && ObdTab is not null) ShowObdWorkspace();
         Pages.SelectedIndex = page;
         EditorPane?.SetWorkspaceActive(page == 1);
         foreach (var button in Navigation.Children.OfType<RadioButton>()) button.IsChecked = (string)button.Tag == page.ToString(System.Globalization.CultureInfo.InvariantCulture);

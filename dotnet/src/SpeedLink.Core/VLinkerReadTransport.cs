@@ -36,7 +36,7 @@ public sealed class MonotonicClock : IMonotonicClock
     public TimeSpan Elapsed => timer.Elapsed;
     public void Sleep(int milliseconds) => Thread.Sleep(milliseconds);
 }
-public class ElmTransport : IReadTransport
+public class ElmTransport : IObdTransport
 {
     protected readonly ISerialConnection Serial;
     protected readonly IMonotonicClock Clock;
@@ -152,6 +152,18 @@ public class ElmTransport : IReadTransport
         catch { Failed = true; throw; }
     }
     public virtual byte[] ExchangeLogger(byte[] request, int expectedResponseLength) => Exchange(request);
+    public virtual byte[] ExchangeObd(byte[] request, bool clearConfirmed = false)
+    {
+        ObdProtocol.CheckAllowed(request, clearConfirmed);
+        if (!Ready || Failed) throw new TransportException("Initialize a fresh connection before diagnostics.");
+        try
+        {
+            string command = Convert.ToHexString(request);
+            return DiagnosticProtocol.FinalResponse(request, DiagnosticProtocol.ParseElm(Command(command, 10), command));
+        }
+        catch (NegativeResponseException) { throw; }
+        catch { Failed = true; throw; }
+    }
     public virtual void Dispose()
     {
         Ready = false;
@@ -289,6 +301,11 @@ public sealed partial class VLinkerReadTransport : ElmTransport
     {
         DiagnosticProtocol.CheckReadOnly(request, ReadChunkSize);
         return ExchangeRead(request, 6);
+    }
+    public override byte[] ExchangeObd(byte[] request, bool clearConfirmed = false)
+    {
+        ObdProtocol.CheckAllowed(request, clearConfirmed);
+        return ExchangeRead(request, 10);
     }
     private byte[] ExchangeRead(byte[] request, double responseSeconds)
     {

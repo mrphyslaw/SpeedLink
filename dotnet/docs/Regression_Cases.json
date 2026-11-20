@@ -262,5 +262,20 @@
   },
   {
     "test": "SpeedLink.Tests.LiveLoggerTests.Fast_partial_and_complete_frames_keep_one_recording_clock_origin"
+  },
+  {
+    "test": "SpeedLink.Tests.ObdDiagnosticsTests.ClearCapturesBeforeRequiresEngineStoppedSendsOnceAndRescans"
+  },
+  {
+    "test": "SpeedLink.Tests.ObdDiagnosticsTests.UnconfirmedRunningEngineAndFailedCaptureNeverDispatchClear"
+  },
+  {
+    "test": "SpeedLink.Tests.ObdDiagnosticsTests.LostAcknowledgementIsUnknownWithoutRetryAndRejectedClearIsDistinct"
+  },
+  {
+    "test": "SpeedLink.Tests.ObdDiagnosticsTests.MalformedOrMissingRepliesStopFurtherRequestsAndNeverBecomeNoCodes"
+  },
+  {
+    "test": "SpeedLink.Tests.ObdDiagnosticsTests.NativeDriverHasAnIndependentObdGateBeforeAnyDriverIo"
   }
 ]

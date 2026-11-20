@@ -36,6 +36,13 @@ session and can run with the engine running. Read-only query and recording
 workflows passed on one L3M6EG000 bench ECU. Running-engine rates and physical
 sensor accuracy remain to be checked.
 
+## Engine diagnostics
+
+**Diagnostics** (Ctrl+8) reads and clears engine ECU fault codes, shows MIL and
+readiness status, captures supported freeze-frame values and exports JSON reports.
+It needs no ROM file. Clearing retains current data, checks zero RPM, sends once
+and rescans. [Guide](../docs/DIAGNOSTICS.md)
+
 ## Offline ROM editing
 
 Open **Editor**. The eleven bundled tuning

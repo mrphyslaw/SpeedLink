@@ -1,5 +1,25 @@
 # Alpha validation scope
 
+## Engine diagnostics · 0.8.0-alpha.16
+
+- vLinker FS and Tactrix both read stored/pending codes, MIL/readiness and ten
+  available frame-0 parameters from the L3M6EG000 isolated bench ECU.
+- Both adapters received a positive Clear acknowledgement and completed a
+  rescan. The U0121 missing ABS/DSC fault was still reported on the isolated
+  bench. These checks establish acknowledged clearing, not resolution of that
+  active communication fault. Durable before/after diagnostic reports were retained.
+- The bench ECU rejects Mode 0A with NRC 11. Unsupported permanent-code service
+  is displayed explicitly. Synthetic tests verify that permanent codes survive
+  a normal clear, and that missing acknowledgements remain unknown without retry.
+- Desktop checks cover no-ROM operation, operation locking, report export,
+  minimum-window layout, Light/Dark rendering, the assignable shortcut and
+  reconnect handling after an unknown clear outcome.
+- The real Diagnostics Connect/read/disconnect buttons are exercised with an
+  injected synthetic adapter. They share the existing adapter settings and
+  connection workflow and keep Diagnostics selected throughout the operation.
+- Gen 2 ECU diagnostics and Mongoose physical diagnostics remain unqualified.
+  This feature addresses the engine ECU; it does not scan ABS, airbags or other modules.
+
 ## L38KEG000 support · 0.8.0-alpha.15
 
 - The supplied 1 MiB image matches the complete L38KEG000 identity. Its native

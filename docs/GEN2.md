@@ -5,6 +5,14 @@ a separate Gen 2 application protocol. Real ECU acceptance, measured sensor
 values and update rates remain unverified. Gen 2 flashing is planned for an
 upcoming release. [The current flashing workflow](FLASHING.md) supports Gen 1 only.
 
+## Standard engine diagnostics
+
+The **Diagnostics** page uses normal OBD services independently of the Gen 2
+ROM reader and the Gen 1-only flashing workflow. No ROM file is needed.
+Service support depends on the ECU. Gen 2 hardware qualification is pending;
+unsupported services and communication errors remain explicit.
+[Engine diagnostics guide](DIAGNOSTICS.md)
+
 ## Read a ROM
 
 1. Connect and identify with the ignition on and engine stopped.

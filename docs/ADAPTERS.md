@@ -6,9 +6,9 @@ controlled interruption and recovery on that ECU. [Gen 1 flashing guide](FLASHIN
 
 | Adapter | SpeedLink status |
 | --- | --- |
-| Vgate vLinker FS USB | Reader and logger available. Gen 1 writing bench-tested. Recovery available with offline coverage and physical recovery pending. |
-| Tactrix Openport 2.0 | Reader and logger available through its installed J2534 driver. Gen 1 writing and controlled recovery bench-tested. |
-| Mongoose-Plus ISO/CAN3 | Experimental reader/logger and Gen 1 flashing/recovery. A user reported a successful dump. Physical programming is pending qualification. |
+| Vgate vLinker FS USB | Reader and logger available. Engine OBD reads and acknowledged clearing/rescan bench-tested. Gen 1 writing bench-tested. Recovery available with offline coverage and physical recovery pending. |
+| Tactrix Openport 2.0 | Reader and logger available through its installed J2534 driver. Engine OBD reads and acknowledged clearing/rescan bench-tested. Gen 1 writing and controlled recovery bench-tested. |
+| Mongoose-Plus ISO/CAN3 | Experimental reader/logger, engine diagnostics and Gen 1 flashing/recovery. A user reported a successful dump. Physical diagnostics and programming are pending qualification. |
 
 ## Mongoose-Plus ISO/CAN3
 

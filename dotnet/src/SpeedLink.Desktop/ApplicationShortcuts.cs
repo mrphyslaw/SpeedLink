@@ -27,7 +27,7 @@ public partial class MainWindow
             case ShortcutAction.SaveRom when ApplicationSaveMenu.IsEnabled: ApplicationSave_Click(this, e); break;
             case ShortcutAction.OpenRecording: ApplicationOpenRecording_Click(this, e); break;
             case ShortcutAction.KeyboardShortcuts: ShowKeyboardShortcuts(); break;
-            case >= ShortcutAction.Connection and <= ShortcutAction.FlashWorkspace:
+            case >= ShortcutAction.Connection and <= ShortcutAction.Diagnostics:
                 Navigate(action - ShortcutAction.Connection);
                 break;
             default: return false;
@@ -78,7 +78,7 @@ public partial class EditorWorkspace
         if (Window.GetWindow(MapRoot) is MainWindow host)
         {
             if (!host.AllowsKeyboardShortcuts) return;
-            if (action <= ShortcutAction.FlashWorkspace)
+            if (action <= ShortcutAction.Diagnostics)
             {
                 e.Handled = e.IsRepeat || host.HandleApplicationShortcut(action, e);
                 return;
