@@ -140,7 +140,8 @@ public partial class MainWindow : Window
                 await FinishClose();
         }
     }
-    private async void Connect_Click(object sender, RoutedEventArgs e)
+    private async void Connect_Click(object sender, RoutedEventArgs e) => await ConnectAdapter();
+    private async Task ConnectAdapter()
     {
         bool passThruAdapter = AdapterBox.SelectedIndex > 0;
         var name = PortBox.Text.Trim();
@@ -166,6 +167,7 @@ public partial class MainWindow : Window
             diagnosticSession?.Record("connection.opening", new { adapter = AdapterBox.Text, port = passThruAdapter ? null : name, baud = passThruAdapter ? 0 : baud });
             var connected = await Task.Run(() =>
             {
+                if (offlineConnectionFactory is { } testFactory) return testFactory();
                 FtdiSerialConnection? serial = null;
                 IReadTransport link;
                 if (passThruAdapter)

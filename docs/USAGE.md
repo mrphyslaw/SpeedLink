@@ -28,7 +28,9 @@ release. [Flashing guide](FLASHING.md)
 
 ## Read or clear engine fault codes
 
-Connect and identify, then open **Diagnostics** (Ctrl+8). **Read codes** captures
+Open **Diagnostics** (Ctrl+8), select your adapter, and choose **Connect & read
+codes**. Connection, disconnection and diagnostic actions stay on that page.
+Once connected, **Read codes** refreshes
 stored/pending codes, supported permanent codes, readiness and available freeze
 frame. **Save report…** exports the results. **Clear codes…** confirms the action,
 retains current information, checks zero RPM, sends Clear once and rescans.

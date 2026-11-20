@@ -9,11 +9,18 @@ namespace SpeedLink.Desktop;
 
 internal sealed class ObdWorkspace : UserControl
 {
-    internal event Action? ScanRequested, ClearRequested, StopRequested, SaveRequested, ConnectRequested, OpenReportsRequested;
+    internal event Action? ScanRequested, ClearRequested, StopRequested, SaveRequested, ConnectRequested, DisconnectRequested, RefreshRequested, OpenReportsRequested;
     internal ObdScan? LastScan { get; private set; }
     internal readonly Button ScanButton = new() { Content = "Read codes" }, ClearButton = new() { Content = "Clear codes…" },
         StopButton = new() { Content = "Stop" }, SaveButton = new() { Content = "Save report…" };
-    internal readonly TextBlock ConnectionText = new(), StatusText = new() { Text = "Connect your adapter, then choose Read codes. No ROM file is required." },
+    internal readonly Button DisconnectButton = new() { Content = "Disconnect" }, RefreshButton = new() { Content = "Refresh devices" };
+    internal readonly ComboBox AdapterSelector = new() { Width = 248, Margin = new(0, 0, 12, 0) },
+        PortSelector = new() { Width = 105, IsEditable = true, Margin = new(0, 0, 10, 0) },
+        BaudSelector = new() { Width = 105, Margin = new(0, 0, 10, 0) }, DriverSelector = new() { Width = 280, Margin = new(0, 0, 10, 0) };
+    private readonly StackPanel serialOptions = new() { Orientation = Orientation.Horizontal }, driverOptions = new() { Orientation = Orientation.Horizontal };
+    private Button? connectSource;
+    private bool connectedHere;
+    internal readonly TextBlock ConnectionText = new(), StatusText = new() { Text = "Select your adapter and choose Connect & read codes. No ROM file is required." },
         SummaryText = new(), ServiceText = new(), FreezeText = new();
     internal readonly DataGrid CodesGrid = Grid(), ReadinessGrid = Grid(), FrameGrid = Grid();
     internal ObdWorkspace()
@@ -22,14 +29,20 @@ internal sealed class ObdWorkspace : UserControl
         var top = new StackPanel(); DockPanel.SetDock(top, Dock.Top); root.Children.Add(top);
         top.Children.Add(new TextBlock { Text = "Engine diagnostics", FontSize = 25, FontWeight = FontWeights.SemiBold });
         top.Children.Add(new TextBlock { Text = "Engine fault codes, readiness and freeze-frame data · no ROM required", Margin = new(0, 5, 0, 10), TextWrapping = TextWrapping.Wrap });
+        var adapters = new WrapPanel { Margin = new(0, 0, 0, 8) };
+        static TextBlock Label(string text) => new() { Text = text, VerticalAlignment = VerticalAlignment.Center, Margin = new(0, 0, 6, 0) };
+        adapters.Children.Add(Label("Adapter")); adapters.Children.Add(AdapterSelector);
+        serialOptions.Children.Add(Label("COM port")); serialOptions.Children.Add(PortSelector); serialOptions.Children.Add(Label("Baud")); serialOptions.Children.Add(BaudSelector);
+        driverOptions.Children.Add(Label("Driver")); driverOptions.Children.Add(DriverSelector);
+        adapters.Children.Add(serialOptions); adapters.Children.Add(driverOptions); adapters.Children.Add(RefreshButton); top.Children.Add(adapters);
         ConnectionText.TextWrapping = StatusText.TextWrapping = SummaryText.TextWrapping = ServiceText.TextWrapping = FreezeText.TextWrapping = TextWrapping.Wrap;
         ConnectionText.Margin = new(0, 0, 0, 10); top.Children.Add(ConnectionText);
         var actions = new WrapPanel { Margin = new(0, 0, 0, 10) };
         ScanButton.SetResourceReference(StyleProperty, "PrimaryButton");
-        foreach (var button in new[] { ScanButton, ClearButton, StopButton, SaveButton }) actions.Children.Add(button);
-        var connect = new Button { Content = "Go to Connection" }; connect.Click += (_, _) => ConnectRequested?.Invoke(); actions.Children.Add(connect);
+        foreach (var button in new[] { ScanButton, DisconnectButton, ClearButton, StopButton, SaveButton }) actions.Children.Add(button);
         var reports = new Button { Content = "Open reports" }; reports.Click += (_, _) => OpenReportsRequested?.Invoke(); actions.Children.Add(reports);
-        ScanButton.Click += (_, _) => ScanRequested?.Invoke(); ClearButton.Click += (_, _) => ClearRequested?.Invoke();
+        ScanButton.Click += (_, _) => { if (connectedHere) ScanRequested?.Invoke(); else ConnectRequested?.Invoke(); }; ClearButton.Click += (_, _) => ClearRequested?.Invoke();
+        DisconnectButton.Click += (_, _) => DisconnectRequested?.Invoke(); RefreshButton.Click += (_, _) => RefreshRequested?.Invoke();
         StopButton.Click += (_, _) => StopRequested?.Invoke(); SaveButton.Click += (_, _) => SaveRequested?.Invoke();
         top.Children.Add(actions);
         StatusText.Margin = new(0, 0, 0, 8); top.Children.Add(StatusText);
@@ -46,6 +59,20 @@ internal sealed class ObdWorkspace : UserControl
         tabs.Items.Add(new TabItem { Header = "Freeze frame", Content = frame }); root.Children.Add(tabs); Content = root;
         SetAvailability(true, false, false, null);
     }
+    internal void ShareConnectionControls(ComboBox adapter, ComboBox port, ComboBox baud, ComboBox driver, Button connect, Button disconnect, Button refresh, FrameworkElement serial, FrameworkElement passThru)
+    {
+        connectSource = connect;
+        static void Bind(DependencyObject target, DependencyProperty property, object source, string path, bool twoWay = false) =>
+            BindingOperations.SetBinding(target, property, new Binding(path) { Source = source, Mode = twoWay ? BindingMode.TwoWay : BindingMode.OneWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
+        foreach (var (target, source) in new[] { (AdapterSelector, adapter), (PortSelector, port), (BaudSelector, baud), (DriverSelector, driver) })
+        { Bind(target, ItemsControl.ItemsSourceProperty, source, "ItemsSource"); Bind(target, IsEnabledProperty, source, "IsEnabled"); }
+        Bind(AdapterSelector, System.Windows.Controls.Primitives.Selector.SelectedIndexProperty, adapter, "SelectedIndex", true);
+        Bind(PortSelector, ComboBox.TextProperty, port, "Text", true);
+        Bind(BaudSelector, System.Windows.Controls.Primitives.Selector.SelectedItemProperty, baud, "SelectedItem", true);
+        Bind(DriverSelector, System.Windows.Controls.Primitives.Selector.SelectedItemProperty, driver, "SelectedItem", true);
+        Bind(serialOptions, VisibilityProperty, serial, "Visibility"); Bind(driverOptions, VisibilityProperty, passThru, "Visibility");
+        Bind(DisconnectButton, IsEnabledProperty, disconnect, "IsEnabled"); Bind(RefreshButton, IsEnabledProperty, refresh, "IsEnabled");
+    }
     private static DataGrid Grid() => new() { IsReadOnly = true, AutoGenerateColumns = false, CanUserAddRows = false, CanUserDeleteRows = false,
         SelectionMode = DataGridSelectionMode.Extended, HeadersVisibility = DataGridHeadersVisibility.Column, Margin = new(0, 8, 0, 0), MinHeight = 100, RowHeight = double.NaN };
     private static void Columns(DataGrid grid, params (string Header, string Path, int Width)[] columns)
@@ -59,9 +86,13 @@ internal sealed class ObdWorkspace : UserControl
     }
     internal void SetAvailability(bool idle, bool connected, bool readSession, EcuIdentity? identity)
     {
-        ScanButton.IsEnabled = ClearButton.IsEnabled = idle && connected && !readSession;
+        connectedHere = connected;
+        ScanButton.Content = connected ? "Read codes" : "Connect & read codes";
+        ScanButton.IsEnabled = idle && (connected ? !readSession : connectSource?.IsEnabled == true);
+        ClearButton.IsEnabled = idle && connected && !readSession;
         StopButton.IsEnabled = !idle && connected; SaveButton.IsEnabled = idle && LastScan is not null;
-        ConnectionText.Text = connected ? $"{identity?.Adapter ?? "Adapter connected"} · {identity?.Calibration ?? "Calibration unavailable"}" : "Adapter disconnected · connect from the Connection page.";
+        ConnectionText.Text = connected ? $"Connected · {identity?.Calibration ?? "Calibration unavailable"}" : "Adapter disconnected · select your adapter above.";
+        ConnectionText.ToolTip = identity?.Adapter;
         ScanButton.ToolTip = ClearButton.ToolTip = readSession ? "Disconnect and reconnect after a ROM read before using OBD diagnostics." : "Use the connected engine ECU. Stop logging or other adapter operations first.";
     }
     internal void ShowScan(ObdScan scan)

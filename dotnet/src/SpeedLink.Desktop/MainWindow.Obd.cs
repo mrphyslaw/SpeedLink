@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using Microsoft.Win32;
 using SpeedLink.Core;
+using SpeedLink.Hardware;
 
 namespace SpeedLink.Desktop;
 
@@ -10,13 +11,18 @@ public partial class MainWindow
 {
     private const int ObdPage = 7;
     private ObdWorkspace? obdWorkspace;
+    private Task? obdConnectWork;
+    private Func<(IReadTransport Link, FtdiSerialConnection? Connection, EcuIdentity Identity)>? offlineConnectionFactory;
     private bool ObdAvailable => transport is IObdTransport && (transport is not DiagnosticTransport traced || traced.Inner is IObdTransport);
     private ObdWorkspace ShowObdWorkspace()
     {
         if (obdWorkspace is null)
         {
             obdWorkspace = new(); ObdTab.Content = obdWorkspace;
-            obdWorkspace.ConnectRequested += () => Navigate(0);
+            obdWorkspace.ShareConnectionControls(AdapterBox, PortBox, BaudBox, DriverBox, ConnectButton, DisconnectButton, RefreshPortsButton, SerialPanel, TactrixPanel);
+            obdWorkspace.ConnectRequested += () => obdConnectWork = ConnectObd();
+            obdWorkspace.DisconnectRequested += async () => await Run(Disconnect);
+            obdWorkspace.RefreshRequested += RefreshPorts;
             obdWorkspace.ScanRequested += async () => await ScanObd();
             obdWorkspace.ClearRequested += async () =>
             {
@@ -29,6 +35,13 @@ public partial class MainWindow
         }
         ObdControls(!busy && !closing && !exportingReport && flashWorkspace?.HardwareInUse != true);
         return obdWorkspace;
+    }
+    private async Task ConnectObd()
+    {
+        var page = ShowObdWorkspace(); page.StatusText.Text = "Connecting and identifying the engine ECU…";
+        await ConnectAdapter();
+        if (ObdAvailable) await ScanObd();
+        else page.StatusText.Text = StatusText.Text;
     }
     private void ObdControls(bool idle) => obdWorkspace?.SetAvailability(idle, ObdAvailable, transport?.ReadAttempted == true, identity);
     private ObdDiagnostics ObdWorkflow() => ObdAvailable && transport is IObdTransport link && !link.ReadAttempted

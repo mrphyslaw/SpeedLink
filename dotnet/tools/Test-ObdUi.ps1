@@ -7,5 +7,5 @@ $process = Start-Process -FilePath (Resolve-Path -LiteralPath $Executable).Path 
 if (!$process.WaitForExit(90000)) { $process.Kill(); throw 'Engine diagnostics UI check timed out.' }
 if ($process.ExitCode -ne 0) { if (Test-Path -LiteralPath $report) { Get-Content -LiteralPath $report -Raw }; throw 'Engine diagnostics UI check failed.' }
 $r = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-if (!$r.passed -or $r.hardwareAccessed -or !$r.readCodes -or !$r.clearAndRescan -or !$r.beforeReportRetained -or !$r.permanentCodesRemain -or !$r.controlsLocked -or !$r.romNotRequired -or !$r.unknownOutcome -or !$r.navigationShortcut -or !$r.shortcutMigration -or !$r.newConnectionClearsResults -or $r.pages -ne 8) { throw 'Incomplete engine diagnostics UI evidence.' }
+if (!$r.passed -or $r.hardwareAccessed -or !$r.readCodes -or !$r.clearAndRescan -or !$r.beforeReportRetained -or !$r.permanentCodesRemain -or !$r.controlsLocked -or !$r.romNotRequired -or !$r.unknownOutcome -or !$r.navigationShortcut -or !$r.shortcutMigration -or !$r.newConnectionClearsResults -or !$r.samePageConnectReadDisconnect -or !$r.sharedAdapterSettings -or $r.pages -ne 8) { throw 'Incomplete engine diagnostics UI evidence.' }
 Write-Output ('Engine diagnostics UI and report workflow passed: '+$folder)

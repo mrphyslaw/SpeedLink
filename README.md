@@ -33,8 +33,9 @@ two matching readbacks. **Gen 2 flashing is planned for an upcoming
 release.** SpeedLink ships without ROM files or adapter drivers.
 [Flashing and recovery guide](docs/FLASHING.md)
 
-**Engine diagnostics:** Connect your adapter, then open **Diagnostics** (Ctrl+8)
-to read stored, pending and supported permanent fault codes, check-engine light
+**Engine diagnostics:** Open **Diagnostics** (Ctrl+8), select your adapter and
+choose **Connect & read codes** on that same page. Read stored, pending and
+supported permanent fault codes, check-engine light
 state, readiness monitors and available freeze-frame data. No ROM file is needed.
 **Clear codes…** retains a before-clear report, checks that engine speed is zero,
 sends the request once and rescans. Clearing resets readiness and removes

@@ -14,6 +14,9 @@
 - Desktop checks cover no-ROM operation, operation locking, report export,
   minimum-window layout, Light/Dark rendering, the assignable shortcut and
   reconnect handling after an unknown clear outcome.
+- The real Diagnostics Connect/read/disconnect buttons are exercised with an
+  injected synthetic adapter. They share the existing adapter settings and
+  connection workflow and keep Diagnostics selected throughout the operation.
 - Gen 2 ECU diagnostics and Mongoose physical diagnostics remain unqualified.
   This feature addresses the engine ECU; it does not scan ABS, airbags or other modules.
 

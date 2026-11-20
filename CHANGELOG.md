@@ -2,7 +2,7 @@
 
 ## 0.8.0-alpha.16
 
-- Add the Diagnostics workspace for engine fault-code reading and clearing, MIL/readiness status and available freeze-frame data. Standard diagnostics require no ROM file.
+- Add the Diagnostics workspace for engine fault-code reading and clearing, MIL/readiness status and available freeze-frame data. Select an adapter and connect/read/disconnect on the same page. Standard diagnostics require no ROM file.
 - Retain a durable before-clear report, require explicit confirmation and zero engine speed, send Clear once and automatically rescan. Unknown acknowledgements require reconnecting; permanent codes remain under ECU control.
 - Add JSON report export, the assignable Ctrl+8 navigation shortcut and a bundled diagnostics guide. Keep diagnostic clearing separate from the reader/logger command filters and Gen 1 programming workflow.
 - Validate reading and acknowledged clearing/rescan with vLinker FS and Tactrix on the L3M6EG000 bench ECU. The missing ABS/DSC module fault remains present on the isolated bench. Gen 2 ECU and Mongoose hardware qualification remain pending.

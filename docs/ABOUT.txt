@@ -7,6 +7,7 @@ ROM reading, verified backups, offline ROM editing, live logging and engine diag
 Read/clear engine fault codes, MIL/readiness and available freeze frame without a ROM.
 Confirmed clearing retains before/after reports and sends Clear once; permanent codes remain under ECU control.
 Diagnostics opens from the sidebar or assignable Ctrl+8 shortcut.
+Select an adapter, connect and read codes, refresh devices and disconnect directly on Diagnostics.
 Standard VINs and supported short chassis IDs recognized during identification.
 One workspace for editing, live logging and recorded logs.
 Multiple resizable map panes with native detachable map windows.

@@ -13,14 +13,25 @@ public partial class MainWindow
         var page = ShowObdWorkspace();
         void Check(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
         Check(Resource("SpeedLink.ObdHelp.md").Contains("Ctrl+8", StringComparison.Ordinal), "Bundled diagnostics guide is missing.");
-        Check(!page.ScanButton.IsEnabled && !page.ClearButton.IsEnabled && !page.SaveButton.IsEnabled && image is null, "Offline diagnostics controls are wrong.");
+        Check(page.ScanButton.IsEnabled && !page.ClearButton.IsEnabled && !page.SaveButton.IsEnabled && image is null, "Offline diagnostics controls are wrong.");
         using var peer = new ObdUiPeer();
         bool locked = false;
         peer.CheckBusy = () => Dispatcher.Invoke(() => { Check(busy && !page.ScanButton.IsEnabled && !page.ClearButton.IsEnabled && !ConnectButton.IsEnabled && !ReadButton.IsEnabled, "Diagnostics did not lock competing operations."); locked = true; });
-        transport = peer; identity = new("synthetic", peer.Adapter, "JM1GG000000000001", "L3M6EG000L3T60A1"); Controls();
-        Check(page.ScanButton.IsEnabled && page.ClearButton.IsEnabled && image is null, "OBD reading incorrectly requires a ROM.");
-        await ScanObd(); UpdateLayout();
+        page.AdapterSelector.SelectedIndex = 1; UpdateLayout();
+        Check(AdapterBox.SelectedIndex == 1, "Diagnostics adapter selection is not shared.");
+        page.AdapterSelector.SelectedIndex = 0; page.PortSelector.Text = "COM_SYNTHETIC"; page.BaudSelector.SelectedItem = 115200; UpdateLayout();
+        Check(PortBox.Text == "COM_SYNTHETIC" && (int)BaudBox.SelectedItem == 115200, "Diagnostics serial settings are not shared.");
+        offlineConnectionFactory = () => (peer, null, new("synthetic", peer.Adapter, "JM1GG000000000001", "L3M6EG000L3T60A1"));
+        page.ScanButton.RaiseEvent(new(System.Windows.Controls.Button.ClickEvent));
+        await (obdConnectWork ?? throw new InvalidOperationException("Connect & read codes did not start.")); UpdateLayout();
+        Check(Pages.SelectedIndex == ObdPage && page.ScanButton.IsEnabled && page.DisconnectButton.IsEnabled && page.ClearButton.IsEnabled && image is null, "Diagnostics connection left the page or incorrectly required a ROM.");
         Check(page.LastScan?.Stored.Value?.Single().Code == "U0121" && page.CodesGrid.Items.Count == 2 && page.FrameGrid.Items.Count == 1, "Fault or frame results were lost.");
+        var firstScan = page.LastScan;
+        page.DisconnectButton.RaiseEvent(new(System.Windows.Controls.Button.ClickEvent)); await activeWork!; UpdateLayout();
+        Check(transport is null && Pages.SelectedIndex == ObdPage && page.ScanButton.IsEnabled && !page.DisconnectButton.IsEnabled, "Disconnect left Diagnostics or failed to restore connection controls.");
+        page.ScanButton.RaiseEvent(new(System.Windows.Controls.Button.ClickEvent)); await obdConnectWork!; UpdateLayout();
+        Check(Pages.SelectedIndex == ObdPage && page.LastScan is not null && !ReferenceEquals(page.LastScan, firstScan), "Reconnect did not replace the previous scan on Diagnostics.");
+        offlineConnectionFactory = null;
         Check(page.LastScan!.Permanent.Status == ObdStatus.Unsupported && page.ServiceText.Text.Contains("Not supported", StringComparison.Ordinal), "Unsupported service became an empty success.");
         ObdReports.SaveNew(Path.Combine(output, "synthetic-report.json"), page.LastScan);
         var originalAppearance = appearance;
@@ -60,7 +71,7 @@ public partial class MainWindow
         Check(page.LastScan is null && page.CodesGrid.Items.Count == 0 && !page.SaveButton.IsEnabled, "Previous ECU results survived a new connection.");
         return new { passed = true, hardwareAccessed = false, readCodes = true, clearAndRescan = true, beforeReportRetained = true,
             permanentCodesRemain = true, controlsLocked = locked, romNotRequired = image is null, unknownOutcome = true,
-            navigationShortcut = true, shortcutMigration = true, newConnectionClearsResults = true, capturedThemes = new[] { "Light", "Dark" }, pages = Pages.Items.Count };
+            navigationShortcut = true, shortcutMigration = true, newConnectionClearsResults = true, samePageConnectReadDisconnect = true, sharedAdapterSettings = true, capturedThemes = new[] { "Light", "Dark" }, pages = Pages.Items.Count };
     }
     private sealed class ObdUiPeer : IObdTransport
     {

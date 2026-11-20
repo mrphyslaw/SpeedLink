@@ -1,14 +1,17 @@
 # Engine diagnostics
 
 Open **Diagnostics** in the sidebar, or use **Ctrl+8** (assignable under
-**Tools → Keyboard shortcuts**). Connect and identify your adapter from
-**Connection** first. No ROM file or backup is required for standard OBD diagnostics.
+**Tools → Keyboard shortcuts**). Select your adapter and COM port or registered
+J2534 driver directly on this page, then choose **Connect & read codes**.
+SpeedLink connects, identifies the ECU and reads its diagnostic information
+without leaving Diagnostics. **Disconnect** and **Refresh devices** are available
+on the same page. No ROM file or backup is required for standard OBD diagnostics.
 If an older installation already assigned Ctrl+8 to another action, SpeedLink
 preserves that binding. Assign a different Diagnostics shortcut in the settings.
 
 ## Read codes
 
-Choose **Read codes** to capture the engine ECU's stored, pending and permanent
+Once connected, choose **Read codes** to refresh the engine ECU's stored, pending and permanent
 emissions-related fault codes, check-engine light state and readiness monitors.
 Unsupported services, rejected requests and communication failures are displayed
 separately. A missing reply never means there are no faults.
