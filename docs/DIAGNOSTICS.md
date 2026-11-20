@@ -44,6 +44,8 @@ clearing; read again if the following scan was stopped.
 **Save report…** creates a new JSON report without overwriting an existing file.
 Reports may contain VIN/chassis ID and calibration information; review them before
 sharing. **Open reports** opens the local folder containing clear-operation reports.
+Starting a new adapter connection clears the displayed scan so results from a
+previous ECU are not attributed to the new connection. Saved reports remain intact.
 
 Only one adapter operation runs at a time. Reading, logging, flashing and recovery
 cannot run concurrently with diagnostics. Disconnect and reconnect after a ROM

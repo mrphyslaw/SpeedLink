@@ -194,6 +194,7 @@ public partial class MainWindow : Window
             transport = connected.Link;
             connection = connected.Connection;
             identity = connected.Identity;
+            obdWorkspace?.ResetForConnection();
             diagnosticSession?.Record("connection.ready", new { identity.Adapter, identity.Calibration, identity.VinStatus, identity.CalibrationStatus });
             LoggerIdentityChanged();
             ShowEcuIdentity();

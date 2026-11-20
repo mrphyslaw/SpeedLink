@@ -94,5 +94,12 @@ internal sealed class ObdWorkspace : UserControl
         else { FreezeText.Text = "Freeze frame: " + Label(scan.FreezeFrame.Status); FreezeText.ToolTip = scan.FreezeFrame.Detail; FrameGrid.ItemsSource = null; }
         StatusText.Text = $"Scan captured {scan.CapturedUtc.ToLocalTime():g}. " + (scan.ConnectionUsable ? "Permanent codes clear only after the ECU confirms the repair." : "Scan incomplete. Reconnect before trying again.");
     }
+    internal void ResetForConnection()
+    {
+        LastScan = null; CodesGrid.ItemsSource = ReadinessGrid.ItemsSource = FrameGrid.ItemsSource = null;
+        SummaryText.Text = ServiceText.Text = FreezeText.Text = ""; ServiceText.ToolTip = FreezeText.ToolTip = null;
+        StatusText.Text = "Connected to a new adapter session. Choose Read codes to capture this ECU's current results.";
+        SaveButton.IsEnabled = false;
+    }
     private static string Label(ObdStatus status) => status switch { ObdStatus.Unsupported => "Not supported", ObdStatus.Rejected => "ECU declined request", ObdStatus.CommunicationError => "Connection error", ObdStatus.NotAttempted => "Not read", _ => "Available" };
 }

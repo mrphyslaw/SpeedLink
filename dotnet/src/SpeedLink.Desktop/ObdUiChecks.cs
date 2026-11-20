@@ -56,9 +56,11 @@ public partial class MainWindow
         savedKeys.Remove(nameof(ShortcutAction.Diagnostics)); File.WriteAllText(legacyPath, JsonSerializer.Serialize(savedKeys));
         var migrated = ShortcutPreferences.Load(legacyPath);
         Check(migrated[ShortcutAction.FindMap] == oldChord && migrated[ShortcutAction.Diagnostics] is null && migrated[ShortcutAction.SaveRom] == EditorPane.Shortcuts[ShortcutAction.SaveRom], "New diagnostics shortcut overwrote existing user bindings.");
+        page.ResetForConnection();
+        Check(page.LastScan is null && page.CodesGrid.Items.Count == 0 && !page.SaveButton.IsEnabled, "Previous ECU results survived a new connection.");
         return new { passed = true, hardwareAccessed = false, readCodes = true, clearAndRescan = true, beforeReportRetained = true,
             permanentCodesRemain = true, controlsLocked = locked, romNotRequired = image is null, unknownOutcome = true,
-            navigationShortcut = true, shortcutMigration = true, capturedThemes = new[] { "Light", "Dark" }, pages = Pages.Items.Count };
+            navigationShortcut = true, shortcutMigration = true, newConnectionClearsResults = true, capturedThemes = new[] { "Light", "Dark" }, pages = Pages.Items.Count };
     }
     private sealed class ObdUiPeer : IObdTransport
     {
