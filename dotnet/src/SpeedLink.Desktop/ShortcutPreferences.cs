@@ -8,7 +8,7 @@ namespace SpeedLink.Desktop;
 internal enum ShortcutAction
 {
     OpenRom, SaveRom, OpenRecording, KeyboardShortcuts,
-    Connection, Editor, Logger, Recordings, RomChecks, Backups, FlashWorkspace,
+    Connection, Editor, Logger, Recordings, RomChecks, Backups, FlashWorkspace, Diagnostics,
     Undo, Redo, FindMap, ToggleBrowser, NewTab, NextTab, PreviousTab,
     MapInformation, ToggleGraph, FitMap, ExpandMap, DockMap, PinMap, CloseMap, EditTools,
     Copy, Paste, ResetCells, Increase, Decrease, IncreaseLarge, DecreaseLarge, InterpolateAcross, InterpolateDown
@@ -50,6 +50,7 @@ internal sealed class ShortcutPreferences
         new(ShortcutAction.RomChecks, "Navigation", "Go to ROM checks", new(Key.D5, Ctrl)),
         new(ShortcutAction.Backups, "Navigation", "Go to Backups", new(Key.D6, Ctrl)),
         new(ShortcutAction.FlashWorkspace, "Navigation", "Go to Flash & Recover", new(Key.D7, Ctrl)),
+        new(ShortcutAction.Diagnostics, "Navigation", "Go to Diagnostics", new(Key.D8, Ctrl)),
         new(ShortcutAction.Undo, "Editor", "Undo ROM edit", new(Key.Z, Ctrl)),
         new(ShortcutAction.Redo, "Editor", "Redo ROM edit", new(Key.Y, Ctrl)),
         new(ShortcutAction.FindMap, "Editor", "Find a map", new(Key.F, Ctrl)),
@@ -142,6 +143,10 @@ internal sealed class ShortcutPreferences
                     if (key is { } chord && !CanAssign(item, chord)) return new();
                     result.bindings[item.Action] = key;
                 }
+            // New defaults yield to bindings explicitly saved by an older version.
+            foreach (var item in Definitions.Where(item => !saved.ContainsKey(item.Action.ToString())))
+                if (result.bindings[item.Action] is { } added && result.bindings.Any(binding => binding.Key != item.Action && binding.Value == added))
+                    result.bindings[item.Action] = null;
             if (result.bindings.Any(binding => binding.Value is { } key && result.Find(key) != binding.Key) ||
                 result.bindings[ShortcutAction.FitMap] == new ShortcutKey(Key.D0, Ctrl) &&
                 result.bindings.Any(binding => binding.Value == new ShortcutKey(Key.NumPad0, Ctrl)))

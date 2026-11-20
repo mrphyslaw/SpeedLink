@@ -293,7 +293,7 @@ app theme. SpeedLink remembers the choice.
 | Ctrl+T | Create an empty workspace tab. |
 | Ctrl+Tab / Ctrl+Shift+Tab | Next / previous workspace tab. |
 | Ctrl+Shift+O | Open a recording. |
-| Ctrl+1 through Ctrl+7 | Switch application workspaces. |
+| Ctrl+1 through Ctrl+8 | Switch application workspaces; Ctrl+8 opens Diagnostics. |
 | F1 | Open/restore help for the active map. |
 | F4 | Switch the active map between the table and graph. |
 | F6 | Expand the active map or restore its size. |

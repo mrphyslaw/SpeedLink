@@ -1,10 +1,10 @@
 # SpeedLink
 
-Open-source ROM reading, data logging, ROM editing, and Gen 1 flashing and recovery for Mazdaspeed and Mazda MPS.
+Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 1 flashing and recovery for Mazdaspeed and Mazda MPS.
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.15](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.15)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.16](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.16)** · A single Windows EXE with the runtime included.
 
 **Watch the SpeedLink v0.8.0-alpha.14 walkthrough (3:30)** · Light mode with on-screen captions and no audio.
 
@@ -24,7 +24,7 @@ move it. New maps use the space they need when the whole table fits at a readabl
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the eleven supported stock ROM layouts.
 **Flashing and stock recovery are Gen 1 only**, covering all ten bundled Gen 1
-ROM layouts. Open **Flash & Recover** below **Connection**. Pick the ROM to
+ROM layouts. Open **Flash & Recover** from the sidebar. Pick the ROM to
 write and SpeedLink looks up the ECU's verified original by VIN or chassis ID
 and calibration. Recovery lists saved runs by date and calibration, checks the
 ECU state, and finds the exact backup automatically. Normal writes offer two, one, or zero full
@@ -32,6 +32,15 @@ readbacks. The zero-readback result is marked unverified. Recovery requires
 two matching readbacks. **Gen 2 flashing is planned for an upcoming
 release.** SpeedLink ships without ROM files or adapter drivers.
 [Flashing and recovery guide](docs/FLASHING.md)
+
+**Engine diagnostics:** Connect your adapter, then open **Diagnostics** (Ctrl+8)
+to read stored, pending and supported permanent fault codes, check-engine light
+state, readiness monitors and available freeze-frame data. No ROM file is needed.
+**Clear codes…** retains a before-clear report, checks that engine speed is zero,
+sends the request once and rescans. Clearing resets readiness and removes
+freeze-frame information; faults can return, and permanent codes may remain.
+Use **Save report…** to export a diagnostic snapshot.
+[Engine diagnostics guide](docs/DIAGNOSTICS.md)
 
 Tactrix Openport 2.0 and vLinker FS have physical write coverage.
 Mongoose-Plus ISO/CAN3 is available for experimental Gen 1 flashing and recovery.

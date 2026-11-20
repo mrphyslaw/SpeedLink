@@ -111,6 +111,7 @@ public partial class MainWindow : Window
         DriverBox.IsEnabled = AdapterBox.IsEnabled;
         LoggerControls(idle);
         DiagnosticControls(idle);
+        ObdControls(idle);
     }
     private Task Run(Func<Task> action)
     {
@@ -400,6 +401,7 @@ public partial class MainWindow : Window
         foreach (var name in Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith("SpeedLink.Notices.", StringComparison.Ordinal)))
             documents["Notices / " + name[18..]] = name;
         documents["Gen 1 flashing and recovery"] = "SpeedLink.FlashingHelp.md";
+        documents["Engine diagnostics"] = "SpeedLink.ObdHelp.md";
         documents["Tuning guide"] = "SpeedLink.TuningHelp.md";
         var panel = new DockPanel { Margin = new Thickness(16) };
         var chooser = new ComboBox { ItemsSource = documents.Keys, Margin = new Thickness(0, 0, 0, 12) };
@@ -463,7 +465,7 @@ public partial class MainWindow : Window
         UpdateLayout();
         if (new System.Windows.Automation.Peers.TabControlAutomationPeer(Pages).GetChildren()?.Count != Pages.Items.Count)
             throw new InvalidOperationException("Workspace automation containers missing.");
-        if (Pages.Items.Count != FlashPage + 1 || !ReferenceEquals(Pages.Items[FlashPage], FlashTab) ||
+        if (Pages.Items.Count != ObdPage + 1 || !ReferenceEquals(Pages.Items[ObdPage], ObdTab) || !ReferenceEquals(Pages.Items[FlashPage], FlashTab) ||
             transport is not null || image is not null || !ConnectButton.IsEnabled || ReadButton.IsEnabled || CorrectButton.IsEnabled)
             throw new InvalidOperationException("Unexpected startup state.");
         if (AdapterBox.Items.Count != 3 || AdapterBox.SelectedIndex != 0 || typeof(ReadWorkflow).Assembly.GetType("SpeedLink.Core.Simulator") is not null)

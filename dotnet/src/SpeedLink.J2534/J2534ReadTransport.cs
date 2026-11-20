@@ -15,13 +15,18 @@ public interface IJ2534Channel : IDisposable
     void Connect(uint bitrate, uint requestId, uint responseId);
     void ClearReceive();
     void Write(byte[] request);
+    void WriteObd(byte[] request, bool clearConfirmed)
+    {
+        ObdProtocol.CheckAllowed(request, clearConfirmed);
+        Write(request);
+    }
     J2534Frame? Read(int timeoutMilliseconds);
     string? CleanupWarning { get; }
     object? ReadDiagnostics => null;
 }
 
 /// <summary>Read-only Mazda diagnostics through an installed J2534 driver.</summary>
-public sealed class J2534ReadTransport : IReadTransport
+public sealed class J2534ReadTransport : IObdTransport
 {
     private readonly IJ2534Channel channel;
     private readonly TimeSpan responseTimeout;
@@ -69,6 +74,15 @@ public sealed class J2534ReadTransport : IReadTransport
     {
         // Validate before touching the driver, including clearing its receive queue.
         DiagnosticProtocol.CheckReadOnly(request, ReadChunkSize);
+        return ExchangeCore(request);
+    }
+    public byte[] ExchangeObd(byte[] request, bool clearConfirmed = false)
+    {
+        ObdProtocol.CheckAllowed(request, clearConfirmed);
+        return ExchangeCore(request, obd: true, clearConfirmed);
+    }
+    private byte[] ExchangeCore(byte[] request, bool obd = false, bool clearConfirmed = false)
+    {
         ObjectDisposedException.ThrowIf(disposed, this);
         if (!initialized || faulted)
             throw new TransportException("Reconnect and identify before continuing.");
@@ -79,7 +93,7 @@ public sealed class J2534ReadTransport : IReadTransport
         try
         {
             channel.ClearReceive();
-            channel.Write(request);
+            if (obd) channel.WriteObd(request, clearConfirmed); else channel.Write(request);
             watch.Start(); // Keep the ECU response deadline independent of driver queue/write time.
             var limit = responseTimeout;
             var packets = new List<byte[]>();

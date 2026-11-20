@@ -1,12 +1,13 @@
 # SpeedLink documentation
 
-SpeedLink combines ROM reading, offline editing, stock-ECU logging, and Gen 1
+SpeedLink combines ROM reading, offline editing, stock-ECU logging, engine diagnostics, and Gen 1
 flashing and recovery. Gen 2 flashing is planned for an upcoming release.
 
 ## Using SpeedLink
 
 | Guide | Contents |
 | --- | --- |
+| [Engine diagnostics](DIAGNOSTICS.md) | Read/clear engine fault codes, readiness, freeze frame and retained before/after reports |
 | [Dump a ROM / request support](DUMP_A_ROM.md) | Guided adapter setup, two-pass reading, verification and ROM contribution |
 | [Gen 1 Flash & Recover](FLASHING.md) | Find a saved backup by ECU identity, choose a readback policy, check boot mode and recover an interrupted write |
 | [ROM editor overview](editor/README.md) | Screenshots, features and a short editing workflow |

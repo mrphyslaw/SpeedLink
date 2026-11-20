@@ -176,6 +176,16 @@ public sealed class NativeJ2534Channel : IJ2534Channel
     {
         if (programmingPermit is null) DiagnosticProtocol.CheckReadOnly(request, 3968);
         else programmingPermit.Consume(request);
+        WriteCore(request);
+    }
+    public void WriteObd(byte[] request, bool clearConfirmed)
+    {
+        ObdProtocol.CheckAllowed(request, clearConfirmed);
+        if (programmingPermit is not null) throw new TransportException("Reconnect through the normal diagnostics connection before using OBD services.");
+        WriteCore(request);
+    }
+    private void WriteCore(byte[] request)
+    {
         EnsureConnected();
         var packet = Packet(requestId, request);
         uint count = 1;

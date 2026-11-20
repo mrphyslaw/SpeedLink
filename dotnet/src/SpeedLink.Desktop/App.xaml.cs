@@ -8,6 +8,26 @@ public partial class App : Application
         base.OnStartup(e);
         InstallCrashReporting();
         if (await RunCrashChecks(e.Args)) return;
+        if (e.Args.Contains("--obd-smoke", StringComparer.Ordinal))
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            string GetObd(string key) { int at = Array.IndexOf(e.Args, key); return at >= 0 && at + 1 < e.Args.Length ? e.Args[at + 1] : throw new ArgumentException("Missing " + key); }
+            MainWindow? obd = null;
+            try
+            {
+                string output = GetObd("--output"); System.IO.Directory.CreateDirectory(output);
+                obd = new MainWindow(System.IO.Path.Combine(output, "data")); MainWindow = obd;
+                var result = await obd.ExerciseObdOffline(output);
+                System.IO.File.WriteAllText(GetObd("--smoke-report"), System.Text.Json.JsonSerializer.Serialize(result));
+                obd.CloseWorkbenchTest(); Shutdown(0);
+            }
+            catch (Exception error)
+            {
+                System.IO.File.WriteAllText(GetObd("--smoke-report"), System.Text.Json.JsonSerializer.Serialize(new { passed = false, error = error.ToString() }));
+                obd?.CloseWorkbenchTest(); Shutdown(1);
+            }
+            return;
+        }
         if (e.Args.Contains("--gen1-flash-smoke", StringComparer.Ordinal))
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;

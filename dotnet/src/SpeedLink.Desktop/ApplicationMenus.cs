@@ -109,7 +109,7 @@ public partial class MainWindow
     {
         if (!AllowsKeyboardShortcuts || EditorWorkspace.NativeKeyboardInput(e.OriginalSource) ||
             EditorPane.Shortcuts.Find(ShortcutKey.From(e)) is not { } action) return;
-        if (e.IsRepeat && action <= ShortcutAction.FlashWorkspace) { e.Handled = true; return; }
+        if (e.IsRepeat && action <= ShortcutAction.Diagnostics) { e.Handled = true; return; }
         e.Handled = HandleApplicationShortcut(action, e);
     }
 }

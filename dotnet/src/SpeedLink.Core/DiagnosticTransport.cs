@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SpeedLink.Core;
 
-public sealed class DiagnosticTransport(IReadTransport inner, DiagnosticSession session) : IReadTransport
+public sealed class DiagnosticTransport(IReadTransport inner, DiagnosticSession session) : IObdTransport
 {
     public IReadTransport Inner => inner;
     public string Mode => inner.Mode;
@@ -14,6 +14,12 @@ public sealed class DiagnosticTransport(IReadTransport inner, DiagnosticSession 
     public IDiagnosticSink Diagnostics => session;
     public static string Describe(ReadOnlySpan<byte> request)
     {
+        if (request.SequenceEqual(new byte[] { 3 })) return "Read stored engine trouble codes";
+        if (request.SequenceEqual(new byte[] { 7 })) return "Read pending engine trouble codes";
+        if (request.SequenceEqual(new byte[] { 10 })) return "Read permanent engine trouble codes";
+        if (request.SequenceEqual(new byte[] { 4 })) return "Clear engine diagnostic information";
+        if (request.SequenceEqual(new byte[] { 1, 1 })) return "Read check-engine light and readiness";
+        if (request.Length == 3 && request[0] == 2) return "Read freeze frame " + request[2] + " PID " + request[1].ToString("X2");
         if (request.SequenceEqual(new byte[] { 9, 2 })) return "Read VIN / chassis ID";
         if (request.SequenceEqual(new byte[] { 9, 4 })) return "Read calibration";
         if (request.SequenceEqual(new byte[] { 1, 12 })) return "Check engine speed";
@@ -28,6 +34,12 @@ public sealed class DiagnosticTransport(IReadTransport inner, DiagnosticSession 
         => ExchangeCore(request, () => inner.Exchange(request));
     public byte[] ExchangeLogger(byte[] request, int expectedResponseLength)
         => ExchangeCore(request, () => inner.ExchangeLogger(request, expectedResponseLength));
+    public byte[] ExchangeObd(byte[] request, bool clearConfirmed = false)
+    {
+        ObdProtocol.CheckAllowed(request, clearConfirmed);
+        if (inner is not IObdTransport obd) throw new TransportException("This connection does not support OBD diagnostics.");
+        return ExchangeCore(request, () => obd.ExchangeObd(request, clearConfirmed));
+    }
     private byte[] ExchangeCore(byte[] request, Func<byte[]> exchange)
     {
         string stage = Describe(request); var timer = Stopwatch.StartNew();
