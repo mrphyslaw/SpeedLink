@@ -12,7 +12,7 @@ public partial class MainWindow
 {
     internal async Task<Dictionary<string, object?>> ExerciseReadProgressOffline(IReadTransport peer, string output, string scenario, bool unknownGen2 = false)
     {
-        Show(); UpdateLayout();
+        Show(); Navigate(0); UpdateLayout();
         if (ReadProgressPanel.Visibility != Visibility.Collapsed) throw new InvalidOperationException("Idle progress takes up space.");
         BeginReadProgress();
         stop = new();
@@ -103,6 +103,7 @@ public partial class MainWindow
         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
         UpdateLayout();
         var bounds = ReadProgressPanel.TransformToAncestor(this).TransformBounds(new Rect(ReadProgressPanel.RenderSize));
+        CaptureWorkbench(Path.Combine(output, "MinimumWindow.png"));
         if (bounds.Right > ActualWidth || bounds.Bottom > ActualHeight - 26 || LogBox.ActualHeight < 50 || ReadBackupBar.ActualHeight < 10)
             throw new InvalidOperationException("Progress or log clipped at minimum window size.");
         Capture("Result");

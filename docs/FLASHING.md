@@ -13,7 +13,7 @@ disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
    Close other applications using the adapter. Switch the ignition **ON** with
    the engine **OFF** and connect a stable battery support supply. SpeedLink
    checks for 12–15 V at the adapter.
-2. If this ECU has no saved verified backup, identify it in **Connection** and
+2. If this ECU has no saved verified backup, identify it in **ECU → Read backup** and
    run **Read & verify backup** with ignition on and engine off. Keep the
    full backup directory, including `rom.bin`, its manifest, journal and both
    read captures. Use a backup from the same physical ECU, captured while it
@@ -26,10 +26,15 @@ disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
 
 ## Write a ROM
 
-1. Open **Flash & Recover** below **Connection** and choose **Write ROM**.
-   After a verified Gen 1 backup, **Open in Flash & Recover** carries it over
-   from Connection. Disconnect any active Connection session before programming.
-2. Select the adapter and the ROM to write, then choose **Identify ECU & find
+1. Open **Flash & Recovery** across the top and choose **Write ROM**.
+   After a verified Gen 1 backup, **Open in Flash & Recovery** carries it over
+   from **ECU → Read backup**. The shared adapter dropdown selects the same adapter
+   everywhere. Opening this section preserves an ordinary connection. Before an
+   ECU-state check, identification or write, SpeedLink closes an idle ordinary
+   session and opens its exclusive programming transport. Finish logging or
+   reading first. After the programming transport closes, normal communication
+   can be reconnected from the shared top bar.
+2. Select the adapter in the shared top bar and the ROM to write, then choose **Identify ECU & find
    backup**. SpeedLink matches the VIN or chassis ID and calibration and shows
    the verified original it found. The target ROM can be moved or renamed.
    **Find backup folder…** adds an older SpeedLink installation, its data
@@ -50,8 +55,8 @@ disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
 6. Wait for the result. With readbacks, **Complete** means the captured ROM
    matched the intended image. With **Skip readback**, SpeedLink checks ECU
    identification after reset and reports **Write acknowledged · readback skipped**.
-   To verify later, use **Connection → Read & verify backup** after the ECU has
-   reset. In **Flash & Recover**, choose **Verify last write…** and open the new
+   To verify later, use **ECU → Read backup → Read & verify backup** after the ECU has
+   reset. In **Flash & Recovery**, choose **Verify last write…** and open the new
    backup's `rom.bin`. SpeedLink reports whether every byte matches the intended
    image. The comparison checks the ECU identity, calibration and capture time.
    On the tested ECU, each full pass took about 25 minutes.
@@ -61,16 +66,16 @@ disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
 1. Keep the failed run folder and the same original verified stock backup.
    Record the stage at which the write stopped. If SpeedLink says
    **Verification required**, the reset was acknowledged. Reconnect in
-   **Connection**, read a fresh verified backup, then choose **Verify last
+   **ECU → Read backup**, read a fresh verified backup, then choose **Verify last
    write…** to compare it with the intended image.
 2. For **Recovery required**, keep the same physical ECU attached. Once the
    failed operation has ended and the adapter is closed, turn the ignition off
    and wait for the ECU to shut down, then turn the ignition back on without
-   starting the engine. Open **Flash & Recover → Recover interrupted write**.
+   starting the engine. Open **Flash & Recovery → Recover interrupted write**.
 3. SpeedLink selects the saved interrupted run when there is only one.
    If several runs are listed, choose by date and calibration. **Browse older
    run…** accepts the original run folder.
-4. Select the adapter and choose **Check ECU state**. Once recovery mode is
+4. Select the adapter in the shared top bar and choose **Check ECU state**. Once recovery mode is
    confirmed, SpeedLink looks up the exact verified backup using the saved
    run's recorded hash and identity. **Normal mode** and **ECU state
    unconfirmed** keep recovery disabled. Confirm the ECU is the same physical

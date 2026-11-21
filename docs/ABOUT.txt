@@ -6,8 +6,8 @@ Workbench alpha
 ROM reading, verified backups, offline ROM editing, live logging and engine diagnostics.
 Read/clear engine fault codes, MIL/readiness and available freeze frame without a ROM.
 Confirmed clearing retains before/after reports and sends Clear once; permanent codes remain under ECU control.
-Diagnostics opens from the sidebar or assignable Ctrl+8 shortcut.
-Select an adapter, connect and read codes, refresh devices and disconnect directly on Diagnostics.
+ECU → Diagnostics opens with the assignable Ctrl+8 shortcut.
+ECU, Editor, Logging and Flash & Recovery share adapter settings and Connect/Disconnect across the top.
 Standard VINs and supported short chassis IDs recognized during identification.
 One workspace for editing, live logging and recorded logs.
 Multiple resizable map panes with native detachable map windows.
@@ -63,7 +63,7 @@ Post-read reconnect guidance and recoverable display/recording input errors.
 Further ECU profiles, physical sensor accuracy and running-engine rates need validation.
 Flashing and stock recovery support all ten bundled Gen 1 ROM layouts.
 Gen 2 flashing is planned for an upcoming release.
-Flash & Recover opens from the sidebar. Help contains the flashing guide.
+Flash & Recovery opens across the top. Help contains the flashing guide.
 Find verified backups by VIN or chassis ID and calibration, or by interrupted journal.
 Check ECU state before recovery. Normal writes can skip readback and remain unverified.
 Normal writes passed on one Gen 1 bench ECU with both wired adapters.

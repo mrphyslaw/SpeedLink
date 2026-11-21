@@ -7,7 +7,7 @@ namespace SpeedLink.Desktop;
 
 public partial class EditorWorkspace
 {
-    internal void CheckGridActionsAndFolders(TuningTable map)
+    internal async Task CheckGridActionsAndFolders(TuningTable map)
     {
         var doc = document!;
         var entry = RevealMapEntry(map);
@@ -28,13 +28,21 @@ public partial class EditorWorkspace
             SearchBox.Clear();
         }
 
-        SelectCell(0);
-        MapGrid.Focus();
+        // Filtering can change the preview pane. Exercise the requested map's
+        // visible editor, rather than assuming the root grid is still attached.
+        var current = OpenMap(map);
+        current.ActivateMap();
+        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        current.UpdateLayout();
+        current.SelectCell(0);
+        current.MapGrid.Focus();
         byte[] before = doc.Snapshot();
         double value = doc.Read(map, 0);
-        var key = new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(MapGrid)!, 0, Key.Q)
+        var source = PresentationSource.FromVisual(current.MapGrid)
+            ?? throw new InvalidOperationException("The active map grid is not attached to a visible window.");
+        var key = new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Q)
             { RoutedEvent = Keyboard.PreviewKeyDownEvent };
-        MapGrid.RaiseEvent(key);
+        current.MapGrid.RaiseEvent(key);
         if (!key.Handled || !(doc.Read(map, 0) > value) || !doc.CanUndo)
             throw new InvalidOperationException("The grid increase shortcut did not make an undoable edit.");
         doc.Undo();

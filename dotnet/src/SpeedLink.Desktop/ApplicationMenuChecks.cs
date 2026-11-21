@@ -17,6 +17,7 @@ public partial class EditorWorkspace
 {
     internal void CheckMapGridColors(TuningTable map)
     {
+        var current = OpenMap(map);
         var values = Enumerable.Range(0, map.Count).Select(index => document!.Read(map, index)).ToArray();
         double low = values.Min(), high = values.Max();
         if (low >= high) throw new InvalidOperationException("The palette check needs different map values.");
@@ -24,9 +25,9 @@ public partial class EditorWorkspace
         {
             int index = Array.IndexOf(values, value);
             int column = index % map.Columns;
-            var binding = (Binding)MapGrid.Columns[column].CellStyle.Setters.OfType<Setter>()
+            var binding = (Binding)current.MapGrid.Columns[column].CellStyle.Setters.OfType<Setter>()
                 .Single(setter => setter.Property == BackgroundProperty).Value;
-            var row = MapGrid.Items[index / map.Columns];
+            var row = current.MapGrid.Items[index / map.Columns];
             if (!ReferenceEquals(binding.Converter.Convert(row, typeof(Brush), "color", CultureInfo.InvariantCulture), UiTheme.Heat(fraction)))
                 throw new InvalidOperationException($"The map grid did not assign value {value} to its palette endpoint.");
         }
@@ -95,9 +96,9 @@ public partial class MainWindow
             throw new InvalidOperationException("Gen 1 flashing or the built-in guide is missing from the menus.");
         if (ApplicationSaveMenu.IsEnabled || EditorPane.UndoButton.IsEnabled || EditorPane.CompareButton.IsEnabled)
             throw new InvalidOperationException("Editing is available without a ROM.");
-        var labels = new[] { NavLabel0, NavLabel1, NavLabel2, NavLabel3, NavLabel4, NavLabel5, NavLabel6, NavLabel7 };
-        if (navigationIsCollapsed || labels.Any(l => !l.IsVisible) || !NavigationLabelsMenu.IsChecked || NavigationColumn.ActualWidth is < 140 or > 160)
-            throw new InvalidOperationException("Fresh navigation does not explain its destinations.");
+        var sections = Navigation.Children.OfType<RadioButton>().ToArray();
+        if (sections.Length != 4 || !sections.Select(b => b.Tag as string).SequenceEqual(["ecu", "editor", "logging", "flash"]) || !TopNavigationBar.IsVisible)
+            throw new InvalidOperationException("Four-section top navigation is incomplete.");
         foreach (var button in Navigation.Children.OfType<RadioButton>())
             if (string.IsNullOrWhiteSpace(AutomationProperties.GetName(button)) || button.ToolTip is not string tip || tip.Length < 20)
                 throw new InvalidOperationException("An icon lacks a descriptive accessible name or tooltip.");
@@ -118,10 +119,15 @@ public partial class MainWindow
         {
             foreach (var item in menu)
             {
+                Activate(); item.Focus();
                 item.IsSubmenuOpen = true; await MenuIdle();
                 if (item.Template.FindName("PART_Popup", item) is not Popup { IsOpen: true, Placement: PlacementMode.Bottom, Child: Border surface } ||
                     surface.Background is not SolidColorBrush background || background.Color != UiTheme.Panel.Color)
-                    throw new InvalidOperationException("Application menu surface is unreadable: " + item.Header);
+                {
+                    CaptureWorkbench(Path.Combine(folder, "MenuFailure.png"));
+                    var failedPopup = item.Template.FindName("PART_Popup", item) as Popup;
+                    throw new InvalidOperationException($"Application menu surface is unreadable: {item.Header}; active={IsActive}, submenu={item.IsSubmenuOpen}, popup={failedPopup?.IsOpen}, placement={failedPopup?.Placement}, expected={UiTheme.Panel.Color}");
+                }
                 foreach (var command in item.Items.OfType<MenuItem>())
                 {
                     command.ApplyTemplate();
@@ -150,26 +156,17 @@ public partial class MainWindow
             app.Resources[SystemColors.MenuBrushKey] = priorMenuBrush;
             app.Resources[SystemColors.MenuTextBrushKey] = priorMenuText;
         }
-        NavigationToggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); await MenuIdle();
-        if (!navigationIsCollapsed || labels.Any(l => l.IsVisible) || NavigationLabelsMenu.IsChecked || NavigationColumn.ActualWidth > 60)
-            throw new InvalidOperationException("The sidebar did not collapse consistently.");
-        if (!EditorLayoutPreferences.Load(Path.Combine(vault, "editor-layout.json")).NavigationCollapsed)
-            throw new InvalidOperationException("The compact navigation preference was not saved.");
-        var restored = new MainWindow(vault);
-        try { restored.Show(); await MenuIdle(); if (!restored.navigationIsCollapsed) throw new InvalidOperationException("Navigation was not restored on restart."); }
-        finally { restored.CloseWorkbenchTest(); }
-        NavigationLabelsMenu.IsChecked = true; NavigationLabelsMenu.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); await MenuIdle();
-        if (navigationIsCollapsed || labels.Any(l => !l.IsVisible) || EditorLayoutPreferences.Load(Path.Combine(vault, "editor-layout.json")).NavigationCollapsed)
-            throw new InvalidOperationException("The View menu did not restore and save labeled navigation.");
+        await CheckSharedTopNavigation(folder);
         Navigate(0); CaptureWorkbench(Path.Combine(folder, "Navigation.png"));
         Width = MinWidth; Height = MinHeight; await MenuIdle();
-        if (ApplicationMenu.TranslatePoint(new(ApplicationMenu.ActualWidth, 0), this).X > ActualWidth || labels.Any(l => l.ActualWidth < 30))
-            throw new InvalidOperationException("Application navigation clips at the minimum window size.");
+        if (ApplicationMenu.TranslatePoint(new(ApplicationMenu.ActualWidth, 0), this).X > ActualWidth ||
+            ConnectionSettingsButton.TranslatePoint(new(ConnectionSettingsButton.ActualWidth, 0), this).X > ActualWidth - 5)
+            throw new InvalidOperationException("Top navigation clips at the minimum window size.");
         Width = 1440; Height = 880; await MenuIdle();
         await CheckShortcutSettings(folder);
         return new { passed = true, hardwareAccessed = false, shortcutSettings = true, menus = results, hostColorsIndependent = true, checkedStatesVisible = true,
             disabledSave = true, keyboardActivation = true, escapeCloses = true, permanentMenus = true,
-            labeledNavigation = true, navigationRemembered = true, minimumLayout = true };
+            labeledNavigation = true, navigationRemembered = true, fourSections = true, sharedConnection = true, minimumLayout = true };
     }
 
     internal async Task<object> ExerciseNavigationOffline(string path, string folder)
@@ -203,6 +200,8 @@ public partial class MainWindow
             item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); await MenuIdle();
             if (!ReferenceEquals(EditorPane.Document, doc) || !edited.AsSpan().SequenceEqual(doc.Snapshot()) || !ApplicationSaveMenu.IsEnabled)
                 throw new InvalidOperationException("Application menu navigation lost ROM state.");
+            if (Pages.SelectedIndex == 4 && !RomText.Text.Contains(doc.LastSavePath ?? doc.SourcePath, StringComparison.Ordinal))
+                throw new InvalidOperationException("ROM information did not inspect the active document's saved file.");
         }
         Navigate(1); await MenuIdle(); CaptureApplicationPreview(Path.Combine(folder, "EditorNavigation.png"));
         await CheckEditorAppearance(folder, map);
@@ -228,7 +227,7 @@ public partial class MainWindow
         var light = AppearanceMenu.Items.OfType<MenuItem>().Single(i => Equals(i.Tag, "Light"));
         var dark = AppearanceMenu.Items.OfType<MenuItem>().Single(i => Equals(i.Tag, "Dark"));
         var original = UiTheme.Panel.Color;
-        EditorPane.CheckGridActionsAndFolders(map);
+        await EditorPane.CheckGridActionsAndFolders(map);
         var lowBrush = UiTheme.Heat(0);
         var highBrush = UiTheme.Heat(1);
         var middleBrush = UiTheme.Heat(.5);

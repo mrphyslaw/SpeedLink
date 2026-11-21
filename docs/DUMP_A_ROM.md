@@ -34,7 +34,7 @@ starting a read.
 
 ## 2. Connect and identify
 
-Open SpeedLink and choose **Connection** in the left navigation.
+Open **ECU → Read backup**. Select the adapter in the shared top-bar dropdown.
 
 | Adapter | Select in SpeedLink |
 | --- | --- |
@@ -42,7 +42,7 @@ Open SpeedLink and choose **Connection** in the left navigation.
 | Openport 2.0 | **Tactrix Openport 2.0** and the installed Openport driver; no COM port or baud is needed |
 | Mongoose-Plus ISO/CAN3 | **Mongoose-Plus ISO/CAN3 (experimental)** and its registered 04.04 driver; no COM port or baud is needed |
 
-Select **Connect & identify**. Note the calibration ID and SpeedLink version.
+Select **Connect** in the shared top bar. Note the calibration ID and SpeedLink version.
 If identification fails, stop here and use the support form's **Need help**
 option. Include the exact error with your VIN and local username removed.
 
@@ -84,7 +84,7 @@ Success says **Backup verified · two matching reads**. The connection log also
 shows **Verified backup saved:** followed by the path to `rom.bin`.
 
 SpeedLink saves operations beneath `data/hardware/` beside the EXE. Use
-**Backups → Open backup folder** to find them. Keep the **entire operation
+**ECU → Saved backups → Open backup folder** to find them. Keep the **entire operation
 folder** as your private backup, including `rom.bin`, `backup.json`, both read
 captures, and the journal. A complete ROM is **1,048,576 bytes**.
 
@@ -94,9 +94,9 @@ Checksum correction on editor exports is a separate operation.
 
 ## 4. Check the result
 
-Open **ROM checks → Open verified backup…** and select that operation's
+Open **Editor → ROM information → Open verified backup…** and select that operation's
 `rom.bin`. SpeedLink revalidates the captures, manifest and journal.
-Record the ROM's **SHA-256** shown in ROM checks.
+Record the ROM's **SHA-256** shown in **Editor → ROM information**.
 
 | Result | What to do |
 | --- | --- |
@@ -162,7 +162,7 @@ and reconnect/identify before attempting a fresh read. If the adapter was
 unplugged, reconnect its USB connection and start with the normal settings.
 Use [General usage](USAGE.md) for the vLinker baud-recovery case.
 
-Use **Connection → Export support report…** to save the failed session. Attach
+Use **Help → Export support report…** to save the failed session. Attach
 its ZIP and report the step that failed, exact error, adapter, version, and
 whether any bytes were read. You can open the same guided request without an attachment.
 We cannot diagnose an incomplete dump as if it were complete firmware.
@@ -187,8 +187,8 @@ Maintainer intake checklist:
 
 ## Reporting a problem
 
-Diagnostic capture starts automatically with **Connect & identify**, including
-failed driver opens. On **Connection**, choose **Export support report…**, select
+Diagnostic capture starts automatically with **Connect** in the shared top bar, including
+failed driver opens. Choose **Help → Export support report…**, select
 the session with the problem and save its ZIP. This also works after restarting
 without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
 the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).

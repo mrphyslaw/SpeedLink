@@ -54,13 +54,34 @@ public partial class MainWindow
         Check(!LoggerStartButton.IsEnabled && LoggerConnectionHint.IsVisible && LoggerConnectionButton.IsEnabled && LoggerConnectionHint.Text.Contains("reconnect", StringComparison.Ordinal), "Read session explains reconnect before logging");
         Width = MinWidth; Height = MinHeight; await Idle();
         var hintBounds = LoggerConnectionButton.TransformToAncestor(this).TransformBounds(new Rect(LoggerConnectionButton.RenderSize));
-        Check(hintBounds.Right <= ActualWidth && hintBounds.Bottom <= ActualHeight && LoggerGrid.ActualHeight >= 149, "Post-read guidance fits minimum window size");
+        CaptureWorkbench(Path.Combine(folder, "MinimumLogging.png"));
+        Check(hintBounds.Right <= ActualWidth && hintBounds.Bottom <= ActualHeight && LoggerGrid.ActualHeight >= 149,
+            $"Post-read guidance fits minimum window size · grid={LoggerGrid.ActualHeight:0.###}, hint={hintBounds}, window={ActualWidth}×{ActualHeight}");
         Width = 1280; Height = 720;
         LoggerConnectionButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        Check(Pages.SelectedIndex == 0 && ReferenceEquals(transport, peer), "Reconnect guidance navigates without changing session");
+        Check(Pages.SelectedIndex == 2 && SharedConnectionPopup.IsOpen && ReferenceEquals(transport, peer), "Reconnect guidance opens shared settings without changing view or session");
+        SharedConnectionPopup.IsOpen = false;
         peer.ReadAttempted = false; StoichBox.Text = "14.7"; RecordCsvBox.IsChecked = true; Navigate(2); Controls();
         var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(10) };
-        timer.Tick += (_, _) => { if (loggerScans >= 3) { timer.Stop(); LoggerStopButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); } };
+        bool switchedDuringLogging = false;
+        Exception? navigationFailure = null;
+        timer.Tick += (_, _) =>
+        {
+            try
+            {
+                if (loggerScans >= 1 && !switchedDuringLogging)
+                {
+                    switchedDuringLogging = true;
+                    Navigate(1); UpdateLayout();
+                    Check(ActivityPanel.IsVisible && StopButton.IsEnabled && !ConnectionSettingsButton.IsEnabled && ReferenceEquals(transport, peer), "Live logging status follows Editor without reconnecting");
+                    Navigate(ObdPage); UpdateLayout();
+                    Check(ActivityPanel.IsVisible && !ShowObdWorkspace().ScanButton.IsEnabled && ReferenceEquals(transport, peer), "Diagnostics cannot interrupt logging after navigation");
+                    Navigate(2);
+                }
+                if (loggerScans >= 3) { timer.Stop(); StopButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); }
+            }
+            catch (Exception error) { navigationFailure = error; timer.Stop(); stop?.Cancel(); }
+        };
         timer.Start();
         try
         {
@@ -70,6 +91,7 @@ public partial class MainWindow
             await work;
         }
         finally { timer.Stop(); }
+        Check(switchedDuringLogging && navigationFailure is null, navigationFailure?.Message ?? "Live logging navigation did not run");
         string[] plotted = LoggerPlots.Children.OfType<StackPanel>().SelectMany(p => p.Children.OfType<TextBlock>()).Select(t => t.Text).ToArray();
         Check(ReferenceEquals(transport, peer) && LoggerStartButton.IsEnabled && !LoggerStopButton.IsEnabled && !ReadButton.IsEnabled && loggerScans >= 3 && plotted.Any(t => t.StartsWith("Stopped", StringComparison.Ordinal)) && !plotted.Any(t => t.StartsWith("OK", StringComparison.Ordinal)), "Stopped charts refresh immediately and logging can restart without reconnecting");
         await ClickAndWait(DisconnectButton);

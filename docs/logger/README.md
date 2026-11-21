@@ -24,19 +24,19 @@ bench ECU passed read-only queries and recording through vLinker FS and Tactrix.
 
 ![SpeedLink recorded-log viewer with channel selection and synchronized engine speed, boost, lambda and fuel-pressure plots](images/recorded-log.png)
 
-Choose **Recordings** in the left navigation to open a recording without an
+Choose **Logging → Recordings** to open a recording without an
 adapter. Select up to six channels, move
 the shared cursor to inspect readings, and zoom into part of the run. Missing
 readings appear as gaps. This screenshot uses the bundled synthetic example log.
 
 ## First recording
 
-1. Connect your adapter and select **Connect & identify**.
-2. Open **Logger → Load current ECU ROM…** and choose the full ROM backup
+1. Connect your adapter and select **Connect** in the shared top bar.
+2. Open **Logging → Live → Load current ECU ROM…** and choose the full ROM backup
    currently installed in the ECU. Its calibration ID must match.
 3. Choose **Essentials** or select individual parameters and display units.
 4. Leave **Record CSV** checked, select **Start logging**, then **Stop** to finish.
-5. Use **Recordings → Open recording…** to open the recording's `log.csv`.
+5. Use **Logging → Recordings → Open recording…** to open the recording's `log.csv`.
 
 Recordings are stored under `data/logs` beside the EXE. Keep the entire recording
 folder when sharing a session for troubleshooting. Fewer selected parameters

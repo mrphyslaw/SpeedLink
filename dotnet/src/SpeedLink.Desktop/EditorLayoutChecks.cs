@@ -165,10 +165,8 @@ public partial class MainWindow
     internal async Task<object> ExerciseLayoutOffline(string path, string folder)
     {
         Show(); Navigate(1); EditorPane.OpenRom(path); UpdateLayout();
-        if (!navigationIsCollapsed) { NavigationToggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); UpdateLayout(); }
-        NavigationToggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); UpdateLayout(); if (NavigationColumn.ActualWidth < 100) throw new InvalidOperationException("Navigation did not expand.");
-        NavigationToggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); UpdateLayout();
-        if (NavigationColumn.ActualWidth > 60) throw new InvalidOperationException("Navigation did not collapse.");
+        if (Navigation.Children.OfType<System.Windows.Controls.RadioButton>().Count() != 4 || EditorPane.TranslatePoint(new Point(0, 0), this).X > 20)
+            throw new InvalidOperationException("The editor did not reclaim the old sidebar width.");
         var result = await EditorPane.ExerciseLayoutAcceptance(folder, (width, height) => { Width = width; Height = height; UpdateLayout(); });
         var restored = new MainWindow(vault, EditorPane.TestInspector, EditorPane.TestGuard);
         try

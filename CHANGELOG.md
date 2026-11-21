@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0-alpha.17
+
+- Replace eight sidebar destinations with ECU, Editor, Logging and Flash & Recovery across the top. Group diagnostics, reading and saved backups under ECU; live and recorded data under Logging; saved-file integrity information under Editor.
+- Share one adapter dropdown and Connect/Disconnect across sections. Preserve connection and document state while navigating, and show active-operation status and Stop outside its original view.
+- Hand an idle ordinary session to the existing exclusive programming transport before a flash-related hardware operation. Active operations block the handoff; Gen 1 programming checks and recovery verification remain mandatory.
+- Preserve existing navigation shortcuts, custom bindings and map layouts. Update the guides and navigation screenshots. Give the full CI matrix a 75-minute job budget while retaining every individual gate and timeout.
+
 ## 0.8.0-alpha.16
 
 - Add the Diagnostics workspace for engine fault-code reading and clearing, MIL/readiness status and available freeze-frame data. Select an adapter and connect/read/disconnect on the same page. Standard diagnostics require no ROM file.

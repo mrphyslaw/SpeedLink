@@ -1,5 +1,13 @@
 # Alpha validation scope
 
+## Four-section navigation · 0.8.0-alpha.17
+
+- Four top-level sections group the existing eight logical views. Existing shortcut identifiers and per-ROM map layouts are preserved. The obsolete sidebar-collapse preference no longer affects app navigation.
+- Required UI checks exercise the shared Connect/Disconnect/settings controls, unchanged transport and identity across all views, section-view memory, both themes and the minimum window size.
+- Synthetic programming handoff checks require one completed ordinary-session disposal before reuse, and reject handoff while another operation is active. The existing Gen 1 programming/recovery protocol checks remain unchanged. No new physical flashing claim is made.
+- Actual synthetic logger requests continue while moving through Editor and Diagnostics. Shared status/Stop remain visible and competing diagnostic controls remain disabled.
+- Full regression and all eleven mandatory save-integrity profiles remain required. Every-map opening/axis and editor acceptance gates are retained. The whole-job CI limit is 75 minutes to accommodate the full matrix; individual test timeouts are unchanged.
+
 ## Engine diagnostics · 0.8.0-alpha.16
 
 - vLinker FS and Tactrix both read stored/pending codes, MIL/readiness and ten
@@ -126,7 +134,7 @@
   all six MAP scaling controls, repeat saves, exact restoration and rejection
   of unrelated code changes.
 - Desktop editor checks open the embedded boost guide at the selected topic.
-  Simulated Flash & Recover checks accept a fresh matching backup and reject
+  Simulated Flash & Recovery checks accept a fresh matching backup and reject
   a backup captured before the write.
 - An offline replay of L3M6EG000 follows one pressure target cell through the
   pressure error, correction curve, accumulator and final wastegate command.
@@ -144,7 +152,7 @@
   check its guide link, and verify that switching to an unrelated map clears
   the link. The ten-profile ROM-save integrity matrix passed.
 
-## Flash & Recover workspace · 0.8.0-alpha.2
+## Flash & Recovery workspace · 0.8.0-alpha.2
 
 - The standalone desktop test opens the sidebar workspace and hands off a
   verified Gen 1 backup from Connection. It writes a moved target file using

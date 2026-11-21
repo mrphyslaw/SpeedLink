@@ -23,6 +23,9 @@ internal sealed class FlashWorkspace : UserControl
     private readonly RadioButton writeMode = new() { Content = "Write ROM", IsChecked = true, Margin = new(0, 0, 18, 0) };
     private readonly RadioButton recoverMode = new() { Content = "Recover interrupted write" };
     private readonly ComboBox driver = new() { MinWidth = 300 };
+    private DockPanel? adapterRow;
+    private Func<Task>? prepareSharedAdapter;
+    internal event Action<BenchFlashProgress>? ProgressChanged;
     private readonly TextBlock connectionHint = new() { TextWrapping = TextWrapping.Wrap, Foreground = UiTheme.Amber, Visibility = Visibility.Collapsed };
     private readonly TextBlock backupText = new() { TextWrapping = TextWrapping.Wrap, Foreground = UiTheme.Muted };
     private readonly TextBlock probeStatus = new() { TextWrapping = TextWrapping.Wrap, Margin = new(8, 4, 0, 0) };
@@ -48,6 +51,7 @@ internal sealed class FlashWorkspace : UserControl
     private bool IsRecovery => recoverMode.IsChecked == true;
     internal bool HardwareInUse => active || checking || identifying;
     internal bool IsWorking => HardwareInUse || loading;
+    internal string ActivityMessage => checking ? probeStatus.Text : loading && !identifying ? "Checking flash files…" : status.Text;
     internal event Action? HardwareUseChanged;
     internal event Action? ConnectionRequested;
     private bool uiStateFailed;
@@ -68,18 +72,18 @@ internal sealed class FlashWorkspace : UserControl
         Background = UiTheme.Panel; Foreground = UiTheme.Text;
         var top = new StackPanel { Margin = new(20), MaxWidth = 1050, HorizontalAlignment = HorizontalAlignment.Stretch };
         Content = new ScrollViewer { Content = top, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-        top.Children.Add(new TextBlock { Text = "Flash & Recover", FontSize = 25, FontWeight = FontWeights.SemiBold });
+        top.Children.Add(new TextBlock { Text = "Flash & Recovery", FontSize = 25, FontWeight = FontWeights.SemiBold });
         top.Children.Add(new TextBlock { Text = "Gen 1 only · Tactrix or vLinker FS · Mongoose-Plus ISO/CAN3 experimental", Foreground = UiTheme.Amber, Margin = new(0, 5, 0, 8), TextWrapping = TextWrapping.Wrap });
         top.Children.Add(new TextBlock { Text = "Preserves the first 32 KiB. Erases and rewrites the complete application. Requires a verified original SpeedLink backup. After reset, each readback compares every byte with the intended image.", TextWrapping = TextWrapping.Wrap, Margin = new(0, 0, 0, 12) });
         var modes = new StackPanel { Orientation = Orientation.Horizontal, Margin = new(0, 5, 0, 8) }; top.Children.Add(modes);
         modes.Children.Add(writeMode); modes.Children.Add(recoverMode); inputs.AddRange([writeMode, recoverMode]);
         var connectionRow = new DockPanel(); top.Children.Add(connectionRow);
-        var goToConnection = new Button { Content = "Go to Connection", Margin = new(0, 0, 8, 0), Visibility = Visibility.Collapsed };
+        var goToConnection = new Button { Content = "Adapter settings…", Margin = new(0, 0, 8, 0), Visibility = Visibility.Collapsed };
         goToConnection.Click += (_, _) => ConnectionRequested?.Invoke();
         connectionRow.Children.Add(goToConnection);
         connectionRow.Children.Add(connectionHint);
         connectionHint.IsVisibleChanged += (_, _) => goToConnection.Visibility = connectionHint.Visibility;
-        var drivers = new DockPanel { Margin = new(0, 5, 0, 5) }; top.Children.Add(drivers);
+        var drivers = adapterRow = new DockPanel { Margin = new(0, 5, 0, 5) }; top.Children.Add(drivers);
         drivers.Children.Add(new TextBlock { Text = "Adapter", Width = 180, VerticalAlignment = VerticalAlignment.Center });
         var refreshAdapters = new Button { Content = "Refresh devices", Margin = new(8, 0, 0, 0) };
         DockPanel.SetDock(refreshAdapters, Dock.Right);
@@ -169,12 +173,30 @@ internal sealed class FlashWorkspace : UserControl
         });
         InvalidatePlan();
     }
+    internal void AttachSharedAdapter(Func<Task> prepare)
+    {
+        prepareSharedAdapter = prepare;
+        if (adapterRow is not null) adapterRow.Visibility = Visibility.Collapsed;
+    }
+    internal void UseSharedAdapter(string? port, J2534Driver? selectedDriver)
+    {
+        if (prepareSharedAdapter is null || IsWorking) return;
+        object? choice = selectedDriver ?? (string.IsNullOrWhiteSpace(port) ? null : (object)new VLinkerPort(port));
+        if (Equals(driver.SelectedItem, choice)) return;
+        driver.ItemsSource = choice is null ? Array.Empty<object>() : new[] { choice };
+        driver.SelectedItem = choice;
+    }
+    internal void ResetSharedConnectionState()
+    {
+        if (IsWorking) return;
+        ResetProbe(); InvalidatePlan();
+    }
     internal void SetConnectionUnavailable(bool unavailable)
     {
         if (connectionUnavailable == unavailable) return;
         connectionUnavailable = unavailable;
         connectionHint.Visibility = unavailable ? Visibility.Visible : Visibility.Collapsed;
-        connectionHint.Text = "Finish the current task and disconnect the adapter in Connection before using it here.";
+        connectionHint.Text = "Finish the current adapter task before flashing. The shared adapter settings are available above.";
         ResetProbe();
         if (!IsWorking) InvalidatePlan();
         Refresh();
@@ -187,7 +209,7 @@ internal sealed class FlashWorkspace : UserControl
         if (IsWorking) return;
         plan = null; recovery = null; summary.Text = ""; ready.IsChecked = false;
         backupText.Text = preferredBackup is null ? "SpeedLink will find the verified original backup." :
-            "Backup from Connection · " + preferredBackup;
+            "Selected original backup · " + preferredBackup;
         status.Text = IsRecovery ? "Choose a saved interrupted run and check ECU state." : "Select the ROM to write and an adapter.";
         Refresh();
     }
@@ -281,7 +303,7 @@ internal sealed class FlashWorkspace : UserControl
     private async Task VerifyLastWrite(Func<string?>? chooseBackup = null)
     {
         if (IsWorking) return;
-        loading = true; Refresh();
+        loading = true; Refresh(); HardwareUseChanged?.Invoke();
         verificationStatus.Text = "Checking the latest flash run…";
         try
         {
@@ -300,7 +322,7 @@ internal sealed class FlashWorkspace : UserControl
         }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or InvalidOperationException or ArgumentException or JsonException or FormatException)
         { verificationStatus.Text = "Could not verify the last write · " + error.Message; }
-        finally { loading = false; Refresh(); }
+        finally { loading = false; HardwareUseChanged?.Invoke(); Refresh(); }
 
         string? BrowseBackup()
         {
@@ -351,10 +373,11 @@ internal sealed class FlashWorkspace : UserControl
         HardwareUseChanged?.Invoke(); Refresh();
         try
         {
+            if (prepareSharedAdapter is not null) await prepareSharedAdapter();
             recoveryConfirmed = await Task.Run(() => WithAdapter(() => BenchFlashWorkflow.CheckRecoveryState(factory, evidenceMode)))
                 == FlashEcuState.Recovery;
             probeStatus.Text = recoveryConfirmed ? "Recovery mode confirmed. Review the journal and original backup." :
-                "Normal mode. If the previous write stopped during verification, check the ROM from Connection.";
+                "Normal mode. If the previous write stopped during verification, check the ROM from ECU → Read backup.";
         }
         catch (Exception error) { probeStatus.Text = "ECU state unconfirmed · " + error.Message; }
         finally { checking = false; HardwareUseChanged?.Invoke(); Refresh(); }
@@ -364,7 +387,7 @@ internal sealed class FlashWorkspace : UserControl
     private async Task LoadPlan()
     {
         if (!load.IsEnabled) return;
-        plan = null; recovery = null; ready.IsChecked = false; loading = true; Refresh();
+        plan = null; recovery = null; ready.IsChecked = false; loading = true; Refresh(); HardwareUseChanged?.Invoke();
         try
         {
             string target = image.Text.Trim(), prior = selectedJournal ?? "";
@@ -378,6 +401,7 @@ internal sealed class FlashWorkspace : UserControl
                 identifying = true;
                 status.Text = "Identifying the ECU and checking that the engine is off…";
                 HardwareUseChanged?.Invoke();
+                if (prepareSharedAdapter is not null) await prepareSharedAdapter();
                 live = await Task.Run(() => WithAdapter(() => BenchFlashWorkflow.IdentifyForBackup(factory, evidenceMode)));
             }
             status.Text = "Finding the original verified backup…";
@@ -417,7 +441,7 @@ internal sealed class FlashWorkspace : UserControl
         }
         throw new InvalidDataException(failure ?? (restoring
             ? "The exact original backup for this run was not found. Use Find backup folder to locate its original SpeedLink folder."
-            : "No verified backup matched this ECU's VIN or chassis ID and calibration. Use Find backup folder or read a verified backup from Connection."));
+            : "No verified backup matched this ECU's VIN or chassis ID and calibration. Use Find backup folder or read a verified backup from ECU → Read backup."));
     }
     private async void Load_Click(object sender, RoutedEventArgs e) => await LoadPlan();
     private async void Start_Click(object sender, RoutedEventArgs e)
@@ -439,6 +463,7 @@ internal sealed class FlashWorkspace : UserControl
         var progress = new WindowProgress(this);
         try
         {
+            if (prepareSharedAdapter is not null) await prepareSharedAdapter();
             await Task.Run(() => WithAdapter(() =>
             {
                 bool holdingWake = false;
@@ -466,7 +491,7 @@ internal sealed class FlashWorkspace : UserControl
             status.Text = $"{workflow.Stage}: {error.Message}";
             detail.Text = workflow.Stage switch
             {
-                BenchFlashStage.VerificationRequired => "The reset was acknowledged. Read a fresh verified backup in Connection, then use Verify last write. Keep this run folder.",
+                BenchFlashStage.VerificationRequired => "The reset was acknowledged. Read a fresh verified backup in ECU → Read backup, then use Verify last write. Keep this run folder.",
                 BenchFlashStage.RecoveryRequired => "Keep the ECU connected. Retain this run folder and original backup, then follow the Gen 1 recovery guide.",
                 _ => "Stopped before application erase. Review the reported preflight problem."
             };
@@ -500,6 +525,7 @@ internal sealed class FlashWorkspace : UserControl
     {
         if (lastStage is { } previous && value.Stage < previous) return;
         bar.Value = value.Fraction * 100; status.Text = value.Message;
+        ProgressChanged?.Invoke(value);
         if (IsRecovery && value.Stage == BenchFlashStage.ProgrammingSession)
             probeStatus.Text = "Recovery mode confirmed again before erase.";
         stop.IsEnabled = active && value.CanCancel && cancel?.IsCancellationRequested != true;

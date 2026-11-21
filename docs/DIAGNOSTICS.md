@@ -1,11 +1,11 @@
 # Engine diagnostics
 
-Open **Diagnostics** in the sidebar, or use **Ctrl+8** (assignable under
-**Tools → Keyboard shortcuts**). Select your adapter and COM port or registered
-J2534 driver directly on this page, then choose **Connect & read codes**.
-SpeedLink connects, identifies the ECU and reads its diagnostic information
-without leaving Diagnostics. **Disconnect** and **Refresh devices** are available
-on the same page. No ROM file or backup is required for standard OBD diagnostics.
+Open **ECU → Diagnostics**, or use **Ctrl+8** (assignable under
+**Tools → Keyboard shortcuts**). The shared adapter dropdown at the top contains
+the COM port/baud or registered J2534 driver and **Refresh devices**. Choose
+**Connect & read codes** to connect, identify and scan without leaving Diagnostics.
+**Connect / Disconnect** stays available in the top bar in every section.
+No ROM file or backup is required for standard OBD diagnostics.
 If an older installation already assigned Ctrl+8 to another action, SpeedLink
 preserves that binding. Assign a different Diagnostics shortcut in the settings.
 

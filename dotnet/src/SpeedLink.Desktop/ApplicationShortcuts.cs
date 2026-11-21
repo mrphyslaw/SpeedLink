@@ -28,7 +28,8 @@ public partial class MainWindow
             case ShortcutAction.OpenRecording: ApplicationOpenRecording_Click(this, e); break;
             case ShortcutAction.KeyboardShortcuts: ShowKeyboardShortcuts(); break;
             case >= ShortcutAction.Connection and <= ShortcutAction.Diagnostics:
-                Navigate(action - ShortcutAction.Connection);
+                if (action == ShortcutAction.RomChecks) OpenEditorRomInformation();
+                else Navigate(action - ShortcutAction.Connection);
                 break;
             default: return false;
         }

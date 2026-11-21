@@ -4,19 +4,20 @@ Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.16](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.16)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.17](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.17)** · A single Windows EXE with the runtime included.
 
 **Watch the SpeedLink v0.8.0-alpha.14 walkthrough (3:30)** · Light mode with on-screen captions and no audio.
 
 https://github.com/user-attachments/assets/f8f9edb4-10d7-484b-af48-afa54bfc24fe
 
-Follow a verified backup, then see the Gen 1 Flash & Recover workflow with
+Follow a verified backup, then see the Gen 1 Flash & Recovery workflow with
 a simulated write, readback verification, and recovery-mode check. The editor
 uses an L3M6EG000 bench ECU backup to show the green-low, red-high default in
 the table and 3D graph. The walkthrough also covers docking, workspace tabs,
-assignable shortcuts, logging, and playback.
+assignable shortcuts, logging, and playback. This alpha.14 video shows the earlier sidebar;
+see the [current navigation guide](docs/NAVIGATION.md) for the four-section layout.
 
-Use the permanent File, Edit, View, Map, Tools and Help menus throughout the app. Sidebar icons show their workspace names by default; collapse them when you want more map space. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+Use **ECU**, **Editor**, **Logging**, and **Flash & Recovery** across the top. The shared adapter dropdown and Connect/Disconnect controls stay available in every section. ECU groups diagnostics, reading and saved backups; Logging groups live data and recordings; ROM information and integrity checks live under Editor. [Navigation guide](docs/NAVIGATION.md). The permanent File, Edit, View, Map, Tools and Help menus remain available. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
 Drag a pane's own edge or corner to resize just that map, or drag its header to
 move it. New maps use the space they need when the whole table fits at a readable size. Drag a map to a workspace edge and release to place it where the outline shows. Use the Windows title bar to return a detached map. Panes can overlap, and clicking a map or selecting it in the browser brings it forward. **Map → Tile maps side by side** restores automatic arrangement. Use **Tools → Keyboard shortcuts** to change the default bindings.
@@ -24,7 +25,7 @@ move it. New maps use the space they need when the whole table fits at a readabl
 SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
 log stock-ECU data, review recordings and edit the eleven supported stock ROM layouts.
 **Flashing and stock recovery are Gen 1 only**, covering all ten bundled Gen 1
-ROM layouts. Open **Flash & Recover** from the sidebar. Pick the ROM to
+ROM layouts. Open **Flash & Recovery** across the top. Pick the ROM to
 write and SpeedLink looks up the ECU's verified original by VIN or chassis ID
 and calibration. Recovery lists saved runs by date and calibration, checks the
 ECU state, and finds the exact backup automatically. Normal writes offer two, one, or zero full
@@ -33,8 +34,8 @@ two matching readbacks. **Gen 2 flashing is planned for an upcoming
 release.** SpeedLink ships without ROM files or adapter drivers.
 [Flashing and recovery guide](docs/FLASHING.md)
 
-**Engine diagnostics:** Open **Diagnostics** (Ctrl+8), select your adapter and
-choose **Connect & read codes** on that same page. Read stored, pending and
+**Engine diagnostics:** Open **ECU → Diagnostics** (Ctrl+8), select the shared adapter above and
+choose **Connect & read codes**. Read stored, pending and
 supported permanent fault codes, check-engine light
 state, readiness monitors and available freeze-frame data. No ROM file is needed.
 **Clear codes…** retains a before-clear report, checks that engine speed is zero,
@@ -46,7 +47,7 @@ Use **Save report…** to export a diagnostic snapshot.
 Tactrix Openport 2.0 and vLinker FS have physical write coverage.
 Mongoose-Plus ISO/CAN3 is available for experimental Gen 1 flashing and recovery.
 
-Connect & identify accepts standard VINs and supported short chassis-number
+ECU identification accepts standard VINs and supported short chassis-number
 replies, including space/null-padded identifiers reported by some ECUs. A chassis
 ID is labeled separately; it does not select or authorize a different ROM/logger profile.
 
@@ -107,8 +108,7 @@ existing timing and data precision.
 
 The Workbench keeps editing, logging and recordings in one window. **Map → Fit entire map**
 gives the table the available workspace. A permanent **File / Edit / View / Map / Tools / Help**
-menu stays available throughout the app. Navigation shows icons and names by default
-and remembers your choice to collapse it;
+menu stays available throughout the app. Four compact sections replace the application sidebar;
 the map browser and graph can be resized, hidden or moved into separate windows.
 Use **View** for app appearance and **Map** for the focused pane. The map header shows its title, Pin and Close. Right-click the title for map commands, including in a detached window.
 New maps open in table view. Use **Map → Toggle table and graph** or F4 to switch to the full graph,
@@ -149,7 +149,7 @@ copies remain available. See [definition import](docs/DEFINITIONS.md).
 ## Report a problem
 
 Capture starts automatically before the adapter opens. After a problem, choose
-**Connection → Export support report…**, select the failed session and save its
+**Help → Export support report…**, select the failed session and save its
 ZIP. You can do this after restarting without reconnecting. Follow the
 [reporting guide](docs/TROUBLESHOOTING.md) and attach it to the
 [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
@@ -171,7 +171,7 @@ driver setup and reporting results.
 1. Download **SpeedLink.exe** from [Releases](https://github.com/mrphyslaw/SpeedLink/releases).
 2. Save it in a writable folder and double-click it. No installer or .NET installation is needed.
 3. Connect a **Vgate vLinker FS USB** or **Tactrix Openport 2.0** with its manufacturer's driver installed. Select the adapter in SpeedLink; vLinker also needs its COM port. Leave vLinker at **115200** unless you know it uses a different startup rate. SpeedLink can find it if a failed session left it at the faster transfer rate.
-4. Turn the ignition on with the engine stopped, then select **Connect & identify**.
+4. Turn the ignition on with the engine stopped, then select **Connect** in the shared top bar.
 5. For an unknown Gen 2 ECU, select **Gen 2 read protocol (experimental)**; known ROMs choose automatically. Select **Read & verify backup**. SpeedLink saves a verified backup after two complete reads match.
 
 ![Backup progress showing the second read pass, overall percentage, bytes and estimated time remaining](docs/reading/images/progress.png)
@@ -190,9 +190,9 @@ You need a full backup of the ROM currently installed in the ECU. SpeedLink uses
 it to choose the logging profile and read the MAP sensor calibration. The current
 logger supports [eleven defined ROMs](definitions/logging/All_ROM_Coverage.md).
 
-1. Connect the adapter and select **Connect & identify**. If you just read a ROM,
+1. Connect the adapter and select **Connect** in the shared top bar. If you just read a ROM,
    disconnect and reconnect before logging.
-2. Open **Logger**, select **Load current ECU ROM…**, and choose that current ROM
+2. Open **Logging → Live**, select **Load current ECU ROM…**, and choose that current ROM
    backup. Its calibration ID must match the connected ECU.
 3. Choose **Essentials** for a starting selection, or select the parameters you
    need. Set each row's display unit. Fewer selected parameters allow faster updates.
@@ -212,7 +212,7 @@ See the [logger guide](docs/LOGGER.md) for setup, recordings and troubleshooting
 
 ## Review a recording
 
-1. Choose **Recordings** in the left navigation. No adapter is needed.
+1. Choose **Logging → Recordings**. No adapter is needed.
 2. Select **Open recording…** and choose the recording folder's `log.csv`.
 3. Select up to six parameters. Move the shared cursor or click a plot to inspect
    readings, and use **Zoom** to focus on part of the recording. Missing data appears
@@ -224,7 +224,7 @@ review any recording separately before deliberately sharing it.
 
 ## ROM checks
 
-Known-ROM checks and checksum correction are available under **ROM checks**.
+Known-ROM checks and checksum correction are available under **Editor → ROM information**.
 Checksum correction saves a separate file. Unknown ROMs do not need to pass these
 checks to be read and saved.
 

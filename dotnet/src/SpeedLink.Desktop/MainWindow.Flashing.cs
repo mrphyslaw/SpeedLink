@@ -19,10 +19,16 @@ public partial class MainWindow
         {
             RememberFlashLocation();
             flashWorkspace = workspace ?? new(Path.Combine(vault, "flashing"), flashBackups);
-            flashWorkspace.HardwareUseChanged += Controls;
-            flashWorkspace.ConnectionRequested += () => Navigate(0);
+            flashWorkspace.HardwareUseChanged += () => { if (!busy) StatusText.Text = flashWorkspace.ActivityMessage; Controls(); };
+            flashWorkspace.ConnectionRequested += OpenSharedConnection;
+            if (workspace is null)
+            {
+                flashWorkspace.AttachSharedAdapter(PrepareSharedProgramming);
+                SharedAdapterChanged();
+            }
+            flashWorkspace.ProgressChanged += value => { StatusText.Text = value.Message; ProgressBar.Value = value.Fraction * 100; };
             FlashTab.Content = flashWorkspace;
-            flashWorkspace.SetConnectionUnavailable(busy || closing || exportingReport || transport is not null);
+            flashWorkspace.SetConnectionUnavailable(busy || closing || exportingReport);
         }
         return flashWorkspace;
     }
@@ -74,10 +80,15 @@ public partial class MainWindow
             throw new InvalidOperationException("A different chassis or calibration matched the saved backup.");
         var page = ShowFlashWorkspace(new(Path.Combine(vault, "flashing"), flashBackups, peer.Open, (inspector, guard)));
         Show();
-        Navigation.Children.OfType<RadioButton>().Single(button => (string)button.Tag == "6").IsChecked = true;
+        Navigation.Children.OfType<RadioButton>().Single(button => (string)button.Tag == "flash").IsChecked = true;
         UpdateLayout();
         if (Pages.SelectedIndex != FlashPage || !page.IsVisible)
-            throw new InvalidOperationException("The sidebar did not open Flash & Recover.");
+            throw new InvalidOperationException("The top navigation did not open Flash & Recovery.");
+        page.HardwareUseChanged += () =>
+        {
+            if (page.IsWorking && (ConnectionSettingsButton.IsEnabled || ConnectButton.IsEnabled || DisconnectButton.IsEnabled))
+                throw new InvalidOperationException("Shared connection controls were enabled during flash preparation or programming.");
+        };
         var report = await page.Smoke(backup, output, peer);
         Navigate(0);
         OfferBackupForFlash(new(backup, inspector.Inspect(File.ReadAllBytes(backup))));
