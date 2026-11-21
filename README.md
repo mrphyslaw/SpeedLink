@@ -8,7 +8,7 @@ Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 
 
 **Watch the SpeedLink v0.8.0-alpha.17 walkthrough (3:46)** · Light mode with on-screen captions and no audio.
 
-https://github.com/user-attachments/assets/f8f9edb4-10d7-484b-af48-afa54bfc24fe
+https://github.com/user-attachments/assets/911b53ec-7566-461a-8953-11a22da34c56
 
 See the four top sections and shared adapter controls, engine diagnostics,
 two-pass verified backups, and the Gen 1 Flash & Recovery workflow. The editor
