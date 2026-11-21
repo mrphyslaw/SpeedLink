@@ -6,16 +6,16 @@ Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 
 
 **[Download SpeedLink v0.8.0-alpha.17](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.17)** · A single Windows EXE with the runtime included.
 
-**Watch the SpeedLink v0.8.0-alpha.14 walkthrough (3:30)** · Light mode with on-screen captions and no audio.
+**Watch the SpeedLink v0.8.0-alpha.17 walkthrough (3:46)** · Light mode with on-screen captions and no audio.
 
 https://github.com/user-attachments/assets/f8f9edb4-10d7-484b-af48-afa54bfc24fe
 
-Follow a verified backup, then see the Gen 1 Flash & Recovery workflow with
-a simulated write, readback verification, and recovery-mode check. The editor
-uses an L3M6EG000 bench ECU backup to show the green-low, red-high default in
-the table and 3D graph. The walkthrough also covers docking, workspace tabs,
-assignable shortcuts, logging, and playback. This alpha.14 video shows the earlier sidebar;
-see the [current navigation guide](docs/NAVIGATION.md) for the four-section layout.
+See the four top sections and shared adapter controls, engine diagnostics,
+two-pass verified backups, and the Gen 1 Flash & Recovery workflow. The editor
+uses a real L3M6EG000 bench ECU backup to demonstrate the green-low, red-high
+gradient, 3D graphs, docking, named workspaces, cell-color options, and assignable
+shortcuts. Logging and playback are included. ECU activity is simulated;
+no physical flashing is performed in the video. [Navigation guide](docs/NAVIGATION.md).
 
 Use **ECU**, **Editor**, **Logging**, and **Flash & Recovery** across the top. The shared adapter dropdown and Connect/Disconnect controls stay available in every section. ECU groups diagnostics, reading and saved backups; Logging groups live data and recordings; ROM information and integrity checks live under Editor. [Navigation guide](docs/NAVIGATION.md). The permanent File, Edit, View, Map, Tools and Help menus remain available. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
