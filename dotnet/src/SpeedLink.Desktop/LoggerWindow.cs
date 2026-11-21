@@ -183,7 +183,7 @@ public partial class MainWindow
         LoggerRomButton.IsEnabled = idle; LoggerRateBox.IsEnabled = idle; StoichBox.IsEnabled = idle; RecordCsvBox.IsEnabled = idle;
         LoggerEssentialsButton.IsEnabled = idle; LoggerAllButton.IsEnabled = idle; LoggerNoneButton.IsEnabled = idle;
         foreach (var row in loggerRows) row.CanEdit = idle;
-        string reason = transport?.ReadAttempted == true ? "After a ROM read, disconnect and reconnect on Connection before logging."
+        string reason = transport?.ReadAttempted == true ? "After a ROM read, disconnect and reconnect using the shared controls before logging."
             : transport is null ? "Connect and identify the ECU, then load its matching ROM."
             : loggerCalibration is null ? "Load the current ECU ROM before logging."
             : !loggerDefinition.MatchesCalibrationId(identity?.Calibration) ? "Load a ROM matching the connected ECU calibration."
@@ -193,7 +193,7 @@ public partial class MainWindow
         LoggerConnectionHint.Visibility = LoggerConnectionButton.Visibility = transport?.ReadAttempted == true ? Visibility.Visible : Visibility.Collapsed;
         LoggerConnectionButton.IsEnabled = idle;
     }
-    private void LoggerConnection_Click(object sender, RoutedEventArgs e) => Navigate(0);
+    private void LoggerConnection_Click(object sender, RoutedEventArgs e) => OpenSharedConnection();
     private void BindLoggerRom(string path)
     {
         if (new FileInfo(path).Length != RomInspector.RomSize) throw new InvalidDataException("Load a full 1 MiB ECU image.");

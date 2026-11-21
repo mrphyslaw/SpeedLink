@@ -19,7 +19,7 @@ Where available, the help links to the corresponding section of the offline **Tu
 
 ## Make your first edit
 
-1. Choose **Editor** in the left navigation, then **File → Open ROM…**.
+1. Choose **Editor** across the top, then **File → Open ROM…**.
    Opening a ROM shows the map browser, even if it was hidden in your saved layout.
 2. Find a map in the category folders or search by name, description or category. Each entry's icon identifies it as a setting, curve or surface.
    Choose **Map → Map information…** to check its units, purpose and correction direction.
@@ -191,10 +191,10 @@ scrolling and graph views. Each calibration has its own layouts. On upgrade,
 maps from the previous layout are kept pinned in the Workspace tab. Layout files
 store display settings. Use **Save copy** to save ROM edits.
 
-Use the app's **☰ Navigation** button to collapse navigation to icons, or toggle
-**View → Navigation labels**. The sidebar starts with names and remembers your
-choice. **Map → Hide map
-browser** (Ctrl+B) hides or restores the map list. Drag its edge to change its
+The four top-level sections leave the full window width for the editor.
+**ROM information…** beside Save copy inspects the current document's most recent
+saved file; unsaved edits remain in Maps. **Map → Hide map browser** (Ctrl+B)
+hides or restores the map list. Drag its edge to change its
 width, or pop it into a separate window.
 
 The **Maps** button in the editor toolbar always brings the map browser back.
@@ -322,7 +322,7 @@ with matching calibration, boot, checksum layout and program-area signature.
 The program check allows defined tuning controls and checksum changes while
 rejecting other program changes. Patched/extended layouts are unsupported.
 Recognizing a calibration does not prove factory provenance or vehicle fit.
-Unknown images can still be dumped with the reader and inspected in ROM checks.
+Unknown images can still be dumped with the reader and inspected in **Editor → ROM information**.
 
 Use **Definitions → Import…** to install an editor XML update for a supported
 layout. Save open work before reopening the ROM to use it; importing does not

@@ -7,9 +7,10 @@ flashing and recovery. Gen 2 flashing is planned for an upcoming release.
 
 | Guide | Contents |
 | --- | --- |
+| [Navigation and shared connection](NAVIGATION.md) | Four sections, shared adapter controls, operation status and existing shortcuts |
 | [Engine diagnostics](DIAGNOSTICS.md) | Read/clear engine fault codes, readiness, freeze frame and retained before/after reports |
 | [Dump a ROM / request support](DUMP_A_ROM.md) | Guided adapter setup, two-pass reading, verification and ROM contribution |
-| [Gen 1 Flash & Recover](FLASHING.md) | Find a saved backup by ECU identity, choose a readback policy, check boot mode and recover an interrupted write |
+| [Gen 1 Flash & Recovery](FLASHING.md) | Find a saved backup by ECU identity, choose a readback policy, check boot mode and recover an interrupted write |
 | [ROM editor overview](editor/README.md) | Screenshots, features and a short editing workflow |
 | [ROM editor guide](EDITOR.md) | First edit, single values, small tables, MAF curves, layout, map help, comparison and saving |
 | [Tuning guide](TUNING_HELP.md) | Map units, boost and wastegate control, protection thresholds, knock and injector calculations |
@@ -25,8 +26,8 @@ flashing and recovery. Gen 2 flashing is planned for an upcoming release.
 
 The app includes Getting started, Editor, Tuning, Logger, Gen 1 flashing, and Report a problem guides under **Help**.
 **Help → Editor guide** opens the editing guide; **Map info** / F1 explains
-the selected map. Navigation shows workspace names by default; **☰ Navigation**
-or **View → Navigation labels** toggles its compact form.
+the selected map. **ECU / Editor / Logging / Flash & Recovery** share the top
+navigation and adapter controls. See the [navigation guide](NAVIGATION.md).
 
 ## Development and validation
 

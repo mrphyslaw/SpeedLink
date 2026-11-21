@@ -14,7 +14,7 @@ public partial class MainWindow
     internal async Task<Dictionary<string, object?>> ExerciseDiagnosticsOffline(string output)
     {
         if (!Resource("SpeedLink.SupportHelp.md").Contains("Factory security-access", StringComparison.Ordinal)) throw new InvalidDataException("Reporting help is missing.");
-        Show(); UpdateLayout(); await BeginDiagnostics();
+        Show(); Navigate(0); UpdateLayout(); await BeginDiagnostics();
         if (diagnosticSession is null) throw new IOException("Diagnostic storage did not open.");
         diagnosticSession.Record("connection.opening", new { adapter = "Synthetic test adapter" });
         diagnosticSession.Record("adapter.ready", new { adapter = "Synthetic test adapter" });

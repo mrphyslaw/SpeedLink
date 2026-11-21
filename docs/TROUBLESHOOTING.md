@@ -14,7 +14,7 @@ enable a debug mode or successfully connect first.
 
 1. Note what you selected and what happened. Copy the exact error if available.
    For a ROM read, mention whether either read pass made progress.
-2. Open **Connection → Export support report…**. After a crash or restart,
+2. Open **Help → Export support report…**. After a crash or restart,
    open the app again and use the same button; reconnecting is unnecessary.
 3. Choose the session at the time of the problem. The newest session appears
    first. Check its version, last request, failure and capture warnings in the
@@ -82,7 +82,7 @@ when upgrading. The app keeps the ten newest sessions, each with up to four
 2 MiB event segments. This is a rolling history: earlier events can rotate out
 during a long session. Export soon after a problem. The summary also retains
 the last request and failure. Queue-overflow omissions are counted in the report;
-storage/omission warnings appear on Connection. Capture runs through a bounded
+storage/omission warnings appear under **ECU → Read backup**. Capture runs through a bounded
 background writer. A diagnostic-storage error does not retry an ECU request or
 turn a partial read into a verified backup.
 

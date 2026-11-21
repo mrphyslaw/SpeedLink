@@ -17,7 +17,7 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
-    timeout-minutes: 55
+    timeout-minutes: 75
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
       DOTNET_NOLOGO: '1'
@@ -73,7 +73,7 @@ jobs:
           if (-not $process.WaitForExit(30000)) { $process.Kill(); throw 'Standalone menu check timed out.' }
           if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $report -Raw; throw 'Standalone menus failed.' }
           $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-          if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or !$result.permanentMenus -or !$result.labeledNavigation -or !$result.navigationRemembered -or $result.menus.Count -ne 6) { throw 'Unexpected standalone menu result.' }
+          if (!$result.passed -or $result.hardwareAccessed -or !$result.keyboardActivation -or !$result.escapeCloses -or !$result.permanentMenus -or !$result.fourSections -or !$result.sharedConnection -or !$result.labeledNavigation -or !$result.navigationRemembered -or $result.menus.Count -ne 6) { throw 'Unexpected standalone menu result.' }
       - name: Check standalone startup and bundled resources
         run: |
           $report = Join-Path (Get-Location) 'TestResults/Standalone_GUI.json'
@@ -84,7 +84,7 @@ jobs:
             throw 'Standalone startup failed.'
           }
           $result = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
-          if ($result.passed -ne $true -or $result.pages -ne 8 -or $result.simulatorAvailable -ne $false -or $result.liveProgrammingEnabled -ne $true -or $result.programmingFamily -ne 'Gen1' -or $result.programmingTargets.Count -ne 10 -or $result.programmingTargets -contains 'L3CGEE000' -or $result.mongooseSelectionVerified -ne $true -or $result.experimentalProgrammingAdapters -notcontains 'Mongoose-Plus ISO/CAN3') { throw 'Unexpected standalone smoke-test result.' }
+          if ($result.passed -ne $true -or $result.pages -ne 8 -or $result.mainSections -ne 4 -or $result.simulatorAvailable -ne $false -or $result.liveProgrammingEnabled -ne $true -or $result.programmingFamily -ne 'Gen1' -or $result.programmingTargets.Count -ne 10 -or $result.programmingTargets -contains 'L3CGEE000' -or $result.mongooseSelectionVerified -ne $true -or $result.experimentalProgrammingAdapters -notcontains 'Mongoose-Plus ISO/CAN3') { throw 'Unexpected standalone smoke-test result.' }
           $expectedRuntime = ([xml](Get-Content -LiteralPath Directory.Build.props -Raw)).Project.PropertyGroup.RuntimeFrameworkVersion
           $expectedVersion = ([xml](Get-Content -LiteralPath Directory.Build.props -Raw)).Project.PropertyGroup.Version
           if ($result.version -ne $expectedVersion) { throw 'Application version differs from package version.' }

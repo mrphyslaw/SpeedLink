@@ -17,10 +17,10 @@ flashing and recovery use the dedicated J2534 programming path.
 
 1. Install the manufacturer's Mongoose-Plus ISO/CAN3 Windows driver, including
    its 32-bit J2534-1 04.04 component. Close other diagnostic applications.
-2. In **Connection**, select **Mongoose-Plus ISO/CAN3 (experimental)**, then
+2. In the shared adapter dropdown, select **Mongoose-Plus ISO/CAN3 (experimental)**, then
    **Refresh devices** and choose the registered Mongoose driver. No COM port
    or serial baud selection is needed.
-3. With ignition on and the engine stopped, select **Connect & identify**.
+3. With ignition on and the engine stopped, select **Connect** in the shared top bar.
    Record the displayed adapter, firmware, driver/API versions and calibration.
 4. If identification succeeds, follow the [ROM-dump workflow](DUMP_A_ROM.md)
    for **Read & verify backup**. Keep the complete operation folder privately.
@@ -28,8 +28,8 @@ flashing and recovery use the dedicated J2534 programming path.
 5. Disconnect and reconnect before testing the [logger](LOGGER.md). Load the
    matching current ROM, start with **Essentials**, record a short CSV and note
    the measured scan rate and any rejected channels or interruptions.
-6. For Gen 1 programming, disconnect and open **Flash & Recover** in the
-   sidebar. Select the registered experimental Mongoose entry and follow the
+6. For Gen 1 programming, finish the current operation and open **Flash & Recovery** in the
+   top bar. Select the registered experimental Mongoose entry and follow the
    [flashing guide](FLASHING.md).
 
 The picker accepts registered Mongoose-Plus ISO/CAN3 / ISO3 entries that advertise
@@ -50,7 +50,7 @@ requests are not automatically resent.
 
 ### Report a test result
 
-Use **Connection → Export support report…** and attach the ZIP to the
+Use **Help → Export support report…** and attach the ZIP to the
 [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
 Include the SpeedLink version, Windows version, exact adapter
 model/connection type, registered driver name, firmware and driver/API versions.
@@ -84,8 +84,8 @@ and [J2534 driver discovery](https://opusivs-au.com/support/oem-customer-support
 
 ## Reporting a problem
 
-Diagnostic capture starts automatically with **Connect & identify**, including
-failed driver opens. On **Connection**, choose **Export support report…**, select
+Diagnostic capture starts automatically with **Connect** in the shared top bar, including
+failed driver opens. Choose **Help → Export support report…**, select
 the session with the problem and save its ZIP. This also works after restarting
 without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
 the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).

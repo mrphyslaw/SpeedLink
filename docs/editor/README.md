@@ -15,10 +15,12 @@ or recording from File. Find definition management in Tools and guides,
 support reports, crash reports and About in Help. Commands that need a ROM
 or map stay disabled until one is available.
 
-The sidebar shows icons and names by default. **☰ Navigation** and
-**View → Navigation labels** switch to compact icons and back; your choice is
-remembered. **View → Workspace** also switches screens. The example map uses
-synthetic values.
+The four sections across the top replace the application sidebar. Adapter
+selection and Connect/Disconnect are shared across sections. **ROM information…**
+inspects the saved file without losing map edits. **View → Workspace** and existing
+shortcuts also navigate directly to a view. The example map uses synthetic values.
+Some map-detail images below show earlier navigation; see the
+[current navigation guide](../NAVIGATION.md) for the full current shell.
 
 ![The File menu opens ROMs and recordings and saves a verified ROM copy](images/application-file-menu.png)
 
@@ -80,8 +82,7 @@ closes that view while keeping its ROM edits.
 **Map → Fit entire map** (Ctrl+0) gives the active map the available workspace. Auto fit adjusts
 cell spacing without shrinking text. Measured cell minimums keep values readable;
 tables scroll when the whole map cannot fit. **Map → Cell display** adjusts text size and offers compact rows.
-The ☰ button expands or collapses navigation; Ctrl+B hides or restores the
-map browser. Use **View** for layout options and floating panels.
+Ctrl+B hides or restores the map browser. Use **View** for layout options and floating panels.
 
 Axis names sit directly above the column breakpoints and beside the row
 breakpoints, with value units in each map pane. The labels stay visible while

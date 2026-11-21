@@ -19,10 +19,7 @@ public partial class MainWindow
         if (obdWorkspace is null)
         {
             obdWorkspace = new(); ObdTab.Content = obdWorkspace;
-            obdWorkspace.ShareConnectionControls(AdapterBox, PortBox, BaudBox, DriverBox, ConnectButton, DisconnectButton, RefreshPortsButton, SerialPanel, TactrixPanel);
             obdWorkspace.ConnectRequested += () => obdConnectWork = ConnectObd();
-            obdWorkspace.DisconnectRequested += async () => await Run(Disconnect);
-            obdWorkspace.RefreshRequested += RefreshPorts;
             obdWorkspace.ScanRequested += async () => await ScanObd();
             obdWorkspace.ClearRequested += async () =>
             {
@@ -43,7 +40,7 @@ public partial class MainWindow
         if (ObdAvailable) await ScanObd();
         else page.StatusText.Text = StatusText.Text;
     }
-    private void ObdControls(bool idle) => obdWorkspace?.SetAvailability(idle, ObdAvailable, transport?.ReadAttempted == true, identity);
+    private void ObdControls(bool idle) => obdWorkspace?.SetAvailability(idle, ObdAvailable, transport?.ReadAttempted == true, identity, ConnectButton.IsEnabled);
     private ObdDiagnostics ObdWorkflow() => ObdAvailable && transport is IObdTransport link && !link.ReadAttempted
         ? new(link, identity, ObdDescriptions.From(definitionSnapshot.Editors, identity?.Calibration))
         : throw new InvalidOperationException("Connect an adapter, and reconnect after any ROM read, before using engine diagnostics.");

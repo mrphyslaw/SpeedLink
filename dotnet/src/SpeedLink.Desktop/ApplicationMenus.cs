@@ -96,14 +96,12 @@ public partial class MainWindow
     private void ApplicationOpenRecording_Click(object sender, RoutedEventArgs e) { Navigate(3); RecordingsPane.RequestOpen(); }
     private void ApplicationExit_Click(object sender, RoutedEventArgs e) => Close();
     private void ApplicationGuide_Click(object sender, RoutedEventArgs e) => HelpWindow((sender as MenuItem)?.Tag as string ?? "Getting started").Show();
-    private void NavigationLabels_Click(object sender, RoutedEventArgs e)
-    {
-        navigationIsCollapsed = !NavigationLabelsMenu.IsChecked;
-        ApplyNavigation(); EditorPane.SaveNavigationLayout();
-    }
     private void WorkspaceMenu_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem { Tag: string tag } && int.TryParse(tag, out int page) && page >= 0 && page < Pages.Items.Count) Navigate(page);
+        if (sender is MenuItem { Tag: string tag } && int.TryParse(tag, out int page) && page >= 0 && page < Pages.Items.Count)
+        {
+            if (page == 4) OpenEditorRomInformation(); else Navigate(page);
+        }
     }
     private void Application_KeyDown(object sender, KeyEventArgs e)
     {

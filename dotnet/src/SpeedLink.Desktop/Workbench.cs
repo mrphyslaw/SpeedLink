@@ -50,12 +50,8 @@ public partial class MainWindow
         if (page == ObdPage && ObdTab is not null) ShowObdWorkspace();
         Pages.SelectedIndex = page;
         EditorPane?.SetWorkspaceActive(page == 1);
-        foreach (var button in Navigation.Children.OfType<RadioButton>()) button.IsChecked = (string)button.Tag == page.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        RefreshSectionNavigation(page);
         RefreshApplicationMenus();
-    }
-    private void Navigate_Checked(object sender, RoutedEventArgs e)
-    {
-        if (Pages is not null && sender is RadioButton { Tag: string tag }) Pages.SelectedIndex = int.Parse(tag, System.Globalization.CultureInfo.InvariantCulture);
     }
     private void Pages_Changed(object sender, SelectionChangedEventArgs e)
     {

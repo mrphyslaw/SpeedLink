@@ -59,6 +59,7 @@ public partial class MainWindow : Window
         EditorPane.Definitions = definitionSnapshot.Editors;
         ConfigureApplicationMenus();
         ConfigureWorkspaceLayout();
+        ConfigureSharedConnection();
         Width = Math.Min(Width, Math.Max(MinWidth, SystemParameters.WorkArea.Width));
         Height = Math.Min(Height, Math.Max(MinHeight, SystemParameters.WorkArea.Height));
         Navigate(0);
@@ -74,6 +75,7 @@ public partial class MainWindow : Window
         RefreshPorts();
         RefreshHistory();
         Controls();
+        Navigate(ObdPage);
         if (definitionSnapshot.Entries.Any(e => e.Problem is not null)) StatusText.Text = "Some imported definitions were rejected · open Definitions for details";
     }
     private void Log(string message)
@@ -85,9 +87,10 @@ public partial class MainWindow : Window
     private void Controls()
     {
         bool flashUsingAdapter = flashWorkspace?.HardwareInUse == true;
-        bool idle = !busy && !closing && !exportingReport && !flashUsingAdapter;
-        ApplicationMenu.IsEnabled = Navigation.IsEnabled = NavigationToggle.IsEnabled = !flashUsingAdapter;
-        flashWorkspace?.SetConnectionUnavailable(busy || closing || exportingReport || transport is not null);
+        bool flashWorking = flashWorkspace?.IsWorking == true;
+        bool idle = !busy && !closing && !exportingReport && !flashWorking;
+        ApplicationMenu.IsEnabled = Navigation.IsEnabled = !flashUsingAdapter;
+        flashWorkspace?.SetConnectionUnavailable(busy || closing || exportingReport);
         FlashBackupButton.IsEnabled = idle && handoffBackup is not null;
         DefinitionsButton.IsEnabled = idle && transport is null;
         CrashReportsButton.IsEnabled = idle;
@@ -112,6 +115,7 @@ public partial class MainWindow : Window
         LoggerControls(idle);
         DiagnosticControls(idle);
         ObdControls(idle);
+        RefreshSharedConnection();
     }
     private Task Run(Func<Task> action)
     {
@@ -120,7 +124,7 @@ public partial class MainWindow : Window
     }
     private async Task RunCore(Func<Task> action)
     {
-        if (busy || flashWorkspace?.HardwareInUse == true)
+        if (busy || flashWorkspace?.IsWorking == true)
             return;
         busy = true;
         stop?.Dispose();
@@ -159,6 +163,7 @@ public partial class MainWindow : Window
             MessageBox.Show(this, "Choose the COM port assigned to your adapter.", "Select a port");
             return;
         }
+        SharedConnectionPopup.IsOpen = false;
         StatusText.Text = "Connecting and identifying…";
         await Run(async () =>
         {
@@ -197,6 +202,7 @@ public partial class MainWindow : Window
             connection = connected.Connection;
             identity = connected.Identity;
             obdWorkspace?.ResetForConnection();
+            flashWorkspace?.ResetSharedConnectionState();
             diagnosticSession?.Record("connection.ready", new { identity.Adapter, identity.Calibration, identity.VinStatus, identity.CalibrationStatus });
             LoggerIdentityChanged();
             ShowEcuIdentity();
@@ -234,6 +240,7 @@ public partial class MainWindow : Window
                 Log("Adapter driver cleanup: " + serial.CleanupWarning);
         }
         IdentityText.Text = "Disconnected. No ECU has been identified.";
+        obdWorkspace?.ShowDisconnected();
         StatusText.Text = "Disconnected";
         Log("Disconnected.");
     }
@@ -405,6 +412,7 @@ public partial class MainWindow : Window
             documents["Notices / " + name[18..]] = name;
         documents["Gen 1 flashing and recovery"] = "SpeedLink.FlashingHelp.md";
         documents["Engine diagnostics"] = "SpeedLink.ObdHelp.md";
+        documents["Navigation"] = "SpeedLink.NavigationHelp.md";
         documents["Tuning guide"] = "SpeedLink.TuningHelp.md";
         var panel = new DockPanel { Margin = new Thickness(16) };
         var chooser = new ComboBox { ItemsSource = documents.Keys, Margin = new Thickness(0, 0, 0, 12) };
@@ -468,7 +476,7 @@ public partial class MainWindow : Window
         UpdateLayout();
         if (new System.Windows.Automation.Peers.TabControlAutomationPeer(Pages).GetChildren()?.Count != Pages.Items.Count)
             throw new InvalidOperationException("Workspace automation containers missing.");
-        if (Pages.Items.Count != ObdPage + 1 || !ReferenceEquals(Pages.Items[ObdPage], ObdTab) || !ReferenceEquals(Pages.Items[FlashPage], FlashTab) ||
+        if (Navigation.Children.OfType<RadioButton>().Count() != 4 || Pages.Items.Count != ObdPage + 1 || !ReferenceEquals(Pages.Items[ObdPage], ObdTab) || !ReferenceEquals(Pages.Items[FlashPage], FlashTab) ||
             transport is not null || image is not null || !ConnectButton.IsEnabled || ReadButton.IsEnabled || CorrectButton.IsEnabled)
             throw new InvalidOperationException("Unexpected startup state.");
         if (AdapterBox.Items.Count != 3 || AdapterBox.SelectedIndex != 0 || typeof(ReadWorkflow).Assembly.GetType("SpeedLink.Core.Simulator") is not null)
@@ -538,6 +546,7 @@ public partial class MainWindow : Window
                 runtimeVersion = Environment.Version.ToString(),
                 framework = "WPF / .NET 10",
                 pages = Pages.Items.Count,
+                mainSections = Navigation.Children.OfType<RadioButton>().Count(),
                 loggerChannels = loggerRows.Count,
                 loggerProfiles = LoggerDefinition.Known.Count,
                 editorDefinitions = definitionSnapshot.Editors.Count,

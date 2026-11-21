@@ -13,23 +13,28 @@ are disabled when their required ROM or map is unavailable. Open a saved log wit
 **File → Open recording…**. Find definition management in **Tools** and guides,
 problem reporting, support export, crash reports and About in **Help**.
 
-Choose a workspace in the labeled left navigation. **☰ Navigation** collapses
-its labels; **View → Navigation labels** controls the same setting. Your explicit
-choice is remembered. Hover over an icon for its name and purpose. Use
-**Editor** to edit a file, **Connection** to read an ECU, **Logger** to record
-live data, **Recordings** to review logs, **ROM checks** to inspect a file, or
-**Backups** to find saved operations. **Diagnostics** reads and clears engine
-fault codes and shows readiness and available freeze-frame data without a ROM.
-**Flash & Recover** in the sidebar
-opens programming for the ten bundled Gen 1 layouts. A verified Gen 1 read also
-offers **Open in Flash & Recover**. Use **Help → Gen 1 flashing
-guide** for the write and recovery steps. Gen 2 flashing is planned for an upcoming
-release. [Flashing guide](FLASHING.md)
+Choose **ECU**, **Editor**, **Logging**, or **Flash & Recovery** across the top.
+The adapter dropdown and **Connect / Disconnect** are shared by all four sections.
+Changing sections keeps the connection, ROM edits, map layouts and recordings.
+Running read/log/diagnostic operations keep a status strip and Stop action visible.
+
+- **ECU:** Diagnostics, Read backup and Saved backups.
+- **Editor:** Maps and **ROM information…** for the saved file's identity/integrity.
+- **Logging:** Live data and Recordings.
+- **Flash & Recovery:** Gen 1 writing and interrupted-write recovery. Gen 2 flashing is planned.
+
+The adapter dropdown contains the COM port/baud or registered J2534 driver and
+**Refresh devices**. A programming operation releases an idle ordinary connection
+before opening its exclusive programming transport. Active logging or reading
+blocks that handoff. Merely opening the section does not disconnect the adapter.
+After the programming transport closes, the shared controls show Disconnected;
+connect again when normal ECU communication is needed.
+See the [navigation guide](NAVIGATION.md) and [flashing guide](FLASHING.md).
 
 ## Read or clear engine fault codes
 
-Open **Diagnostics** (Ctrl+8), select your adapter, and choose **Connect & read
-codes**. Connection, disconnection and diagnostic actions stay on that page.
+Open **ECU → Diagnostics** (Ctrl+8), select the shared adapter above, and choose
+**Connect & read codes**. Connect/Disconnect stays available in the top bar.
 Once connected, **Read codes** refreshes
 stored/pending codes, supported permanent codes, readiness and available freeze
 frame. **Save report…** exports the results. **Clear codes…** confirms the action,
@@ -62,15 +67,15 @@ Use **Help → Editor guide** for the complete included guide, or see the
 1. Install your adapter manufacturer's Windows driver. Close other diagnostic
    applications so they release the adapter.
 2. Connect the adapter to the PC and vehicle. Turn the ignition on with the
-   engine stopped, then open **Connection**.
+   engine stopped, then open **ECU → Read backup**.
 3. Select **Vgate vLinker FS** and its COM port, or **Tactrix Openport 2.0**
    and its installed J2534 driver. See the adapter notes below.
-4. Choose **Connect & identify**. Known ROMs select their read protocol automatically.
+4. Choose **Connect** in the top bar. Known ROMs select their read protocol automatically.
    For an unknown Gen 2 calibration, select **Gen 2 read protocol (experimental)**
-   in the adapter settings. Choose **Read & verify backup** and leave the ignition
+   under **ECU → Read backup**. Choose **Read & verify backup** and leave the ignition
    on and adapter connected through both passes.
 5. Wait for **Backup verified · two matching reads**. Find the operation under
-   **Backups → Open backup folder** and keep the entire folder.
+   **ECU → Saved backups → Open backup folder** and keep the entire folder.
 
 An ECU may report a short chassis number instead of a conventional VIN.
 SpeedLink labels recognized replies as **Chassis ID**, removes trailing space/null
@@ -79,7 +84,7 @@ backup metadata and checks it again before reading. A chassis number does not
 identify a ROM layout: unknown calibrations can be dumped using the compatible
 read protocol, while editing and logging require their own matching definitions.
 
-During the backup, Connection shows the current pass, bytes read, overall
+During the backup, **ECU → Read backup** shows the current pass, bytes read, overall
 progress across both reads and elapsed time. Remaining time is estimated from
 the measured transfer speed and can change during a read. Verification stays
 below 100% until the backup and its completion records have been saved. Stop
@@ -99,7 +104,7 @@ walks through verification and contributing a file for support.
 
 ## Log live data and review recordings
 
-Connect and identify, then choose **Logger → Load current ECU ROM…**. Use the
+Connect and identify, then choose **Logging → Live → Load current ECU ROM…**. Use the
 full backup currently installed in the ECU; its calibration must match. Choose
 **Essentials** or individual parameters and units, leave **Record CSV** checked,
 then choose **Start logging**. **Stop** finishes the recording and keeps a healthy
@@ -116,13 +121,13 @@ achievable running-engine rates still require vehicle validation. Read-only star
 on one L3M6EG000 bench ECU passed through vLinker FS and Tactrix. See the [logger guide](LOGGER.md) for units, plots and
 unavailable data, plus [measured bench performance](LOGGER_PERFORMANCE.md).
 
-Choose **Recordings → Open recording…** to review a SpeedLink `log.csv` without
+Choose **Logging → Recordings → Open recording…** to review a SpeedLink `log.csv` without
 an adapter. Logs live under `data/logs` beside the EXE. Keep the complete folder,
 including raw replies and session details, for troubleshooting.
 
 ## Inspect a ROM or backup
 
-**ROM checks → Open verified backup…** revalidates a backup's captures, manifest
+**Editor → ROM information → Open verified backup…** revalidates a backup's captures, manifest
 and journal. **Inspect ROM…** accepts any complete 1 MiB image. Known layouts
 get identification, boot, checksum-layout and checksum checks; unknown layouts
 show their size and SHA-256 without a guessed checksum.
@@ -136,7 +141,7 @@ local paths; review reports before sharing them.
 
 - **vLinker FS:** use initial baud **115200**. The adapter temporarily uses
   2,000,000 baud during reads and normally returns to 115200 on disconnect.
-  After a transport error, click **Connect & identify** again. SpeedLink
+  After a transport error, click **Connect** in the shared top bar again. SpeedLink
   automatically checks whether the adapter stayed at its transfer rate. If the
   adapter still does not answer, check USB, OBD power and the selected COM port.
   The app uses the installed FTDI driver with 1 ms latency and restores the prior
@@ -162,8 +167,8 @@ reload the current ECU ROM for a logger update. Imported copies live under
 
 ## Reporting a problem
 
-Diagnostic capture starts automatically with **Connect & identify**, including
-failed driver opens. On **Connection**, choose **Export support report…**, select
+Diagnostic capture starts automatically with **Connect** in the shared top bar, including
+failed driver opens. Choose **Help → Export support report…**, select
 the session with the problem and save its ZIP. This also works after restarting
 without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
 the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
@@ -175,7 +180,7 @@ before sharing.
 
 L3CGEE000 has a 448-control editor and 20-parameter stock logger. Known ROMs
 choose their reader automatically. For an unknown compatible Gen 2 ECU, select
-**Gen 2 read protocol (experimental)** in Connection. Both read passes must match.
+**Gen 2 read protocol (experimental)** under **ECU → Read backup**. Both read passes must match.
 Gen 2 saves validate the supported code layout and markers and correct the
 native code checksum when needed. Choose **Help → Gen 2 (experimental)**
 for scope, exclusions and pending real ECU validation.

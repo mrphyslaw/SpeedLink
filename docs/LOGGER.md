@@ -11,9 +11,10 @@ the original seven Gen 1 profiles, including sustained requests, fault handling,
 recording and USB interruption/reconnect checks. These tests use simulated ECU
 replies through real adapters. See the [validation results](../dotnet/docs/Validation.md).
 
-Choose **Help → Logger guide** for this guide inside the app. Choose Logger or
-Recordings in the labeled left navigation. **☰ Navigation** or
-**View → Navigation labels** switches between names and compact icons.
+Choose **Help → Logger guide** for this guide inside the app. **Logging → Live**
+contains live data and recording. **Logging → Recordings** reviews saved files.
+Use the shared top-bar adapter controls in either view. Recording continues when
+you switch sections; the shared status strip and Stop action remain visible.
 
 ## Before you start
 
@@ -35,8 +36,8 @@ running-engine sampling behavior still require validation.
 
 ## Start logging
 
-1. In **Connection**, select your adapter and choose **Connect & identify**.
-2. Open **Logger**, then **Load current ECU ROM…**. Select a full backup of the
+1. Select your adapter in the shared dropdown and choose **Connect**. Open **Logging → Live**.
+2. Open **Logging → Live**, then **Load current ECU ROM…**. Select a full backup of the
    image currently installed in the ECU. SpeedLink selects its profile and reads its MAP calibration.
 3. Select parameters and display units. **Essentials** is a tuning preset;
    **All** includes every available parameter for that profile. More parameters reduce each parameter's rate.
@@ -51,7 +52,7 @@ running-engine sampling behavior still require validation.
 6. After **Stop**, **View recording…** opens that session directly in Recordings.
    The shortcut is disabled during logging so you open the finalized file. A
    live-only session leaves the last saved recording available. Use
-   **Recordings → Open recording…** for older files, including after restarting SpeedLink.
+   **Logging → Recordings → Open recording…** for older files, including after restarting SpeedLink.
 
 Logging can run with the engine running. **ROM backup reads require the engine
 stopped**. They use a different diagnostic session. A connection used for a ROM
@@ -115,7 +116,7 @@ Rate, stoichiometric AFR and CSV choices are also restored on launch. Load the
 current ECU ROM again to establish its calibration; preferences do not bind a ROM.
 Invalid AFR input leaves the connection available so you can correct it and retry.
 After a backup, the Logger explains the required reconnect and provides a
-**Go to Connection** button.
+**Adapter settings…** button or the shared adapter dropdown.
 
 During a partial scan, a still-fresh last-known display value is marked **Pending**
 with its age. Expired or rejected values are cleared. Recordings retain the actual
@@ -132,7 +133,7 @@ parameter's status and remaining checks.
 
 ## View a saved recording
 
-Choose **Recordings** in the left navigation, then **Open recording…** and choose a SpeedLink
+Choose **Logging → Recordings**, then **Open recording…** and choose a SpeedLink
 `log.csv`. This works without an adapter. Select up to six parameters for plots
 with a shared time axis. Move the cursor slider or click a plot to inspect the
 latest preceding observation; use Zoom to narrow the displayed time range.
@@ -170,8 +171,8 @@ transport behavior and its remaining validation limits.
 
 ## Reporting a problem
 
-Diagnostic capture starts automatically with **Connect & identify**, including
-failed driver opens. On **Connection**, choose **Export support report…**, select
+Diagnostic capture starts automatically with **Connect** in the shared top bar, including
+failed driver opens. Choose **Help → Export support report…**, select
 the session with the problem and save its ZIP. This also works after restarting
 without reconnecting. Follow the [reporting guide](TROUBLESHOOTING.md) and attach
 the ZIP to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
