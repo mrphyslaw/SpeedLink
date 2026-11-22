@@ -69,7 +69,9 @@ internal sealed class ObdWorkspace : UserControl
         ConnectionText.Text = connected ? $"Connected · {identity?.Calibration ?? "Calibration unavailable"}" : "Adapter disconnected · use the shared adapter controls above.";
         if (reconnectForScan) ConnectionText.Text += " · Reconnect after a ROM read to use diagnostics.";
         ConnectionText.ToolTip = identity?.Adapter;
-        ScanButton.ToolTip = ClearButton.ToolTip = readSession ? "Disconnect and reconnect after a ROM read before using OBD diagnostics." : "Use the connected engine ECU. Stop logging or other adapter operations first.";
+        const string idleEngine = "Use the connected engine ECU. Stop logging or other adapter operations first.";
+        ScanButton.ToolTip = readSession ? "Reconnect and read engine codes without leaving Diagnostics." : idleEngine;
+        ClearButton.ToolTip = readSession ? "Choose Reconnect & read codes before clearing codes." : idleEngine;
     }
     internal void ShowScan(ObdScan scan)
     {

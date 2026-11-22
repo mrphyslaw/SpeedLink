@@ -98,7 +98,9 @@ public partial class MainWindow : Window
         ConnectButton.IsEnabled = idle && transport is null;
         DisconnectButton.IsEnabled = idle && transport is not null;
         ReadButton.IsEnabled = idle && transport is not null && identity is not null && !transport.ReadAttempted && !loggerReadReconnectRequired;
-        ReadButton.ToolTip = loggerReadReconnectRequired ? "Disconnect and reconnect before reading a ROM after logging." : "Read and verify two matching copies of the ECU ROM.";
+        ReadButton.ToolTip = loggerReadReconnectRequired || transport?.ReadAttempted == true
+            ? "Choose Reconnect for backup to start a new read session."
+            : "Read and verify two matching copies of the ECU ROM.";
         RefreshReadConnection(idle);
         var readProfiles = RomInspector.KnownProfiles.Where(p => RomInspector.MatchesCalibrationId(p, identity?.Calibration)).ToArray();
         if (readProfiles.Length == 1) ReadFamilyBox.SelectedIndex = readProfiles[0].Family == "Gen2" ? 1 : 0;

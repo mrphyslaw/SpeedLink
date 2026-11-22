@@ -6,16 +6,13 @@ Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 
 
 **[Download SpeedLink v0.8.0-alpha.18](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.18)** · A single Windows EXE with the runtime included.
 
-**Watch the SpeedLink v0.8.0-alpha.17 walkthrough (3:46)** · Light mode with on-screen captions and no audio.
+**Watch the SpeedLink walkthrough (7:53)** · Light mode, on-screen captions, and seven chapters.
 
-https://github.com/user-attachments/assets/911b53ec-7566-461a-8953-11a22da34c56
+https://github.com/user-attachments/assets/220d0312-ad01-48b8-8138-2b1ac9145a07
 
-See the four top sections and shared adapter controls, engine diagnostics,
-two-pass verified backups, and the Gen 1 Flash & Recovery workflow. The editor
-uses a real L3M6EG000 bench ECU backup to demonstrate the green-low, red-high
-gradient, 3D graphs, docking, named workspaces, cell-color options, and assignable
-shortcuts. Logging and playback are included. ECU activity is simulated;
-no physical flashing is performed in the video. [Navigation guide](docs/NAVIGATION.md).
+Follow adapter setup and verified backups, map editing and comparison, live
+logging and replay, engine diagnostics, and Gen 1 flashing and recovery.
+The editor uses a genuine stock Mazda ROM. ECU sessions are simulated.
 
 Use **ECU**, **Editor**, **Logging**, and **Flash & Recovery** across the top. The shared adapter dropdown and Connect/Disconnect controls stay available in every section. ECU groups diagnostics, reading and saved backups; Logging groups live data and recordings; ROM information and integrity checks live under Editor. [Navigation guide](docs/NAVIGATION.md). The permanent File, Edit, View, Map, Tools and Help menus remain available. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
