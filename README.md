@@ -1,281 +1,86 @@
 # SpeedLink
 
-Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 1 flashing and recovery for Mazdaspeed and Mazda MPS.
+SpeedLink is an open-source Windows tool for backing up, editing, and logging
+Mazdaspeed and Mazda MPS ECUs. It also reads and clears engine fault codes
+and supports flashing and recovery for compatible Gen 1 ECUs.
 
-[![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
+**[Download SpeedLink v0.8.0-alpha.18](https://github.com/mrphyslaw/SpeedLink/releases/download/v0.8.0-alpha.18/SpeedLink.exe)** · A portable Windows EXE with the runtime included.
 
-**[Download SpeedLink v0.8.0-alpha.18](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.18)** · A single Windows EXE with the runtime included.
+[Release notes](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.18) · [All releases](https://github.com/mrphyslaw/SpeedLink/releases)
 
-**Watch the SpeedLink walkthrough (7:53)** · Light mode, on-screen captions, and seven chapters.
+## Compatibility
+
+| ECU | Available workflows |
+| --- | --- |
+| **Gen 1 Mazdaspeed3, Mazdaspeed6, and Mazda MPS** | Ten bundled ROM layouts support editing, stock ECU logging, flashing, and recovery. Flashing requires a verified original backup from the same ECU. |
+| **Gen 2 Mazdaspeed3 / Mazda3 MPS** | The **L3CGEE000** profile supports experimental editing and logging. Compatible Gen 2 ROMs can be read. Gen 2 flashing is planned. |
+| **Unknown compatible 1 MiB MZR DISI ROMs** | Select the appropriate read protocol to capture and verify a backup. Editing and logging require matching profiles. |
+
+Check your calibration against the [supported ROM list](docs/SUPPORTED_ROMS.md).
+Engine diagnostics can run with a supported adapter before you load a ROM.
+
+**Adapters** · Vgate vLinker FS USB and Tactrix Openport 2.0 are the primary
+wired options. Mongoose-Plus ISO/CAN3 is experimental. Install your adapter
+manufacturer's Windows driver and check the [adapter guide](docs/ADAPTERS.md)
+for driver requirements and tested workflows. Supply your own ROM or read it
+from your ECU.
+
+## Getting started
+
+1. Save **SpeedLink.exe** in a writable folder and open it.
+2. For ECU work, connect your adapter and select its COM port or driver in the
+   shared connection bar. Turn the ignition on with the engine stopped, then select **Connect**.
+3. Choose **ECU → Read backup → Read & verify backup**. SpeedLink verifies the
+   backup after two complete reads match. Keep the full backup folder in `data`
+   alongside the EXE.
+4. Use **ECU → Saved backups** to reopen the verified ROM in the Editor.
+   For live logging, load the ROM currently installed on the ECU in **Logging → Live**.
+   Follow the [flashing guide](docs/FLASHING.md) before writing to a Gen 1 ECU.
+
+You can **open a supported ROM** in the Editor or **replay a saved CSV**
+from Logging with the adapter disconnected. When updating SpeedLink, replace
+the EXE and keep your existing `data` folder.
+
+### Video walkthrough · 7:53
+
+Follow a first backup through editing, logging, diagnostics, and Gen 1 recovery.
+The demo uses a stock Mazda ROM and simulated ECU sessions.
 
 https://github.com/user-attachments/assets/220d0312-ad01-48b8-8138-2b1ac9145a07
 
-Follow adapter setup and verified backups, map editing and comparison, live
-logging and replay, engine diagnostics, and Gen 1 flashing and recovery.
-The editor uses a genuine stock Mazda ROM. ECU sessions are simulated.
+## What you can do
 
-Use **ECU**, **Editor**, **Logging**, and **Flash & Recovery** across the top. The shared adapter dropdown and Connect/Disconnect controls stay available in every section. ECU groups diagnostics, reading and saved backups; Logging groups live data and recordings; ROM information and integrity checks live under Editor. [Navigation guide](docs/NAVIGATION.md). The permanent File, Edit, View, Map, Tools and Help menus remain available. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
+| SpeedLink section | What it does | Guide |
+| --- | --- | --- |
+| **ECU** | Read and verify a backup, browse saved backups, and review engine fault codes, readiness, and freeze-frame data. | [Back up a ROM](docs/DUMP_A_ROM.md) · [Engine diagnostics](docs/DIAGNOSTICS.md) |
+| **Editor** | Find and compare maps, inspect 2D curves and 3D surfaces, and organize pinned maps in named workspaces. Save changes to a new file with a verified checksum. | [Editor](docs/EDITOR.md) · [Tuning](docs/TUNING_HELP.md) |
+| **Logging** | Record selected ECU parameters to CSV. Review recordings offline with synchronized plots, a shared cursor, and zoom. | [Logging and replay](docs/LOGGER.md) |
+| **Flash & Recovery** | Write a compatible Gen 1 ROM, verify a saved write, or restore the verified original after an interrupted write. | [Gen 1 flashing and recovery](docs/FLASHING.md) |
 
-Drag a pane's own edge or corner to resize just that map, or drag its header to
-move it. New maps use the space they need when the whole table fits at a readable size. Drag a map to a workspace edge and release to place it where the outline shows. Use the Windows title bar to return a detached map. Panes can overlap, and clicking a map or selecting it in the browser brings it forward. **Map → Tile maps side by side** restores automatic arrangement. Use **Tools → Keyboard shortcuts** to change the default bindings.
+[![SpeedLink editor with a shaded map grid and a named workspace](docs/editor/images/application-navigation.png)](docs/editor/README.md)
 
-SpeedLink can dump unknown 1 MiB MZR DISI ROMs, create two-pass verified backups,
-log stock-ECU data, review recordings and edit the eleven supported stock ROM layouts.
-**Flashing and stock recovery are Gen 1 only**, covering all ten bundled Gen 1
-ROM layouts. Open **Flash & Recovery** across the top. Pick the ROM to
-write and SpeedLink looks up the ECU's verified original by VIN or chassis ID
-and calibration. Recovery lists saved runs by date and calibration, checks the
-ECU state, and finds the exact backup automatically. Normal writes offer two, one, or zero full
-readbacks. The zero-readback result is marked unverified. Recovery requires
-two matching readbacks. **Gen 2 flashing is planned for an upcoming
-release.** SpeedLink ships without ROM files or adapter drivers.
-[Flashing and recovery guide](docs/FLASHING.md)
+[Editor screenshots](docs/editor/README.md) · [Logger screenshots](docs/logger/README.md) · [Navigation and shortcuts](docs/NAVIGATION.md) · [All user guides](docs/README.md)
 
-**Engine diagnostics:** Open **ECU → Diagnostics** (Ctrl+8), select the shared adapter above and
-choose **Connect & read codes**. Read stored, pending and
-supported permanent fault codes, check-engine light
-state, readiness monitors and available freeze-frame data. No ROM file is needed.
-**Clear codes…** retains a before-clear report, checks that engine speed is zero,
-sends the request once and rescans. Clearing resets readiness and removes
-freeze-frame information; faults can return, and permanent codes may remain.
-Use **Save report…** to export a diagnostic snapshot.
-[Engine diagnostics guide](docs/DIAGNOSTICS.md)
+## Get help
 
-Tactrix Openport 2.0 and vLinker FS have physical write coverage.
-Mongoose-Plus ISO/CAN3 is available for experimental Gen 1 flashing and recovery.
+- **Connection or app problem?** Choose **Help → Export support report…**.
+  Review the ZIP before attaching it to the [problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
+  [Troubleshooting guide](docs/TROUBLESHOOTING.md)
+- **Missing ROM support?** Follow the [ROM-dump guide](docs/DUMP_A_ROM.md),
+  then open a [ROM-support request](https://github.com/mrphyslaw/SpeedLink/issues/new?template=rom-support.yml).
+- **Updating definitions?** See [definition import](docs/DEFINITIONS.md) and the
+  related [MazdaSpeedDefs project](https://github.com/mrphyslaw/MazdaSpeedDefs).
 
-ECU identification accepts standard VINs and supported short chassis-number
-replies, including space/null-padded identifiers reported by some ECUs. A chassis
-ID is labeled separately; it does not select or authorize a different ROM/logger profile.
+## Development
 
-**Experimental Gen 2:** L3CGEE000 has 448 editor controls and a 20-parameter
-stock-ROM logger. Compatible unknown Gen 2 ROMs can be dumped by selecting the
-Gen 2 read protocol. Real ECU validation is pending; see the [Gen 2 guide](docs/GEN2.md).
+[![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-## A look inside
+[Build from source](docs/BUILD.md) · [C# implementation](dotnet/README.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
-### ROM editor
-
-[![SpeedLink editor with permanent application menus, labeled navigation, a workspace tab and a shaded map grid](docs/editor/images/application-navigation.png)](docs/editor/README.md)
-
-Browse related maps, edit the grid, compare values and inspect 2D curves or
-rotatable 3D surfaces. [More editor screenshots and a first-edit walkthrough →](docs/editor/README.md)
-Axis headers have a distinct background and bright separators. **Map → Map information…** and **F1** show units, correction direction and practical examples.
-Axis titles stay centered beside the visible rows and above the visible columns,
-including short tables with unused space. [See the alignment example →](docs/editor/README.md#axis-titles-follow-the-data)
-The map-window preview uses synthetic example values. **View → Appearance** changes
-the map gradient with the theme. [Compare Light and Dark and see the shortcut settings](docs/editor/README.md#appearance-and-shortcuts).
-
-Single values use compact cards that wrap across the workspace, with units,
-help and baseline comparison. Rejected ROM files leave the current editing
-session available, including unsaved changes and open map windows.
-Small maps stay proportional to their contents, and the table/preview divider
-can be dragged to resize it. See the [editor guide and screenshots](docs/editor/README.md).
-The gallery's layout and MAF examples use synthetic values. Screenshots are not
-tuning recommendations.
-
-### Logging and recordings
-
-[![SpeedLink recorded-log viewer with engine speed, boost, lambda and fuel-pressure plots](docs/logger/images/recorded-log.png)](docs/logger/README.md)
-
-Record selected parameters to CSV, then review up to six synchronized plots
-without an adapter. This preview uses synthetic example data; it does not show
-a vehicle test or measured ECU logging rates.
-After Stop, **View recording…** opens the session just saved. Live charts reuse
-their views to reduce redraw allocations; polling and recording retain their
-existing timing and data precision.
-[Live logger screenshots and a quick start →](docs/logger/README.md)
-
-## Choose a workflow
-
-| Task | Start here |
-| --- | --- |
-| Dump an unknown ROM and help add support | [Guided ROM-dump workflow](docs/DUMP_A_ROM.md) |
-| Edit a ROM: map grid, 2D curves and 3D surfaces | [Editor overview and screenshots](docs/editor/README.md) |
-| Editing operations, comparison and saving | [Editor guide](docs/EDITOR.md) |
-| Understand map units, corrections and thresholds | [Tuning guide](docs/TUNING_HELP.md) |
-| See the logger, record parameters and review logs | [Logger overview and screenshots](docs/logger/README.md) |
-| Logger setup, rates, units and troubleshooting | [Logger guide](docs/LOGGER.md) |
-| Check ROM/profile compatibility | [Supported ROMs](docs/SUPPORTED_ROMS.md) |
-| Report a connection, read, logger or app problem | [Export a support report](docs/TROUBLESHOOTING.md) |
-| Build from source or review validation | [Documentation index](docs/README.md) |
-| Install editor or logger definition updates | [Definition import](docs/DEFINITIONS.md) |
-
-## Edit a ROM
-
-The Workbench keeps editing, logging and recordings in one window. **Map → Fit entire map**
-gives the table the available workspace. A permanent **File / Edit / View / Map / Tools / Help**
-menu stays available throughout the app. Four compact sections replace the application sidebar;
-the map browser and graph can be resized, hidden or moved into separate windows.
-Use **View** for app appearance and **Map** for the focused pane. The map header shows its title, Pin and Close. Right-click the title for map commands, including in a detached window.
-New maps open in table view. Use **Map → Toggle table and graph** or F4 to switch to the full graph,
-or choose a split view. Long MAF curves open with their value list and graph
-together. **View → Appearance** offers System, Light and Dark.
-Cell shading follows the value range of each map, and blue highlights the
-selected cells and their axis headers.
-Axis names sit directly above the column breakpoints and beside the row
-breakpoints. Selected row and column headers highlight together; value units
-appear beneath the table and in Map information. 3D maps carry labeled axis rulers and tick values
-directly on their frame, aligned with the surface as it rotates.
-
-1. Open **Editor**, then **File → Open ROM…**.
-2. Select a map from the category folders or use search. Icons identify
-   settings, curves and surfaces. Pin maps to keep them open while browsing.
-3. For a single value, type in the field and choose **Apply** or Enter;
-   Cancel or Escape discards typing. For a table, double-click a cell, use
-   **Map → Edit tools**, or right-click selected cells to see actions and shortcuts.
-   State controls use named
-   choices. Compare with the original, last save or another compatible ROM;
-   Undo/Redo restores operations. Review a curve or surface when available.
-4. Choose **Save copy…**. Every save applies the ROM-specific checksum/integrity checks, then
-   creates and verifies a new file; the original and existing copies are preserved.
-
-Editing needs no adapter. Supported tuning profiles are **L33XEH000, L35HEH000,
-L38KEH000, L38KEG000, L39SED000, L39SEE000, L39SEF000, L3M6EG000, L3M7EF000, L3P4EM000 and L3CGEE000**. A matching calibration,
-boot and program area are required. Patched/extended ROM layouts are unsupported.
-Static axes are read-only. See the [editor guide](docs/EDITOR.md) for details.
-
-Long MAF curves use a breakpoint/value list beside a zoomable curve. Click a
-point to reach its value, including either end of a 129-point calibration.
-Layout preferences are saved beside the EXE in `data/editor-layout.json`.
-
-Choose **Tools → Manage definitions…** to import editor XML or logger JSON updates for supported
-ROM layouts. Updates are kept in `data/definitions` beside the EXE; the bundled
-copies remain available. See [definition import](docs/DEFINITIONS.md).
-
-## Report a problem
-
-Capture starts automatically before the adapter opens. After a problem, choose
-**Help → Export support report…**, select the failed session and save its
-ZIP. You can do this after restarting without reconnecting. Follow the
-[reporting guide](docs/TROUBLESHOOTING.md) and attach it to the
-[problem-report form](https://github.com/mrphyslaw/SpeedLink/issues/new?template=bug-report.yml).
-Factory seed/key exchanges are retained; personal information is redacted and
-ROM bytes stay in your backups.
-
-## Read and back up a ROM
-
-[Adapter status and testing candidates](docs/ADAPTERS.md) distinguishes available
-adapter paths from hardware awaiting qualification.
-**Mongoose-Plus ISO/CAN3** is available as an experimental J2534 reader/logger
-option for user testing; hardware validation is pending. See the guide for
-driver setup and reporting results.
-
-**First time, or contributing an unknown ROM?** Follow the
-[step-by-step ROM-dump workflow](docs/DUMP_A_ROM.md), then use the
-[guided ROM-support request](https://github.com/mrphyslaw/SpeedLink/issues/new?template=rom-support.yml).
-
-1. Download **SpeedLink.exe** from [Releases](https://github.com/mrphyslaw/SpeedLink/releases).
-2. Save it in a writable folder and double-click it. No installer or .NET installation is needed.
-3. Connect a **Vgate vLinker FS USB** or **Tactrix Openport 2.0** with its manufacturer's driver installed. Select the adapter in SpeedLink; vLinker also needs its COM port. Leave vLinker at **115200** unless you know it uses a different startup rate. SpeedLink can find it if a failed session left it at the faster transfer rate.
-4. Turn the ignition on with the engine stopped, then select **Connect** in the shared top bar.
-5. For an unknown Gen 2 ECU, select **Gen 2 read protocol (experimental)**; known ROMs choose automatically. Select **Read & verify backup**. SpeedLink saves a verified backup after two complete reads match.
-
-![Backup progress showing the second read pass, overall percentage, bytes and estimated time remaining](docs/reading/images/progress.png)
-
-The progress panel shows both passes, elapsed time and an estimate based on
-measured read speed. It reaches 100% after verification and saving finish.
-This screenshot uses a synthetic offline test; its timing is not a vehicle
-read-speed measurement. [Progress and result screenshots →](docs/DUMP_A_ROM.md#3-read-and-verify)
-
-Backups are saved in the `data` folder beside the EXE. Keep the whole backup
-folder, including its captures, manifest and journal. Use **ECU → Saved backups**
-to find a backup by date and calibration, open its folder, or open a verified
-copy in the Editor.
-
-## Log engine data
-
-You need a full backup of the ROM currently installed in the ECU. SpeedLink uses
-it to choose the logging profile and read the MAP sensor calibration. The current
-logger supports [eleven defined ROMs](definitions/logging/All_ROM_Coverage.md).
-
-1. Connect the adapter and select **Connect** in the shared top bar. If you just read a ROM,
-   use **Reconnect to log** on the Live tab.
-2. Open **Logging → Live**, select **Load current ECU ROM…**, and choose that current ROM
-   backup. Its calibration ID must match the connected ECU.
-3. Choose **Essentials** for a starting selection, or select the parameters you
-   need. Set each row's display unit. Fewer selected parameters allow faster updates.
-4. Leave mixture readings in lambda, or enter your fuel's stoichiometric AFR
-   before choosing an AFR display unit.
-5. Leave **Record CSV** checked and select **Start logging**. Use the **Plot** column
-   to choose up to six synchronized charts for logged parameters. The **Hz** column shows its measured sample rate;
-   **Polling → Max** collects data without a scan-rate delay. Choose **Hide plots**
-   for more table space while keeping your recording selection.
-6. Select **Stop** to finish the recording. The healthy connection stays ready for
-   **Start logging** again, with your ROM and selections retained. Each start creates
-   a separate recording. Use **Open logs** to find them under `data/logs` beside the EXE.
-   Use **Reconnect for backup** on **ECU → Read backup** before reading a ROM after logging.
-
-Logging can run with the engine running. **ROM backup reads require the engine
-stopped.** Unknown ROMs can still be dumped; logging requires a supported profile.
-See the [logger guide](docs/LOGGER.md) for setup, recordings and troubleshooting.
-
-## Review a recording
-
-1. Choose **Logging → Recordings**. No adapter is needed.
-2. Select a saved session and choose **Open selected recording**. Use **Open CSV…**
-   to choose a recording from another folder.
-3. Select up to six parameters. Move the shared cursor or click a plot to inspect
-   readings on the elapsed-time ruler. Use **Zoom** to focus on part of the recording
-   and **Reset zoom** to return to the full run. Missing data appears as gaps.
-
-Keep the whole recording folder, including `responses.jsonl` and `session.json`,
-locally. Start troubleshooting with a [support ZIP](docs/TROUBLESHOOTING.md);
-review any recording separately before deliberately sharing it.
-
-## ROM checks
-
-Known-ROM checks and checksum correction are available under **Editor → ROM information**.
-Checksum correction saves a separate file. Unknown ROMs do not need to pass these
-checks to be read and saved.
-
-See [ROM checks and compatibility](docs/SUPPORTED_ROMS.md) for the known layouts.
-Related RomRaider definitions are available in [MazdaSpeedDefs](https://github.com/mrphyslaw/MazdaSpeedDefs).
-
-## Status and development
-
-- **Available:** ROM reading, two-pass verified backups, known-ROM checks and
-  checksum correction to a separate file; live logging, charts, CSV recording
-  and saved-log viewing; offline ROM editing, comparison, 2D/3D views and undo/redo.
-  The reader covers the 1 MiB MZR DISI ECU family.
-- **Logger coverage:** ten Gen 1 profiles with 33–38 stock-ROM parameters each,
-  plus experimental L3CGEE000 Gen 2 logging with 20 parameters.
-  No logging patch is required. See [coverage and exclusions](definitions/logging/All_ROM_Coverage.md).
-- **Fixed:** logger matching accepts known complete ECU calibration IDs, including
-  `L3P4EM000L3T6051`. Renaming a ROM file is unnecessary.
-- **Checked:** 615 C# tests, 2,631 native-derived logger vectors and 45 standard-batch equivalence cases. Ten-profile
-  editor checks cover direct cell entry, comparison, undo/redo and byte-identical
-  no-edit exports. L3CGEE000 adds 379 native logger instruction checks and complete
-  reference-ROM cell/axis comparisons. See [validation](docs/VALIDATION.md).
-  Earlier physical logger tests passed with vLinker FS and Tactrix across the
-  original seven Gen 1 profiles, including fault handling, sustained requests
-  and USB recovery. Isolated Gen 2 simulated-peer reads and logging have also
-  passed using vLinker FS and Tactrix; this does not establish real ECU acceptance. Saved-log viewing and
-  standalone EXE checks also passed.
-- **Logging performance:** Max polling is the default. Both wired adapters completed
-  over 25,000 read-only requests combined on one L3M6EG000 bench ECU, including
-  three-minute all-parameter recordings and repeated desktop Start/Stop sessions.
-  See [measured rates and scope](docs/LOGGER_PERFORMANCE.md).
-- **Still pending:** broader Mazda ECU read coverage, physical sensor readings,
-  running-engine behavior and achievable vehicle logging rates. The 384 channel/profile
-  vehicle validation checks remain pending.
-- **Gen 1 programming:** Ten bundled layouts pass the offline write and recovery
-  matrix. Both supported adapters completed edited and stock writes on one
-  L3M6EG000 bench ECU. Tactrix also completed recovery after a controlled
-  interruption. Broader hardware qualification and Gen 2 flashing are upcoming.
-  [Validation scope](docs/VALIDATION.md)
-
-Validation distinguishes simulated ECU replies over real adapters from tests
-on a powered ECU. Matching ROM reads verify the captured bytes across both
-passes. Unknown calibration IDs can be read with a compatible read protocol.
-
-See [usage notes](docs/USAGE.md), [build instructions](docs/BUILD.md), and
-[contributing](CONTRIBUTING.md) for more information. Help and license notices
-are also included in the EXE.
-
-See the [C#/.NET source](dotnet/README.md) and
-[validation results](dotnet/docs/Validation.md) for the completed checks and remaining work.
+See the [validation guide](docs/VALIDATION.md) for physical bench and simulated
+test coverage, and the [logger performance guide](docs/LOGGER_PERFORMANCE.md)
+for measured rates and test conditions.
 
 ## License
 
-Released under [GPL-3.0-or-later](LICENSE). See [attributions](ATTRIBUTIONS.md).
+[GPL-3.0-or-later](LICENSE) · [Attributions](ATTRIBUTIONS.md)
