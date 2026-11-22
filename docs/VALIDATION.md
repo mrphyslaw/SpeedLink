@@ -1,5 +1,11 @@
 # Alpha validation scope
 
+## Workflow usability · 0.8.0-alpha.18
+
+- Simulated desktop workflows cover adapter selection and reconnect, backup browsing and opening, per-map comparisons, and the Save copy, Discard, and Cancel paths. ROM-save integrity remains required for all eleven profiles.
+- Logger checks exercise recording, restarting, connection failure, and ECU identity changes across the supported profiles. Replay checks cover the recording library, elapsed-time ruler, and zoom reset.
+- Gen 1 standalone checks cover opening recovery from an interrupted result and selecting an earlier acknowledged write for verification. Verification still requires a matching backup captured after the selected write. These checks use simulated ECUs.
+
 ## Four-section navigation · 0.8.0-alpha.17
 
 - Four top-level sections group the existing eight logical views. Existing shortcut identifiers and per-ROM map layouts are preserved. The obsolete sidebar-collapse preference no longer affects app navigation.

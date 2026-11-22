@@ -24,6 +24,8 @@ public partial class EditorWorkspace : UserControl
         if (ChangesList is null) return;
         var changed = document?.Definition.Tables.Where(t => document.TableChanged(t, Baseline)).ToArray() ?? [];
         ChangesList.ItemsSource = changed; ChangesButton.Header = $"Changes ({changed.Length})";
+        ChangesTitle.Text = $"Changed vs. {ComparisonName}";
+        ChangesTitle.ToolTip = $"Maps that differ from {ComparisonName}";
     }
     private void Changes_Selected(object sender, SelectionChangedEventArgs e)
     {
@@ -38,6 +40,13 @@ public partial class EditorWorkspace : UserControl
     private TuningTable? table;
     private bool refreshing, closingForTest;
     private TuningBaseline Baseline => (TuningBaseline)Math.Max(0, BaselineBox.SelectedIndex);
+    private string ComparisonName => ComparisonReferenceName(document, Baseline);
+    internal static string ComparisonReferenceName(RomEditor? rom, TuningBaseline baseline) => baseline switch
+    {
+        TuningBaseline.LastSave => "Last save",
+        TuningBaseline.Comparison => Path.GetFileName(rom?.ComparisonPath) ?? "Comparison ROM",
+        _ => "Original ROM"
+    };
     public EditorWorkspace() : this(new(), new()) { }
     internal EditorWorkspace(RomInspector inspector, TuningCodeGuard codeGuard, EditorWorkspace? mapOwner = null)
     {
@@ -60,27 +69,12 @@ public partial class EditorWorkspace : UserControl
         }
         Graph.CellPicked += index => SelectCell(index); RefreshControls(); SetViewMode(2);
     }
-    public void OpenRom(string path)
+    private void Attempt(Action action) => ExecuteEditorAction(action, ReportEditorError);
+    private void ReportEditorError(string message)
     {
-        var opened = new RomEditor(File.ReadAllBytes(path), path, inspector, codeGuard, Definitions);
-        SaveMapWorkspace();
-        restoringMaps = true;
-        try
-        {
-            ClearMapWindows();
-            if (document is not null) document.Changed -= Document_Changed;
-            document = opened; document.Changed += Document_Changed; table = null;
-            MapTabs.Items.Clear(); BaselineBox.SelectedIndex = 0; SearchBox.Text = ""; ChangedOnly.IsChecked = false;
-            FileText.Text = Path.GetFileName(path); FileText.ToolTip = path;
-            RefreshBrowser(); RefreshTable(); RefreshControls();
-            ShowMapBrowser();
-        }
-        finally { restoringMaps = false; }
-        RestoreMapWorkspace();
-        EditorStatus.Text = "ROM loaded. Choose a map to edit. Static axes are read-only.";
+        EditorStatus.Text = message;
+        MessageBox.Show(Window.GetWindow(this), message, "SpeedLink ROM editor", MessageBoxButton.OK, MessageBoxImage.Information);
     }
-    private void Attempt(Action action)
-        => ExecuteEditorAction(action, message => { EditorStatus.Text = message; MessageBox.Show(Window.GetWindow(this), message, "SpeedLink ROM editor", MessageBoxButton.OK, MessageBoxImage.Information); });
     internal static void ExecuteEditorAction(Action action, Action<string> report)
     {
         try { action(); }
@@ -88,25 +82,6 @@ public partial class EditorWorkspace : UserControl
         { report(error.Message); }
     }
     private bool FinishEdit() => CommitScalar() && MapGrid.CommitEdit(DataGridEditingUnit.Row, true);
-    private bool MayReplace() => document?.IsDirty != true || MessageBox.Show(Window.GetWindow(this), "Discard unsaved changes? Saved copies and the original ROM are kept.", "Unsaved ROM edits", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
-    private void Open_Click(object sender, RoutedEventArgs e)
-    {
-        if (mapOwner is not null) { mapOwner.Open_Click(sender, e); return; }
-        if (!FinishAllMapEdits() || !MayReplace()) return;
-        var dialog = new OpenFileDialog { Title = "Open ROM for editing", Filter = "ROM files|*.bin;*.rom|All files|*.*" };
-        if (dialog.ShowDialog(Window.GetWindow(this)) == true) Attempt(() => OpenRom(dialog.FileName));
-    }
-    private void Save_Click(object sender, RoutedEventArgs e)
-    {
-        if (mapOwner is not null) { mapOwner.Save_Click(sender, e); return; }
-        if (document is null || !FinishAllMapEdits()) return;
-        string stem = Path.GetFileNameWithoutExtension(document.SourcePath) + "_edited";
-        string folder = Path.GetDirectoryName(document.LastSavePath ?? document.SourcePath)!;
-        string suggestion = stem + ".bin"; int revision = 2;
-        while (File.Exists(Path.Combine(folder, suggestion))) suggestion = stem + "_" + revision++ + ".bin";
-        var dialog = new SaveFileDialog { Title = "Save a new edited ROM copy", Filter = "Binary ROM|*.bin", FileName = suggestion, InitialDirectory = folder, OverwritePrompt = false };
-        if (dialog.ShowDialog(Window.GetWindow(this)) == true) Attempt(() => { document.SaveNew(dialog.FileName); EditorStatus.Text = "Saved · bytes and checksum verified: " + dialog.FileName; });
-    }
     private void Compare_Click(object sender, RoutedEventArgs e)
     {
         if (!ReferenceEquals(CommandMap, this)) { CommandMap.Compare_Click(sender, e); return; }
@@ -122,6 +97,7 @@ public partial class EditorWorkspace : UserControl
         if (!gridDraft) RefreshTable();
         if (draft is not null) ScalarInput.Text = draft;
         RefreshBrowser();
+        if (mapOwner is null) RefreshMapCommandState();
     }
     private void RefreshControls()
     {
@@ -145,6 +121,9 @@ public partial class EditorWorkspace : UserControl
     private void RefreshBrowser()
     {
         if (MapTree is null || mapOwner is not null) return;
+        ChangedOnlyLabel.Text = $"Changed vs. {ComparisonName}";
+        ChangedOnly.ToolTip = $"Show only maps that differ from {ComparisonName}";
+        System.Windows.Automation.AutomationProperties.SetName(ChangedOnly, (string)ChangedOnly.ToolTip);
         if (!mapBrowserFiltered && MapTree.Items.Count > 0)
             expandedMapFolders = MapTreeEntries(MapTree).Where(i => i.IsExpanded).Select(i => i.Tag).OfType<string>().ToHashSet(StringComparer.Ordinal);
         MapTree.Items.Clear(); if (document is null) return;
@@ -169,7 +148,13 @@ public partial class EditorWorkspace : UserControl
             return;
         }
         if (BaselineBox.SelectedIndex == 2 && document?.HasComparison != true) { BaselineBox.SelectedIndex = 0; if (EditorStatus is not null) EditorStatus.Text = "Load a comparison ROM first."; return; }
-        if (MapTree is not null) { RefreshBrowser(); RefreshTable(); RefreshChanges(); }
+        if (MapTree is not null)
+        {
+            RefreshBrowser();
+            RefreshTable();
+            RefreshChanges();
+            MapRoot.RefreshMapCommandState();
+        }
     }
     private void Map_Selected(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
@@ -228,7 +213,7 @@ public partial class EditorWorkspace : UserControl
             {
                 MapTitle.Text = "Select a map"; RefreshAxes(); HelpText.Text = "Choose a map from the list.";
                 HelpUnitsText.Text = ""; HelpAxesText.Text = "";
-                StorageText.Text = ""; CellText.Text = ""; GraphTitle.Text = "2D curve / 3D surface"; Graph.SetData(null, [], -1); return;
+                StorageText.Text = ""; CellText.Text = ""; CellText.ToolTip = null; GraphTitle.Text = "2D curve / 3D surface"; Graph.SetData(null, [], -1); return;
             }
             MapTitle.Text = table.Name;
             InterpolationBox.Visibility = CurveList ? Visibility.Collapsed : Visibility.Visible;
@@ -320,11 +305,17 @@ public partial class EditorWorkspace : UserControl
     private void UpdateCellText()
     {
         if (document is null || table is null) return; var selected = SelectedIndices();
-        if (selected.Length == 0) { CellText.Text = "Select a cell to see its reference value."; return; }
+        string comparison = $"Compared with {ComparisonName}";
+        if (selected.Length == 0)
+        {
+            CellText.Text = comparison;
+            CellText.ToolTip = comparison + "\nSelect a cell to see its reference value.";
+            return;
+        }
         int index = selected[0]; double value = document.Read(table, index), reference = document.Read(table, index, Baseline), delta = value - reference;
         string percent = reference == 0 ? "n/a" : (delta / reference * 100).ToString("G6", CultureInfo.InvariantCulture) + "%";
-        CellText.Text = $"{selected.Length} selected · {table.Compact(value)} {table.Units} · Δ {table.Compact(delta)}";
-        CellText.ToolTip = $"Current: {value:R}\nBaseline: {reference:R}\nDifference: {delta:R} ({percent})";
+        CellText.Text = $"Δ {table.Compact(delta)} · {comparison}";
+        CellText.ToolTip = $"{selected.Length} selected\nCurrent: {value:R} {table.Units}\n{ComparisonName}: {reference:R}\nDifference: {delta:R} ({percent})";
     }
     private void SelectCell(int index)
     {
@@ -373,7 +364,6 @@ public partial class EditorWorkspace : UserControl
         using var stream = typeof(EditorWindow).Assembly.GetManifestResourceStream("SpeedLink.EditorHelp.md")!; using var reader = new StreamReader(stream);
         new Window { Owner = Window.GetWindow(this), Title = "SpeedLink · Editor guide", Width = 830, Height = 650, Content = new TextBox { Text = reader.ReadToEnd(), IsReadOnly = true, TextWrapping = TextWrapping.Wrap, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Padding = new(20) } }.Show();
     }
-    internal bool MayClose() => closingForTest || (FinishAllMapEdits() && MayReplace());
     internal void CloseOfflineTest() => closingForTest = true;
     internal async Task<object> ExerciseOffline(string path, string folder, Action? switchWorkspaces = null)
     {
@@ -455,7 +445,11 @@ internal sealed class EditorCellConverter(RomEditor document, TuningTable table,
         int index = curveList ? row.Index : row.Index * table.Columns + column; double current = document.Read(table, index);
         if (curveList && column == 0) return (string)parameter == "tip" ? "Static breakpoint · read-only" : (string)parameter == "border" ? Brushes.Transparent : UiTheme.Panel;
         if ((string)parameter == "border") return document.CellChanged(table, index, baseline) ? UiTheme.Brush("ChangedCellBrush") : Brushes.Transparent;
-        if ((string)parameter == "tip") { double reference = document.Read(table, index, baseline); return $"Current: {current:R}\nBaseline: {reference:R}\nDifference: {current - reference:R} {table.Units}"; }
+        if ((string)parameter == "tip")
+        {
+            double reference = document.Read(table, index, baseline);
+            return $"Current: {current:R}\n{EditorWorkspace.ComparisonReferenceName(document, baseline)}: {reference:R}\nDifference: {current - reference:R} {table.Units}";
+        }
         if (!double.IsFinite(current)) return UiTheme.Brush("InvalidCellBrush");
         double scale = Math.Max(1, Math.Max(Math.Abs(min), Math.Abs(max))), span = max / scale - min / scale;
         double fraction = span < 1e-15 ? .5 : Math.Clamp((current / scale - min / scale) / span, 0, 1);

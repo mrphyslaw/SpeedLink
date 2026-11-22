@@ -3,7 +3,10 @@
 SpeedLink has four sections across the top. The adapter dropdown and
 **Connect / Disconnect** stay available in all four. Choose the COM port and baud
 for vLinker FS, or the registered J2534 driver for Tactrix or experimental Mongoose,
-in that dropdown. **Refresh devices** refreshes the available ports and drivers.
+in that dropdown. The top bar shows the selected port or driver. SpeedLink
+remembers the last valid selection and checks that it is available when you
+open the app. Use **Set up adapter** when a selection is missing and **Refresh
+devices** after reconnecting USB or installing a driver.
 
 | Section | Views and actions |
 | --- | --- |
@@ -29,16 +32,19 @@ on Diagnostics. No ROM is required. See the [diagnostics guide](DIAGNOSTICS.md).
 
 Use **ECU → Read backup** for two matching ROM reads and retained verification
 records. Known ROMs select their read protocol automatically; choose the generation
-there for an unknown ROM. **Saved backups** lists retained operations, including
-interrupted reads. See [reading a ROM](DUMP_A_ROM.md).
+there for an unknown ROM. **Saved backups** lists reads by date, calibration and
+status. Select a row to open its folder or open a verified backup in the Editor.
+See [reading a ROM](DUMP_A_ROM.md).
 
 ## Keep an operation visible
 
 Reading, logging and diagnostic operations keep a status strip and **Stop** action
 visible when you switch sections. The bottom progress indicator stays visible.
 Only one adapter operation may run at a time. Stop logging before diagnostics or
-programming. A ROM-read session must be disconnected and reconnected before normal
-logging or diagnostics; do that from the shared controls in the current section.
+programming. After a ROM read, use **Reconnect & read codes** in Diagnostics or
+**Reconnect to log** in Live. On Read backup, **Reconnect for backup** gets the
+reader ready after a previous backup or logging session. Select **Read & verify
+backup** or **Start logging** separately when ready.
 
 Opening **Flash & Recovery** preserves an idle ordinary connection. Before a
 flash-related ECU-state check, identification or write, SpeedLink closes that

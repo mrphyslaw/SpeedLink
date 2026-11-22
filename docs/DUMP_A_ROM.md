@@ -53,7 +53,7 @@ with baud rates. See [connection troubleshooting](USAGE.md) if reconnecting fail
 ## 3. Read and verify
 
 Known ROMs select their protocol automatically. For an unknown Gen 2 ECU, choose
-**Gen 2 read protocol (experimental)** in the adapter settings. Other unknown ROMs default
+**Gen 2 read protocol (experimental)** from **Read protocol** on **ECU → Read backup**. Other unknown ROMs default
 to Gen 1; confirm the ECU family before reading. See the [Gen 2 guide](GEN2.md).
 
 Select **Read & verify backup** once. Leave the ignition on, engine stopped,
@@ -84,7 +84,8 @@ Success says **Backup verified · two matching reads**. The connection log also
 shows **Verified backup saved:** followed by the path to `rom.bin`.
 
 SpeedLink saves operations beneath `data/hardware/` beside the EXE. Use
-**ECU → Saved backups → Open backup folder** to find them. Keep the **entire operation
+**ECU → Saved backups**, select a read, then choose **Open folder**. Completed
+verified backups also offer **Open in Editor**. Keep the **entire operation
 folder** as your private backup, including `rom.bin`, `backup.json`, both read
 captures, and the journal. A complete ROM is **1,048,576 bytes**.
 

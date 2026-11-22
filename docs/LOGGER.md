@@ -26,8 +26,8 @@ Mongoose-Plus ISO/CAN3 uses the experimental adapter option and its registered
 J2534 driver. Hardware validation is pending; follow the [testing guide](ADAPTERS.md).
 
 Have a full backup of the ROM currently installed in the ECU ready. If you need
-to make one, use **Read & verify backup** with the engine stopped, then disconnect
-and reconnect before logging. Use the verified `rom.bin` from that backup.
+to make one, use **Read & verify backup** with the engine stopped, then choose
+**Logging → Live → Reconnect to log**. Use the verified `rom.bin` from that backup.
 
 Read-only query acceptance and three consecutive Start/Stop sessions also passed
 on one powered L3M6EG000 bench ECU through each of vLinker FS and Tactrix. This
@@ -44,15 +44,18 @@ running-engine sampling behavior still require validation.
 4. For AFR display, enter your fuel's stoichiometric AFR, then choose AFR on the
    actual or desired mixture row. Leave it blank to log lambda.
 5. Leave **Record CSV** checked to save a recording, then select **Start logging**.
-   Use **Plot** to select up to six synchronized charts for logged parameters. **Stop** ends the recording
-   and leaves a healthy connection ready for **Start logging** again. Your ROM,
+   Use **Plot** to select up to six synchronized charts for logged parameters.
+   Choose **Hide plots** to give the table the full width on a smaller screen.
+   **Show plots** brings back your chart selection. This display choice is
+   remembered and has no effect on the channels being recorded. **Stop** ends
+   the recording and leaves a healthy connection ready for **Start logging** again. Your ROM,
    parameters, units and plot choices stay selected; each start creates a separate
-   recording. Disconnect and reconnect before reading a ROM. **Open logs** opens
-   the recording folder location.
+   recording. Use **Reconnect for backup** in ECU before reading a ROM.
+   **Open logs** opens the recording folder location.
 6. After **Stop**, **View recording…** opens that session directly in Recordings.
    The shortcut is disabled during logging so you open the finalized file. A
    live-only session leaves the last saved recording available. Use
-   **Logging → Recordings → Open recording…** for older files, including after restarting SpeedLink.
+   **Logging → Recordings** for older saved sessions, including after restarting SpeedLink.
 
 Logging can run with the engine running. **ROM backup reads require the engine
 stopped**. They use a different diagnostic session. A connection used for a ROM
@@ -115,8 +118,8 @@ Selections, units and plot choices are remembered separately for each profile in
 Rate, stoichiometric AFR and CSV choices are also restored on launch. Load the
 current ECU ROM again to establish its calibration; preferences do not bind a ROM.
 Invalid AFR input leaves the connection available so you can correct it and retry.
-After a backup, the Logger explains the required reconnect and provides a
-**Adapter settings…** button or the shared adapter dropdown.
+After a backup, the Logger explains the required reconnect and provides
+**Reconnect to log** in the same view.
 
 During a partial scan, a still-fresh last-known display value is marked **Pending**
 with its age. Expired or rejected values are cleared. Recordings retain the actual
@@ -133,10 +136,17 @@ parameter's status and remaining checks.
 
 ## View a saved recording
 
-Choose **Logging → Recordings**, then **Open recording…** and choose a SpeedLink
-`log.csv`. This works without an adapter. Select up to six parameters for plots
-with a shared time axis. Move the cursor slider or click a plot to inspect the
-latest preceding observation; use Zoom to narrow the displayed time range.
+Choose **Logging → Recordings** to see saved sessions with their start time, ECU
+calibration, duration and status when available. Select a session and choose
+**Open selected recording**, or double-click it. **Open CSV…** opens a SpeedLink
+`log.csv` from another folder. Use **Recent recordings** to return to the list
+and **Show open recording** to pick up where you left off. Reviewing a saved log
+works without an adapter.
+
+Select up to six parameters for plots with a shared elapsed-time ruler. Move
+the cursor slider or click a plot to inspect the latest preceding observation.
+Use **Zoom** to narrow the displayed time range and **Reset zoom** to show
+the whole recording while keeping the cursor on the same sample time.
 
 Values keep their recorded units. Missing readings and long gaps break the
 lines. Cursor readings become unavailable when their sample is too old. Plot

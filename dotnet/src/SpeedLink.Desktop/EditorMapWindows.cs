@@ -173,6 +173,7 @@ public partial class EditorWorkspace
     {
         if (mapOwner is not null) return;
         var current = CommandMap; bool graphable = current.table is { Count: > 1, IsChoice: false };
+        ResetCellsMenu.Header = "Reset selection to " + current.ComparisonName.Replace("_", "__", StringComparison.Ordinal);
         FitMapButton.IsEnabled = DetailsButton.IsEnabled = current.table is not null;
         ToggleGraphItem.IsEnabled = graphable;
         CloseOtherMapsItem.IsEnabled = current.table is not null && mapSlots.Count(s => s.Editor.table is not null) > 1;

@@ -75,7 +75,7 @@ Use **Help → Editor guide** for the complete included guide, or see the
    under **ECU → Read backup**. Choose **Read & verify backup** and leave the ignition
    on and adapter connected through both passes.
 5. Wait for **Backup verified · two matching reads**. Find the operation under
-   **ECU → Saved backups → Open backup folder** and keep the entire folder.
+   **ECU → Saved backups**, select the read, and choose **Open folder**. Keep the entire folder.
 
 An ECU may report a short chassis number instead of a conventional VIN.
 SpeedLink labels recognized replies as **Chassis ID**, removes trailing space/null

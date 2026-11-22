@@ -16,6 +16,8 @@ public partial class MainWindow
         async Task Idle() { await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle); UpdateLayout(); }
         Show(); Navigate(1);
         cases.AddRange(await EditorPane.ExerciseRejectedRomFiles(rom, folder));
+        await CheckSavedBackupLibrary(rom);
+        cases.Add("Saved backups show verified and interrupted reads and open the selected verified ROM");
         OpenEditorFile(rom); await Idle();
         var editor = EditorPane;
         var map = editor.Document!.Definition.Tables.First(t => t.Rows > 1 && t.Columns > 1 && !t.IsChoice);
@@ -40,17 +42,20 @@ public partial class MainWindow
 
         var profile = LoggerDefinition.ForCalibration(editor.Document.Definition.Calibration)!;
         ConfigureLoggerProfile(profile); loggerCalibration = LoggerCalibration.ExplicitMap(100, 0);
-        using var peer = new CountingTestTransport(createPeer(profile)); transport = peer; identity = new("test", peer.Adapter, null, RomInspector.KnownProfiles.Single(p => p.Calibration == profile.SoftwareIds.Single()).Identity);
+        using var priorPeer = new CountingTestTransport(createPeer(profile));
+        transport = priorPeer;
+        var testIdentity = new EcuIdentity("test", priorPeer.Adapter, null, RomInspector.KnownProfiles.Single(p => p.Calibration == profile.SoftwareIds.Single()).Identity);
+        identity = testIdentity;
         foreach (var row in loggerRows) { row.Selected = row.Id == "engine_rpm"; row.Plotted = row.Selected; }
         StoichBox.Text = "invalid"; Navigate(2); Controls();
         LoggerStartButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        Check(!busy && !loggingActive && ReferenceEquals(transport, peer) && activeWork is null && peer.Requests == 0 && !peer.Disposed && StatusText.Text.Contains("between 1 and 30", StringComparison.Ordinal), "Invalid AFR keeps connection and issues no logging requests");
+        Check(!busy && !loggingActive && ReferenceEquals(transport, priorPeer) && activeWork is null && priorPeer.Requests == 0 && !priorPeer.Disposed && StatusText.Text.Contains("between 1 and 30", StringComparison.Ordinal), "Invalid AFR keeps connection and issues no logging requests");
         var lambda = loggerRows.Single(r => r.Id == "actual_lambda");
         lambda.Selected = true; lambda.Unit = "AFR"; StoichBox.Text = "";
         LoggerStartButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        Check(!loggingActive && ReferenceEquals(transport, peer) && peer.Requests == 0 && !peer.Disposed && activeWork is null, "Missing AFR conversion input is recoverable without traffic");
+        Check(!loggingActive && ReferenceEquals(transport, priorPeer) && priorPeer.Requests == 0 && !priorPeer.Disposed && activeWork is null, "Missing AFR conversion input is recoverable without traffic");
         lambda.Unit = "lambda"; lambda.Selected = false;
-        peer.ReadAttempted = true; Controls();
+        priorPeer.ReadAttempted = true; Controls();
         Check(!LoggerStartButton.IsEnabled && LoggerConnectionHint.IsVisible && LoggerConnectionButton.IsEnabled && LoggerConnectionHint.Text.Contains("reconnect", StringComparison.Ordinal), "Read session explains reconnect before logging");
         Width = MinWidth; Height = MinHeight; await Idle();
         var hintBounds = LoggerConnectionButton.TransformToAncestor(this).TransformBounds(new Rect(LoggerConnectionButton.RenderSize));
@@ -58,10 +63,21 @@ public partial class MainWindow
         Check(hintBounds.Right <= ActualWidth && hintBounds.Bottom <= ActualHeight && LoggerGrid.ActualHeight >= 149,
             $"Post-read guidance fits minimum window size · grid={LoggerGrid.ActualHeight:0.###}, hint={hintBounds}, window={ActualWidth}×{ActualHeight}");
         Width = 1280; Height = 720;
-        LoggerConnectionButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        Check(Pages.SelectedIndex == 2 && SharedConnectionPopup.IsOpen && ReferenceEquals(transport, peer), "Reconnect guidance opens shared settings without changing view or session");
-        SharedConnectionPopup.IsOpen = false;
-        peer.ReadAttempted = false; StoichBox.Text = "14.7"; RecordCsvBox.IsChecked = true; Navigate(2); Controls();
+        using var peer = new CountingTestTransport(createPeer(profile));
+        AdapterBox.SelectedIndex = 0; PortBox.Text = "COM_SYNTHETIC";
+        int reconnections = 0;
+        offlineConnectionFactory = () =>
+        {
+            if (!priorPeer.Disposed) throw new InvalidOperationException("The old session was still active at reconnect.");
+            reconnections++;
+            return (peer, null, testIdentity);
+        };
+        try { await ClickAndWait(LoggerConnectionButton); }
+        finally { offlineConnectionFactory = null; }
+        Check(Pages.SelectedIndex == 2 && ReferenceEquals(transport, peer) && reconnections == 1 &&
+            peer.Requests == 0 && LoggerStartButton.IsEnabled && !LoggerConnectionButton.IsVisible,
+            "Reconnect replaces the read session in Live and waits for Start logging");
+        StoichBox.Text = "14.7"; RecordCsvBox.IsChecked = true; Controls();
         var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(10) };
         bool switchedDuringLogging = false;
         Exception? navigationFailure = null;
@@ -94,8 +110,16 @@ public partial class MainWindow
         Check(switchedDuringLogging && navigationFailure is null, navigationFailure?.Message ?? "Live logging navigation did not run");
         string[] plotted = LoggerPlots.Children.OfType<StackPanel>().SelectMany(p => p.Children.OfType<TextBlock>()).Select(t => t.Text).ToArray();
         Check(ReferenceEquals(transport, peer) && LoggerStartButton.IsEnabled && !LoggerStopButton.IsEnabled && !ReadButton.IsEnabled && loggerScans >= 3 && plotted.Any(t => t.StartsWith("Stopped", StringComparison.Ordinal)) && !plotted.Any(t => t.StartsWith("OK", StringComparison.Ordinal)), "Stopped charts refresh immediately and logging can restart without reconnecting");
+        using var backupPeer = new CountingTestTransport(createPeer(profile));
+        Navigate(0); await Idle();
+        Check(ReadReconnectButton.IsVisible && ReadReconnectButton.IsEnabled && !ReadButton.IsEnabled, "Read backup shows a reconnect action after logging");
+        offlineConnectionFactory = () => (backupPeer, null, testIdentity);
+        try { await ClickAndWait(ReadReconnectButton); }
+        finally { offlineConnectionFactory = null; }
+        Check(Pages.SelectedIndex == 0 && peer.Disposed && ReadButton.IsEnabled && backupPeer.Requests == 0 &&
+            ReferenceEquals(transport, backupPeer), "Reconnect prepares the reader and waits for the explicit backup action");
         await ClickAndWait(DisconnectButton);
-        Check(transport is null && !LoggerStartButton.IsEnabled && peer.Disposed, "Explicit disconnect releases the stopped logger connection");
+        Check(transport is null && !LoggerStartButton.IsEnabled && backupPeer.Disposed, "Explicit disconnect releases the connection");
         var display = new LoggerRow(profile.Channels.First(c => c.Id == "engine_rpm")); var now = DateTimeOffset.UtcNow;
         display.Observe(new(display.Id, 1000, now, "OK"), profile, null, now);
         display.Observe(new(display.Id, null, null, "Waiting"), profile, null, now.AddMilliseconds(100));

@@ -268,6 +268,17 @@ public partial class MainWindow
         UpdateLayout();
         if (ActualWidth > MinWidth || ActualHeight > MinHeight || LoggerGrid.ActualHeight < 149 || LoggerFileText.TransformToAncestor(this).Transform(new Point(0, 0)).Y > ActualHeight - 65)
             throw new InvalidOperationException("Logger controls are clipped at the minimum window size.");
+        double visibleTableWidth = LoggerGrid.ActualWidth;
+        if (LoggerParameterColumn.ActualWidth < 176 || LoggerGrid.Columns.Sum(column => column.ActualWidth) > visibleTableWidth)
+            throw new InvalidOperationException("Logger columns do not fit the minimum window size.");
+        var plottedBeforeHide = loggerRows.Where(row => row.Plotted).Select(row => row.Id).ToArray();
+        LoggerPlotsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); UpdateLayout();
+        if (LoggerPlotPanel.IsVisible || LoggerGrid.ActualWidth < visibleTableWidth + 150
+            || !LoggerPreferences.Load(System.IO.Path.Combine(vault, "logger-settings.json")).HidePlots)
+            throw new InvalidOperationException("Hide plots did not expand the table or save the choice.");
+        LoggerPlotsButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); UpdateLayout();
+        if (!LoggerPlotPanel.IsVisible || !loggerRows.Where(row => row.Plotted).Select(row => row.Id).SequenceEqual(plottedBeforeHide))
+            throw new InvalidOperationException("Showing plots did not restore the panel and channel choices.");
         var report = new Dictionary<string, object?>
         {
             ["passed"] = true, ["mode"] = "offline UI fixture, no hardware", ["channels"] = loggerRows.Count,

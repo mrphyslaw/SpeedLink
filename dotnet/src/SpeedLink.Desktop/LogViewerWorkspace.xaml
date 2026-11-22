@@ -1,11 +1,38 @@
 <UserControl x:Class="SpeedLink.Desktop.LogViewerWorkspace" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="{DynamicResource ShellBrush}" Foreground="{DynamicResource TextBrush}">
  <Grid Margin="20"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-  <DockPanel><Button x:Name="OpenButton" DockPanel.Dock="Right" Content="Open recording…" Padding="16,9" Click="Open_Click"/><StackPanel><TextBlock Text="Recorded log" FontSize="26" FontWeight="SemiBold"/><TextBlock x:Name="FileText" Text="Open a SpeedLink log.csv recording" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource MutedBrush}" Margin="0,5,16,12"/></StackPanel></DockPanel>
-  <Grid Grid.Row="1" Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/></Grid.ColumnDefinitions>
+  <DockPanel>
+   <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+    <Button x:Name="RecordingViewButton" Content="Recent recordings" Visibility="Collapsed" Click="RecordingView_Click"/>
+    <Button x:Name="OpenButton" Content="Open CSV…" Click="Open_Click"/>
+   </StackPanel>
+   <StackPanel>
+    <TextBlock x:Name="ViewTitle" Text="Recorded log" FontSize="26" FontWeight="SemiBold"/>
+    <TextBlock x:Name="FileText" Text="Open a SpeedLink log.csv recording" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource MutedBrush}" Margin="0,5,16,12"/>
+    <TextBlock x:Name="LibrarySubtitle" Text="Saved sessions on this PC. No adapter connection is needed." Foreground="{DynamicResource MutedBrush}" Margin="0,5,16,12" Visibility="Collapsed"/>
+   </StackPanel>
+  </DockPanel>
+  <DockPanel x:Name="RecordingLibraryPanel" Grid.Row="1" Grid.RowSpan="3" Visibility="Collapsed">
+   <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+    <Button x:Name="OpenRecentRecordingButton" Content="Open selected recording" Style="{DynamicResource PrimaryButton}" IsEnabled="False" Click="OpenRecentRecording_Click"/>
+    <Button x:Name="RefreshRecordingsButton" Content="Refresh" Click="RefreshRecordings_Click"/>
+    <TextBlock x:Name="RecordingLibraryStatus" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>
+   </StackPanel>
+   <DataGrid x:Name="RecentRecordings" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow"
+             HeadersVisibility="Column" SelectionChanged="RecentRecordings_SelectionChanged" MouseDoubleClick="RecentRecordings_DoubleClick" PreviewKeyDown="RecentRecordings_KeyDown">
+    <DataGrid.Columns>
+     <DataGridTextColumn Header="Started" Binding="{Binding StartTime}" SortMemberPath="StartedUtc" Width="165"/>
+     <DataGridTextColumn Header="Calibration" Binding="{Binding Calibration}" Width="160"/>
+     <DataGridTextColumn Header="Duration" Binding="{Binding DurationText}" SortMemberPath="Duration" Width="100"/>
+     <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+    </DataGrid.Columns>
+   </DataGrid>
+  </DockPanel>
+  <Grid x:Name="ReplayControls" Grid.Row="1" Margin="0,0,0,12" Visibility="Collapsed"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="130"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
    <TextBlock Text="Cursor" VerticalAlignment="Center" Margin="0,0,8,0"/><Slider Grid.Column="1" x:Name="TimeCursor" Minimum="0" Maximum="1" ValueChanged="Position_Changed" VerticalAlignment="Center"/>
    <TextBlock Grid.Column="2" Text="Zoom" Margin="18,0,8,0" VerticalAlignment="Center"/><Slider Grid.Column="3" x:Name="Zoom" Minimum="1" Maximum="100" Value="1" ValueChanged="Position_Changed" VerticalAlignment="Center"/>
+   <Button x:Name="ResetZoomButton" Grid.Column="4" Content="Reset zoom" Margin="10,0,0,0" IsEnabled="False" Click="ResetZoom_Click"/>
   </Grid>
-  <Grid Grid.Row="2"><Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
+  <Grid x:Name="ReplayBody" Grid.Row="2" Visibility="Collapsed"><Grid.ColumnDefinitions><ColumnDefinition Width="270"/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
    <DockPanel><TextBlock DockPanel.Dock="Bottom" Text="Select up to six channels. Plots share the same time axis. Values keep their recorded units." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,12,0,0"/>
     <DataGrid x:Name="Channels" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" HeadersVisibility="Column" >
      <DataGrid.Columns><DataGridTemplateColumn Header="Plot" Width="42"><DataGridTemplateColumn.CellTemplate><DataTemplate><CheckBox IsChecked="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
@@ -13,8 +40,12 @@
      </DataGrid.Columns>
     </DataGrid>
    </DockPanel>
-   <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel x:Name="Plots" SizeChanged="Plots_SizeChanged"/></ScrollViewer>
+   <Grid Grid.Column="2">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions>
+    <Canvas x:Name="ElapsedRuler" Height="25" IsHitTestVisible="False" AutomationProperties.Name="Elapsed time"/>
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel x:Name="Plots" SizeChanged="Plots_SizeChanged"/></ScrollViewer>
+   </Grid>
   </Grid>
-  <StackPanel Grid.Row="3" Margin="0,12,0,0"><TextBlock x:Name="Summary" Text="No adapter connection is needed." TextWrapping="Wrap"/><TextBlock x:Name="Warnings" Foreground="{DynamicResource AmberBrush}" TextWrapping="Wrap" Margin="0,5,0,0"/></StackPanel>
+  <StackPanel x:Name="ReplayFooter" Grid.Row="3" Margin="0,12,0,0"><TextBlock x:Name="Summary" Text="No adapter connection is needed." TextWrapping="Wrap"/><TextBlock x:Name="Warnings" Foreground="{DynamicResource AmberBrush}" TextWrapping="Wrap" Margin="0,5,0,0"/></StackPanel>
  </Grid>
 </UserControl>

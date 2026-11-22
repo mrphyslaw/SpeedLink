@@ -4,7 +4,7 @@ Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.17](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.17)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.18](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.18)** · A single Windows EXE with the runtime included.
 
 **Watch the SpeedLink v0.8.0-alpha.17 walkthrough (3:46)** · Light mode with on-screen captions and no audio.
 
@@ -182,7 +182,9 @@ This screenshot uses a synthetic offline test; its timing is not a vehicle
 read-speed measurement. [Progress and result screenshots →](docs/DUMP_A_ROM.md#3-read-and-verify)
 
 Backups are saved in the `data` folder beside the EXE. Keep the whole backup
-folder, including its captures, manifest and journal.
+folder, including its captures, manifest and journal. Use **ECU → Saved backups**
+to find a backup by date and calibration, open its folder, or open a verified
+copy in the Editor.
 
 ## Log engine data
 
@@ -191,7 +193,7 @@ it to choose the logging profile and read the MAP sensor calibration. The curren
 logger supports [eleven defined ROMs](definitions/logging/All_ROM_Coverage.md).
 
 1. Connect the adapter and select **Connect** in the shared top bar. If you just read a ROM,
-   disconnect and reconnect before logging.
+   use **Reconnect to log** on the Live tab.
 2. Open **Logging → Live**, select **Load current ECU ROM…**, and choose that current ROM
    backup. Its calibration ID must match the connected ECU.
 3. Choose **Essentials** for a starting selection, or select the parameters you
@@ -200,11 +202,12 @@ logger supports [eleven defined ROMs](definitions/logging/All_ROM_Coverage.md).
    before choosing an AFR display unit.
 5. Leave **Record CSV** checked and select **Start logging**. Use the **Plot** column
    to choose up to six synchronized charts for logged parameters. The **Hz** column shows its measured sample rate;
-   **Polling → Max** collects data without a scan-rate delay. Numeric limits are optional; the **Hz** column shows achieved rates.
+   **Polling → Max** collects data without a scan-rate delay. Choose **Hide plots**
+   for more table space while keeping your recording selection.
 6. Select **Stop** to finish the recording. The healthy connection stays ready for
    **Start logging** again, with your ROM and selections retained. Each start creates
    a separate recording. Use **Open logs** to find them under `data/logs` beside the EXE.
-   Disconnect and reconnect before switching from logging to a ROM backup read.
+   Use **Reconnect for backup** on **ECU → Read backup** before reading a ROM after logging.
 
 Logging can run with the engine running. **ROM backup reads require the engine
 stopped.** Unknown ROMs can still be dumped; logging requires a supported profile.
@@ -213,10 +216,11 @@ See the [logger guide](docs/LOGGER.md) for setup, recordings and troubleshooting
 ## Review a recording
 
 1. Choose **Logging → Recordings**. No adapter is needed.
-2. Select **Open recording…** and choose the recording folder's `log.csv`.
+2. Select a saved session and choose **Open selected recording**. Use **Open CSV…**
+   to choose a recording from another folder.
 3. Select up to six parameters. Move the shared cursor or click a plot to inspect
-   readings, and use **Zoom** to focus on part of the recording. Missing data appears
-   as gaps; the viewer also shows sample ages and recorded rates.
+   readings on the elapsed-time ruler. Use **Zoom** to focus on part of the recording
+   and **Reset zoom** to return to the full run. Missing data appears as gaps.
 
 Keep the whole recording folder, including `responses.jsonl` and `session.json`,
 locally. Start troubleshooting with a [support ZIP](docs/TROUBLESHOOTING.md);

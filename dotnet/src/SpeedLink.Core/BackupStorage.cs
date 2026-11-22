@@ -212,7 +212,11 @@ public sealed class OperationJournal : IDisposable
 }
 
 public sealed record JournalInspection(string Path, bool Valid, bool Complete, int Records, string? Operation = null,
-    string? Mode = null, string? LastEvent = null, JsonObject? LastDetails = null, bool CompletionPending = false, string? Error = null);
+    string? Mode = null, string? LastEvent = null, JsonObject? LastDetails = null, bool CompletionPending = false, string? Error = null)
+{
+    public DateTimeOffset? StartedAt { get; init; }
+    public string? Calibration { get; init; }
+}
 public sealed record LoadedBackup(byte[] Data, JsonObject Manifest);
 
 public sealed class BackupStore
@@ -274,9 +278,15 @@ public sealed class BackupStore
                 throw new InvalidDataException("Unsupported journal version.");
             var pending = version == 2 && FileSystem.Exists(path + ".incomplete");
             observe?.Invoke(rows);
+            var identity = rows.FirstOrDefault(row => row["event"]!.GetValue<string>() == "identity")?["details"]?["identity"] as JsonObject;
             return new(path, true, rows[^1]["event"]!.GetValue<string>() == "completed" && !pending, rows.Count,
                 rows[0]["details"]?["operation"]?.GetValue<string>() ?? "unknown", rows[0]["details"]?["mode"]?.GetValue<string>() ?? "unknown",
-                rows[^1]["event"]!.GetValue<string>(), rows[^1]["details"]!.AsObject(), pending);
+                rows[^1]["event"]!.GetValue<string>(), rows[^1]["details"]!.AsObject(), pending)
+            {
+                StartedAt = rows[0]["time"] is JsonValue time && time.TryGetValue<string>(out var timestamp) &&
+                    DateTimeOffset.TryParse(timestamp, CultureInfo.InvariantCulture, DateTimeStyles.None, out var started) ? started : null,
+                Calibration = identity?["calibration"] is JsonValue calibration && calibration.TryGetValue<string>(out var id) ? id : null
+            };
         }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or JsonException or InvalidOperationException or ArgumentException or FormatException)
         {

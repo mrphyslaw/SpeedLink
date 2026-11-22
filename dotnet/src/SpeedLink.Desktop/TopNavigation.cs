@@ -54,6 +54,7 @@ public partial class MainWindow
         info.Click += (_, _) => OpenEditorRomInformation();
         ((Panel)EditorPane.SaveButton.Parent).Children.Insert(0, info);
         PortBox.AddHandler(TextBoxBase.TextChangedEvent, new RoutedEventHandler((_, _) => SharedAdapterChanged()));
+        PortBox.SelectionChanged += (_, _) => SharedAdapterChanged();
         DriverBox.SelectionChanged += (_, _) => SharedAdapterChanged();
         AdapterBox.SelectionChanged += (_, _) => SharedAdapterChanged();
     }
@@ -66,12 +67,20 @@ public partial class MainWindow
     }
     private void RefreshSharedConnection()
     {
-        if (ConnectionSettingsButton is null) return;
+        if (ConnectionSettingsLabel is null || ConnectionSetupText is null) return;
         bool programming = flashWorkspace?.HardwareInUse == true;
         bool preparing = flashWorkspace?.IsWorking == true;
-        string adapter = AdapterBox.SelectedIndex switch { 0 => "vLinker FS", 1 => "Tactrix", 2 => "Mongoose · experimental", _ => "Adapter" };
-        ConnectionSettingsButton.Content = $"{adapter} · {(programming ? "Programming" : transport is null ? "Disconnected" : "Connected")} ▾";
-        ConnectionSettingsButton.ToolTip = identity is null ? "Shared adapter, COM port, baud and J2534 driver settings." : $"{identity.Adapter}\n{identity.Calibration}\nShared by ECU, Editor, Logging and Flash & Recovery.";
+        string adapter = AdapterBox.SelectedIndex switch { 0 => "vLinker FS", 1 => "Tactrix", 2 => "Mongoose", _ => "Adapter" };
+        string? endpoint = AdapterBox.SelectedIndex == 0 ? PortBox.Text.Trim() : (DriverBox.SelectedItem as J2534Driver)?.Name;
+        string label = string.IsNullOrWhiteSpace(endpoint) ? adapter :
+            endpoint.StartsWith(adapter, StringComparison.OrdinalIgnoreCase) ? endpoint : $"{adapter} · {endpoint}";
+        string state = programming ? "Programming" : transport is null ? "Disconnected" : "Connected";
+        ConnectionSettingsLabel.Text = $"{label} · {state} ▾";
+        ConnectionSettingsButton.ToolTip = $"{label} · {state}" + (identity is null ? "" : $"\n{identity.Calibration}");
+        string? setup = AdapterBox.SelectedIndex >= 0 ? MissingAdapterSetup() : null;
+        ConnectionSetupText.Text = setup ?? "";
+        ConnectionSetupText.Visibility = setup is null ? Visibility.Collapsed : Visibility.Visible;
+        ConnectButton.Content = setup is null ? "Connect" : "Set up adapter";
         ConnectionSettingsButton.IsEnabled = !busy && !closing && !exportingReport && !preparing;
         ConnectButton.Visibility = transport is null ? Visibility.Visible : Visibility.Collapsed;
         DisconnectButton.Visibility = transport is null ? Visibility.Collapsed : Visibility.Visible;
@@ -92,7 +101,12 @@ public partial class MainWindow
         }
         Navigate(4);
     }
-    private void OpenSharedConnection() { SharedConnectionPopup.IsOpen = true; ConnectionSettingsButton.Focus(); }
+    private void OpenSharedConnection()
+    {
+        RefreshSharedConnection();
+        ConnectionSettingsButton.Focus();
+        SharedConnectionPopup.SetCurrentValue(Popup.IsOpenProperty, true);
+    }
     private async Task PrepareSharedProgramming()
     {
         if (busy || closing || exportingReport) throw new InvalidOperationException("Finish the current adapter operation first.");

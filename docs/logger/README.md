@@ -24,10 +24,10 @@ bench ECU passed read-only queries and recording through vLinker FS and Tactrix.
 
 ![SpeedLink recorded-log viewer with channel selection and synchronized engine speed, boost, lambda and fuel-pressure plots](images/recorded-log.png)
 
-Choose **Logging → Recordings** to open a recording without an
-adapter. Select up to six channels, move
-the shared cursor to inspect readings, and zoom into part of the run. Missing
-readings appear as gaps. This screenshot uses the bundled synthetic example log.
+Choose **Logging → Recordings** to open a recording without an adapter. Select
+up to six channels and move the shared cursor along the elapsed-time ruler.
+Use **Zoom** to inspect part of the run and **Reset zoom** to show the full run.
+Missing readings appear as gaps. This screenshot uses the bundled synthetic example log.
 
 ## First recording
 
@@ -36,7 +36,8 @@ readings appear as gaps. This screenshot uses the bundled synthetic example log.
    currently installed in the ECU. Its calibration ID must match.
 3. Choose **Essentials** or select individual parameters and display units.
 4. Leave **Record CSV** checked, select **Start logging**, then **Stop** to finish.
-5. Use **Logging → Recordings → Open recording…** to open the recording's `log.csv`.
+5. Choose **View recording…** to open that session, or select it in
+   **Logging → Recordings**. Use **Open CSV…** for a recording in another folder.
 
 Recordings are stored under `data/logs` beside the EXE. Keep the entire recording
 folder when sharing a session for troubleshooting. Fewer selected parameters
@@ -46,7 +47,7 @@ rates depend on the parameters, transport and ECU. See
 [measured performance](../LOGGER_PERFORMANCE.md) for rates and validation limits.
 
 Logging can run with the engine running. ROM backup reads require the engine
-stopped; disconnect and reconnect after a backup before starting the logger.
+stopped. After a backup, choose **Reconnect to log** on the Live tab.
 
 See the [full logger guide](../LOGGER.md) for adapter setup, units, rates,
 recording files and troubleshooting. Check [profile coverage](../../definitions/logging/All_ROM_Coverage.md)

@@ -10,7 +10,36 @@ public partial class MainWindow
     private async Task CheckSharedTopNavigation(string folder)
     {
         var sections = Navigation.Children.OfType<RadioButton>().ToArray();
-        AdapterBox.SelectedIndex = 0; PortBox.Text = "COM_SYNTHETIC";
+        AdapterBox.SelectedIndex = 0;
+        PortBox.Text = "COM_SYNTHETIC";
+        RefreshPortChoices(["COM_SYNTHETIC", "COM_OTHER"]);
+        BaudBox.SelectedItem = 38400;
+        SaveAdapterSelection();
+        PortBox.Text = "";
+        BaudBox.SelectedItem = 115200;
+        rememberedAdapter = null;
+        LoadAdapterSelection();
+        RefreshPortChoices(["COM_OTHER"]);
+        if (PortBox.Text.Length != 0 || !Equals(BaudBox.SelectedItem, 38400) || transport is not null)
+            throw new InvalidOperationException("A missing remembered port was replaced with a different device.");
+        ConnectButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        await MenuIdle();
+        if (!SharedConnectionPopup.IsOpen || !ConnectionSetupText.IsVisible || transport is not null)
+            throw new InvalidOperationException($"Missing adapter setup did not point to the selector. Popup: {SharedConnectionPopup.IsOpen}; message: {ConnectionSetupText.Visibility}; connected: {transport is not null}.");
+        SharedConnectionPopup.IsOpen = false;
+        RefreshPortChoices(["COM_OTHER", "COM_SYNTHETIC"]);
+        if (PortBox.Text != "COM_SYNTHETIC" || !ConnectionSettingsLabel.Text.Contains("COM_SYNTHETIC", StringComparison.Ordinal))
+            throw new InvalidOperationException("Refreshing devices did not restore and display the available remembered port.");
+        using var canceled = new SharedSessionPeer();
+        offlineConnectionFactory = () =>
+        {
+            Dispatcher.Invoke(() => StopButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)));
+            return (canceled, null, new("synthetic", "Canceled connection", "JM1GG000000000001", "L3M6EG000L3T60A1"));
+        };
+        try { await ConnectAdapter(); }
+        finally { offlineConnectionFactory = null; }
+        if (transport is not null || canceled.Disposals != 1)
+            throw new InvalidOperationException("Stopping while opening an adapter retained a canceled connection.");
         using var peer = new SharedSessionPeer();
         offlineConnectionFactory = () => (peer, null, new("synthetic", "Synthetic shared adapter", "JM1GG000000000001", "L3M6EG000L3T60A1"));
         try

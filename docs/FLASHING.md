@@ -55,26 +55,34 @@ disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
 6. Wait for the result. With readbacks, **Complete** means the captured ROM
    matched the intended image. With **Skip readback**, SpeedLink checks ECU
    identification after reset and reports **Write acknowledged · readback skipped**.
-   To verify later, use **ECU → Read backup → Read & verify backup** after the ECU has
-   reset. In **Flash & Recovery**, choose **Verify last write…** and open the new
-   backup's `rom.bin`. SpeedLink reports whether every byte matches the intended
-   image. The comparison checks the ECU identity, calibration and capture time.
-   On the tested ECU, each full pass took about 25 minutes.
+   To verify it, choose **Read for verification** on the result. SpeedLink opens
+   **ECU → Read backup** with the saved write selected. Connect to the same ECU
+   and choose **Read & verify backup** when ready. After both reads match, the
+   reader shows whether the new backup matches the intended image. **Show flash
+   result** returns to the comparison in Flash & Recovery.
+
+Use **Verify saved write…** to choose an earlier write by date and calibration.
+The list includes saved writes with a valid journal and an acknowledged reset.
+Choose **Read for verification** to capture a new backup, or **Choose verified
+backup…** if you already have a `rom.bin` captured after that write. SpeedLink
+checks ECU identity, calibration, and capture time before comparing the bytes.
+On the tested ECU, each full pass took about 25 minutes.
 
 ## Recover an interrupted write
 
 1. Keep the failed run folder and the same original verified stock backup.
    Record the stage at which the write stopped. If SpeedLink says
-   **Verification required**, the reset was acknowledged. Reconnect in
-   **ECU → Read backup**, read a fresh verified backup, then choose **Verify last
-   write…** to compare it with the intended image.
+   **Verification required**, the reset was acknowledged. Choose **Read for
+   verification**, reconnect to the same ECU, and read a fresh verified backup.
 2. For **Recovery required**, keep the same physical ECU attached. Once the
    failed operation has ended and the adapter is closed, turn the ignition off
    and wait for the ECU to shut down, then turn the ignition back on without
-   starting the engine. Open **Flash & Recovery → Recover interrupted write**.
+   starting the engine. From the result, choose **Review interrupted run** to open
+   recovery with that run selected. You can also open **Recover interrupted write**
+   directly from **Flash & Recovery**.
 3. SpeedLink selects the saved interrupted run when there is only one.
-   If several runs are listed, choose by date and calibration. **Browse older
-   run…** accepts the original run folder.
+   If you opened recovery directly and several runs are listed, choose by date and
+   calibration. **Browse older run…** accepts the original run folder.
 4. Select the adapter in the shared top bar and choose **Check ECU state**. Once recovery mode is
    confirmed, SpeedLink looks up the exact verified backup using the saved
    run's recorded hash and identity. **Normal mode** and **ECU state

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.0-alpha.18
+
+- Show the selected COM port or driver in the shared connection bar. Remember and recheck the adapter selection. Reconnect from Live logging, Read backup, or Diagnostics without switching sections.
+- List saved backups and recordings with session details. Open a verified backup directly in the Editor, open its folder, or replay a saved recording.
+- Name the comparison source in each map and in change and reset controls. Offer Save copy, Discard, or Cancel when opening another ROM or exiting with unsaved edits.
+- Review an interrupted Gen 1 write directly from its result. Verify a saved write with a fresh or existing verified backup, including eligible older writes.
+- Wrap logger parameter names, remember whether plots are shown, and add an elapsed-time ruler and Reset zoom to recording playback.
+- Replace the README walkthrough with a seven-chapter tour of the current workflow.
+
 ## 0.8.0-alpha.17
 
 - Replace eight sidebar destinations with ECU, Editor, Logging and Flash & Recovery across the top. Group diagnostics, reading and saved backups under ECU; live and recorded data under Logging; saved-file integrity information under Editor.

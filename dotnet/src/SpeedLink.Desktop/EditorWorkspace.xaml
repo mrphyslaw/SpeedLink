@@ -37,7 +37,9 @@
    <Border x:Name="BrowserPanel" Background="{DynamicResource PanelBrush}" Padding="6"><DockPanel>
     <DockPanel DockPanel.Dock="Top" Margin="0,0,0,5"><StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button Content="↗" Click="PopBrowser_Click" ToolTip="Pop out map browser" Padding="5,0" MinHeight="23"/><Button Content="×" Click="HideBrowser_Click" ToolTip="Hide map browser" Padding="5,0" MinHeight="23"/></StackPanel><TextBlock Text="Maps" FontWeight="SemiBold" VerticalAlignment="Center"/></DockPanel>
     <TextBox x:Name="SearchBox" DockPanel.Dock="Top" ToolTip="Search maps" TextChanged="Search_Changed" Margin="0,0,0,5" Padding="5,3"/>
-    <CheckBox x:Name="ChangedOnly" DockPanel.Dock="Top" Content="Changed maps only" Checked="Filter_Changed" Unchecked="Filter_Changed" Margin="0,3,0,5"/>
+    <CheckBox x:Name="ChangedOnly" DockPanel.Dock="Top" Checked="Filter_Changed" Unchecked="Filter_Changed" Margin="0,3,0,5">
+     <TextBlock x:Name="ChangedOnlyLabel" Text="Changed vs. Original ROM" TextTrimming="CharacterEllipsis"/>
+    </CheckBox>
     <TextBlock x:Name="MapCountText" DockPanel.Dock="Bottom" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,5,0,0"/>
     <TreeView x:Name="MapTree" SelectedItemChanged="Map_Selected" RequestBringIntoView="PreserveBrowserScroll" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True"/>
    </DockPanel></Border>
@@ -101,7 +103,10 @@
          <StackPanel x:Name="ScalarActions" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0" Visibility="Collapsed"><Button x:Name="ScalarApply" Content="Apply" Click="ScalarApply_Click" IsEnabled="False" Style="{DynamicResource PrimaryButton}" FontSize="11" MinHeight="23" Padding="7,1" ToolTip="Apply this value · Enter"/><Button x:Name="ScalarCancel" Content="Cancel" Click="ScalarCancel_Click" IsEnabled="False" FontSize="11" MinHeight="23" Padding="7,1" ToolTip="Discard the typed value · Escape"/></StackPanel>
         </WrapPanel>
         <TextBlock x:Name="ScalarError" Foreground="{DynamicResource ErrorBrush}" TextWrapping="Wrap" Margin="0,6,0,0" Visibility="Collapsed"/>
-        <WrapPanel Margin="0,5,0,0"><TextBlock x:Name="ScalarReference" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="6,0" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="110"/><Button x:Name="ScalarReset" Content="↶" Click="Reset_Click" FontSize="13" MinHeight="23" Padding="6,1" ToolTip="Reset this value to the selected baseline" AutomationProperties.Name="Reset to baseline"/></WrapPanel>
+        <DockPanel Margin="0,5,0,0">
+         <Button x:Name="ScalarReset" DockPanel.Dock="Right" Content="↶" Click="Reset_Click" FontSize="13" MinHeight="23" Padding="6,1" ToolTip="Reset to reference value" AutomationProperties.Name="Reset to reference value"/>
+         <TextBlock x:Name="ScalarReference" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="6,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+        </DockPanel>
       </StackPanel>
      </ScrollViewer>
     </Grid>
@@ -128,8 +133,14 @@
     </ScrollViewer>
    </Border>
    <GridSplitter x:Name="ChangesSplitter" Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource ShellBrush}" Visibility="Collapsed"/>
-   <Border x:Name="ChangesPanel" Grid.Column="4" Background="{DynamicResource PanelBrush}" Padding="8" Visibility="Collapsed"><DockPanel><TextBlock DockPanel.Dock="Top" Text="Changed maps" FontWeight="SemiBold" Margin="0,0,0,8"/><ListBox x:Name="ChangesList" DisplayMemberPath="Name" SelectionChanged="Changes_Selected"/></DockPanel></Border>
+   <Border x:Name="ChangesPanel" Grid.Column="4" Background="{DynamicResource PanelBrush}" Padding="8" Visibility="Collapsed"><DockPanel><TextBlock x:Name="ChangesTitle" DockPanel.Dock="Top" Text="Changed maps" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" Margin="0,0,0,8"/><ListBox x:Name="ChangesList" DisplayMemberPath="Name" SelectionChanged="Changes_Selected"/></DockPanel></Border>
   </Grid>
-  <DockPanel Grid.Row="3" Margin="2,3,2,0"><TextBlock x:Name="ExportIntegrityText" DockPanel.Dock="Right" Text="Checksum ✓ on save" ToolTip="Every export applies the ROM's integrity policy: checksum correction when supported, otherwise mandatory native code and marker validation. Invalid Gen 2 code is rejected without repair." Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="10,0,0,0"/><TextBlock x:Name="ValueUnitsText" DockPanel.Dock="Right" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="6,0" MaxWidth="120" TextTrimming="CharacterEllipsis"/><TextBlock x:Name="CellText" DockPanel.Dock="Right" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="8,0"/><TextBlock x:Name="FileText" DockPanel.Dock="Left" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,0,8,0" MaxWidth="180" TextTrimming="CharacterEllipsis"/><TextBlock x:Name="EditorStatus" FontSize="11" Foreground="{DynamicResource MutedBrush}" Text="Open a ROM to begin" TextTrimming="CharacterEllipsis"/></DockPanel>
+  <DockPanel Grid.Row="3" Margin="2,3,2,0">
+   <TextBlock x:Name="ExportIntegrityText" DockPanel.Dock="Right" Text="Checksum ✓ on save" ToolTip="Every export applies the ROM's integrity policy: checksum correction when supported, otherwise mandatory native code and marker validation. Invalid Gen 2 code is rejected without repair." Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="10,0,0,0"/>
+   <TextBlock x:Name="CellText" DockPanel.Dock="Right" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="5,0" MaxWidth="300" TextTrimming="CharacterEllipsis"/>
+   <TextBlock x:Name="ValueUnitsText" DockPanel.Dock="Right" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="6,0" MaxWidth="120" TextTrimming="CharacterEllipsis"/>
+   <TextBlock x:Name="FileText" DockPanel.Dock="Left" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,0,8,0" MaxWidth="180" TextTrimming="CharacterEllipsis"/>
+   <TextBlock x:Name="EditorStatus" FontSize="11" Foreground="{DynamicResource MutedBrush}" Text="Open a ROM to begin" TextTrimming="CharacterEllipsis"/>
+  </DockPanel>
  </Grid>
 </UserControl>
