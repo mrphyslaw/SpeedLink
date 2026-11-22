@@ -148,7 +148,8 @@ public partial class EditorWorkspace
             bool values = HasEditableCells;
             AddAction(actions, "Copy", Shortcuts.Label(ShortcutAction.Copy), () => Copy_Click(this, new()), MapGrid.SelectedCells.Count > 0);
             AddAction(actions, "Paste", Shortcuts.Label(ShortcutAction.Paste), () => Paste_Click(this, new()), values);
-            AddAction(actions, "Reset to baseline", Shortcuts.Label(ShortcutAction.ResetCells), () => Reset_Click(this, new()), values);
+            AddAction(actions, "Reset to " + ComparisonName.Replace("_", "__", StringComparison.Ordinal),
+                Shortcuts.Label(ShortcutAction.ResetCells), () => Reset_Click(this, new()), values);
             actions.Items.Add(new Separator());
             AddAction(actions, "Increase", Shortcuts.Label(ShortcutAction.Increase), () => Nudge(1), values);
             AddAction(actions, "Decrease", Shortcuts.Label(ShortcutAction.Decrease), () => Nudge(-1), values);
@@ -214,9 +215,16 @@ public partial class EditorWorkspace
         items.Insert(2, compare);
         Add(compare.Items, "Original ROM", m => m.BaselineBox.SelectedIndex = 0, Loaded, m => m.BaselineBox.SelectedIndex == 0);
         Add(compare.Items, "Last save", m => m.BaselineBox.SelectedIndex = 1, Loaded, m => m.BaselineBox.SelectedIndex == 1);
-        Add(compare.Items, "Comparison ROM", m => m.BaselineBox.SelectedIndex = 2, m => Loaded(m) && m.document?.HasComparison == true, m => m.BaselineBox.SelectedIndex == 2);
+        var comparisonRom = Add(compare.Items, "Comparison ROM", m => m.BaselineBox.SelectedIndex = 2,
+            m => Loaded(m) && m.document?.HasComparison == true, m => m.BaselineBox.SelectedIndex == 2);
         Add(compare.Items, "Load comparison ROM…", m => m.Compare_Click(m, new()), Loaded);
-        update.Add(() => compare.IsEnabled = Loaded(target()));
+        update.Add(() =>
+        {
+            var map = target();
+            compare.IsEnabled = Loaded(map);
+            comparisonRom.Header = ComparisonReferenceName(map.document, TuningBaseline.Comparison)
+                .Replace("_", "__", StringComparison.Ordinal);
+        });
 
         Add(items, "Edit tools", m => m.ToggleMapEditTools(), Numeric, m => m.showMapEditTools, ShortcutAction.EditTools);
         var dock = Add(items, "Undock map", m => m.UndockMap_Click(m, new()), Loaded, shortcut: ShortcutAction.DockMap);

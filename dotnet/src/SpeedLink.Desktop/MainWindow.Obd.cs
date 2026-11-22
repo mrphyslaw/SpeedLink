@@ -35,9 +35,11 @@ public partial class MainWindow
     }
     private async Task ConnectObd()
     {
-        var page = ShowObdWorkspace(); page.StatusText.Text = "Connecting and identifying the engine ECU…";
-        await ConnectAdapter();
-        if (ObdAvailable) await ScanObd();
+        var page = ShowObdWorkspace();
+        bool reconnect = transport?.ReadAttempted == true;
+        page.StatusText.Text = reconnect ? "Reconnecting and identifying the engine ECU…" : "Connecting and identifying the engine ECU…";
+        await ConnectAdapter(reconnect);
+        if (ObdAvailable && transport?.ReadAttempted == false) await ScanObd();
         else page.StatusText.Text = StatusText.Text;
     }
     private void ObdControls(bool idle) => obdWorkspace?.SetAvailability(idle, ObdAvailable, transport?.ReadAttempted == true, identity, ConnectButton.IsEnabled);

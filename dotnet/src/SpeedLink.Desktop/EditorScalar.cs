@@ -29,12 +29,14 @@ public partial class EditorWorkspace
             string State(double number) => table.IsChoice && ScalarChoice.ItemsSource is IEnumerable<TuningState> states
                 ? states.FirstOrDefault(s => s.Value == number)?.Name ?? number.ToString("G10", CultureInfo.InvariantCulture)
                 : table.Compact(number) + " " + table.Units;
-            ScalarReference.Text = State(reference);
-            ScalarReference.ToolTip = reference.ToString("R", CultureInfo.InvariantCulture) + " " + table.Units;
+            ScalarReference.Text = $"{ComparisonName} · {State(reference)}";
+            ScalarReference.ToolTip = $"{ScalarReference.Text}\nStored reference: {reference.ToString("R", CultureInfo.InvariantCulture)} {table.Units}";
+            ScalarReset.ToolTip = $"Reset this value to {ComparisonName}";
+            System.Windows.Automation.AutomationProperties.SetName(ScalarReset, (string)ScalarReset.ToolTip);
             bool changed = document.CellChanged(table, 0, Baseline);
             ScalarDifference.Text = !changed ? "Unchanged" : table.IsChoice ? "Changed"
                 : "Δ " + (delta > 0 ? "+" : "") + table.Compact(delta) + " " + table.Units;
-            ScalarDifference.ToolTip = "Difference from the selected baseline";
+            ScalarDifference.ToolTip = $"Difference from {ComparisonName}";
             ScalarDifference.Visibility = Visibility.Visible;
             ScalarDifference.Foreground = changed ? UiTheme.Amber : UiTheme.Muted;
             ScalarError.Visibility = Visibility.Collapsed; scalarDraft = false;

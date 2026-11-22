@@ -11,6 +11,7 @@ public sealed class LoggerPreferences
     public int Target { get; set; } = 0; // Zero means maximum acquisition rate, with no scan delay.
     public string Stoich { get; set; } = "";
     public bool Record { get; set; } = true;
+    public bool HidePlots { get; set; }
     public string? ActiveCalibration { get; set; }
     public Dictionary<string, LoggerChannelPreference[]> Profiles { get; set; } = new(StringComparer.Ordinal);
     // Preserve all version-one IDs until their profiles have been selected, including

@@ -35,7 +35,9 @@
   <Border Grid.Row="1" x:Name="TopNavigationBar" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1" Background="{DynamicResource PanelBrush}" Padding="8,5">
    <DockPanel LastChildFill="False">
     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-     <ToggleButton x:Name="ConnectionSettingsButton" Style="{DynamicResource ToggleButton}" Content="Adapter · disconnected ▾" MinWidth="190" MaxWidth="280" Padding="10,5" Margin="4,0" ToolTip="Select the shared adapter, COM port, baud or J2534 driver." AutomationProperties.Name="Shared adapter connection settings"/>
+     <ToggleButton x:Name="ConnectionSettingsButton" Style="{DynamicResource ToggleButton}" MinWidth="190" MaxWidth="280" Padding="10,5" Margin="4,0" ToolTip="Select the shared adapter, COM port, baud or J2534 driver." AutomationProperties.Name="Shared adapter connection settings">
+      <TextBlock x:Name="ConnectionSettingsLabel" Text="Adapter · disconnected ▾" TextTrimming="CharacterEllipsis"/>
+     </ToggleButton>
      <Button x:Name="ConnectButton" Content="Connect" Click="Connect_Click" Style="{DynamicResource PrimaryButton}" MinWidth="82" Margin="3,0"/>
      <Button x:Name="DisconnectButton" Content="Disconnect" Click="Disconnect_Click" MinWidth="82" Margin="3,0"/>
     </StackPanel>
@@ -59,6 +61,7 @@
      <StackPanel x:Name="TactrixPanel" Visibility="Collapsed"><TextBlock Text="J2534 driver" Margin="0,0,0,4"/><ComboBox x:Name="DriverBox" Margin="0,0,0,7" VerticalContentAlignment="Center"/></StackPanel>
      <TextBlock x:Name="AdapterNote" Visibility="Collapsed" Text="Mongoose support is experimental. This adapter supports experimental reading, logging and Gen 1 programming. Physical programming qualification is pending." TextWrapping="Wrap" Foreground="{DynamicResource AmberBrush}" Margin="0,0,0,8"/>
      <Button x:Name="RefreshPortsButton" Content="Refresh devices" Click="RefreshPorts_Click" HorizontalAlignment="Left"/>
+     <TextBlock x:Name="ConnectionSetupText" TextWrapping="Wrap" Foreground="{DynamicResource AmberBrush}" Margin="0,8,0,0" Visibility="Collapsed"/>
      <TextBlock Text="This adapter selection is shared by all four sections." TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,10,0,0"/>
     </StackPanel>
    </Border>
@@ -75,9 +78,13 @@
    <TabControl Grid.Row="3" x:Name="Pages" Style="{DynamicResource WorkspacePages}" SelectionChanged="Pages_Changed">
 <TabItem Header="Connection"><Grid Margin="22"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
     <StackPanel><TextBlock Text="Read and verify an ECU backup" FontSize="25" FontWeight="SemiBold"/><TextBlock Text="Use the shared adapter controls above. Keep ignition on and the engine stopped when reading." Foreground="{DynamicResource MutedBrush}" Margin="0,6,0,12"/></StackPanel>
-    <WrapPanel Grid.Row="1" Margin="0,0,0,14"><TextBlock Text="Read protocol" VerticalAlignment="Center" Margin="0,0,8,0"/><ComboBox x:Name="ReadFamilyBox" Width="260" VerticalContentAlignment="Center" ToolTip="Known ROMs choose their protocol automatically. Choose the ECU generation for an unknown ROM."/>
+    <WrapPanel Grid.Row="1" Margin="0,0,0,8"><TextBlock Text="Read protocol" VerticalAlignment="Center" Margin="0,0,8,0"/><ComboBox x:Name="ReadFamilyBox" Width="260" VerticalContentAlignment="Center" ToolTip="Known ROMs choose their protocol automatically. Choose the ECU generation for an unknown ROM."/>
          <Button x:Name="ReadButton" Content="Read &amp; verify backup" Click="Read_Click" ToolTipService.ShowOnDisabled="True"/>
      <Button x:Name="FlashBackupButton" Content="Open in Flash &amp; Recovery" Visibility="Collapsed" Click="OpenBackupInFlash_Click" ToolTip="Carry this verified backup to the Gen 1 flashing workspace."/><Button x:Name="ExportReportButton"  Content="Export support report…" Click="ExportReport_Click"/></WrapPanel>
+    <WrapPanel Grid.Row="2" x:Name="ReadConnectionPanel" Visibility="Collapsed">
+     <TextBlock x:Name="ReadConnectionHint" Text="Reconnect before reading another backup." VerticalAlignment="Center" Margin="0,0,8,0"/>
+     <Button x:Name="ReadReconnectButton" Content="Reconnect for backup" Click="ReadReconnect_Click"/>
+    </WrapPanel>
     <TextBlock Grid.Row="3" x:Name="IdentityText" Text="Disconnected. No ECU has been identified." TextWrapping="Wrap" Margin="0,10,0,10"/>
     <Border x:Name="ReadProgressPanel" Grid.Row="4" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,12">
      <StackPanel>
@@ -101,20 +108,27 @@
      <CheckBox x:Name="RecordCsvBox" Content="Record CSV" IsChecked="True" VerticalAlignment="Center" Margin="8,0,16,0"/>
      <TextBlock Text="Polling" VerticalAlignment="Center"/><ComboBox x:Name="LoggerRateBox" ToolTip="Max polls as quickly as complete replies allow. An optional scans/s limit reduces bus traffic and recording volume." Width="65" Margin="8,0,16,0" VerticalContentAlignment="Center"/>
      <TextBlock Text="Stoich AFR" VerticalAlignment="Center"/><TextBox x:Name="StoichBox" Width="65" Margin="8,0,0,0" ToolTip="Optional. Enter your fuel's stoichiometric AFR before choosing AFR units. Leave blank to use lambda."/>
+     <Button x:Name="LoggerPlotsButton" Content="Hide plots" Margin="12,0,0,0" Click="LoggerPlots_Click" ToolTip="Show or hide the live chart panel without changing which data is recorded."/>
     </WrapPanel>
     <DockPanel Grid.Row="3" Margin="0,0,0,6"><StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button x:Name="LoggerEssentialsButton" Content="Essentials" Click="LoggerEssentials_Click"/><Button x:Name="LoggerAllButton" Content="All" Click="LoggerAll_Click"/><Button x:Name="LoggerNoneButton" Content="None" Click="LoggerNone_Click"/></StackPanel><TextBlock Text="Search" VerticalAlignment="Center" Margin="0,0,8,0"/><TextBox x:Name="LoggerSearchBox" TextChanged="LoggerSearch_Changed" ToolTip="Filter by parameter name or group" Margin="0,0,12,0"/></DockPanel>
-<Grid Grid.Row="4"><Grid.ColumnDefinitions><ColumnDefinition Width="2*" MinWidth="400"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*" MinWidth="260"/></Grid.ColumnDefinitions>    <DataGrid Grid.Column="0" x:Name="LoggerGrid" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single" SelectionUnit="FullRow" SelectionChanged="LoggerSelection_Changed" HeadersVisibility="Column" EnableRowVirtualization="True">
+<Grid Grid.Row="4"><Grid.ColumnDefinitions><ColumnDefinition Width="3*" MinWidth="570"/><ColumnDefinition x:Name="LoggerPlotSplitterColumn" Width="8"/><ColumnDefinition x:Name="LoggerPlotColumn" Width="*" MinWidth="230"/></Grid.ColumnDefinitions>    <DataGrid Grid.Column="0" x:Name="LoggerGrid" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single" SelectionUnit="FullRow" SelectionChanged="LoggerSelection_Changed" HeadersVisibility="Column" EnableRowVirtualization="True" MinRowHeight="32">
      <DataGrid.Columns>
       <DataGridTemplateColumn Header="Plot" Width="42"><DataGridTemplateColumn.CellTemplate><DataTemplate><CheckBox IsChecked="{Binding Plotted, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
       <DataGridTemplateColumn Header="Log" Width="45"><DataGridTemplateColumn.CellTemplate><DataTemplate><CheckBox IsEnabled="{Binding CanEdit}" IsChecked="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
-      <DataGridTextColumn Header="Group" Binding="{Binding Group}" IsReadOnly="True" Width="75"/>
-      <DataGridTextColumn Header="Parameter" Binding="{Binding Name}" IsReadOnly="True" Width="*" MinWidth="150"/>
-      <DataGridTextColumn Header="Value" Binding="{Binding ValueText}" IsReadOnly="True" Width="90"/>
-      <DataGridTemplateColumn Header="Unit" Width="100"><DataGridTemplateColumn.CellTemplate><DataTemplate><ComboBox IsEnabled="{Binding CanEdit}" ItemsSource="{Binding Units}" SelectedItem="{Binding Unit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="Transparent"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
-      <DataGridTextColumn Header="Hz" Binding="{Binding RateText}" IsReadOnly="True" Width="55"/>
-      <DataGridTextColumn Header="Status" Binding="{Binding Status}" IsReadOnly="True" Width="130"/>
+      <DataGridTextColumn Header="Group" Binding="{Binding Group}" IsReadOnly="True" Width="68"/>
+      <DataGridTextColumn x:Name="LoggerParameterColumn" Header="Parameter" Binding="{Binding Name}" IsReadOnly="True" Width="*" MinWidth="176">
+       <DataGridTextColumn.ElementStyle>
+        <Style TargetType="TextBlock" BasedOn="{x:Static DataGridTextColumn.DefaultElementStyle}"><Setter Property="TextWrapping" Value="Wrap"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="ToolTip" Value="{Binding Name}"/></Style>
+       </DataGridTextColumn.ElementStyle>
+      </DataGridTextColumn>
+      <DataGridTextColumn Header="Value" Binding="{Binding ValueText}" IsReadOnly="True" Width="78"/>
+      <DataGridTemplateColumn Header="Unit" Width="76"><DataGridTemplateColumn.CellTemplate><DataTemplate><ComboBox IsEnabled="{Binding CanEdit}" ItemsSource="{Binding Units}" SelectedItem="{Binding Unit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="Transparent" ToolTip="{Binding Unit}"/></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+      <DataGridTextColumn Header="Hz" Binding="{Binding RateText}" IsReadOnly="True" Width="49"/>
+      <DataGridTextColumn Header="Status" Binding="{Binding Status}" IsReadOnly="True" Width="102">
+       <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock" BasedOn="{x:Static DataGridTextColumn.DefaultElementStyle}"><Setter Property="TextTrimming" Value="CharacterEllipsis"/><Setter Property="ToolTip" Value="{Binding Status}"/></Style></DataGridTextColumn.ElementStyle>
+      </DataGridTextColumn>
      </DataGrid.Columns>
-    </DataGrid><GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Stretch" Background="{DynamicResource ShellBrush}"/><ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel x:Name="LoggerPlots" SizeChanged="LoggerChart_SizeChanged"/></ScrollViewer></Grid>    <StackPanel Grid.Row="5" Margin="0,8,0,0"><TextBlock x:Name="LoggerHelpText" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource MutedBrush}"/><DockPanel Margin="0,6,0,0"><StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button x:Name="ViewRecordingButton" Content="View recording…" Click="ViewRecording_Click"/><Button Content="Open logs" Click="OpenLogs_Click"/></StackPanel><StackPanel><TextBlock x:Name="LoggerRateText" Text="Rates are measured during logging. More selected parameters reduce each channel's rate." TextTrimming="CharacterEllipsis"/><TextBlock x:Name="LoggerFileText" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" Foreground="{DynamicResource MutedBrush}"/></StackPanel></DockPanel></StackPanel>
+    </DataGrid><GridSplitter x:Name="LoggerPlotSplitter" Grid.Column="1" Width="8" HorizontalAlignment="Stretch" Background="{DynamicResource ShellBrush}"/><ScrollViewer x:Name="LoggerPlotPanel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel x:Name="LoggerPlots" SizeChanged="LoggerChart_SizeChanged"/></ScrollViewer></Grid>    <StackPanel Grid.Row="5" Margin="0,8,0,0"><TextBlock x:Name="LoggerHelpText" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource MutedBrush}"/><DockPanel Margin="0,6,0,0"><StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button x:Name="ViewRecordingButton" Content="View recording…" Click="ViewRecording_Click"/><Button Content="Open logs" Click="OpenLogs_Click"/></StackPanel><StackPanel><TextBlock x:Name="LoggerRateText" Text="Rates are measured during logging. More selected parameters reduce each channel's rate." TextTrimming="CharacterEllipsis"/><TextBlock x:Name="LoggerFileText" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" Foreground="{DynamicResource MutedBrush}"/></StackPanel></DockPanel></StackPanel>
 </Grid></TabItem>
 <TabItem Header="Recordings"><local:LogViewerWorkspace x:Name="RecordingsPane"/></TabItem>
 <TabItem Header="ROM information"><Grid Margin="22"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
@@ -124,10 +138,17 @@
     <TextBox Grid.Row="3" x:Name="RomText" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontFamily="Consolas"/>
    </Grid></TabItem>
 <TabItem Header="Backups"><Grid Margin="22"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-    <StackPanel><TextBlock Text="Saved operations" FontSize="25" FontWeight="SemiBold"/><TextBlock Text="Interrupted operations are retained for inspection. Reconnect and begin a new read." Foreground="{DynamicResource MutedBrush}" Margin="0,8,0,18"/></StackPanel>
-    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12"><Button x:Name="RefreshHistoryButton" Content="Refresh" Click="RefreshHistory_Click"/><Button Content="Open backup folder" Click="OpenFolder_Click"/></StackPanel>
-    <DataGrid Grid.Row="2" x:Name="HistoryGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False"><DataGrid.Columns>
-     <DataGridTextColumn Header="Mode" Binding="{Binding Mode}" Width="90"/><DataGridTextColumn Header="Operation" Binding="{Binding Operation}" Width="150"/><DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="170"/><DataGridTextColumn Header="Folder" Binding="{Binding Folder}" Width="*"/>
+    <StackPanel><TextBlock Text="Saved backups" FontSize="25" FontWeight="SemiBold"/><TextBlock Text="Open a verified backup in the Editor or inspect the files from an interrupted read." Foreground="{DynamicResource MutedBrush}" Margin="0,8,0,14" TextWrapping="Wrap"/></StackPanel>
+    <WrapPanel Grid.Row="1" Margin="0,0,0,12">
+     <Button x:Name="OpenBackupInEditorButton" Content="Open in Editor" Click="OpenSavedBackupInEditor_Click" IsEnabled="False" Style="{DynamicResource PrimaryButton}"/>
+     <Button x:Name="OpenBackupFolderButton" Content="Open folder" Click="OpenFolder_Click" IsEnabled="False"/>
+     <Button x:Name="RefreshHistoryButton" Content="Refresh" Click="RefreshHistory_Click"/>
+    </WrapPanel>
+    <DataGrid Grid.Row="2" x:Name="HistoryGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" SelectionChanged="BackupSelection_Changed"><DataGrid.Columns>
+     <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="1.2*"/>
+     <DataGridTextColumn Header="Calibration" Binding="{Binding Calibration}" Width="1.5*"/>
+     <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="1.4*"/>
+     <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*"/>
     </DataGrid.Columns></DataGrid><TextBlock Grid.Row="3" x:Name="HistoryNote" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" Margin="0,12,0,0"/>
    </Grid></TabItem>
     <TabItem x:Name="FlashTab" Header="Flash &amp; Recover"/>

@@ -11,7 +11,8 @@ preserves that binding. Assign a different Diagnostics shortcut in the settings.
 
 ## Read codes
 
-Once connected, choose **Read codes** to refresh the engine ECU's stored, pending and permanent
+After a ROM read, **Reconnect & read codes** opens a fresh connection and scans
+from this page. Once connected, choose **Read codes** to refresh the engine ECU's stored, pending and permanent
 emissions-related fault codes, check-engine light state and readiness monitors.
 Unsupported services, rejected requests and communication failures are displayed
 separately. A missing reply never means there are no faults.

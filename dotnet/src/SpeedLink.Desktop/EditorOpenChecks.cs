@@ -73,6 +73,16 @@ public partial class EditorWorkspace
         var native = mapSlots.Single(s => ReferenceEquals(s.Editor, floating)).Window!;
         firstMap.SelectCell(1); floating.SelectCell(2);
         firstMap.SetCellZoom(firstMap.cellZoom + .05);
+        const string comparisonName = "comparison_stock.bin";
+        doc.LoadComparison(source, Path.Combine(folder, comparisonName));
+        floating.BaselineBox.SelectedIndex = 2;
+        firstMap.BaselineBox.SelectedIndex = 1;
+        floating.ActivateMap();
+        Check(firstMap.CellText.Text.Contains("Compared with Last save", StringComparison.Ordinal) &&
+            floating.CellText.Text.Contains("Compared with " + comparisonName, StringComparison.Ordinal) &&
+            ChangedOnlyLabel.Text == "Changed vs. Last save" &&
+            Equals(ResetCellsMenu.Header, "Reset selection to comparison__stock.bin"),
+            "Docked and detached maps identify their own comparison, filter and reset targets");
         doc.Apply([new(maps[0], 0, doc.Read(maps[0], 0) + 1)], "Existing unsaved edit"); await Idle();
         var snapshot = doc.Snapshot(); var slots = mapSlots.ToArray();
         var selection = firstMap.SelectedIndices(); var floatingSelection = floating.SelectedIndices();
@@ -84,14 +94,34 @@ public partial class EditorWorkspace
             Check(mapSlots.SequenceEqual(slots) && native.IsVisible && firstMap.SelectedIndices().SequenceEqual(selection) && floating.SelectedIndices().SequenceEqual(floatingSelection) && firstMap.cellZoom == zoom && FileText.Text == fileName,
                 "Rejected " + input.Name + " preserves docked and detached maps, selections and zoom");
         }
+        bool prompted = false;
+        var errors = new List<string>();
+        ExecuteEditorAction(() => ReplaceRom(Path.Combine(folder, "truncated-file.bin"),
+            choose: () => { prompted = true; return UnsavedRomChoice.Discard; }), errors.Add);
+        Check(!prompted && errors.Count == 1, "A replacement ROM is validated before asking to save or discard");
+        errors.Clear();
+        Check(!ReplaceRom(path, choose: () => UnsavedRomChoice.Cancel) &&
+            !ReplaceRom(path, choose: () => UnsavedRomChoice.SaveCopy, saveCopy: () => SaveCopy(_ => null, errors.Add)) &&
+            !ReplaceRom(path, choose: () => UnsavedRomChoice.SaveCopy, saveCopy: () => SaveCopy(_ => path, errors.Add)) &&
+            errors.Count == 1 && ReferenceEquals(document, doc) && doc.IsDirty && doc.CanUndo &&
+            snapshot.AsSpan().SequenceEqual(doc.Snapshot()) && mapSlots.SequenceEqual(slots),
+            "Cancel, canceled save and failed save each leave the edited document and maps open");
         doc.Undo(); Check(source.AsSpan().SequenceEqual(doc.Snapshot()), "Undo still works after unsupported file rejection");
         doc.Redo(); Check(snapshot.AsSpan().SequenceEqual(doc.Snapshot()), "Redo still works after unsupported file rejection");
-        string saved = Path.Combine(folder, "supported-calibration-edit.bin"); doc.SaveNew(saved);
-        Check(inspector.Inspect(File.ReadAllBytes(saved)).ChecksumValid == true && !doc.IsDirty, "Save after rejection still verifies mandatory integrity");
+        string saved = Path.Combine(folder, "supported-calibration-edit.bin");
+        Check(ReplaceRom(path, choose: () => UnsavedRomChoice.SaveCopy, saveCopy: () => SaveCopy(_ => saved, errors.Add)) &&
+            inspector.Inspect(File.ReadAllBytes(saved)).ChecksumValid == true && !doc.IsDirty &&
+            document != doc && source.AsSpan().SequenceEqual(document!.Snapshot()),
+            "Save copy verifies the edited ROM before opening the replacement");
         OpenRom(saved); await Idle();
-        Check(document != doc && document!.SourcePath == saved && document.Read(document.Definition.Tables.Single(t => t.Name == maps[0].Name), 0) == doc.Read(maps[0], 0), "Supported calibration-only modified ROM opens after unsupported rejection");
-        OpenRom(path); await Idle();
-        Check(document is not null && source.AsSpan().SequenceEqual(document.Snapshot()) && File.ReadAllBytes(path).AsSpan().SequenceEqual(source), "Stock ROM opens afterward and original file remains unchanged");
+        var savedDoc = document!;
+        var savedMap = savedDoc.Definition.Tables.Single(t => t.Name == maps[0].Name);
+        Check(savedDoc.SourcePath == saved && savedDoc.Read(savedMap, 0) == doc.Read(maps[0], 0),
+            "Supported calibration-only modified ROM opens after unsupported rejection");
+        savedDoc.Apply([new(savedMap, 0, savedDoc.Read(savedMap, 0) + 1)], "Edit to discard");
+        Check(ReplaceRom(path, choose: () => UnsavedRomChoice.Discard) &&
+            source.AsSpan().SequenceEqual(document!.Snapshot()) && File.ReadAllBytes(path).AsSpan().SequenceEqual(source),
+            "Discard opens the replacement and preserves the original file");
         bool unexpectedEscaped = false;
         try { ExecuteEditorAction(() => throw new NullReferenceException("Controlled unexpected failure"), _ => { }); }
         catch (NullReferenceException) { unexpectedEscaped = true; }

@@ -97,17 +97,22 @@ public partial class MainWindow
     private readonly ObservableCollection<LoggerRow> loggerRows = [];
     private bool loggingActive, loggerReadReconnectRequired;
     private string? latestRecordingPath;
+    private string? activeRecordingPath;
     private bool openingLatestRecording;
     private long loggerScans;
     private LoggerPreferences loggerPreferences = new();
     private bool loggerSettingsReady, configuringLogger;
+    private GridLength visiblePlotsWidth = new(1, GridUnitType.Star);
+    private bool loggerPlotsHidden;
     private static readonly string[] EssentialChannels = ["engine_rpm", "absolute_load", "boost_pressure", "actual_lambda", "desired_lambda",
         "fuel_rail_pressure", "desired_fuel_rail_pressure", "injection_pulsewidth", "injector_duty_cycle", "knock_retard", "boost_air_temperature", "relative_throttle_position"];
     private string LoggerFolder => System.IO.Path.Combine(vault, "logs");
 
     private void InitializeLogger()
     {
+        RecordingsPane.ConfigureLibrary(LoggerFolder, () => activeRecordingPath);
         ConfigureLoggerProfile(definitionSnapshot.LoggerFor("L38KEH000")!);
+        LoggerGrid.RowHeight = double.NaN;
         LoggerGrid.ItemsSource = loggerRows;
         LoggerRateBox.ItemsSource = new[] { 0, 1, 2, 5, 10, 20 }.Select(n => new LoggerPollingRate(n)).ToArray();
         LoggerRateBox.SelectedValuePath = nameof(LoggerPollingRate.Target); LoggerRateBox.SelectedValue = 0;
@@ -183,17 +188,26 @@ public partial class MainWindow
         LoggerRomButton.IsEnabled = idle; LoggerRateBox.IsEnabled = idle; StoichBox.IsEnabled = idle; RecordCsvBox.IsEnabled = idle;
         LoggerEssentialsButton.IsEnabled = idle; LoggerAllButton.IsEnabled = idle; LoggerNoneButton.IsEnabled = idle;
         foreach (var row in loggerRows) row.CanEdit = idle;
-        string reason = transport?.ReadAttempted == true ? "After a ROM read, disconnect and reconnect using the shared controls before logging."
-            : transport is null ? "Connect and identify the ECU, then load its matching ROM."
+        bool reconnect = transport?.ReadAttempted == true;
+        string? reason = !idle ? null
+            : reconnect ? "After a ROM read, reconnect before logging."
+            : transport is null ? "Connect to the ECU to start logging."
+            : definitionSnapshot.LoggerFor(identity?.Calibration) is null ? "This ECU calibration has no logger profile."
             : loggerCalibration is null ? "Load the current ECU ROM before logging."
             : !loggerDefinition.MatchesCalibrationId(identity?.Calibration) ? "Load a ROM matching the connected ECU calibration."
-            : !loggerRows.Any(row => row.Selected) ? "Select at least one parameter to log." : "Start a new logging session.";
-        LoggerStartButton.ToolTip = reason;
-        LoggerConnectionHint.Text = reason;
-        LoggerConnectionHint.Visibility = LoggerConnectionButton.Visibility = transport?.ReadAttempted == true ? Visibility.Visible : Visibility.Collapsed;
-        LoggerConnectionButton.IsEnabled = idle;
+            : !loggerRows.Any(row => row.Selected) ? "Select at least one parameter to log." : null;
+        LoggerStartButton.ToolTip = reason ?? (idle ? "Start a new logging session." : "Finish the current adapter operation first.");
+        LoggerConnectionHint.Text = reason ?? "";
+        LoggerConnectionHint.Visibility = reason is null ? Visibility.Collapsed : Visibility.Visible;
+        LoggerConnectionButton.Visibility = idle && reconnect ? Visibility.Visible : Visibility.Collapsed;
+        LoggerConnectionButton.Content = "Reconnect to log";
+        LoggerConnectionButton.IsEnabled = idle && reconnect;
     }
-    private void LoggerConnection_Click(object sender, RoutedEventArgs e) => OpenSharedConnection();
+    private async void LoggerConnection_Click(object sender, RoutedEventArgs e)
+    {
+        if (LoggerConnectionButton.IsEnabled && transport?.ReadAttempted == true)
+            await ConnectAdapter(reconnect: true);
+    }
     private void BindLoggerRom(string path)
     {
         if (new FileInfo(path).Length != RomInspector.RomSize) throw new InvalidDataException("Load a full 1 MiB ECU image.");
@@ -283,6 +297,7 @@ public partial class MainWindow
                             {
                                 LoggerFileText.Text = file.Folder;
                                 latestRecordingPath = System.IO.Path.Combine(file.Folder, "log.csv");
+                                activeRecordingPath = latestRecordingPath;
                             });
                         }
                         while (!stop!.IsCancellationRequested)
@@ -327,6 +342,8 @@ public partial class MainWindow
             finally
             {
                 loggingActive = false;
+                activeRecordingPath = null;
+                if (!closing && RecordingsPane.IsVisible) _ = RecordingsPane.RefreshLibraryAsync();
                 displayTimer.Stop();
                 try { RenderPending(); }
                 catch { stoppedCleanly = false; await Disconnect(); throw; }
@@ -366,10 +383,29 @@ public partial class MainWindow
     private bool drawingLogger;
     private readonly Dictionary<string, LiveLoggerChart> liveCharts = new(StringComparer.Ordinal);
     private TextBlock? emptyLoggerChart;
+    private void LoggerPlots_Click(object sender, RoutedEventArgs e)
+    {
+        SetLoggerPlotsHidden(!loggerPlotsHidden);
+        SaveLoggerSettings();
+    }
+
+    private void SetLoggerPlotsHidden(bool hidden)
+    {
+        if (loggerPlotsHidden == hidden) return;
+        loggerPlotsHidden = hidden;
+        if (hidden) visiblePlotsWidth = LoggerPlotColumn.Width;
+        LoggerPlotColumn.MinWidth = hidden ? 0 : 230;
+        LoggerPlotColumn.Width = hidden ? new GridLength(0) : visiblePlotsWidth;
+        LoggerPlotSplitterColumn.Width = new GridLength(hidden ? 0 : 8);
+        LoggerPlotPanel.Visibility = LoggerPlotSplitter.Visibility = hidden ? Visibility.Collapsed : Visibility.Visible;
+        LoggerPlotsButton.Content = hidden ? "Show plots" : "Hide plots";
+        if (!hidden) DrawLoggerChart();
+    }
+
     private void LoggerChart_SizeChanged(object sender, SizeChangedEventArgs e) { if (Math.Abs(e.NewSize.Width - e.PreviousSize.Width) > 1) DrawLoggerChart(); }
     private void DrawLoggerChart()
     {
-        if (LoggerPlots is null || drawingLogger) return;
+        if (LoggerPlots is null || drawingLogger || loggerPlotsHidden) return;
         drawingLogger = true;
         try
         {
@@ -428,6 +464,7 @@ public partial class MainWindow
         RememberLoggerProfile();
         loggerPreferences.Target = LoggerRateBox.SelectedValue is int target ? target : 0;
         loggerPreferences.Stoich = StoichBox.Text; loggerPreferences.Record = RecordCsvBox.IsChecked == true;
+        loggerPreferences.HidePlots = loggerPlotsHidden;
         loggerPreferences.ActiveCalibration = loggerDefinition.SoftwareIds.First();
         try { loggerPreferences.Save(System.IO.Path.Combine(vault, "logger-settings.json")); }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException)
@@ -443,6 +480,7 @@ public partial class MainWindow
             loggerPreferences = LoggerPreferences.Load(path);
             LoggerRateBox.SelectedValue = loggerPreferences.Target;
             StoichBox.Text = loggerPreferences.Stoich; RecordCsvBox.IsChecked = loggerPreferences.Record;
+            SetLoggerPlotsHidden(loggerPreferences.HidePlots);
             var priorProfile = loggerDefinition;
             var priorCalibration = loggerCalibration;
             string priorRomText = LoggerRomText.Text;

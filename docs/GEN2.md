@@ -18,7 +18,7 @@ unsupported services and communication errors remain explicit.
 1. Connect and identify with the ignition on and engine stopped.
 2. Known short or complete calibration IDs select their reader automatically.
    For an unknown Gen 2 calibration, select **Gen 2 read protocol (experimental)**
-   in the adapter settings. This selects a compatible protocol; it does
+   from **Read protocol** on **ECU → Read backup**. This selects a compatible protocol; it does
    not establish support for every Gen 2 ECU.
 3. Start the read and leave the adapter connected through both complete passes.
    The progress panel shows each pass, bytes and elapsed time.

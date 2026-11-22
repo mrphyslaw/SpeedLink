@@ -111,14 +111,15 @@ display as **Invalid**. Storage limits do not establish a suitable tuning range.
 ## Compare revisions
 
 Use **Edit → Compare ROM…** to load a comparison file with the same calibration.
-Choose **Original ROM**, **Last save** or **Comparison ROM** in the baseline
-selector. The single-value card has its own baseline selector.
+Choose **Original ROM**, **Last save**, or the comparison filename under
+**Map → Comparison baseline**. Each open map shows its own comparison beside
+the cell difference or reference value. Reset commands name the source they use.
 
 Orange cell borders and browser dots identify differences from that baseline.
-Cell tooltips and the selection status show current, baseline and difference
-values. **Changed maps only** filters the browser. **Map → Changes** opens a
-list of changed maps; select an entry to jump to it. These are comparison views,
-not a record of the order in which edits were made.
+Cell tooltips show the current value, reference value, and difference.
+The **Changed vs. …** filter and **Map → Changes** list name the comparison they
+use for the map browser. Select a map in the list to open it. The editor's
+**Unsaved changes** status tracks edits since the last save.
 
 ## Arrange the workspace
 
@@ -265,8 +266,10 @@ Checksum correction is undoable if it changes bytes. The Original ROM baseline
 always remains the image first opened in this session.
 
 Use a descriptive filename and keep the current ECU backup separately. Closing
-SpeedLink with unsaved edits prompts before discarding them. There is no saved
-tune-project format or recovery of unsaved work in this version.
+SpeedLink or opening another ROM with unsaved edits offers **Save copy…**,
+**Discard**, and **Cancel**. SpeedLink validates a replacement ROM before
+asking. If saving fails or you cancel the save dialog, the current ROM stays
+open with its edits.
 
 ## Keyboard shortcuts
 

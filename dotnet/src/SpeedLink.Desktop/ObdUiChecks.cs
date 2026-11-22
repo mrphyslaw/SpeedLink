@@ -31,6 +31,18 @@ public partial class MainWindow
         Check(transport is null && Pages.SelectedIndex == ObdPage && page.ScanButton.IsEnabled && !DisconnectButton.IsEnabled, "Disconnect left Diagnostics or failed to restore connection controls.");
         page.ScanButton.RaiseEvent(new(System.Windows.Controls.Button.ClickEvent)); await obdConnectWork!; UpdateLayout();
         Check(Pages.SelectedIndex == ObdPage && page.LastScan is not null && !ReferenceEquals(page.LastScan, firstScan), "Reconnect did not replace the previous scan on Diagnostics.");
+        using var readSession = new ObdUiPeer { ReadAttempted = true };
+        transport = readSession;
+        Controls();
+        Check(page.ScanButton.IsEnabled && Equals(page.ScanButton.Content, "Reconnect & read codes") &&
+            page.ConnectionText.Text.Contains("Reconnect after a ROM read", StringComparison.Ordinal) && !page.ClearButton.IsEnabled,
+            "Diagnostics did not offer an in-place action for the ROM-read session.");
+        firstScan = page.LastScan;
+        page.ScanButton.RaiseEvent(new(System.Windows.Controls.Button.ClickEvent));
+        await obdConnectWork!;
+        Check(readSession.Disposals == 1 && ReferenceEquals(transport, peer) && Pages.SelectedIndex == ObdPage &&
+            page.LastScan is not null && !ReferenceEquals(firstScan, page.LastScan),
+            "Reconnect and read did not close the prior session and refresh diagnostics in place.");
         offlineConnectionFactory = null;
         Check(page.LastScan!.Permanent.Status == ObdStatus.Unsupported && page.ServiceText.Text.Contains("Not supported", StringComparison.Ordinal), "Unsupported service became an empty success.");
         ObdReports.SaveNew(Path.Combine(output, "synthetic-report.json"), page.LastScan);
@@ -76,7 +88,7 @@ public partial class MainWindow
     private sealed class ObdUiPeer : IObdTransport
     {
         public string Mode => "synthetic"; public string Adapter => "Synthetic OBD ECU · no hardware"; public int ReadChunkSize => 256;
-        public bool ReadAttempted { get; set; } public int Clears; public bool PermanentSupported, LoseAcknowledgement; public Action? CheckBusy;
+        public bool ReadAttempted { get; set; } public int Clears, Disposals; public bool PermanentSupported, LoseAcknowledgement; public Action? CheckBusy;
         public byte[] Exchange(byte[] request) => throw new InvalidOperationException("Synthetic OBD check used the ROM reader.");
         public byte[] ExchangeObd(byte[] request, bool clearConfirmed = false)
         {
@@ -90,6 +102,6 @@ public partial class MainWindow
             if (request[0] == 4) { Clears++; if (LoseAcknowledgement) throw new TransportException("Synthetic lost acknowledgement"); return [0x44]; }
             throw new InvalidOperationException("Unexpected synthetic OBD request.");
         }
-        public void Dispose() { }
+        public void Dispose() { Disposals++; }
     }
 }

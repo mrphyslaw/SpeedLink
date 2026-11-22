@@ -68,7 +68,7 @@ public partial class MainWindow : Window
         BaudBox.ItemsSource = new[] { 115200, 38400, 57600, 230400, 500000, 1000000, 2000000 };
         BaudBox.SelectedItem = 115200;
         AdapterBox.ItemsSource = new[] { "Vgate vLinker FS", "Tactrix Openport 2.0", "Mongoose-Plus ISO/CAN3 (experimental)" };
-        AdapterBox.SelectedIndex = 0;
+        LoadAdapterSelection();
         ReadFamilyBox.ItemsSource = new[] { "Gen 1 read protocol", "Gen 2 read protocol (experimental)" };
         ReadFamilyBox.SelectedIndex = 0;
         InitializeLogger();
@@ -98,7 +98,10 @@ public partial class MainWindow : Window
         ConnectButton.IsEnabled = idle && transport is null;
         DisconnectButton.IsEnabled = idle && transport is not null;
         ReadButton.IsEnabled = idle && transport is not null && identity is not null && !transport.ReadAttempted && !loggerReadReconnectRequired;
-        ReadButton.ToolTip = loggerReadReconnectRequired ? "Disconnect and reconnect before reading a ROM after logging." : "Read and verify two matching copies of the ECU ROM.";
+        ReadButton.ToolTip = loggerReadReconnectRequired || transport?.ReadAttempted == true
+            ? "Choose Reconnect for backup to start a new read session."
+            : "Read and verify two matching copies of the ECU ROM.";
+        RefreshReadConnection(idle);
         var readProfiles = RomInspector.KnownProfiles.Where(p => RomInspector.MatchesCalibrationId(p, identity?.Calibration)).ToArray();
         if (readProfiles.Length == 1) ReadFamilyBox.SelectedIndex = readProfiles[0].Family == "Gen2" ? 1 : 0;
         ReadFamilyBox.IsEnabled = idle && readProfiles.Length == 0;
@@ -110,6 +113,7 @@ public partial class MainWindow : Window
         BaudBox.IsEnabled = PortBox.IsEnabled;
         RefreshPortsButton.IsEnabled = PortBox.IsEnabled;
         RefreshHistoryButton.IsEnabled = idle;
+        RefreshBackupActions(idle);
         AdapterBox.IsEnabled = idle && transport is null;
         DriverBox.IsEnabled = AdapterBox.IsEnabled;
         LoggerControls(idle);
@@ -145,30 +149,32 @@ public partial class MainWindow : Window
         }
     }
     private async void Connect_Click(object sender, RoutedEventArgs e) => await ConnectAdapter();
-    private async Task ConnectAdapter()
+    private async Task ConnectAdapter(bool reconnect = false)
     {
+        if (busy || closing || exportingReport || flashWorkspace?.IsWorking == true || (transport is not null && !reconnect))
+            return;
         bool passThruAdapter = AdapterBox.SelectedIndex > 0;
         var name = PortBox.Text.Trim();
-        var baud = (int)BaudBox.SelectedItem;
+        int baud = BaudBox.SelectedItem is int selectedBaud ? selectedBaud : 115200;
         var driver = DriverBox.SelectedItem as J2534Driver;
-        if (passThruAdapter && (driver is null || driver.Kind != SelectedDriverKind))
+        if (MissingAdapterSetup() is string setup)
         {
-            MessageBox.Show(this, SelectedDriverKind == J2534AdapterKind.MongoosePlusIsoCan3
-                ? "Install the manufacturer's Mongoose-Plus ISO/CAN3 driver with 32-bit J2534-1 04.04 / ISO15765 support, then refresh devices."
-                : "Install the Tactrix Openport drivers, then refresh devices.", "J2534 driver needed");
-            return;
-        }
-        if (!passThruAdapter && name.Length == 0)
-        {
-            MessageBox.Show(this, "Choose the COM port assigned to your adapter.", "Select a port");
+            StatusText.Text = setup;
+            OpenSharedConnection();
             return;
         }
         SharedConnectionPopup.IsOpen = false;
-        StatusText.Text = "Connecting and identifying…";
+        StatusText.Text = reconnect ? "Reconnecting and identifying…" : "Connecting and identifying…";
         await Run(async () =>
         {
+            var cancellation = stop!.Token;
+            if (reconnect)
+            {
+                await Disconnect(updateStatus: false);
+            }
             ClearReadProgress();
             await BeginDiagnostics();
+            cancellation.ThrowIfCancellationRequested();
             diagnosticSession?.Record("connection.opening", new { adapter = AdapterBox.Text, port = passThruAdapter ? null : name, baud = passThruAdapter ? 0 : baud });
             var connected = await Task.Run(() =>
             {
@@ -198,6 +204,11 @@ public partial class MainWindow : Window
                 }
                 catch { link.Dispose(); throw; }
             });
+            if (cancellation.IsCancellationRequested)
+            {
+                await Task.Run(connected.Link.Dispose);
+                cancellation.ThrowIfCancellationRequested();
+            }
             transport = connected.Link;
             connection = connected.Connection;
             identity = connected.Identity;
@@ -208,6 +219,7 @@ public partial class MainWindow : Window
             ShowEcuIdentity();
             StatusText.Text = "Connected · identification recorded";
             Log(IdentityText.Text);
+            if (offlineConnectionFactory is null) SaveAdapterSelection();
         });
     }
     private void ShowEcuIdentity()
@@ -215,8 +227,8 @@ public partial class MainWindow : Window
         if (identity is not null)
             IdentityText.Text = $"{identity.Adapter}\n{identity.VehicleIdentifierLabel}: {identity.VehicleIdentifier ?? "unavailable"}    Calibration: {identity.Calibration ?? "unavailable"}";
     }
-    private async void Disconnect_Click(object sender, RoutedEventArgs e) => await Run(Disconnect);
-    private async Task Disconnect()
+    private async void Disconnect_Click(object sender, RoutedEventArgs e) => await Run(() => Disconnect());
+    private async Task Disconnect(bool updateStatus = true)
     {
         var link = transport;
         var serial = connection;
@@ -241,12 +253,12 @@ public partial class MainWindow : Window
         }
         IdentityText.Text = "Disconnected. No ECU has been identified.";
         obdWorkspace?.ShowDisconnected();
-        StatusText.Text = "Disconnected";
+        if (updateStatus) StatusText.Text = "Disconnected";
         Log("Disconnected.");
     }
     private async void Read_Click(object sender, RoutedEventArgs e)
     {
-        if (transport is null || identity is null || loggerReadReconnectRequired)
+        if (transport is null || identity is null || transport.ReadAttempted || loggerReadReconnectRequired)
             return;
         var link = transport;
         var expected = identity;
@@ -272,6 +284,7 @@ public partial class MainWindow : Window
                 Log("ROM saved. The two reads match, but one or more known-ROM checks did not pass.");
             StatusText.Text = "Backup verified · two matching reads";
             RefreshHistory();
+            await VerifyPendingFlashRead(result.Path);
         });
     }
     private void Stop_Click(object sender, RoutedEventArgs e)
@@ -282,11 +295,9 @@ public partial class MainWindow : Window
     }
     private void RefreshPorts()
     {
-        var found = SerialConnection.GetPorts();
-        PortBox.ItemsSource = found;
-        if (PortBox.Text.Length == 0 && found.Length > 0)
-            PortBox.Text = found[0];
+        RefreshPortChoices(SerialConnection.GetPorts());
         RefreshDrivers();
+        RefreshSharedConnection();
     }
     private void RefreshDrivers()
     {
@@ -296,9 +307,9 @@ public partial class MainWindow : Window
         selectedDrivers.TryGetValue(kind, out var selectedDriver);
         var drivers = J2534Drivers.Discover(kind);
         DriverBox.ItemsSource = drivers;
-        if (drivers.Count > 0)
-            DriverBox.SelectedItem = drivers.FirstOrDefault(item => item.LibraryPath.Equals(selectedDriver, StringComparison.OrdinalIgnoreCase))
-                ?? drivers.FirstOrDefault(item => Path.GetFileName(item.LibraryPath).Equals("op20pt32.dll", StringComparison.OrdinalIgnoreCase)) ?? drivers[0];
+        DriverBox.SelectedItem = selectedDriver is null
+            ? drivers.FirstOrDefault(item => Path.GetFileName(item.LibraryPath).Equals("op20pt32.dll", StringComparison.OrdinalIgnoreCase)) ?? drivers.FirstOrDefault()
+            : drivers.FirstOrDefault(item => item.LibraryPath.Equals(selectedDriver, StringComparison.OrdinalIgnoreCase));
     }
     private void Adapter_Changed(object sender, SelectionChangedEventArgs e)
     {
@@ -313,18 +324,6 @@ public partial class MainWindow : Window
         StatusText.Text = experimental ? "Experimental · select the installed Mongoose-Plus ISO/CAN3 driver" : passThruAdapter ? "Ready · select the installed Tactrix driver" : "Ready · select your adapter COM port";
     }
     private void RefreshPorts_Click(object sender, RoutedEventArgs e) => RefreshPorts();
-    private void RefreshHistory()
-    {
-        var entries = store.Scan(vault);
-        HistoryGrid.ItemsSource = entries.Select(row => new { row.Mode, row.Operation, Status = row.Complete ? "Complete" : row.Valid ? "Interrupted / stopped" : "Journal damaged", Folder = Path.GetDirectoryName(row.Path) }).ToArray();
-        HistoryNote.Text = $"{entries.Count} saved operation(s). Storage: {vault}";
-    }
-    private void RefreshHistory_Click(object sender, RoutedEventArgs e) => RefreshHistory();
-    private void OpenFolder_Click(object sender, RoutedEventArgs e)
-    {
-        Directory.CreateDirectory(vault);
-        Process.Start(new ProcessStartInfo(vault) { UseShellExecute = true });
-    }
     private void LoadImage(string path)
     {
         if (new FileInfo(path).Length != RomInspector.RomSize)
@@ -442,7 +441,11 @@ public partial class MainWindow : Window
             return;
         }
         if (!closeApproved && !EditorPane.MayClose()) { e.Cancel = true; return; }
-        if (!closeApproved) SaveLoggerSettings();
+        if (!closeApproved)
+        {
+            SaveLoggerSettings();
+            if (offlineConnectionFactory is null) SaveAdapterSelection();
+        }
         closeApproved = true;
         EditorPane.PrepareHostClose();
         if (transport is null && !busy && diagnosticSession is null)

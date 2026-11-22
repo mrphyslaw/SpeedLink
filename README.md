@@ -4,18 +4,15 @@ Open-source ROM reading, data logging, engine diagnostics, ROM editing, and Gen 
 
 [![C# checks](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml/badge.svg)](https://github.com/mrphyslaw/SpeedLink/actions/workflows/checks-dotnet.yml)
 
-**[Download SpeedLink v0.8.0-alpha.17](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.17)** · A single Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.18](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.18)** · A single Windows EXE with the runtime included.
 
-**Watch the SpeedLink v0.8.0-alpha.17 walkthrough (3:46)** · Light mode with on-screen captions and no audio.
+**Watch the SpeedLink walkthrough (7:53)** · Light mode, on-screen captions, and seven chapters.
 
-https://github.com/user-attachments/assets/911b53ec-7566-461a-8953-11a22da34c56
+https://github.com/user-attachments/assets/220d0312-ad01-48b8-8138-2b1ac9145a07
 
-See the four top sections and shared adapter controls, engine diagnostics,
-two-pass verified backups, and the Gen 1 Flash & Recovery workflow. The editor
-uses a real L3M6EG000 bench ECU backup to demonstrate the green-low, red-high
-gradient, 3D graphs, docking, named workspaces, cell-color options, and assignable
-shortcuts. Logging and playback are included. ECU activity is simulated;
-no physical flashing is performed in the video. [Navigation guide](docs/NAVIGATION.md).
+Follow adapter setup and verified backups, map editing and comparison, live
+logging and replay, engine diagnostics, and Gen 1 flashing and recovery.
+The editor uses a genuine stock Mazda ROM. ECU sessions are simulated.
 
 Use **ECU**, **Editor**, **Logging**, and **Flash & Recovery** across the top. The shared adapter dropdown and Connect/Disconnect controls stay available in every section. ECU groups diagnostics, reading and saved backups; Logging groups live data and recordings; ROM information and integrity checks live under Editor. [Navigation guide](docs/NAVIGATION.md). The permanent File, Edit, View, Map, Tools and Help menus remain available. **Pin** the maps you want to keep side by side while you browse in a reusable pane. Use the **+** after the last workspace tab to save named layouts such as Fuel Tuning or Boost Control. Auto fit preserves readable text and uses available cell spacing. Replace the EXE and keep your existing `data` folder. See [changes](CHANGELOG.md), the [editor guide](docs/EDITOR.md) and [reporting problems](docs/TROUBLESHOOTING.md).
 
@@ -182,7 +179,9 @@ This screenshot uses a synthetic offline test; its timing is not a vehicle
 read-speed measurement. [Progress and result screenshots →](docs/DUMP_A_ROM.md#3-read-and-verify)
 
 Backups are saved in the `data` folder beside the EXE. Keep the whole backup
-folder, including its captures, manifest and journal.
+folder, including its captures, manifest and journal. Use **ECU → Saved backups**
+to find a backup by date and calibration, open its folder, or open a verified
+copy in the Editor.
 
 ## Log engine data
 
@@ -191,7 +190,7 @@ it to choose the logging profile and read the MAP sensor calibration. The curren
 logger supports [eleven defined ROMs](definitions/logging/All_ROM_Coverage.md).
 
 1. Connect the adapter and select **Connect** in the shared top bar. If you just read a ROM,
-   disconnect and reconnect before logging.
+   use **Reconnect to log** on the Live tab.
 2. Open **Logging → Live**, select **Load current ECU ROM…**, and choose that current ROM
    backup. Its calibration ID must match the connected ECU.
 3. Choose **Essentials** for a starting selection, or select the parameters you
@@ -200,11 +199,12 @@ logger supports [eleven defined ROMs](definitions/logging/All_ROM_Coverage.md).
    before choosing an AFR display unit.
 5. Leave **Record CSV** checked and select **Start logging**. Use the **Plot** column
    to choose up to six synchronized charts for logged parameters. The **Hz** column shows its measured sample rate;
-   **Polling → Max** collects data without a scan-rate delay. Numeric limits are optional; the **Hz** column shows achieved rates.
+   **Polling → Max** collects data without a scan-rate delay. Choose **Hide plots**
+   for more table space while keeping your recording selection.
 6. Select **Stop** to finish the recording. The healthy connection stays ready for
    **Start logging** again, with your ROM and selections retained. Each start creates
    a separate recording. Use **Open logs** to find them under `data/logs` beside the EXE.
-   Disconnect and reconnect before switching from logging to a ROM backup read.
+   Use **Reconnect for backup** on **ECU → Read backup** before reading a ROM after logging.
 
 Logging can run with the engine running. **ROM backup reads require the engine
 stopped.** Unknown ROMs can still be dumped; logging requires a supported profile.
@@ -213,10 +213,11 @@ See the [logger guide](docs/LOGGER.md) for setup, recordings and troubleshooting
 ## Review a recording
 
 1. Choose **Logging → Recordings**. No adapter is needed.
-2. Select **Open recording…** and choose the recording folder's `log.csv`.
+2. Select a saved session and choose **Open selected recording**. Use **Open CSV…**
+   to choose a recording from another folder.
 3. Select up to six parameters. Move the shared cursor or click a plot to inspect
-   readings, and use **Zoom** to focus on part of the recording. Missing data appears
-   as gaps; the viewer also shows sample ages and recorded rates.
+   readings on the elapsed-time ruler. Use **Zoom** to focus on part of the recording
+   and **Reset zoom** to return to the full run. Missing data appears as gaps.
 
 Keep the whole recording folder, including `responses.jsonl` and `session.json`,
 locally. Start troubleshooting with a [support ZIP](docs/TROUBLESHOOTING.md);

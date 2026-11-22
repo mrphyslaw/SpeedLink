@@ -14,6 +14,7 @@ internal sealed class ObdWorkspace : UserControl
     internal readonly Button ScanButton = new() { Content = "Read codes" }, ClearButton = new() { Content = "Clear codes…" },
         StopButton = new() { Content = "Stop" }, SaveButton = new() { Content = "Save report…" };
     private bool connectedHere;
+    private bool reconnectForScan;
     internal readonly TextBlock ConnectionText = new(), StatusText = new() { Text = "Select the shared adapter above and choose Connect & read codes. No ROM file is required." },
         SummaryText = new(), ServiceText = new(), FreezeText = new();
     internal readonly DataGrid CodesGrid = Grid(), ReadinessGrid = Grid(), FrameGrid = Grid();
@@ -29,7 +30,7 @@ internal sealed class ObdWorkspace : UserControl
         ScanButton.SetResourceReference(StyleProperty, "PrimaryButton");
         foreach (var button in new[] { ScanButton, ClearButton, StopButton, SaveButton }) actions.Children.Add(button);
         var reports = new Button { Content = "Open reports" }; reports.Click += (_, _) => OpenReportsRequested?.Invoke(); actions.Children.Add(reports);
-        ScanButton.Click += (_, _) => { if (connectedHere) ScanRequested?.Invoke(); else ConnectRequested?.Invoke(); }; ClearButton.Click += (_, _) => ClearRequested?.Invoke();
+        ScanButton.Click += (_, _) => { if (connectedHere && !reconnectForScan) ScanRequested?.Invoke(); else ConnectRequested?.Invoke(); }; ClearButton.Click += (_, _) => ClearRequested?.Invoke();
         StopButton.Click += (_, _) => StopRequested?.Invoke(); SaveButton.Click += (_, _) => SaveRequested?.Invoke();
         top.Children.Add(actions);
         StatusText.Margin = new(0, 0, 0, 8); top.Children.Add(StatusText);
@@ -60,13 +61,17 @@ internal sealed class ObdWorkspace : UserControl
     internal void SetAvailability(bool idle, bool connected, bool readSession, EcuIdentity? identity, bool canConnect = false)
     {
         connectedHere = connected;
-        ScanButton.Content = connected ? "Read codes" : "Connect & read codes";
-        ScanButton.IsEnabled = idle && (connected ? !readSession : canConnect);
+        reconnectForScan = connected && readSession;
+        ScanButton.Content = reconnectForScan ? "Reconnect & read codes" : connected ? "Read codes" : "Connect & read codes";
+        ScanButton.IsEnabled = idle && (connected || canConnect);
         ClearButton.IsEnabled = idle && connected && !readSession;
         StopButton.IsEnabled = !idle && connected; SaveButton.IsEnabled = idle && LastScan is not null;
         ConnectionText.Text = connected ? $"Connected · {identity?.Calibration ?? "Calibration unavailable"}" : "Adapter disconnected · use the shared adapter controls above.";
+        if (reconnectForScan) ConnectionText.Text += " · Reconnect after a ROM read to use diagnostics.";
         ConnectionText.ToolTip = identity?.Adapter;
-        ScanButton.ToolTip = ClearButton.ToolTip = readSession ? "Disconnect and reconnect after a ROM read before using OBD diagnostics." : "Use the connected engine ECU. Stop logging or other adapter operations first.";
+        const string idleEngine = "Use the connected engine ECU. Stop logging or other adapter operations first.";
+        ScanButton.ToolTip = readSession ? "Reconnect and read engine codes without leaving Diagnostics." : idleEngine;
+        ClearButton.ToolTip = readSession ? "Choose Reconnect & read codes before clearing codes." : idleEngine;
     }
     internal void ShowScan(ObdScan scan)
     {

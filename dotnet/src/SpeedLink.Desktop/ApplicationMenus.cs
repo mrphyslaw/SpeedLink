@@ -134,6 +134,7 @@ public partial class EditorWorkspace
         foreach (var item in menus[1].Items.OfType<MenuItem>().Take(3))
             item.SetBinding(IsEnabledProperty, new Binding(nameof(IsEnabled)) { Source = FitMapButton });
         MoveItems(menus[1], edit); MoveItems(menus[2], view);
+        edit.SubmenuOpened += (_, e) => { if (ReferenceEquals(e.Source, edit)) RefreshMapCommandState(); };
         view.SubmenuOpened += (_, e) => { if (ReferenceEquals(e.Source, view)) RefreshMapCommandState(); };
         EditorMenu.Visibility = Visibility.Collapsed;
         FitMapButton.Visibility = Visibility.Collapsed;
