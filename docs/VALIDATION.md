@@ -1,6 +1,6 @@
 # Alpha validation scope
 
-## Mazda CX-7 L37JEF000
+## Mazda CX-7 L37JEF000 · 0.8.0-alpha.19
 
 - The supplied CX-7 image matched the full calibration identity, boot fingerprint,
   and native checksum layout. The editor audit checked 25,729 cells and switch

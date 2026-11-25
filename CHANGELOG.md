@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.0-alpha.19
 
 - Add offline editing and checksum-verified exports for the Mazda CX-7 L37JEF000 ROM. The 892 bundled controls include the new in-gear and neutral idle targets indexed by coolant temperature.
 - Add two-pass ROM backup, flashing, and stock recovery for L37JEF000 using a verified original backup from the same ECU. Write and interrupted recovery passed offline with the reference image. Physical CX-7 testing is pending.
