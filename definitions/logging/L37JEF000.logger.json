@@ -1,0 +1,1906 @@
+{
+  "$schema": "logger-definition.schema.json",
+  "schemaVersion": 1,
+  "definitionVersion": "0.2.0",
+  "id": "mzr-disi-l37jef000",
+  "vehicle": "Mazda CX-7 2.3 DISI Turbo (2007 automatic, reported)",
+  "softwareIds": [
+    "L37JEF000"
+  ],
+  "referenceRomSha256": "402cff79702b9022839060460ed02472ce62e96a62d01f28e43a1b6bfb235a46",
+  "status": "ROM verified; live ECU validation pending",
+  "referenceRomProvenance": "Supplied complete reference image for a reported 2007 Mazda CX-7 2.3 DISI Turbo automatic. Factory provenance and individual vehicle identity are unverified.",
+  "protocol": {
+    "transport": "ISO15765",
+    "canBitrate": 500000,
+    "requestCanId": "0x7E0",
+    "responseCanId": "0x7E8",
+    "service": "0x22",
+    "positiveService": "0x62",
+    "identifierBytes": 2,
+    "byteOrder": "big",
+    "sessionPolicy": "normal_application_logging",
+    "sessionChanges": [],
+    "sessionAndSecurityAcceptance": "pending_ecu_test",
+    "negativeResponseValue": "unavailable",
+    "requireExactResponseLength": true,
+    "requireIdentifierEcho": true
+  },
+  "calibration": {
+    "sourcePolicy": "Read bindings from the matching ECU backup, or explicitly supply a measured sensor calibration.",
+    "referenceDefaultsAreNotVehicleConfirmation": true,
+    "parameters": {
+      "map_gain_kpa_per_v": 54.117647260427475,
+      "map_offset_kpa": 1.6469999551773071,
+      "stoichiometric_afr": null
+    },
+    "bindings": {
+      "map_gain_kpa_per_v": {
+        "operation": "product",
+        "sources": [
+          {
+            "offset": "0x0B2914",
+            "storage": "float32",
+            "byteOrder": "big"
+          },
+          {
+            "offset": "0x0B2918",
+            "storage": "float32",
+            "byteOrder": "big"
+          }
+        ]
+      },
+      "map_offset_kpa": {
+        "operation": "read",
+        "sources": [
+          {
+            "offset": "0x0B291C",
+            "storage": "float32",
+            "byteOrder": "big"
+          }
+        ]
+      }
+    },
+    "requiredForChannels": [
+      "manifold_absolute_pressure",
+      "boost_pressure"
+    ]
+  },
+  "queries": {
+    "1723": {
+      "requestHex": "221723",
+      "positiveHeaderHex": "621723",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B638",
+      "nativePayloadRam": "0xFFFF5819",
+      "descriptorSha256": "e3de9cca796aebec0bfa237737d5a9a180a1a1003266c7d1d27ed51c81452881"
+    },
+    "0900": {
+      "requestHex": "220900",
+      "positiveHeaderHex": "620900",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B470",
+      "nativePayloadRam": "0xFFFF584C",
+      "descriptorSha256": "b4ac79d33cf74e535aaf7c196cc6e2441a4362b6d7a79a055f7a915c98c7c863"
+    },
+    "16E1": {
+      "requestHex": "2216E1",
+      "positiveHeaderHex": "6216E1",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B644",
+      "nativePayloadRam": "0xFFFF581A",
+      "descriptorSha256": "c6a47d63e9be195b73292f1beabc71acd0da4558799fdd83b1addbc8211b3d5f"
+    },
+    "0034": {
+      "requestHex": "220034",
+      "positiveHeaderHex": "620034",
+      "dataBytes": 4,
+      "nativeDescriptorOffset": "0x04B374",
+      "nativePayloadRam": "0xFFFF5274",
+      "descriptorSha256": "b2260708ed684dfe729b8b8acf2e50fc54118c9ee1189c0d2de54a3984ca7cae"
+    },
+    "0044": {
+      "requestHex": "220044",
+      "positiveHeaderHex": "620044",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B3BC",
+      "nativePayloadRam": "0xFFFF528E",
+      "descriptorSha256": "1bec21a975e78a7f1f8d6402a7a63c7621900caf7f6320977c5ca897bb7ec32f"
+    },
+    "1752": {
+      "requestHex": "221752",
+      "positiveHeaderHex": "621752",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B4F4",
+      "nativePayloadRam": "0xFFFF6578",
+      "descriptorSha256": "e92937574ed78beda02ab02bfd6503fd03347f8ff93032e815cb92e61f7da168"
+    },
+    "1410": {
+      "requestHex": "221410",
+      "positiveHeaderHex": "621410",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B4E8",
+      "nativePayloadRam": "0xFFFF5870",
+      "descriptorSha256": "04cf48edf0c07acba109cc80e95032065a8a31e12d0ff72c3de16d6e14e75fe0"
+    },
+    "168B": {
+      "requestHex": "22168B",
+      "positiveHeaderHex": "62168B",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B650",
+      "nativePayloadRam": "0xFFFF581C",
+      "descriptorSha256": "8e4b37766f70db4e615f91306a20035e7a619e1aa6cdac2e486cfd621fed370e"
+    },
+    "0023": {
+      "requestHex": "220023",
+      "positiveHeaderHex": "620023",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B320",
+      "nativePayloadRam": "0xFFFF5284",
+      "descriptorSha256": "0a1d0490963204e4f679081acd7d2b85d72cb1c6ad88f196e40ea7635cc894bf"
+    },
+    "0007": {
+      "requestHex": "220007",
+      "positiveHeaderHex": "620007",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B26C",
+      "nativePayloadRam": "0xFFFF529D",
+      "descriptorSha256": "552261684479c7bf5d673517870ea7405a19f55027b3f22e29627480065e8e53"
+    },
+    "0015": {
+      "requestHex": "220015",
+      "positiveHeaderHex": "620015",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B2E4",
+      "nativePayloadRam": "0xFFFF5280",
+      "descriptorSha256": "b2bf0b078114409e92f27fce90c5043e50c8d6af6197015b54379e07e4e617cb"
+    },
+    "0006": {
+      "requestHex": "220006",
+      "positiveHeaderHex": "620006",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B260",
+      "nativePayloadRam": "0xFFFF529C",
+      "descriptorSha256": "957fa6565d09ecabf766e51851d227753737fe59ba0b4f217542dbe0042da341"
+    },
+    "163E": {
+      "requestHex": "22163E",
+      "positiveHeaderHex": "62163E",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B500",
+      "nativePayloadRam": "0xFFFF5896",
+      "descriptorSha256": "84c5b6e8def73ffd3902b0e6b61596476349ff4f27b7893c51e26caf563a4fa3"
+    },
+    "0043": {
+      "requestHex": "220043",
+      "positiveHeaderHex": "620043",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B3B0",
+      "nativePayloadRam": "0xFFFF528C",
+      "descriptorSha256": "b0590fe0fc41d5ccfa165592701716cdfae954e77ef0ca017e72a2d0df78343d"
+    },
+    "1340": {
+      "requestHex": "221340",
+      "positiveHeaderHex": "621340",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B4C4",
+      "nativePayloadRam": "0xFFFF57E1",
+      "descriptorSha256": "6faa62e997770cf9349fd44a35e182f355e2dfea02a569fab6aa50bf901e8f32"
+    },
+    "16CD": {
+      "requestHex": "2216CD",
+      "positiveHeaderHex": "6216CD",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B59C",
+      "nativePayloadRam": "0xFFFF589A",
+      "descriptorSha256": "3e184a44d13d44aa4fea7026ba27107bbde3b82d38eb667db95ff4a2149cc76c"
+    },
+    "0033": {
+      "requestHex": "220033",
+      "positiveHeaderHex": "620033",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B368",
+      "nativePayloadRam": "0xFFFF52AE",
+      "descriptorSha256": "483a5fa6e61908a7ed3c432e46bb64b17065b434f588d11116c59a60cfd09e38"
+    },
+    "003C": {
+      "requestHex": "22003C",
+      "positiveHeaderHex": "62003C",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B380",
+      "nativePayloadRam": "0xFFFF52C2",
+      "descriptorSha256": "67f081a8996dc9e68d8662d2cb197e55d164696bfa9c99883ca9f557b8bdba67"
+    },
+    "A211": {
+      "requestHex": "22A211",
+      "positiveHeaderHex": "62A211",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B7B8",
+      "nativePayloadRam": "0xFFFF5890",
+      "descriptorSha256": "5a877bcf5fd9f9be65ae3545909688edffb6f248b0312aa7bc6b3a3834b3e492"
+    },
+    "0042": {
+      "requestHex": "220042",
+      "positiveHeaderHex": "620042",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B3A4",
+      "nativePayloadRam": "0xFFFF528A",
+      "descriptorSha256": "905623cf7194bfde5d27e411d9e6a3151d720659c13eea3943c35980aa36ad2d"
+    },
+    "096E": {
+      "requestHex": "22096E",
+      "positiveHeaderHex": "62096E",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B56C",
+      "nativePayloadRam": "0xFFFF585C",
+      "descriptorSha256": "aec96489c355ed621a9febf5c0428e547474da905b97e77e154cce9d6900e26d"
+    },
+    "004C": {
+      "requestHex": "22004C",
+      "positiveHeaderHex": "62004C",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B404",
+      "nativePayloadRam": "0xFFFF52BB",
+      "descriptorSha256": "183b91b8b41706d429c7deef90ca1201c85ef72846122227ff8aeb5b67fdd2fa"
+    },
+    "0005": {
+      "requestHex": "220005",
+      "positiveHeaderHex": "620005",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B254",
+      "nativePayloadRam": "0xFFFF529B",
+      "descriptorSha256": "f43236abbae12a07e03ce492f514c062c12fd3f966cd9ed4191ba40937328cb6"
+    },
+    "000C": {
+      "requestHex": "22000C",
+      "positiveHeaderHex": "62000C",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B284",
+      "nativePayloadRam": "0xFFFF527A",
+      "descriptorSha256": "a2f65fba9a2a0e49a5d72026ce25c174aeda443b0120011d68efc3e511119e51"
+    },
+    "091F": {
+      "requestHex": "22091F",
+      "positiveHeaderHex": "62091F",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B5C0",
+      "nativePayloadRam": "0xFFFF5858",
+      "descriptorSha256": "1e1662efb636c2997b0218b173d637dfd8d7265bd13f57dd1638224832003554"
+    },
+    "000F": {
+      "requestHex": "22000F",
+      "positiveHeaderHex": "62000F",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B2A8",
+      "nativePayloadRam": "0xFFFF52A3",
+      "descriptorSha256": "180edbf62bf985dbd6daeebc08d4e3441c56075a144389ee5a5309b920fa7a08"
+    },
+    "0010": {
+      "requestHex": "220010",
+      "positiveHeaderHex": "620010",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B2B4",
+      "nativePayloadRam": "0xFFFF527C",
+      "descriptorSha256": "29aeb8df4ba3def97106a8d89f1e5d8d29140cbfbe28fe275203ee937db68125"
+    },
+    "1177": {
+      "requestHex": "221177",
+      "positiveHeaderHex": "621177",
+      "dataBytes": 2,
+      "nativeDescriptorOffset": "0x04B440",
+      "nativePayloadRam": "0xFFFF586E",
+      "descriptorSha256": "174c2e8fc5d06e5741dc3b1b6727e0dc092231e106a418bd986b21c64db6970b"
+    },
+    "0045": {
+      "requestHex": "220045",
+      "positiveHeaderHex": "620045",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B3C8",
+      "nativePayloadRam": "0xFFFF52B3",
+      "descriptorSha256": "cfcce038536747d022d7614f98644ed3709189b6d1c9ac13f6a9221bfa95c4e7"
+    },
+    "000D": {
+      "requestHex": "22000D",
+      "positiveHeaderHex": "62000D",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B290",
+      "nativePayloadRam": "0xFFFF52A1",
+      "descriptorSha256": "51c042b9072f852a03c0ab6c71b1290faa4ad251fc3e47fd9fb3c0035df70f4f"
+    },
+    "000E": {
+      "requestHex": "22000E",
+      "positiveHeaderHex": "62000E",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B29C",
+      "nativePayloadRam": "0xFFFF52A2",
+      "descriptorSha256": "a71993ab799a4d8c71062644285c3ac10cbadc8d397aee951e031b02902ca7bb"
+    },
+    "1746": {
+      "requestHex": "221746",
+      "positiveHeaderHex": "621746",
+      "dataBytes": 1,
+      "nativeDescriptorOffset": "0x04B620",
+      "nativePayloadRam": "0xFFFF57DA",
+      "descriptorSha256": "dc692701b03128c8e6be00fffea017c484ade32bf1f2cfbd3470824cab6271c8"
+    }
+  },
+  "channels": [
+    {
+      "id": "boost_air_temperature",
+      "name": "Boost air temperature",
+      "group": "Boost",
+      "unit": "degC",
+      "help": "Temperature of the charge air entering the engine.",
+      "nativeSourceRam": [
+        "0xFFFF535C"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "1723",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.625,
+        "offset": -40
+      },
+      "encodingRange": {
+        "minimum": -40.0,
+        "maximum": 119.375,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "boost_pressure",
+      "name": "Boost pressure",
+      "group": "Boost",
+      "unit": "kPa",
+      "help": "Manifold pressure above or below atmospheric pressure. Vacuum is negative.",
+      "nativeSourceRam": [],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": false,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": false,
+        "romInterfaceBasis": "verified_input_dependencies",
+        "nativeVectors": true
+      },
+      "kind": "calculated",
+      "calculation": {
+        "operation": "subtract",
+        "inputs": [
+          "manifold_absolute_pressure",
+          "barometric_pressure"
+        ],
+        "requireValidFreshInputs": true
+      }
+    },
+    {
+      "id": "manifold_absolute_pressure",
+      "name": "Intake manifold absolute pressure",
+      "group": "Boost",
+      "unit": "kPa",
+      "help": "Manifold pressure relative to vacuum, using the selected MAP calibration.",
+      "nativeSourceRam": [
+        "0xFFFF3EA4"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Confirm installed MAP sensor and matching gain/offset; compare key-on pressure to barometric pressure"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0900",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.0009765625,
+        "offset": 0,
+        "afterLinear": {
+          "operation": "calibrated_affine",
+          "gain": "map_gain_kpa_per_v",
+          "subtract": "map_offset_kpa"
+        }
+      }
+    },
+    {
+      "id": "map_sensor_voltage",
+      "name": "MAP sensor voltage",
+      "group": "Boost",
+      "unit": "V",
+      "help": "Voltage reported for the MAP sensor.",
+      "nativeSourceRam": [
+        "0xFFFF3EA4"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0900",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.0009765625,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 63.9990234375,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "wastegate_duty_cycle",
+      "name": "Wastegate control solenoid duty cycle",
+      "group": "Boost",
+      "unit": "percent",
+      "help": "Wastegate control command reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF697C"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "16E1",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.00152587890625,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 99.99847412109375,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "actual_lambda",
+      "name": "Actual equivalence/air to fuel ratio",
+      "group": "Fuel",
+      "unit": "lambda",
+      "help": "Measured mixture relative to stoichiometric. Set your fuel stoichiometry for AFR display.",
+      "nativeSourceRam": [
+        "0xFFFF5A70"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0034",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 3.0517578125e-05,
+        "offset": 0
+      },
+      "displayConversions": [
+        {
+          "unit": "AFR",
+          "operation": "multiply_parameter",
+          "parameter": "stoichiometric_afr",
+          "requireExplicitParameter": true
+        }
+      ],
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 1.999969482421875,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "desired_lambda",
+      "name": "Desired equivalence/air to fuel ratio",
+      "group": "Fuel",
+      "unit": "lambda",
+      "help": "Mixture requested by the ECU, relative to stoichiometric.",
+      "nativeSourceRam": [
+        "0xFFFF5A74"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0044",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 3.0517578125e-05,
+        "offset": 0
+      },
+      "displayConversions": [
+        {
+          "unit": "AFR",
+          "operation": "multiply_parameter",
+          "parameter": "stoichiometric_afr",
+          "requireExplicitParameter": true
+        }
+      ],
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 1.999969482421875,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "fuel_injection_amount",
+      "name": "Fuel injection amount",
+      "group": "Fuel",
+      "unit": "mg",
+      "help": "Calculated fuel quantity reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF4158"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "1752",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.030517578125,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 1999.969482421875,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "injection_pulsewidth",
+      "name": "Fuel injection pulse width",
+      "group": "Fuel",
+      "unit": "ms",
+      "help": "Injection pulsewidth calculated by the ECU for logging.",
+      "nativeSourceRam": [
+        "0xFFFF4158"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Compare with actual commanded injector timing; 1410 is computed from fuel quantity, density and a calibration coefficient"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "1410",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.008,
+        "offset": 0
+      },
+      "signalType": "calculated_logging_pulsewidth",
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 524.28,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "fuel_pressure_sensor_voltage",
+      "name": "Fuel pressure sensor voltage",
+      "group": "Fuel",
+      "unit": "V",
+      "help": "Voltage reported for the fuel pressure sensor.",
+      "nativeSourceRam": [
+        "0xFFFF3E9E"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "168B",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 7.629510948348211e-05,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "fuel_rail_pressure",
+      "name": "Fuel rail pressure",
+      "group": "Fuel",
+      "unit": "kPa",
+      "help": "Fuel rail pressure reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF6964"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Confirm pressure reference and sensor/command calibration on the ECU"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0023",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 10,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0,
+        "maximum": 655350,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "injector_duty_cycle",
+      "name": "Injector duty cycle",
+      "group": "Fuel",
+      "unit": "percent",
+      "help": "Calculated injection time as a percentage of a 360-degree engine revolution.",
+      "nativeSourceRam": [],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": false,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Confirm that the reported pulsewidth and360-degree convention describe the available DI injection window"
+        ],
+        "nativeEncoderApplicable": false,
+        "romInterfaceBasis": "verified_input_dependencies",
+        "nativeVectors": true
+      },
+      "kind": "calculated",
+      "calculation": {
+        "operation": "product_divide",
+        "inputs": [
+          "injection_pulsewidth",
+          "engine_rpm"
+        ],
+        "divisor": 600,
+        "crankWindowDegrees": 360,
+        "requireValidFreshInputs": true
+      }
+    },
+    {
+      "id": "long_term_fuel_trim",
+      "name": "Long term fuel trim",
+      "group": "Fuel",
+      "unit": "percent",
+      "help": "Learned fuel correction. Positive values add fuel.",
+      "nativeSourceRam": [
+        "0xFFFF48F8"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0007",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.78125,
+        "offset": -100
+      },
+      "encodingRange": {
+        "minimum": -100.0,
+        "maximum": 99.21875,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "narrowband_oxygen_voltage",
+      "name": "Narrow band oxygen sensor voltage",
+      "group": "Fuel",
+      "unit": "V",
+      "help": "Voltage from the narrowband oxygen sensor.",
+      "nativeSourceRam": [
+        "0xFFFF501C"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0015",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.005,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 1.2750000000000001,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "short_term_fuel_trim_primary",
+      "name": "Short term fuel trim (primary sensor)",
+      "group": "Fuel",
+      "unit": "percent",
+      "help": "Current fuel correction from the primary sensor.",
+      "nativeSourceRam": [
+        "0xFFFF4234"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0006",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.78125,
+        "offset": -100
+      },
+      "encodingRange": {
+        "minimum": -100.0,
+        "maximum": 99.21875,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "short_term_fuel_trim_secondary",
+      "name": "Short term fuel trim (secondary sensor)",
+      "group": "Fuel",
+      "unit": "percent",
+      "help": "Secondary-sensor fuel correction, displayed as a percentage.",
+      "nativeSourceRam": [
+        "0xFFFF4270"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Compare percent and fraction presentations with a known scanner; metadata unit-label discrepancy is documented"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "163E",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": true,
+        "multiplier": 0.01220703125,
+        "offset": 0
+      },
+      "displayConversions": [
+        {
+          "unit": "correction_fraction",
+          "operation": "linear",
+          "multiplier": 0.01,
+          "offset": 0
+        }
+      ],
+      "encodingRange": {
+        "minimum": -400.0,
+        "maximum": 399.98779296875,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "absolute_load",
+      "name": "Absolute load",
+      "group": "General",
+      "unit": "ratio",
+      "help": "Calculated engine load. A value of 1.0 represents 100 percent.",
+      "nativeSourceRam": [
+        "0xFFFF3F5C"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0043",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.00392156862745098,
+        "offset": 0
+      },
+      "displayConversions": [
+        {
+          "unit": "percent",
+          "operation": "linear",
+          "multiplier": 100,
+          "offset": 0
+        }
+      ],
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 257.0,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "accelerator_pedal_position",
+      "name": "Accelerator pedal position",
+      "group": "General",
+      "unit": "percent",
+      "help": "Accelerator pedal position reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF6BCC"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "1340",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.39369473279507883,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 100.3921568627451,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "actual_valve_timing",
+      "name": "Actual valve timing",
+      "group": "General",
+      "unit": "deg",
+      "help": "Intake cam timing reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF406C"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Check negative cam angles and whether angle is expressed in crank or cam degrees"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "16CD",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": true,
+        "multiplier": 0.0625,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": -2048.0,
+        "maximum": 2047.9375,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "barometric_pressure",
+      "name": "Barometric pressure",
+      "group": "General",
+      "unit": "kPa",
+      "help": "Atmospheric pressure reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF3E96"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0033",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0,
+        "maximum": 255,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "catalyst_temperature",
+      "name": "Catalyst temperature",
+      "group": "General",
+      "unit": "degC",
+      "help": "Catalyst temperature estimated by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF42BC"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "003C",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.1,
+        "offset": -40
+      },
+      "signalType": "modeled_temperature",
+      "encodingRange": {
+        "minimum": -40.0,
+        "maximum": 6513.5,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "clutch_switch",
+      "name": "Clutch pedal position",
+      "group": "General",
+      "unit": "state",
+      "help": "Clutch switch state reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF35F5"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Confirm switch polarity; do not treat switch state as pedal travel"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "A211",
+      "decode": {
+        "operation": "bit",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "mask": 1,
+        "labels": {
+          "0": "inactive",
+          "1": "active"
+        }
+      }
+    },
+    {
+      "id": "module_voltage",
+      "name": "Control module voltage",
+      "group": "General",
+      "unit": "V",
+      "help": "Supply voltage reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF4648"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0042",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.001,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 65.535,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "desired_engine_rpm",
+      "name": "Desired engine RPM",
+      "group": "General",
+      "unit": "rpm",
+      "help": "Engine speed requested by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF3F84"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "096E",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.25,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 16383.75,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "desired_throttle_position",
+      "name": "Desired throttle position",
+      "group": "General",
+      "unit": "percent",
+      "help": "Throttle command reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF52BC"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "004C",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.39215686274509803,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 100.0,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "coolant_temperature",
+      "name": "Engine coolant temperature",
+      "group": "General",
+      "unit": "degC",
+      "help": "Engine coolant temperature reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF3E84"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0005",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": -40
+      },
+      "encodingRange": {
+        "minimum": -40,
+        "maximum": 215,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "engine_rpm",
+      "name": "Engine RPM",
+      "group": "General",
+      "unit": "rpm",
+      "help": "Current engine speed.",
+      "nativeSourceRam": [
+        "0xFFFF3E50"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "000C",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.25,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 16383.75,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "fan_duty_cycle",
+      "name": "Fan duty cycle",
+      "group": "General",
+      "unit": "percent",
+      "help": "Radiator fan command reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF4DAC"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "091F",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.0030517578125,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 199.9969482421875,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "intake_air_temperature",
+      "name": "Intake air temperature",
+      "group": "General",
+      "unit": "degC",
+      "help": "Intake air temperature reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF3E86"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "000F",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": -40
+      },
+      "encodingRange": {
+        "minimum": -40,
+        "maximum": 215,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "mass_airflow",
+      "name": "Mass airflow",
+      "group": "General",
+      "unit": "g/s",
+      "help": "Airflow measured by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF3F10"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0010",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.01,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 655.35,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "maf_sensor_voltage",
+      "name": "Mass airflow sensor voltage",
+      "group": "General",
+      "unit": "V",
+      "help": "Voltage reported for the mass airflow sensor.",
+      "nativeSourceRam": [
+        "0xFFFF3E82"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "1177",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "multiplier": 0.000244140625,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 15.999755859375,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "neutral_switch",
+      "name": "Neutral gear status",
+      "group": "General",
+      "unit": "state",
+      "help": "Neutral switch state reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF35F4"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation",
+          "Confirm switch polarity; do not treat switch state as pedal travel"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "A211",
+      "decode": {
+        "operation": "bit",
+        "byteOffset": 0,
+        "byteLength": 2,
+        "signed": false,
+        "mask": 1024,
+        "labels": {
+          "0": "inactive",
+          "1": "active"
+        }
+      }
+    },
+    {
+      "id": "relative_throttle_position",
+      "name": "Relative throttle position",
+      "group": "General",
+      "unit": "percent",
+      "help": "Throttle position relative to the learned closed position.",
+      "nativeSourceRam": [
+        "0xFFFF6A86",
+        "0xFFFF105C"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "0045",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.39215686274509803,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 100.0,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "vehicle_speed",
+      "name": "Vehicle speed",
+      "group": "General",
+      "unit": "km/h",
+      "help": "Vehicle speed reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF46B4"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "000D",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 1,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0,
+        "maximum": 255,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "ignition_timing",
+      "name": "Ignition timing advance",
+      "group": "Ignition",
+      "unit": "deg",
+      "help": "Ignition advance reported by the ECU.",
+      "nativeSourceRam": [
+        "0xFFFF4974"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "000E",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.5,
+        "offset": -64
+      },
+      "encodingRange": {
+        "minimum": -64.0,
+        "maximum": 63.5,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    },
+    {
+      "id": "knock_retard",
+      "name": "Knock retard",
+      "group": "Ignition",
+      "unit": "deg",
+      "help": "Ignition timing removed by knock control.",
+      "nativeSourceRam": [
+        "0xFFFF4A54"
+      ],
+      "verification": {
+        "romInterface": true,
+        "nativeEncoder": true,
+        "definitionVectors": true,
+        "adapterBench": "not_tested_for_logger",
+        "ecu": "pending",
+        "ecuChecks": [
+          "Confirm live values and physical signal meaning",
+          "Confirm update rate and behavior during engine operation"
+        ],
+        "nativeEncoderApplicable": true,
+        "romInterfaceBasis": "native_descriptor_and_encoder",
+        "nativeVectors": true
+      },
+      "kind": "query",
+      "query": "1746",
+      "decode": {
+        "operation": "linear",
+        "byteOffset": 0,
+        "byteLength": 1,
+        "signed": false,
+        "multiplier": 0.3515625,
+        "offset": 0
+      },
+      "encodingRange": {
+        "minimum": 0.0,
+        "maximum": 89.6484375,
+        "atEncodingBoundary": "possibly_saturated_or_invalid; confirm ECU behavior"
+      }
+    }
+  ],
+  "codeFingerprints": [
+    {
+      "name": "native_query",
+      "ranges": [
+        {
+          "start": "0x09B1B8",
+          "length": 512
+        }
+      ],
+      "sha256": "3426028d7cf6d2b41f09670661b0242c814e6c7807552909729caa0852db1978"
+    },
+    {
+      "name": "standard_encoders",
+      "ranges": [
+        {
+          "start": "0x0B23BC",
+          "length": 1368
+        },
+        {
+          "start": "0x0B2920",
+          "length": 2000
+        }
+      ],
+      "sha256": "018bb722495ccde379e2ce300cd0bf1a6c30b103d143e6b24a01bca443ac7c31"
+    },
+    {
+      "name": "extended_encoders",
+      "ranges": [
+        {
+          "start": "0x0B00B8",
+          "length": 3384
+        }
+      ],
+      "sha256": "a73e3359485f3f5a6c03fef0b5e7893b755955a6c06e2e26d411578e12e98f23"
+    },
+    {
+      "name": "native_quantizers",
+      "ranges": [
+        {
+          "start": "0x090FBE",
+          "length": 374
+        }
+      ],
+      "sha256": "922a119684bda0adf6c0e0026f85d1e329dac132d888b05e4a5c0b129f1fe260"
+    },
+    {
+      "name": "diagnostic_records",
+      "ranges": [
+        {
+          "start": "0x04B254",
+          "length": 1392
+        }
+      ],
+      "sha256": "d484720f24885511f50c029899606b91536d81d8f44c9a23a563de122b653e34"
+    },
+    {
+      "name": "executed_helpers_1",
+      "ranges": [
+        {
+          "start": "0x091134",
+          "length": 16
+        },
+        {
+          "start": "0x0911BA",
+          "length": 10
+        },
+        {
+          "start": "0x0911CA",
+          "length": 8
+        },
+        {
+          "start": "0x0FE1A8",
+          "length": 16
+        },
+        {
+          "start": "0x0FE1BA",
+          "length": 4
+        },
+        {
+          "start": "0x0FE386",
+          "length": 10
+        },
+        {
+          "start": "0x0FE396",
+          "length": 174
+        },
+        {
+          "start": "0x0FE44E",
+          "length": 8
+        },
+        {
+          "start": "0x0FEC84",
+          "length": 10
+        },
+        {
+          "start": "0x0FEC92",
+          "length": 82
+        },
+        {
+          "start": "0x0FF676",
+          "length": 28
+        },
+        {
+          "start": "0x0FF694",
+          "length": 4
+        }
+      ],
+      "sha256": "fcc07e007d564770921ee1ddb7a0fe16d7e650f5df774415f29da0b00cc6c93d"
+    }
+  ],
+  "evidenceFile": "L37JEF000.evidence.json",
+  "validation": {
+    "romVerified": true,
+    "offlineVectorsPassed": true,
+    "loggerAdapterBenchTested": false,
+    "realEcuTested": false,
+    "nativeQueryChannelsChecked": 34,
+    "calculatedChannelsChecked": 2,
+    "distinctNativeRequests": 32,
+    "nativeVectorsPassed": 284,
+    "independentScalarChecks": 224
+  },
+  "sources": [
+    {
+      "role": "published tuning definition and display metadata",
+      "definition": "L37JEF000.xml",
+      "sha256": "389a2daf01c38ab5948eedbecb1034fb4a89e157557f846dd73c1e2f7640b20a",
+      "url": "https://github.com/mrphyslaw/MazdaSpeedDefs/blob/cf704700e7060e0df24b114a473d4c22f8c021f7/L37JEF000.xml"
+    },
+    {
+      "role": "independent native analysis",
+      "romSha256": "402cff79702b9022839060460ed02472ce62e96a62d01f28e43a1b6bfb235a46"
+    }
+  ],
+  "unavailableChannels": [
+    {
+      "id": "desired_fuel_rail_pressure",
+      "name": "Desired fuel rail pressure",
+      "reason": "Identifier absent from this ROM",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "ambient_air_temperature",
+      "name": "Ambient air temperature",
+      "reason": "Inactive native lookup; no active encoder established",
+      "ecu": "not_offered_by_this_profile"
+    }
+  ]
+}

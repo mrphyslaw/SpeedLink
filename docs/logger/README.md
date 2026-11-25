@@ -1,7 +1,7 @@
 # SpeedLink logger
 
 Choose engine parameters, watch live values and record a CSV for later review.
-The logger supports ten Gen 1 profiles with 33–38 parameters each, plus the
+The logger supports eleven Gen 1 profiles with 33–38 parameters each, plus the
 experimental L3CGEE000 Gen 2 profile with 20. Reader/logger adapter paths include
 Vgate vLinker FS USB and Tactrix Openport 2.0, with Mongoose-Plus ISO/CAN3
 available for experimental testing. The logger uses the stock ROM interface.
@@ -53,6 +53,9 @@ See the [full logger guide](../LOGGER.md) for adapter setup, units, rates,
 recording files and troubleshooting. Check [profile coverage](../../definitions/logging/All_ROM_Coverage.md)
 before connecting an ECU. Unknown ROMs can still be dumped, but logging requires
 a supported profile.
+
+The Mazda CX-7 L37JEF000 offers 36 parameters and uses the MAP calibration from
+its current ECU backup. Physical CX-7 logger testing is pending.
 
 [Documentation index](../README.md) · [ROM editor](../editor/README.md) · [Download SpeedLink](https://github.com/mrphyslaw/SpeedLink/releases)
 

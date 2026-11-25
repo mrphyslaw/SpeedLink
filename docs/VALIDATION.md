@@ -1,6 +1,6 @@
 # Alpha validation scope
 
-## L37JEF000 editor support
+## Mazda CX-7 L37JEF000
 
 - The supplied CX-7 image matched the full calibration identity, boot fingerprint,
   and native checksum layout. The editor audit checked 25,729 cells and switch
@@ -8,6 +8,26 @@
 - The audit verified that no-edit exports reproduce the original bytes, edits
   stay within the selected control, and saves correct and verify the checksum.
   The original file stayed intact. This coverage is offline.
+- Offline replay verified application identity and RPM replies. The original ROM
+  read handler returned two byte-identical 1 MiB captures over 530 requests.
+  Startup replay selected the application for a complete image and the retained
+  boot server for an incomplete image.
+- The programming handler matched the checked L35HEH000 handler byte for byte.
+  The L37JEF000 replay returned its positive download acknowledgement
+  `0x0FF9` and accepted 256 blocks of 3,968 bytes from `0x008000` through
+  `0x0FFFFF`. Writing retained the original first 32 KiB.
+- The original startup routine selected recovery after an interrupted write with
+  one acknowledged block. The original loader reproduced the entire stock image
+  and the next startup selected the application. Both SpeedLink readbacks matched
+  in the simulated workflow. Physical CX-7 backup, write and recovery testing is pending.
+- Offline logger validation checked the original ROM's 36 parameters across 32
+  enhanced identifiers. The audit produced 284 native decode and calculation
+  vectors, 224 independent numeric checks, and 325 legal Mode 01 alias orders and
+  subsets. Batching the five verified aliases gives 28 requests per all-channel
+  scan. The profile uses its own MAP calibration from the current ECU backup.
+  Desired fuel rail pressure and ambient air temperature are unavailable.
+  Physical CX-7 adapter acceptance, sensor accuracy, and rates are pending.
+  [Logger coverage](../definitions/logging/All_ROM_Coverage.md)
 
 ## Workflow usability · 0.8.0-alpha.18
 

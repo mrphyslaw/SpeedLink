@@ -24,7 +24,7 @@ reopened for file inspection with size and SHA-256 checks.
 | L3M7EF000 | Mazdaspeed6 / Mazda 6 MPS | 0x03F000 | 0x0FFFF4 |
 | L35HEH000 | Mazda3 MPS | 0x048000 | 0x048000 |
 | L33XEH000 | Mazdaspeed3 / Axela | 0x048000 | 0x048000 |
-| L37JEF000 | Mazda CX-7 2.3 DISI Turbo (2007 automatic, reported), editor only | 0x048000 | 0x048000 |
+| L37JEF000 | Mazda CX-7 2.3 DISI Turbo (2007 automatic, reported) | 0x048000 | 0x048000 |
 | L3CGEE000 | Mazdaspeed3 / Mazda3 MPS (Gen 2) | Native code sum with split ranges | 0x03FFC0 |
 
 These layouts correspond to the published or locally prepared MazdaSpeedDefs
@@ -34,9 +34,11 @@ checksum is not guessed. Read success does not require a passing known-ROM check
 
 ## Stock-ROM logging
 
-The eleven Mazdaspeed/MPS layouts have logger profiles. The CX-7 L37JEF000
-definition is for offline editing only. L38KEG000, L38KEH000 and the three
-L39S variants have 38 parameters; L3M7EF000, L33XEH000 and L3P4EM000 have 35; L35HEH000 has 36.
+All twelve layouts have logger profiles. L38KEG000, L38KEH000 and the three
+L39S variants have 38 parameters. L3M7EF000, L33XEH000 and L3P4EM000 have 35.
+L35HEH000 and the CX-7 L37JEF000 have 36.
+L37JEF000 uses its own MAP calibration from the current ECU backup. Desired fuel
+rail pressure and ambient air temperature are unavailable for this profile.
 L3M6EG000 offers 33 parameters across 30 enhanced identifiers, with five baseline
 parameters unavailable. Standard batching can reduce all-channel polling to 26 requests per scan.
 L3CGEE000 offers 20 parameters; see [Gen 2 coverage and integrity limits](GEN2.md).
@@ -51,9 +53,10 @@ remain to be checked. [Logger performance](LOGGER_PERFORMANCE.md)
 
 ## Flashing and recovery
 
-The ten **Gen 1 Mazdaspeed/MPS** layouts in the table support writing and stock
-recovery with the bundled definition and a verified original backup from the same
-ECU. The CX-7 L37JEF000 is an editor-only profile.
+Eleven **Gen 1** layouts in the table support writing and stock recovery with the
+bundled definition and a verified original backup from the same ECU. They include
+ten Mazdaspeed/MPS layouts and the Mazda CX-7 L37JEF000. CX-7 backup, write, and
+recovery paths have offline coverage. Physical CX-7 testing is pending.
 L3CGEE000 is Gen 2. Gen 2 flashing is planned for an upcoming release.
 [Flashing and recovery guide](FLASHING.md)
 

@@ -56,4 +56,7 @@ help text and display labels. All 892 controls retain the upstream storage, scal
 axes, and switch settings.
 The editor checks its complete calibration identity, boot fingerprint and program
 signature. Exports correct the established checksum word at `0x048000` and
-verify the durable copy. This profile supports offline editing.
+verify the durable copy. The app also supports verified backups, flashing and
+stock recovery for this calibration. See the [flashing guide](../../docs/FLASHING.md).
+The separate [logger profile](../logging/All_ROM_Coverage.md) provides 36 stock
+parameters and binds MAP calibration from the current ECU backup.

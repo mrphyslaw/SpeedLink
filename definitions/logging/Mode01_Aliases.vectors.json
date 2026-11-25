@@ -318,6 +318,37 @@
           "instructions": 5631
         }
       ]
+    },
+    {
+      "calibration": "L37JEF000",
+      "romSha256": "402cff79702b9022839060460ed02472ce62e96a62d01f28e43a1b6bfb235a46",
+      "cases": [
+        {
+          "requestHex": "010c430e1023",
+          "responseHex": "410c0c3743436e0e0e10103b23234e",
+          "instructions": 5631
+        },
+        {
+          "requestHex": "010c43",
+          "responseHex": "410c0c3743436e",
+          "instructions": 2350
+        },
+        {
+          "requestHex": "010e10",
+          "responseHex": "410e0e10103b",
+          "instructions": 2337
+        },
+        {
+          "requestHex": "0123",
+          "responseHex": "4123234e",
+          "instructions": 1252
+        },
+        {
+          "requestHex": "0123100e430c",
+          "responseHex": "4123234e10103b0e0e43436e0c0c37",
+          "instructions": 5631
+        }
+      ]
     }
   ]
 }

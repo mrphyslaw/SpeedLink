@@ -8,8 +8,6 @@ namespace SpeedLink.Tests;
 public sealed class DefinitionImportTests
 {
     public static IEnumerable<object[]> Profiles => RomInspector.KnownProfiles.Select(p => new object[] { p.Calibration });
-    public static IEnumerable<object[]> LoggerProfiles => LoggerDefinition.Known.SelectMany(p => p.SoftwareIds)
-        .Select(calibration => new object[] { calibration });
     private static string WriteEditor(TempFolder folder, string calibration, Action<XDocument>? change = null)
     {
         var xml = XDocument.Parse(Encoding.UTF8.GetString(DefinitionLibrary.BundledBytes(DefinitionKind.Editor, calibration)));
@@ -27,7 +25,6 @@ public sealed class DefinitionImportTests
     {
         using var folder = new TempFolder(); string installed = Path.Combine(folder.Path, "installed"); var library = new DefinitionLibrary(installed);
         var original = library.Load(); var profile = Fixture.Profiles.Single(p => p.Calibration == calibration); byte[] input = Fixture.Image(profile);
-        Assert.Equal(!profile.EditorOnly, original.Entries.Any(e => e.Kind == DefinitionKind.Logger && e.Calibration == calibration));
         var open = new RomEditor(input, Path.Combine(folder.Path, "source.bin"), Fixture.Inspector(), Fixture.TuningGuard, original.Editors);
         var candidate = library.Preview(WriteEditor(folder, calibration)); library.Install(candidate, null);
         var loaded = new DefinitionLibrary(installed).Load(); Assert.Equal(original.Entries.Count, loaded.Entries.Count);
@@ -42,7 +39,7 @@ public sealed class DefinitionImportTests
         Assert.False(library.Load().Entries.Single(e => e.Kind == DefinitionKind.Editor && e.Calibration == calibration).Imported);
         Assert.Equal("import-test", editor.Definition.Version);
     }
-    [Theory, MemberData(nameof(LoggerProfiles))]
+    [Theory, MemberData(nameof(Profiles))]
     public void LoggerImportOverridesDecoderAndPreservesBundledFallback(string calibration)
     {
         using var folder = new TempFolder(); var library = new DefinitionLibrary(Path.Combine(folder.Path, "installed"));

@@ -13,7 +13,6 @@ public sealed record RomProfile(string Calibration, string Model, int IdentityOf
     int? LoopAddress, int? LoopSize, string? LoopSha256)
 {
     public string Family { get; init; } = "Gen1";
-    public bool EditorOnly { get; init; }
     public int BootLength { get; init; } = 0x8000;
     public RomRange[]? BootDataRanges { get; init; }
     public RomRange[]? SumRanges { get; init; }

@@ -102,10 +102,9 @@ public partial class MainWindow : Window
             ? "Choose Reconnect for backup to start a new read session."
             : "Read and verify two matching copies of the ECU ROM.";
         RefreshReadConnection(idle);
-        var readProfiles = ReadProtocol.IdentifyProfiles(identity?.Calibration);
-        bool useSelectedReadFamily = readProfiles.Length == 0 || readProfiles is [{ EditorOnly: true }];
-        if (!useSelectedReadFamily && readProfiles.Length == 1) ReadFamilyBox.SelectedIndex = readProfiles[0].Family == "Gen2" ? 1 : 0;
-        ReadFamilyBox.IsEnabled = idle && useSelectedReadFamily;
+        var readProfiles = RomInspector.KnownProfiles.Where(p => RomInspector.MatchesCalibrationId(p, identity?.Calibration)).ToArray();
+        if (readProfiles.Length == 1) ReadFamilyBox.SelectedIndex = readProfiles[0].Family == "Gen2" ? 1 : 0;
+        ReadFamilyBox.IsEnabled = idle && readProfiles.Length == 0;
         StopButton.IsEnabled = busy;
         OpenRomButton.IsEnabled = idle;
         CorrectButton.IsEnabled = idle && inspection?.CanCorrectChecksum == true;

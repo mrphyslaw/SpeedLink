@@ -1,7 +1,8 @@
 # Importing definitions
 
-SpeedLink includes twelve editor definitions and eleven logger profiles. The
-Mazda CX-7 L37JEF000 definition is for offline editing only.
+SpeedLink includes twelve editor definitions and twelve logger profiles. The
+Mazda CX-7 L37JEF000 logger uses the MAP calibration in the current matching ECU
+backup. Read, write, and recovery workflows are built into the app.
 You can install definition updates without replacing the EXE.
 
 1. Disconnect the adapter and finish any active operation.

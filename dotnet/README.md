@@ -7,7 +7,7 @@ Connect a Vgate vLinker FS USB or Tactrix Openport 2.0 and select it in the adap
 A definition is not required to dump a ROM. Two matching full 1 MiB reads are required before a verified backup is sealed. Original captures, manifest and durable journal are retained in the `data` folder beside the executable. Keep the whole backup folder.
 
 **Editor** opens twelve bundled layouts for offline editing, including the
-experimental Gen 2 L3CGEE000 profile and the editor-only Mazda CX-7 L37JEF000.
+experimental Gen 2 L3CGEE000 profile and the Mazda CX-7 L37JEF000.
 **ROM checks → Inspect ROM…** opens known or unknown complete 1 MiB images for
 inspection. Known layouts have guarded checks and separate checksum-corrected-copy
 export; unknown layouts have no guessed checksum. Vehicle match and factory
@@ -18,7 +18,9 @@ Install the manufacturer's Windows driver and close other diagnostic apps before
 The vLinker temporarily uses 2000000 baud during reads and restores 115200 on a clean disconnect. After reconnecting USB, start with 115200. If the app was interrupted while the adapter stayed connected, select 2000000 to reconnect. Baud selection is explicit; the port is never probed automatically. Tactrix uses its J2534 driver and needs no serial baud selection. Both adapters use 500 kbit/s CAN.
 
 The standalone programming smoke test uses generated ECU replies. The public
-programming workflow accepts the ten supported Gen 1 Mazdaspeed/MPS layouts.
+programming workflow accepts eleven Gen 1 layouts, including the Mazda CX-7
+L37JEF000. The CX-7 backup, write and recovery paths have offline coverage.
+Physical CX-7 testing is pending.
 [Flashing guide](../docs/FLASHING.md)
 
 Mongoose-Plus ISO/CAN3 is experimental for reading, logging, and Gen 1 flashing
@@ -26,10 +28,11 @@ and recovery. Select its registered 32-bit J2534 04.04 driver. A user reported a
 successful dump. Logging and programming still need physical qualification.
 See the [adapter testing guide](../docs/ADAPTERS.md).
 
-The **Logger** workspace provides 33–38 parameters for each of the ten Gen 1
+The **Logger** workspace provides 33–38 parameters for each of the eleven Gen 1
 profiles and 20 for L3CGEE000 Gen 2. It shows measured host sample rates and
 supports selectable units, up to six synchronized plots and CSV recording.
 Load the ECU's current matching ROM backup for MAP calibration.
+The CX-7 L37JEF000 provides 36 parameters and uses its own MAP binding.
 Live ECU calibration identity must match. See the [logger guide](../docs/LOGGER.md).
 ROM reads require an engine-stopped connection; logging uses the normal application
 session and can run with the engine running. Read-only query and recording

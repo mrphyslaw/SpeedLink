@@ -39,11 +39,14 @@ does not establish the ECU's internal sensor/calculation update rate.
   It does not shorten the response timeout or resend the ECU request. Missing,
   truncated, mismatched or malformed replies stop the session.
 - Read-only standard batches combine byte-equivalent RPM, absolute-load, spark,
-  MAF and fuel-pressure data on ten independently checked Gen 1 layouts.
+  MAF and fuel-pressure data on eleven independently checked Gen 1 layouts.
   Enhanced channels, MAP voltage/calibration and numeric precision are retained.
   Gen 2 keeps its separately established enhanced-identifier path. A completed
   unsupported-batch rejection selects individual queries on the next scheduled
   scan; uncertain exchanges stop without fallback or resend.
+  The CX-7 L37JEF000 can combine all five aliases to poll 36 parameters in
+  28 requests per scan. That count comes from the offline request plan.
+  Physical CX-7 logging rates are pending.
 - A bounded display handoff separates polling and recording from screen redraws.
   Display refresh does not cap acquisition. A delayed screen can discard old
   display updates while recordings retain the captured frames. Values become

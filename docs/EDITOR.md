@@ -328,10 +328,11 @@ rejecting other program changes. Patched/extended layouts are unsupported.
 Recognizing a calibration does not prove factory provenance or vehicle fit.
 Unknown images can still be dumped with the reader and inspected in **Editor → ROM information**.
 
-**L37JEF000** is an editor-only profile for the reported 2007 Mazda CX-7 2.3 DISI
-Turbo automatic. SpeedLink checks the full calibration, boot fingerprint and
+**L37JEF000** matches the reported 2007 Mazda CX-7 2.3 DISI Turbo automatic.
+SpeedLink checks the full calibration, boot fingerprint and
 guarded program layout, then automatically corrects the checksum word at
-`0x048000` and verifies the saved copy. See the [ROM compatibility list](SUPPORTED_ROMS.md).
+`0x048000` and verifies the saved copy. Use the same ECU's verified original
+backup if you intend to flash a modified copy. [Flashing guide](FLASHING.md)
 Under **Idle**, the **Idle RPM Target - In Gear** and **Idle RPM Target - Neutral**
 maps use current coolant temperature and coolant temperature at startup.
 

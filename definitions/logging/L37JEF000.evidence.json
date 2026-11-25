@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "calibration": "L37JEF000",
+  "romSha256": "402cff79702b9022839060460ed02472ce62e96a62d01f28e43a1b6bfb235a46",
+  "channels": 36,
+  "distinctRequests": 32,
+  "nativeVectors": 284,
+  "independentScalarChecks": 224,
+  "instructionSteps": 367572,
+  "executedInstructionWords": 1875,
+  "realEcuTested": false,
+  "loggerAdapterBenchTested": false,
+  "excludedChannels": [
+    {
+      "id": "desired_fuel_rail_pressure",
+      "name": "Desired fuel rail pressure",
+      "reason": "Identifier absent from this ROM",
+      "ecu": "not_offered_by_this_profile"
+    },
+    {
+      "id": "ambient_air_temperature",
+      "name": "Ambient air temperature",
+      "reason": "Inactive native lookup; no active encoder established",
+      "ecu": "not_offered_by_this_profile"
+    }
+  ],
+  "sourceRomUnchanged": true,
+  "scope": "Original bounded encoders and descriptor copy paths with synthetic RAM; bitmap refresh and unrelated capture/status paths held out. No peripheral, scheduler or physical ECU validation.",
+  "csharpVectorsPassed": true,
+  "offlineDesktopWorkflowsPassed": [
+    "record-stop",
+    "connection-failure",
+    "identity-change"
+  ]
+}

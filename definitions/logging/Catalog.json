@@ -87,6 +87,18 @@
       "realEcuTested": false
     },
     {
+      "calibration": "L37JEF000",
+      "vehicle": "Mazda CX-7 2.3 DISI Turbo (2007 automatic, reported)",
+      "profileFile": "L37JEF000.logger.json",
+      "channels": 36,
+      "queries": 32,
+      "unavailable": 2,
+      "vectors": 284,
+      "romSha256": "402cff79702b9022839060460ed02472ce62e96a62d01f28e43a1b6bfb235a46",
+      "definitionSha256": "58e3dcefcdcae2053729236267d9ca6121f2ee7feea3d4dbf6eb57b5217fbedf",
+      "realEcuTested": false
+    },
+    {
       "calibration": "L33XEH000",
       "vehicle": "Mazdaspeed3 / Axela",
       "profileFile": "L33XEH000.logger.json",

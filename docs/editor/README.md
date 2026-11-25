@@ -2,8 +2,8 @@
 
 An offline editor for twelve stock ROM layouts, built into the same Windows app
 as the reader and logger. No adapter is needed to edit a file. The
-[flashing workflow](../FLASHING.md) supports ten Gen 1 Mazdaspeed/MPS ROMs. The CX-7
-L37JEF000 profile supports offline editing. The experimental Gen 2
+[flashing workflow](../FLASHING.md) supports eleven Gen 1 ROMs, including the
+Mazda CX-7 L37JEF000. The experimental Gen 2
 L3CGEE000 profile has separate [integrity checks and validation limits](../GEN2.md).
 
 ## Find your way around

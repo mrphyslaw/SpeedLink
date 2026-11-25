@@ -57,8 +57,7 @@
     ],
     "LoopAddress": 799664,
     "LoopSize": 64,
-    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c",
-    "EditorOnly": true
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c"
   },
   {
     "Calibration": "L39SED000",

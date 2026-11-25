@@ -52,7 +52,8 @@ with baud rates. See [connection troubleshooting](USAGE.md) if reconnecting fail
 
 ## 3. Read and verify
 
-Known ROMs select their protocol automatically. For an unknown Gen 2 ECU, choose
+Known ROMs select their protocol automatically. The Mazda CX-7 L37JEF000 uses
+the Gen 1 protocol. For an unknown Gen 2 ECU, choose
 **Gen 2 read protocol (experimental)** from **Read protocol** on **ECU → Read backup**. Other unknown ROMs default
 to Gen 1; confirm the ECU family before reading. See the [Gen 2 guide](GEN2.md).
 

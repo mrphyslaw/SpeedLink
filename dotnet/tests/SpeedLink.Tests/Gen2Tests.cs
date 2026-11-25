@@ -41,7 +41,7 @@ public sealed class Gen2Tests
     {
         Assert.Throws<TransportException>(() => ReadProtocol.For(new("test", "fixture", null, "L3CGEE000 L38KEH000")));
         Assert.Throws<TransportException>(() => ReadProtocol.For(new("test", "fixture", null, "L3CGEE000 L37JEF000")));
-        Assert.Equal(ReadFamily.Gen2, ReadProtocol.For(new("test", "fixture", null, "L37JEF000"), ReadFamily.Gen2).Family);
+        Assert.Equal(ReadFamily.Gen1, ReadProtocol.For(new("test", "fixture", null, "L37JEF000"), ReadFamily.Gen2).Family);
         var unknown = new EcuIdentity("test", "fixture", null, "L3CGEE000L3T9999");
         Assert.Null(LoggerDefinition.ForCalibration(unknown.Calibration));
         Assert.Equal(ReadFamily.Gen2, ReadProtocol.For(unknown, ReadFamily.Gen2).Family);

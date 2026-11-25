@@ -42,7 +42,7 @@ public sealed class BenchFlashPlan
         Image = image.ToArray(); Baseline = backup.Data.ToArray(); BackupPath = Path.GetFullPath(backupPath);
         Inspector = inspector;
         Profile = inspector.ProfileFor(Baseline) ?? throw new InvalidDataException("The backup has no known ROM profile.");
-        if (Profile.EditorOnly || Profile.Family != "Gen1" || Profile.BootLength != Start || Profile.CorrectionAddress < Start)
+        if (Profile.Family != "Gen1" || Profile.BootLength != Start || Profile.CorrectionAddress < Start)
             throw new InvalidDataException("Programming is limited to the supported Gen 1 ROM layout.");
         var definition = TuningDefinition.Known.SingleOrDefault(d => d.Calibration == Profile.Calibration && d.Identity == Profile.Identity)
             ?? throw new InvalidDataException("A complete bundled definition is required for this calibration.");
@@ -169,7 +169,7 @@ public sealed class BenchFlashWorkflow
     // Hardware access is limited to the profiles with a verified native command path.
     private static readonly Dictionary<string, ushort> NativeWriterProfiles = new(StringComparer.Ordinal)
     {
-        ["L33XEH000"] = 0x0FFF, ["L35HEH000"] = 0x0FF9, ["L38KEH000"] = 0x0FFF, ["L38KEG000"] = 0x0FFF,
+        ["L33XEH000"] = 0x0FFF, ["L35HEH000"] = 0x0FF9, ["L37JEF000"] = 0x0FF9, ["L38KEH000"] = 0x0FFF, ["L38KEG000"] = 0x0FFF,
         ["L39SED000"] = 0x0FF9, ["L39SEE000"] = 0x0FFF, ["L39SEF000"] = 0x0FF9,
         ["L3M6EG000"] = 0x0FFF, ["L3M7EF000"] = 0x0FFF, ["L3P4EM000"] = 0x0FFF
     };
