@@ -15,11 +15,11 @@ public sealed class RomEditorTests
     [Fact]
     public void DefinitionsAreCompleteAndNaturallySorted()
     {
-        Assert.Equal(11, TuningDefinition.Known.Count);
-        Assert.Equal(9300, TuningDefinition.Known.Sum(d => d.Tables.Count));
+        Assert.Equal(12, TuningDefinition.Known.Count);
+        Assert.Equal(10192, TuningDefinition.Known.Sum(d => d.Tables.Count));
         foreach (var d in TuningDefinition.Known)
         {
-            Assert.Equal(d.Calibration switch { "L3CGEE000" => 450, "L3M6EG000" or "L3M7EF000" => 865, "L3P4EM000" => 897, _ => 889 }, d.Tables.Count);
+            Assert.Equal(d.Calibration switch { "L3CGEE000" => 450, "L3M6EG000" or "L3M7EF000" => 865, "L3P4EM000" => 897, "L37JEF000" => 892, _ => 889 }, d.Tables.Count);
             Assert.All(d.Tables, t => { Assert.Equal(t.Columns, t.X.Values.Length); Assert.Equal(t.Rows, t.Y.Values.Length); Assert.InRange(t.End, 0x8000, RomInspector.RomSize - 2); });
             foreach (var group in d.Tables.GroupBy(t => t.Category)) Assert.Equal(group.OrderBy(t => t.Name, NaturalOrder.Instance), group);
         }

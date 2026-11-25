@@ -60,11 +60,11 @@ public class BenchFlashTests
     private static BenchFlashPlan SimPlan(string image, string backup) => BenchFlashPlan.LoadSimulation(image, backup, Fixture.Inspector(), Fixture.TuningGuard);
     private static BenchRecoveryPlan SimRecovery(string journal, string backup) => BenchRecoveryPlan.LoadSimulation(journal, backup, Fixture.Inspector(), Fixture.TuningGuard);
     [Fact]
-    public void flash_allowlist_covers_all_bundled_gen1_definitions_and_rejects_gen2()
+    public void flash_allowlist_covers_supported_gen1_definitions()
     {
         var bundled = TuningDefinition.Known.Select(definition => Fixture.Profiles.Single(profile =>
             profile.Calibration == definition.Calibration && profile.Identity == definition.Identity)).ToArray();
-        Assert.Equal(10, bundled.Count(profile => profile.Family == "Gen1"));
+        Assert.Equal(11, bundled.Count(profile => profile.Family == "Gen1"));
         Assert.All(bundled, profile => Assert.Equal(profile.Family == "Gen1",
             BenchFlashWorkflow.IsNativeWriterVerified(profile.Calibration)));
 
@@ -160,7 +160,7 @@ public class BenchFlashTests
     }
 
     [Theory]
-    [InlineData("L33XEH000")] [InlineData("L35HEH000")] [InlineData("L38KEH000")] [InlineData("L38KEG000")]
+    [InlineData("L33XEH000")] [InlineData("L35HEH000")] [InlineData("L37JEF000")] [InlineData("L38KEH000")] [InlineData("L38KEG000")]
     [InlineData("L39SED000")] [InlineData("L39SEE000")] [InlineData("L39SEF000")]
     [InlineData("L3M6EG000")] [InlineData("L3M7EF000")] [InlineData("L3P4EM000")]
     public void all_gen1_profiles_support_per_ecu_binding_edit_flash_and_recovery_in_simulation(string calibration)
@@ -176,9 +176,13 @@ public class BenchFlashTests
         var peer = new PeerState(original)
         {
             ReportedCalibration = profile.Identity, Vehicle = chassis,
-            DownloadLimitLowByte = calibration is "L35HEH000" or "L39SED000" or "L39SEF000" ? (byte)0xF9 : (byte)0xFF
+            DownloadLimitLowByte = calibration is "L35HEH000" or "L37JEF000" or "L39SED000" or "L39SEF000" ? (byte)0xF9 : (byte)0xFF
         };
-        var backup = TestBackup(temp.Path, original, calibration, chassis);
+        string backup;
+        using (var reader = peer.Open())
+            backup = Fixture.Reader().ReadBackup(reader, ReadWorkflow.Identify(reader), temp.Path, unknownFamily: ReadFamily.Gen2).Path;
+        Assert.Equal(original, File.ReadAllBytes(backup));
+        Assert.Equal(530, peer.Requests.Count(request => request[0] == 0x23));
         var editor = new RomEditor(original, backup, Fixture.Inspector(), Fixture.TuningGuard);
         editor.Apply([new CellEdit(table, 0, 7900)], "Synthetic write matrix");
         string edited = Path.Combine(temp.Path, "edited.bin");

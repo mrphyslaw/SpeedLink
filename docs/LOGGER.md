@@ -2,7 +2,7 @@
 
 For a visual tour, see the [logger overview and screenshots](logger/README.md).
 
-The logger covers ten Gen 1 ROMs with 33–38 parameters, plus experimental Gen 2
+The logger covers eleven Gen 1 ROMs with 33–38 parameters, plus experimental Gen 2
 L3CGEE000 with 20. It uses the factory application's read-identifier interface
 with stock ROMs. The encoders and offline conversions have been checked.
 
@@ -194,6 +194,16 @@ L3P4EM000 adds 35 parameters checked against its own ROM handlers and MAP
 calibration bindings. Its live ECU logging, rates and adapter acceptance still
 need testing. Desired fuel rail pressure, fuel injection amount and ambient air
 temperature are excluded from this profile.
+
+## Mazda CX-7 L37JEF000 stock interface
+
+L37JEF000 offers 36 parameters across 32 enhanced identifiers. When all five
+verified standard aliases are batched, the all-channel plan uses 28 requests per
+scan. Load the backup from the current ECU to use this profile's own MAP
+calibration. Desired fuel rail pressure and ambient air temperature are
+unavailable. Native decoding and calculations passed offline. Physical CX-7
+adapter acceptance and logging rates are pending.
+[Per-ROM coverage](../definitions/logging/All_ROM_Coverage.md)
 
 ## Experimental Gen 2 logger
 

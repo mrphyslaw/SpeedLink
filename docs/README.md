@@ -22,7 +22,7 @@ flashing and recovery. Gen 2 flashing is planned for an upcoming release.
 | [Supported ROMs](SUPPORTED_ROMS.md) | Known inspection layouts and compatibility limits |
 | [Adapter status and testing candidates](ADAPTERS.md) | Qualified adapter paths, planned hardware and the test checklist |
 | [Definition import](DEFINITIONS.md) | Import editor/logger updates, persistence and bundled fallback |
-| [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all eleven profiles |
+| [Logger coverage](../definitions/logging/All_ROM_Coverage.md) | Included and excluded parameters across all twelve profiles |
 
 The app includes Getting started, Editor, Tuning, Logger, Gen 1 flashing, and Report a problem guides under **Help**.
 **Help → Editor guide** opens the editing guide; **Map info** / F1 explains

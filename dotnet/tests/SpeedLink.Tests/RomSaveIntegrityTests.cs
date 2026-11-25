@@ -17,7 +17,7 @@ public sealed class RomSaveIntegrityTests
         {
             "L3CGEE000" => 0x4000,
             "L3M6EG000" or "L3M7EF000" => 0x3F000,
-            "L33XEH000" or "L35HEH000" or "L38KEH000" or "L38KEG000" or "L39SED000" or "L39SEE000" or "L39SEF000" or "L3P4EM000" => 0x48000,
+            "L33XEH000" or "L35HEH000" or "L37JEF000" or "L38KEH000" or "L38KEG000" or "L39SED000" or "L39SEE000" or "L39SEF000" or "L3P4EM000" => 0x48000,
             _ => throw new InvalidDataException("Establish an independent checksum range for the new ROM profile.")
         };
         Assert.Equal(first, profile.ChecksumStart);
@@ -41,6 +41,7 @@ public sealed class RomSaveIntegrityTests
     [Theory]
     [InlineData("L33XEH000", 0xd008, 0xcf98, 0xd220, 0xd1b0)]
     [InlineData("L35HEH000", 0xd008, 0xcf98, 0xd220, 0xd1b0)]
+    [InlineData("L37JEF000", 0xd004, 0xcf94, 0xd21c, 0xd1ac)]
     [InlineData("L38KEH000", 0xce40, 0xcdd0, 0xd058, 0xcfe8)]
     [InlineData("L38KEG000", 0xce40, 0xcdd0, 0xd058, 0xcfe8)]
     [InlineData("L39SED000", 0xd060, 0xcff0, 0xd278, 0xd208)]

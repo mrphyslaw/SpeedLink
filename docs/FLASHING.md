@@ -1,8 +1,10 @@
 # Gen 1 flashing and recovery
 
-SpeedLink supports writing and stock recovery for all ten bundled **Gen 1**
-ROM layouts. **Gen 2 flashing is planned for an upcoming release** and remains
-disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
+SpeedLink supports writing and stock recovery for eleven **Gen 1** ROM layouts,
+including ten Mazdaspeed/MPS layouts and the Mazda CX-7 L37JEF000. The CX-7
+uses the same verified backup, writing, and recovery workflow described below.
+**Gen 2 flashing is planned for an upcoming release** and remains disabled in
+this build. See the [supported ROM list](SUPPORTED_ROMS.md) and
 [adapter matrix](ADAPTERS.md) before starting.
 
 ## Before writing
@@ -101,7 +103,10 @@ identifiers. Keep them private when reporting a problem.
 
 ## Validation scope
 
-The ten layouts were checked in native-handler replay and simulated workflows.
+All eleven layouts have offline programming coverage. For the CX-7 L37JEF000,
+offline checks used the original reference image and covered backup, writing
+and exact stock recovery after a modeled interruption. Physical CX-7 testing
+is pending.
 Uninterrupted stock and edited writes were verified on one L3M6EG000 bench ECU
 with both adapters. A controlled interruption after one acknowledged block and
 stock restore were exercised on that same ECU with Tactrix. Mongoose

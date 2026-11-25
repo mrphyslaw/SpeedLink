@@ -4,9 +4,9 @@ SpeedLink is an open-source Windows tool for backing up, editing, and logging
 Mazdaspeed and Mazda MPS ECUs. It also reads and clears engine fault codes
 and supports flashing and recovery for compatible Gen 1 ECUs.
 
-**[Download SpeedLink v0.8.0-alpha.18](https://github.com/mrphyslaw/SpeedLink/releases/download/v0.8.0-alpha.18/SpeedLink.exe)** · A portable Windows EXE with the runtime included.
+**[Download SpeedLink v0.8.0-alpha.19](https://github.com/mrphyslaw/SpeedLink/releases/download/v0.8.0-alpha.19/SpeedLink.exe)** · A portable Windows EXE with the runtime included.
 
-[Release notes](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.18) · [All releases](https://github.com/mrphyslaw/SpeedLink/releases)
+[Release notes](https://github.com/mrphyslaw/SpeedLink/releases/tag/v0.8.0-alpha.19) · [All releases](https://github.com/mrphyslaw/SpeedLink/releases)
 
 ## Compatibility
 
@@ -14,6 +14,7 @@ and supports flashing and recovery for compatible Gen 1 ECUs.
 | --- | --- |
 | **Gen 1 Mazdaspeed3, Mazdaspeed6, and Mazda MPS** | Ten bundled ROM layouts support editing, stock ECU logging, flashing, and recovery. Flashing requires a verified original backup from the same ECU. |
 | **Gen 2 Mazdaspeed3 / Mazda3 MPS** | The **L3CGEE000** profile supports experimental editing and logging. Compatible Gen 2 ROMs can be read. Gen 2 flashing is planned. |
+| **Mazda CX-7 2.3 DISI Turbo (2007 automatic, reported)** | **L37JEF000** supports verified backups, editing, stock ECU logging with 36 parameters, flashing, and stock recovery. Use a verified original backup from the same ECU for flashing. Physical CX-7 testing is pending. |
 | **Unknown compatible 1 MiB MZR DISI ROMs** | Select the appropriate read protocol to capture and verify a backup. Editing and logging require matching profiles. |
 
 Check your calibration against the [supported ROM list](docs/SUPPORTED_ROMS.md).

@@ -55,9 +55,9 @@ after a ROM read before using diagnostics.
    ROM-specific checksum/integrity checks. The original and existing files are preserved.
 
 Drag the table/preview divider to resize it. **Map → Fit entire map** restores automatic
-sizing; Ctrl+B hides or restores the browser. Editing requires one of the eleven
-supported stock program layouts. Static axes are read-only; extended/patched
-layouts are unsupported.
+sizing. Ctrl+B hides or restores the browser. Editing requires one of the twelve
+[supported stock program layouts](SUPPORTED_ROMS.md). Static axes are read-only
+and extended or patched layouts are unsupported.
 
 Use **Help → Editor guide** for the complete included guide, or see the
 [editor guide](EDITOR.md) and [screenshots](editor/README.md) on GitHub.
@@ -71,6 +71,7 @@ Use **Help → Editor guide** for the complete included guide, or see the
 3. Select **Vgate vLinker FS** and its COM port, or **Tactrix Openport 2.0**
    and its installed J2534 driver. See the adapter notes below.
 4. Choose **Connect** in the top bar. Known ROMs select their read protocol automatically.
+   The Mazda CX-7 L37JEF000 uses the Gen 1 read protocol.
    For an unknown Gen 2 calibration, select **Gen 2 read protocol (experimental)**
    under **ECU → Read backup**. Choose **Read & verify backup** and leave the ignition
    on and adapter connected through both passes.
@@ -112,7 +113,7 @@ connection ready for another Start. The current ROM, selections, units and plots
 stay selected. Disconnect and reconnect when switching between ROM reading and
 logging, or after a connection error.
 
-The logger supports ten Gen 1 profiles with 33–38 parameters each, plus the
+The logger supports eleven Gen 1 profiles with 33–38 parameters each, plus the
 experimental L3CGEE000 Gen 2 profile with 20. Logging can run with the engine
 running; ROM reads require it stopped. The **Hz** column
 shows measured host sample rates. Leave **Polling** on **Max** for the fastest
@@ -120,6 +121,11 @@ completed-reply polling; numeric limits are optional. Physical readings and
 achievable running-engine rates still require vehicle validation. Read-only start/stop and query acceptance
 on one L3M6EG000 bench ECU passed through vLinker FS and Tactrix. See the [logger guide](LOGGER.md) for units, plots and
 unavailable data, plus [measured bench performance](LOGGER_PERFORMANCE.md).
+
+For the CX-7 L37JEF000, load the current ECU backup to use its profile-specific
+MAP calibration. This profile offers 36 parameters. Desired fuel rail pressure
+and ambient air temperature are unavailable. Physical CX-7 logging and rate
+tests are pending.
 
 Choose **Logging → Recordings → Open recording…** to review a SpeedLink `log.csv` without
 an adapter. Logs live under `data/logs` beside the EXE. Keep the complete folder,

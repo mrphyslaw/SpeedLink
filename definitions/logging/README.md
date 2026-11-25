@@ -1,11 +1,12 @@
 # Stock-ROM logger definitions
 
-The catalog now covers **ten ROMs with tuning definitions**: nine Gen 1 profiles with
-33–38 parameters, plus L3CGEE000 Gen 2 with 20. See [per-ROM coverage and exclusions](All_ROM_Coverage.md),
+The catalog covers **twelve ROMs with tuning definitions**. Eleven Gen 1 profiles
+offer 33–38 parameters each, plus L3CGEE000 Gen 2 with 20. See [per-ROM coverage and exclusions](All_ROM_Coverage.md),
 [channel coverage](All_ROM_Coverage.csv), and the
 [live ECU checklist](All_ROM_ECU_Checklist.csv). `Catalog.json` inventories the
 profiles. Every profile has its own requests, MAP bindings, code guards, native
-vectors and evidence. All 346 included ROM/channel combinations need ECU testing.
+vectors and evidence. Physical sensor accuracy and running-engine rates remain
+to be checked for the 420 included ROM/channel combinations.
 
 `LoggerDefinition.Known` exposes the embedded catalog;
 `LoggerDefinition.ForCalibration` selects a unique live calibration ID;
@@ -16,8 +17,8 @@ still be dumped by the reader. No ROM files are bundled.
 The application can overlay imported `*.logger.json` updates through **Definitions**.
 See [definition import](../../docs/DEFINITIONS.md) for file selection and compatibility limits.
 
-`Mode01_Aliases.vectors.json` adds 45 synthetic original-handler cases across
-the nine Gen 1 profiles. The five standard aliases have byte-identical payloads
+`Mode01_Aliases.vectors.json` contains 55 curated original-handler cases across
+the eleven Gen 1 profiles. The five standard aliases have byte-identical payloads
 to their enhanced identifiers; batching changes request count, not the existing
 scales or precision. Gen 2 is excluded. Completed unsupported-batch rejections
 use the individual path on the next scan; uncertain exchanges stop. See
