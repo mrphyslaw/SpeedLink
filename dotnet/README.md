@@ -6,8 +6,8 @@ Connect a Vgate vLinker FS USB or Tactrix Openport 2.0 and select it in the adap
 
 A definition is not required to dump a ROM. Two matching full 1 MiB reads are required before a verified backup is sealed. Original captures, manifest and durable journal are retained in the `data` folder beside the executable. Keep the whole backup folder.
 
-**Editor** opens all eleven bundled layouts for offline editing, including the
-experimental Gen 2 L3CGEE000 profile.
+**Editor** opens twelve bundled layouts for offline editing, including the
+experimental Gen 2 L3CGEE000 profile and the editor-only Mazda CX-7 L37JEF000.
 **ROM checks → Inspect ROM…** opens known or unknown complete 1 MiB images for
 inspection. Known layouts have guarded checks and separate checksum-corrected-copy
 export; unknown layouts have no guessed checksum. Vehicle match and factory
@@ -18,7 +18,7 @@ Install the manufacturer's Windows driver and close other diagnostic apps before
 The vLinker temporarily uses 2000000 baud during reads and restores 115200 on a clean disconnect. After reconnecting USB, start with 115200. If the app was interrupted while the adapter stayed connected, select 2000000 to reconnect. Baud selection is explicit; the port is never probed automatically. Tactrix uses its J2534 driver and needs no serial baud selection. Both adapters use 500 kbit/s CAN.
 
 The standalone programming smoke test uses generated ECU replies. The public
-programming workflow accepts only the ten bundled Gen 1 layouts.
+programming workflow accepts the ten supported Gen 1 Mazdaspeed/MPS layouts.
 [Flashing guide](../docs/FLASHING.md)
 
 Mongoose-Plus ISO/CAN3 is experimental for reading, logging, and Gen 1 flashing
@@ -45,7 +45,7 @@ and rescans. [Guide](../docs/DIAGNOSTICS.md)
 
 ## Offline ROM editing
 
-Open **Editor**. The eleven bundled tuning
+Open **Editor**. The twelve bundled tuning
 definitions provide grid editing, 2D curves, rotatable 3D surfaces, comparison,
 selection arithmetic, clipboard, interpolation and undo/redo. Single values use
 a dedicated value/state card; small grids and previews stay proportional to the

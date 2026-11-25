@@ -97,7 +97,7 @@ internal sealed class FlashBackupLibrary(string dataFolder, string sourcesFolder
                     Field(saved, "vin") != identity.Vin || Field(saved, "chassisId") != identity.ChassisId)
                     return null;
                 string? calibration = Field(saved, "calibration");
-                if (!RomInspector.KnownProfiles.Any(p => p.Family == "Gen1" &&
+                if (!RomInspector.KnownProfiles.Any(p => BenchFlashWorkflow.IsNativeWriterVerified(p.Calibration) &&
                     (p.Identity == calibration || p.Calibration == calibration) &&
                     (p.Identity == identity.Calibration || p.Calibration == identity.Calibration)))
                     return null;

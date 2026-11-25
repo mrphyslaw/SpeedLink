@@ -1,5 +1,14 @@
 # Alpha validation scope
 
+## L37JEF000 editor support
+
+- The supplied CX-7 image matched the full calibration identity, boot fingerprint,
+  and native checksum layout. The editor audit checked 25,729 cells and switch
+  bits across 892 controls, including both new idle target maps.
+- The audit verified that no-edit exports reproduce the original bytes, edits
+  stay within the selected control, and saves correct and verify the checksum.
+  The original file stayed intact. This coverage is offline.
+
 ## Workflow usability · 0.8.0-alpha.18
 
 - Simulated desktop workflows cover adapter selection and reconnect, backup browsing and opening, per-map comparisons, and the Save copy, Discard, and Cancel paths. ROM-save integrity remains required for all eleven profiles.

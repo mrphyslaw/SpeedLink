@@ -60,18 +60,22 @@ public class BenchFlashTests
     private static BenchFlashPlan SimPlan(string image, string backup) => BenchFlashPlan.LoadSimulation(image, backup, Fixture.Inspector(), Fixture.TuningGuard);
     private static BenchRecoveryPlan SimRecovery(string journal, string backup) => BenchRecoveryPlan.LoadSimulation(journal, backup, Fixture.Inspector(), Fixture.TuningGuard);
     [Fact]
-    public void flash_allowlist_covers_all_bundled_gen1_definitions_and_rejects_gen2()
+    public void flash_allowlist_covers_supported_gen1_definitions()
     {
         var bundled = TuningDefinition.Known.Select(definition => Fixture.Profiles.Single(profile =>
             profile.Calibration == definition.Calibration && profile.Identity == definition.Identity)).ToArray();
-        Assert.Equal(10, bundled.Count(profile => profile.Family == "Gen1"));
-        Assert.All(bundled, profile => Assert.Equal(profile.Family == "Gen1",
+        Assert.Equal(10, bundled.Count(profile => profile.Family == "Gen1" && !profile.EditorOnly));
+        Assert.All(bundled, profile => Assert.Equal(profile.Family == "Gen1" && !profile.EditorOnly,
             BenchFlashWorkflow.IsNativeWriterVerified(profile.Calibration)));
 
         using var temp = new TempFolder();
         var gen2 = bundled.Single(profile => profile.Family == "Gen2");
         string backup = TestBackup(temp.Path, Fixture.Image(gen2), gen2.Identity, Chassis);
         Assert.Throws<InvalidDataException>(() => SimPlan(backup, backup));
+        var editorOnly = bundled.Single(profile => profile.Calibration == "L37JEF000");
+        Assert.True(editorOnly.EditorOnly);
+        string editorBackup = TestBackup(temp.Path, Fixture.Image(editorOnly), editorOnly.Identity, Chassis);
+        Assert.Throws<InvalidDataException>(() => SimPlan(editorBackup, editorBackup));
 
         var simulated = Plan(temp);
         bool opened = false;

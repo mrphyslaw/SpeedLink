@@ -55,9 +55,9 @@ after a ROM read before using diagnostics.
    ROM-specific checksum/integrity checks. The original and existing files are preserved.
 
 Drag the table/preview divider to resize it. **Map → Fit entire map** restores automatic
-sizing; Ctrl+B hides or restores the browser. Editing requires one of the eleven
-supported stock program layouts. Static axes are read-only; extended/patched
-layouts are unsupported.
+sizing. Ctrl+B hides or restores the browser. Editing requires one of the twelve
+[supported stock program layouts](SUPPORTED_ROMS.md). Static axes are read-only
+and extended or patched layouts are unsupported.
 
 Use **Help → Editor guide** for the complete included guide, or see the
 [editor guide](EDITOR.md) and [screenshots](editor/README.md) on GitHub.

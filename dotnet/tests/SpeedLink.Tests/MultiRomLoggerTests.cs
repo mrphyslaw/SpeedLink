@@ -57,7 +57,8 @@ public class MultiRomLoggerTests
         using var document = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "LoggerDefinitions", "Catalog.json")));
         var expected = Profiles.Select(row => (string)row[0]).Order().ToArray();
         Assert.Equal(expected, LoggerDefinition.Known.SelectMany(p => p.SoftwareIds).Order().ToArray());
-        Assert.Equal(expected, RomInspector.KnownProfiles.Select(p => p.Calibration).Order().ToArray());
+        Assert.Equal(expected, RomInspector.KnownProfiles.Where(p => !p.EditorOnly).Select(p => p.Calibration).Order().ToArray());
+        Assert.Null(LoggerDefinition.ForCalibration("L37JEF000L3T6061"));
         Assert.Equal(2929, Profiles.Sum(row => (int)row[3]));
         Assert.Equal(384, LoggerDefinition.Known.Sum(p => p.ChannelIds.Count));
         Assert.Equal(38, LoggerDefinition.Known.Sum(p => p.UnavailableChannels.Count));

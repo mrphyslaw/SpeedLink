@@ -1,6 +1,9 @@
 # Logger ROM coverage
 
-All eleven ROMs with local tuning definitions have a logger profile. Each profile uses its own identifier records, MAP calibration locations and code guards. The existing 38-channel baseline was checked separately in every image.
+SpeedLink includes eleven logger profiles. The Mazda CX-7 L37JEF000 profile is
+editor only. Each logger profile uses its own identifier records, MAP calibration
+locations and code guards. The existing 38-channel baseline was checked
+separately in every image.
 
 | ROM | Parameters | Distinct enhanced identifiers | Excluded baseline parameters | Native vectors |
 | --- | ---: | ---: | ---: | ---: |

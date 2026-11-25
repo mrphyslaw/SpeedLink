@@ -319,13 +319,21 @@ be undone as one edit.
 
 ## Compatible files and definition updates
 
-Supported stock layouts: **L33XEH000, L35HEH000, L38KEH000, L38KEG000, L39SED000,
-L39SEE000, L39SEF000, L3M6EG000, L3M7EF000 and L3P4EM000**. Opening requires a complete 1 MiB image
-with matching calibration, boot, checksum layout and program-area signature.
+The bundled profiles cover **L33XEH000, L35HEH000, L37JEF000, L38KEH000, L38KEG000,
+L39SED000, L39SEE000, L39SEF000, L3M6EG000, L3M7EF000, L3P4EM000 and L3CGEE000**.
+Opening requires a complete 1 MiB image with matching calibration, boot, checksum
+layout and program-area signature.
 The program check allows defined tuning controls and checksum changes while
 rejecting other program changes. Patched/extended layouts are unsupported.
 Recognizing a calibration does not prove factory provenance or vehicle fit.
 Unknown images can still be dumped with the reader and inspected in **Editor → ROM information**.
+
+**L37JEF000** is an editor-only profile for the reported 2007 Mazda CX-7 2.3 DISI
+Turbo automatic. SpeedLink checks the full calibration, boot fingerprint and
+guarded program layout, then automatically corrects the checksum word at
+`0x048000` and verifies the saved copy. See the [ROM compatibility list](SUPPORTED_ROMS.md).
+Under **Idle**, the **Idle RPM Target - In Gear** and **Idle RPM Target - Neutral**
+maps use current coolant temperature and coolant temperature at startup.
 
 Use **Definitions → Import…** to install an editor XML update for a supported
 layout. Save open work before reopening the ROM to use it; importing does not

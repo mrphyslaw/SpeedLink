@@ -26,6 +26,41 @@
     "LoopSha256": null
   },
   {
+    "Calibration": "L37JEF000",
+    "Model": "Mazda CX-7 2.3 DISI Turbo",
+    "IdentityOffset": 191110,
+    "Identity": "L37JEF000L3T6061",
+    "BootSha256": "d2a164e330e677fea9342fb4b80a941b38fce18f06519587cceba312564f94b5",
+    "ChecksumStart": 294912,
+    "CorrectionAddress": 294912,
+    "LayoutWords": [
+      {
+        "Address": 294916,
+        "Value": 4294967295
+      },
+      {
+        "Address": 294920,
+        "Value": 2147241762
+      },
+      {
+        "Address": 800432,
+        "Value": 1520786085
+      },
+      {
+        "Address": 800484,
+        "Value": 1048576
+      },
+      {
+        "Address": 800496,
+        "Value": 294912
+      }
+    ],
+    "LoopAddress": 799664,
+    "LoopSize": 64,
+    "LoopSha256": "905e31471b165c156c9d7bffbbe1789256e8bf0ade616dc6c11204784297274c",
+    "EditorOnly": true
+  },
+  {
     "Calibration": "L39SED000",
     "Model": "Mazdaspeed3",
     "IdentityOffset": 191260,

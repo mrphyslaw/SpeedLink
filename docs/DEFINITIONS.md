@@ -1,6 +1,7 @@
 # Importing definitions
 
-SpeedLink includes editor and logger definitions for all eleven supported ROMs.
+SpeedLink includes twelve editor definitions and eleven logger profiles. The
+Mazda CX-7 L37JEF000 definition is for offline editing only.
 You can install definition updates without replacing the EXE.
 
 1. Disconnect the adapter and finish any active operation.

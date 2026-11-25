@@ -42,7 +42,7 @@ public sealed class BenchFlashPlan
         Image = image.ToArray(); Baseline = backup.Data.ToArray(); BackupPath = Path.GetFullPath(backupPath);
         Inspector = inspector;
         Profile = inspector.ProfileFor(Baseline) ?? throw new InvalidDataException("The backup has no known ROM profile.");
-        if (Profile.Family != "Gen1" || Profile.BootLength != Start || Profile.CorrectionAddress < Start)
+        if (Profile.EditorOnly || Profile.Family != "Gen1" || Profile.BootLength != Start || Profile.CorrectionAddress < Start)
             throw new InvalidDataException("Programming is limited to the supported Gen 1 ROM layout.");
         var definition = TuningDefinition.Known.SingleOrDefault(d => d.Calibration == Profile.Calibration && d.Identity == Profile.Identity)
             ?? throw new InvalidDataException("A complete bundled definition is required for this calibration.");

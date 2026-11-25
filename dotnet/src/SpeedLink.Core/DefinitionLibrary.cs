@@ -23,6 +23,7 @@ public sealed class DefinitionLibrary
         foreach (var kind in Enum.GetValues<DefinitionKind>())
             foreach (var profile in RomInspector.KnownProfiles)
             {
+                if (kind == DefinitionKind.Logger && profile.EditorOnly) continue;
                 string name = kind == DefinitionKind.Editor ? $"SpeedLink.Core.Tuning.{profile.Calibration}.xml" : $"SpeedLink.Core.Logging.{profile.Calibration}.logger.json";
                 using var input = assembly.GetManifestResourceStream(name) ?? throw new InvalidDataException("Bundled definition is missing.");
                 using var memory = new MemoryStream(); input.CopyTo(memory); result.Add((kind, profile.Calibration), memory.ToArray());
@@ -30,7 +31,9 @@ public sealed class DefinitionLibrary
         return result;
     });
     public DefinitionLibrary(string folder) => Folder = Path.GetFullPath(folder);
-    public static byte[] BundledBytes(DefinitionKind kind, string calibration) => (byte[])bundled.Value[(kind, calibration)].Clone();
+    public static byte[] BundledBytes(DefinitionKind kind, string calibration) =>
+        bundled.Value.TryGetValue((kind, calibration), out var bytes) ? (byte[])bytes.Clone() :
+        throw new InvalidDataException("No bundled definition of this type exists for the calibration.");
     private string FilePath(DefinitionKind kind, string calibration)
     {
         if (!RomInspector.KnownProfiles.Any(p => p.Calibration == calibration)) throw new InvalidDataException("This ROM layout needs application support before a definition can be imported.");

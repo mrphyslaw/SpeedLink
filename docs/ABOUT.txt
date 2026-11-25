@@ -17,7 +17,7 @@ Auto fit preserves text size and measured cell minimums; smaller panes scroll.
 Independent 85–150% map text zoom, selections and graph views.
 Per-calibration map layouts and detached-window positions restore on ROM open.
 Floating editor panels follow the active workspace; empty graphs stay hidden.
-Eleven tuning definitions, Fit map, floating panels, changes and undo/redo.
+Twelve tuning definitions, Fit map, floating panels, changes and undo/redo.
 Permanent application menus, labeled navigation, saved layouts and zoomable long MAF curves.
 Opening a ROM shows its maps; the Maps button restores the browser at any time.
 Compact wrapping value cards with units, Apply/Cancel, baseline and change.
@@ -44,6 +44,7 @@ Adapters: Vgate vLinker FS (USB), Tactrix Openport 2.0
 Experimental: Mongoose-Plus ISO/CAN3 reading, logging and Gen 1 programming.
 Stock-ROM logger: ten Gen 1 profiles with 33–38 parameters; Gen 2 with 20.
 L38KEG000: 889 editor controls, automatic checksum correction and 38 logging parameters.
+L37JEF000: Mazda CX-7 2.3 DISI Turbo editor-only profile with automatic checksum correction.
 L3M6EG000: 863 editor controls, mandatory checksum correction, 33 stock logger parameters.
 Per-ECU identification bytes preserved unchanged in ROM exports.
 Experimental Gen 2 L3CGEE000: 293 tuning entries, including six MAP controls, and 155 DTC reporting controls.
@@ -61,7 +62,7 @@ Verified standard batches retain stock Gen 1 precision; Gen 2 uses its own proto
 Both wired adapters passed sustained read-only logging on one L3M6EG000 bench ECU.
 Post-read reconnect guidance and recoverable display/recording input errors.
 Further ECU profiles, physical sensor accuracy and running-engine rates need validation.
-Flashing and stock recovery support all ten bundled Gen 1 ROM layouts.
+Flashing and stock recovery support ten Gen 1 Mazdaspeed/MPS ROM layouts.
 Gen 2 flashing is planned for an upcoming release.
 Flash & Recovery opens across the top. Help contains the flashing guide.
 Find verified backups by VIN or chassis ID and calibration, or by interrupted journal.

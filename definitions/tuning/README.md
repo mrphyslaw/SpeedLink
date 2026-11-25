@@ -1,6 +1,6 @@
 # Bundled tuning definitions
 
-These eleven XML files are SpeedLink snapshots of the MazdaSpeedDefs definitions,
+These twelve XML files are SpeedLink snapshots of the MazdaSpeedDefs definitions,
 incorporated under its MIT license (LICENSE in this folder). They
 are embedded into the executable. No ROM image or commercial software is bundled.
 
@@ -47,3 +47,13 @@ complete identity and boot fingerprint are checked before editing or writing.
 SpeedLink applies its existing L38KEH000 help, display labels and units to the
 matching L38KEG000 controls. Storage addresses, dimensions, scaling arithmetic,
 static breakpoints, switch values and checksum support follow the complete upstream XML.
+
+L37JEF000 is the complete Mazda CX-7 2.3 DISI Turbo editor definition from
+[cf70470](https://github.com/mrphyslaw/MazdaSpeedDefs/commit/cf704700e7060e0df24b114a473d4c22f8c021f7).
+It includes separate in-gear and neutral idle targets, each indexed by current
+coolant temperature and coolant temperature at startup. SpeedLink updates selected
+help text and display labels. All 892 controls retain the upstream storage, scaling,
+axes, and switch settings.
+The editor checks its complete calibration identity, boot fingerprint and program
+signature. Exports correct the established checksum word at `0x048000` and
+verify the durable copy. This profile supports offline editing.

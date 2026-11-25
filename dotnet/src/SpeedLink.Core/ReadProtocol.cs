@@ -9,9 +9,9 @@ public sealed record ReadProtocol(ReadFamily Family, byte Session, byte SeedLeve
 {
     public static ReadProtocol For(EcuIdentity identity, ReadFamily unknownFamily = ReadFamily.Gen1)
     {
-        var matches = RomInspector.KnownProfiles.Where(p => RomInspector.MatchesCalibrationId(p, identity.Calibration)).ToArray();
+        var matches = IdentifyProfiles(identity.Calibration);
         if (matches.Length > 1) throw new TransportException("Ambiguous ECU calibration; no read was started.");
-        var family = matches.Length == 1 ? matches[0].Family switch
+        var family = matches.Length == 1 && !matches[0].EditorOnly ? matches[0].Family switch
         {
             "Gen1" => ReadFamily.Gen1,
             "Gen2" => ReadFamily.Gen2,
@@ -24,6 +24,9 @@ public sealed record ReadProtocol(ReadFamily Family, byte Session, byte SeedLeve
             _ => throw new ArgumentOutOfRangeException(nameof(unknownFamily))
         };
     }
+
+    internal static RomProfile[] IdentifyProfiles(string? calibration) => RomInspector.KnownProfiles
+        .Where(profile => RomInspector.MatchesCalibrationId(profile, calibration)).ToArray();
 
     public byte[] ReadRequest(int address, int count)
     {

@@ -1,8 +1,9 @@
 # Gen 1 flashing and recovery
 
-SpeedLink supports writing and stock recovery for all ten bundled **Gen 1**
-ROM layouts. **Gen 2 flashing is planned for an upcoming release** and remains
-disabled in this build. See the [supported ROM list](SUPPORTED_ROMS.md) and the
+SpeedLink supports writing and stock recovery for ten **Gen 1 Mazdaspeed/MPS**
+ROM layouts. The Mazda CX-7 L37JEF000 profile is editor only.
+**Gen 2 flashing is planned for an upcoming release** and remains disabled in
+this build. See the [supported ROM list](SUPPORTED_ROMS.md) and
 [adapter matrix](ADAPTERS.md) before starting.
 
 ## Before writing

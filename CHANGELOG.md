@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add offline editing and checksum-verified exports for the Mazda CX-7 L37JEF000 ROM. The 892 bundled controls include the new in-gear and neutral idle targets indexed by coolant temperature.
+
 ## 0.8.0-alpha.18
 
 - Show the selected COM port or driver in the shared connection bar. Remember and recheck the adapter selection. Reconnect from Live logging, Read backup, or Diagnostics without switching sections.
