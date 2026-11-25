@@ -216,8 +216,8 @@
 - Require automatic checksum correction and verification on every editor export,
   with no opt-out. Enforce prepared-byte and durable-readback integrity checks.
   Gen 2 native code validation rejects invalid code without guessed repair.
-- Add an explicit contributor/agent requirement and mandatory save tests for every
-  supported ROM, including repeated edits, no-edit saves and invalid input.
+- Document the checksum requirements for contributors and require save tests for
+  every supported ROM, including repeated edits, no-edit saves, and invalid input.
 - ROM definitions, read/logging protocols and integrity policies are unchanged.
   ECU programming remains disabled; real ECU validation remains pending.
 

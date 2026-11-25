@@ -23,7 +23,7 @@ adapter or vehicle, and they must not silently skip when private files are absen
 Fixture boot hashes are patched only within tests. Production profile recognition
 must keep its independent pinned value.
 
-ROM-save integrity is a mandatory requirement; see [AGENTS.md](AGENTS.md).
+ROM-save integrity is mandatory. See [Saving a revision](docs/EDITOR.md#save-a-revision).
 Every editor ROM export must automatically receive its established checksum correction
 and pass verification before publication. There is no opt-out. Profiles with a
 verified validation-only policy must preserve valid native code and reject invalid

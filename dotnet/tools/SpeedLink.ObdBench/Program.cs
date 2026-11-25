@@ -13,7 +13,9 @@ try
     if(adapter=="vlinker") { var v=new VLinkerReadTransport(new FtdiSerialConnection(Get("--port"),115200)); link=v; v.Initialize(); }
     else if(adapter=="tactrix")
     {
-        var drivers=J2534Drivers.Discover().Where(d=>!d.Name.Contains("Codex",StringComparison.OrdinalIgnoreCase)).ToArray();
+        var drivers = J2534Drivers.Discover(J2534AdapterKind.Tactrix)
+            .Where(driver => string.Equals(Path.GetFileName(driver.LibraryPath), "op20pt32.dll", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
         if(drivers.Length!=1) throw new IOException("Select one physical Tactrix registration before testing.");
         var t=new J2534ReadTransport(new NativeJ2534Channel(drivers[0])); link=t; t.Initialize();
     }
